@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &398545258093009837
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 398545258093009843}
+  - component: {fileID: 398545258093009842}
+  - component: {fileID: 3164156876753556568}
+  m_Layer: 0
+  m_Name: LocalTurnSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &398545258093009843
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 398545258093009837}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &398545258093009842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 398545258093009837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad3faa1c58e38e24daad8cbe2f321aba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LocalTurnSystem: {fileID: 3164156876753556568}
+  pathToGame: 
+  initialized: 0
+--- !u!114 &3164156876753556568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 398545258093009837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea74de323b4c0994e953eafd8597046f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FirebaseTurnMangementNetworkBinder: {fileID: 398545258093009842}
+  MaxTurns: 6
+  MaxRounds: 3
+  RoundCounter:
+    value: 0
+  TurnCounter:
+    initialValue: 0
+    reactiveProperty:
+      value: 0
+  GameInitlized: 0
+  OtherPlayerID:
+    initialValue: -1
+    reactiveProperty:
+      value: -1
+  PlayerReady:
+    initialValue: 0
+    reactiveProperty:
+      value: 0
+  OtherPlayerReady:
+    initialValue: 0
+    reactiveProperty:
+      value: 0
+  FirstPlayer:
+    initialValue: -1
+    reactiveProperty:
+      value: -1
+  CurrentPlayerID:
+    initialValue: -1
+    reactiveProperty:
+      value: -1
+  TurnStartedNotificationTrigger:
+    initialValue: -1
+    reactiveProperty:
+      value: -1
+  GameStartedNotificationTrigger:
+    initialValue: -1
+    reactiveProperty:
+      value: -1

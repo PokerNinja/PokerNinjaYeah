@@ -1,0 +1,28 @@
+[debug] [2021-01-10T09:28:01.719Z] ----------------------------------------------------------------------
+[debug] [2021-01-10T09:28:01.722Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Aviad\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2021-01-10T09:28:01.722Z] CLI Version:   9.1.2
+[debug] [2021-01-10T09:28:01.722Z] Platform:      win32
+[debug] [2021-01-10T09:28:01.722Z] Node Version:  v14.15.3
+[debug] [2021-01-10T09:28:01.723Z] Time:          Sun Jan 10 2021 11:28:01 GMT+0200 (שעון ישראל (חורף))
+[debug] [2021-01-10T09:28:01.724Z] ----------------------------------------------------------------------
+[debug] [2021-01-10T09:28:01.724Z] 
+[debug] [2021-01-10T09:28:01.730Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-01-10T09:28:01.731Z] > authorizing via signed-in user
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\Aviad
+
+Before we get started, keep in mind:
+
+  * You are initializing your home directory as a Firebase project
+  * You are initializing in an existing Firebase project directory
+
+[error] 
+[error] Error: Aborted by user.
