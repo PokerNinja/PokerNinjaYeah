@@ -90,7 +90,7 @@ public class PowerUpState : State
             }
             else
             {
-                battleSystem.selectCardsMode = true;
+               // battleSystem.selectCardsMode = true;
                 if (waitForAction)
                 { //DRAW 2 CARDS
                     EnableZpoitionForCardsList(battleSystem.cardsDeckUi.playerCardsUi, true);
@@ -121,7 +121,7 @@ public class PowerUpState : State
         if (isPlayerActivate)
         {
             battleSystem.ReduceEnergy(energyCost);
-
+            battleSystem.selectMode = false;
         }
         switch (powerUpName)
         {
@@ -277,7 +277,6 @@ public class PowerUpState : State
 
     private void ActivateCardSelection(string[] cardsToActivate)
     {
-        Debug.LogWarning("SELECTION " + cardsToActivate[0] + " " + cardsToActivate[1]);
         if (cardsToActivate[0] == Constants.AllCardsTag)
         {
             battleSystem.resetAllCardsSelectionWhenCardClicked = true;

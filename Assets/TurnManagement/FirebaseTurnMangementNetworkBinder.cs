@@ -87,14 +87,18 @@ public class FirebaseTurnMangementNetworkBinder : MonoBehaviour
     [Button]
     public void getBoolTest()
     {
-        returned = DataBaseReference.Child(TurnDataCollectionName).Child("Initlized").GetValueAsync().Result;
+        returned = DataBaseReference.Child(TurnDataCollectionName).Child("CurrentPlayer").GetValueAsync().Result;
     }
 
     public async void BindPlayerToTurnManagement(string PlayerID)
     {
-        Debug.LogWarning("bind");
+        Debug.LogWarning("BindCurretnes");
         await Task.Delay(200);
-         LocalTurnSystem.CurrentPlayerID.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("CurrentPlayer"));
+       LocalTurnSystem.CurrentPlayerID.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("CurrentPlayer"));
+        LocalTurnSystem.RoundCounter.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("RoundCounter"));
+        LocalTurnSystem.TurnCounter.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("TurnCounter"));
+       
+       // LocalTurnSystem.CurrentPlayerID.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("CurrentPlayer"));
         /*
                 LocalTurnSystem.PlayerReady.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("Player1_Ready"));
                 LocalTurnSystem.OtherPlayerReady.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("Player2_Ready"));*/
@@ -102,8 +106,12 @@ public class FirebaseTurnMangementNetworkBinder : MonoBehaviour
 
         // LocalTurnSystem.FirstPlayer.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("FirstPlayer"));
         // LocalTurnSystem.OtherPlayerID.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("SecondPlayer"));
-        LocalTurnSystem.RoundCounter.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("RoundCounter"));
-        LocalTurnSystem.TurnCounter.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("TurnCounter"));
+
+
+
+
+
+     
         //  LocalTurnSystem.Instance.FirstPlayer.Value = await GetFirstPlayerID();
     }
     /*
@@ -165,14 +173,16 @@ public class FirebaseTurnMangementNetworkBinder : MonoBehaviour
             value = "SecondPlayer";
         }
         await DataBaseReference.Child(TurnDataCollectionName).Child(value).GetValueAsync()
-            .ContinueWithOnMainThread(task =>
+            .ContinueWithOnMainThread(async task =>
             {
+                Debug.LogError("Fault " + task.IsCompleted) ;
                 if (task.IsFaulted)
                 {
                     Debug.LogError("Fault in access to Database");
                 }
                 else if (task.IsCompleted)
                 {
+                    await Task.Delay(2000);
                     DataSnapshot snapshot = task.Result;
                     if (snapshot.Exists)
                     {
@@ -180,25 +190,44 @@ public class FirebaseTurnMangementNetworkBinder : MonoBehaviour
                             result = rs;
                         if (first)
                         {
-                            LocalTurnSystem.Instance.isPlayerFirstPlayer = result.ToString().Equals(LocalTurnSystem.Instance.PlayerID.Value.ToString());
+                            // LocalTurnSystem.Instance.isPlayerFirstPlayer = result.ToString().Equals(LocalTurnSystem.Instance.PlayerID.Value.ToString());
+                            Debug.LogWarning("forsto");
                               BindPlayersReady(result.Equals(LocalTurnSystem.Instance.PlayerID.Value));
+                            LocalTurnSystem.Instance.InitBind("");
                         }
 
+                    }
+                    else
+                    {
+                      //  await Task.Delay(1000);
+                      // await GetPlayersID(first);
+                        Debug.LogError("SnapSHIT existNot" + snapshot.Exists);
                     }
                 }
             });
         return result;
     }
-    private async void SetPlayersID(string[] playerIDs, string MyPlayerID)
+    private  void SetPlayersID(string[] playerIDs, string MyPlayerID)
     {
         LocalTurnSystem.Instance.PlayerID.Value = MyPlayerID;
         LocalTurnSystem.Instance.OtherPlayerID = playerIDs.First(p => p != MyPlayerID);
-        LocalTurnSystem.FirstPlayerStr = await GetPlayersID(true);
-        LocalTurnSystem.SecondPlayerStr = await GetPlayersID(false);
+        // LocalTurnSystem.Instance.isPlayerFirstPlayer = playerIDs[0].ToString().Equals(MyPlayerID.ToString());
+        SetPlayersFirstSecond(playerIDs);
+        BindPlayersReady(LocalTurnSystem.Instance.isPlayerFirstPlayer);
+        LocalTurnSystem.Instance.InitBind("");
+
+    }
+
+    private void SetPlayersFirstSecond(string[] playerIDs)
+    {
+        LocalTurnSystem.FirstPlayerStr = playerIDs[0];
+        LocalTurnSystem.SecondPlayerStr = playerIDs[1];
+      
     }
 
     private void BindPlayersReady(bool playerIsFirst)
     {
+        Debug.LogWarning("BindReadynes");
         if (playerIsFirst)
         {
             LocalTurnSystem.PlayerReady.BindToFirebaseValue(DataBaseReference.Child(TurnDataCollectionName).Child("Player1_Ready"));
@@ -241,16 +270,31 @@ public class FirebaseTurnMangementNetworkBinder : MonoBehaviour
 */
 
     public bool initialized = false;
+
+
+
     [Button]
     public void Initialize(DatabaseReference dbRef, string[] playerIDs, string MyPlayerID)
     {
         if (!initialized)
         {
+            Debug.LogError("init FTM " + playerIDs[0].ToString().Equals(MyPlayerID));
+
             //need to be replaced
-            //DataBaseAPI.DatabaseAPI.InitializeDatabase();
+
             DataBaseReference = dbRef;
-            BindPlayerToTurnManagement("p");
-            SetPlayersID(playerIDs, MyPlayerID);
+            
+            // BindPlayerToTurnManagement("p");
+           // SetPlayersID(playerIDs, MyPlayerID);
+
+            LocalTurnSystem.Instance.PlayerID.Value = MyPlayerID;
+            LocalTurnSystem.Instance.OtherPlayerID = playerIDs.First(p => p != MyPlayerID);
+            // LocalTurnSystem.Instance.isPlayerFirstPlayer = playerIDs[0].ToString().Equals(MyPlayerID.ToString());
+            SetPlayersFirstSecond(playerIDs);
+            BindPlayersReady(LocalTurnSystem.Instance.isPlayerFirstPlayer);
+            BindPlayerToTurnManagement("");
+            // LocalTurnSystem.Instance.Init(dbRef, playerIDs, MyPlayerID);
+
             /*var b = (MyPlayerID == playerIDs[0]);
             if (b)
             {

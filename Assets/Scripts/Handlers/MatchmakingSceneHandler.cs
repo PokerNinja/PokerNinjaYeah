@@ -68,11 +68,14 @@ namespace Handlers
                         playerId => Debug.Log(playerId + " is ready!"), () =>
                         {
                             var dbrefOfGameRoom = DataBaseAPI.DatabaseAPI.GetReferenceFromPath($"games/{gameId}");
-                        
+                            
                             Debug.Log("All players are ready!");
                             // SingleOrMultiplayer.CrossSceneInformation = "MP";
                             //NO INIT MP
+
+                          //  LocalTurnSystem.Instance.Init(dbrefOfGameRoom, gameInfo.playersIds, MainManager.Instance.currentLocalPlayerId);
                             LocalTurnSystem.Instance.Init(dbrefOfGameRoom, gameInfo.playersIds, MainManager.Instance.currentLocalPlayerId);
+
                             // Initilize Turn Manager here! Destroy when leave
                             SceneManager.LoadScene("GameScene2");
                         }, Debug.Log);
@@ -107,7 +110,7 @@ namespace Handlers
                 isReady = true;
                 Ready();
             }
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(1f);
             if (!isReady)
             { 
             StartCoroutine(AutoReady());

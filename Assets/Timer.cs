@@ -78,7 +78,11 @@ public class Timer : MonoBehaviour
 
     private IEnumerator CountDown()
     {
-        bool isPlayerTurn = LocalTurnSystem.Instance.IsPlayerTurn();
+        bool isPlayerTurn = false;
+        if (!Values.Instance.TEST_MODE)
+        {
+        isPlayerTurn = LocalTurnSystem.Instance.IsPlayerTurn();
+        }
         bool isLastSeconds = false;
         while (countTimer > 0 && updateTime)
         {
@@ -97,7 +101,6 @@ public class Timer : MonoBehaviour
                 if (isLastSeconds)
                 {
                     SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
-                    Debug.LogWarning("StopSound");
                 }
                 if (!endTurnByPlayer)
                 {
@@ -112,7 +115,6 @@ public class Timer : MonoBehaviour
             if (isLastSeconds)
             {
                 SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
-                Debug.LogWarning("StopSound");
             }
             if (!endTurnByPlayer)
             {

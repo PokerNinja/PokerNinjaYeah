@@ -140,7 +140,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
             target = enemyPuBParent.transform;
         }
         pu.transform.SetParent(target);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(pu.transform, target.position, pu.transform.localScale, target.rotation, 2f, EndAction, null, null, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(pu.transform, target.position, pu.transform.localScale, Values.Instance.puPushNewSlotMoveDuration, EndAction, null, null, null));
 
     }
 
@@ -328,7 +328,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         }
 
         StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
-            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), 0.9f, null, action));
+            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, action));
     }
 
     private void PuCreatorUi(string puName, bool aboveDarkScreen, int index, bool isPlayer, GameObject puParent, Action EndAction)
@@ -358,9 +358,8 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
             //targetPosition;
         }
         puObject.Init(puName, index, PowerUpStruct.Instance.GetPowerUpDisplayName(puName), puName[0].ToString(), isPlayer);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(puObject.transform, puParent.transform.position, puVector, puParent.transform.rotation,
-        2f, null, () => puObject.CardReveal(isPlayer, null), EndAction, () => puObject.LoopShine(puObject.isMonster)));
-        puObject.isClickable = true;
+        StartCoroutine(AnimationManager.Instance.SmoothMove(puObject.transform, puParent.transform.position, puVector,
+        Values.Instance.puDrawMoveDuration, null, () => puObject.CardReveal(isPlayer, null), EndAction, () => puObject.LoopShine(puObject.isMonster)));
         AddCardToList(puTag, index, puObject);
     }
 

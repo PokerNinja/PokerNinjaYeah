@@ -55,7 +55,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         gameObject.SetActive(enable);
     }
 
-    public void Init(string puName, int puIndex,string puDisplayName, string puElement, bool isPlayer)
+    public void Init(string puName, int puIndex, string puDisplayName, string puElement, bool isPlayer)
     {
         this.puName = puName;
         this.puIndex = puIndex;
@@ -72,7 +72,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private int SetEnergyCost()
     {
-        if(isMonster )
+        if (isMonster)
         {
             return 2;
         }
@@ -86,8 +86,9 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void OnClick()
     {
         // TODO move this to battleSystem
-       // BattleSystem battleSystem = GameObject.Find("BattleSystem").GetComponent<BattleSystem>();
+        // BattleSystem battleSystem = GameObject.Find("BattleSystem").GetComponent<BattleSystem>();
         //Maybe Better One
+        Debug.LogError("WW");
         if (BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.HideDialog();
@@ -101,28 +102,30 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             BattleSystem.Instance.Interface.EnableDarkScreen(true, null);
             if (puIndex != -1)
             {
-                AnimatePuUse(() => BattleSystem.Instance.OnPowerUpPress(puName, puIndex , energyCost),null);
-              //  AnimatePuUse(() => BattleSystem.Instance.OnPowerUpPress(puName, puIndex , energyCost), null, () => BattleSystem.Instance.ResetPuUi(true, puIndex));
+                AnimatePuUse(() => BattleSystem.Instance.OnPowerUpPress(puName, puIndex, energyCost), null);
+                //  AnimatePuUse(() => BattleSystem.Instance.OnPowerUpPress(puName, puIndex , energyCost), null, () => BattleSystem.Instance.ResetPuUi(true, puIndex));
             }
             else
             {
                 BattleSystem.Instance.OnPowerUpPress(puName, puIndex, energyCost);
             }
         }
-        else if(isPlayer && replaceMode)
+        else if (isPlayer && replaceMode)
         {
-            BattleSystem.Instance.ReplacePu(true,puIndex);
+            BattleSystem.Instance.ReplacePu(true, puIndex);
         }
-        else
+        else if(isPlayer || !isPlayer)
         {
+            StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick);
+            Debug.LogError("WWSASDS");
         }
     }
     public void OnPointerUp(PointerEventData eventData)
     {
-       
+
         CancelInvoke("OnLongPress");
-        if (isPlayer)
+        if (isPlayer || isSkill)
         {
             if (!held)
             {
@@ -137,7 +140,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (isPlayer)
+        if (isPlayer || isSkill)
         {
             held = false;
             Invoke("OnLongPress", holdTime);
@@ -155,8 +158,6 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnLongPress()
     {
-        Debug.LogError("P");
-
         held = true;
         onLongPress.Invoke();
     }
@@ -176,11 +177,11 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             if (enable)
             {
-                StartCoroutine(AnimationManager.Instance.ShinePU(true,1, 3, spriteRenderer.material, () => LoopShine(true)));
+                StartCoroutine(AnimationManager.Instance.ShinePU(true, 1, 3, spriteRenderer.material, () => LoopShine(true)));
             }
             else
             {
-                spriteRenderer.material.SetFloat("_ShineGlow",0);
+                spriteRenderer.material.SetFloat("_ShineGlow", 0);
             }
         }
     }
@@ -198,8 +199,10 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnObjectSpawn()
     {
+        isClickable = false;
         spriteRenderer.material.SetFloat("_FadeAmount", -0.1f);
         spriteRenderer.material.SetFloat("_GradBlend", 0f);
+
         spriteRenderer.material.SetFloat("_ShineGlow", 0);
 
         EnableShake(false);
@@ -209,29 +212,31 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [Button]
     public void EnablePu(bool enable)
     {
-        isClickable = enable;
         float value = 0.65f;
         if (enable)
         {
             value = 0;
         }
-        EnableShake(enable); 
+        if (!isSkill)
+        {
+            EnableShake(enable);
+        }
 
-        StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend",spriteRenderer.material,value,null));
+        StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", spriteRenderer.material, value, () => isClickable = enable));
     }
 
     public void EnableShake(bool enable)
     {
         float targetSpeed;
-        float x = 0.55f;
-        float y = 0.12f;
+        float x = Values.Instance.floatingShakeAnimationX;
+        float y = Values.Instance.floatingShakeAnimationY;
         if (enable)
         {
-            targetSpeed = 0.5f;
+            targetSpeed = Values.Instance.floatingShakeAnimationSpeed;
             if (puIndex == 1)
             {
-                x = 0.57f;
-                y = 0.1f;
+                x += 0.02f;
+                y -= 0.01f;
             }
             spriteRenderer.material.SetFloat("_ShakeUvX", x);
             spriteRenderer.material.SetFloat("_ShakeUvY", y);
@@ -250,19 +255,19 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (isPlayer)
         {
             StartCoroutine(AnimationManager.Instance.PulseSize(true, transform, 1.15f, 0.4f, true,
-            () => StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material , OnEndRoutine3))));
+            () => StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3))));
         }
         else
         {
             CardReveal(true, () =>
          StartCoroutine(AnimationManager.Instance.PulseSize(false, transform, 1.15f, 0.4f, true,
-            () => StartCoroutine(AnimationManager.Instance.ShinePU(false, 1,1, spriteRenderer.material, OnEndRoutine3)))));
+            () => StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3)))));
             //() => StartCoroutine(AnimationManager.FadeBurnPU(spriteRenderer.material, false, 1f,null, OnEndRoutine2, OnEndRoutine3))
         }
     }
 
- 
-    public void DissolvePu(float delayBefor,float duration, Action End,Action End2)
+
+    public void DissolvePu(float delayBefor, float duration, Action End, Action End2)
     {
 
         StartCoroutine(AnimationManager.Instance.FadeBurnPU(spriteRenderer.material, delayBefor, false, duration, null, End, End2));
@@ -283,7 +288,14 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         isFaceDown = !reveal;
         flipInProgress = true;
-        StartCoroutine(AnimationManager.Instance.FlipCard(gameObject.transform, 0.45f, () => flipInProgress = false, () => LoadSprite(reveal), onFinish));
+        StartCoroutine(AnimationManager.Instance.FlipCard(gameObject.transform, 0.45f, () => flipInProgress = false, () =>
+        {
+            LoadSprite(reveal);
+            if (isPlayer)
+            {
+                spriteRenderer.material.SetFloat("_GradBlend", 0.65f);
+            }
+        }, onFinish));
         StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform.parent, 1.15f, 0.45f, false, null));
 
     }
@@ -292,14 +304,10 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (enable)
         {
-       isClickable = false;
-        replaceMode = true;
+            isClickable = false;
         }
-        else
-        {
-            replaceMode = false;
-        }
-      //  isClickable = !enable;
+        replaceMode = enable;
+        //  isClickable = !enable;
         if (enable)
         {
             StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", spriteRenderer.material, 0f, null));
@@ -314,7 +322,6 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             interval = -26f;
         }
         transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, interval);
-        Debug.LogError("VECT " + transform.position.z);
     }
 
     #endregion

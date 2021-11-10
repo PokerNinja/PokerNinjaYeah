@@ -69,6 +69,9 @@ public class BattleUI : MonoBehaviour
     public SpriteRenderer playerLargeTurnIndicator;
     public SpriteRenderer playerLargeNotTurnIndicator;
 
+    public SpriteRenderer btnReplaceRenderer;
+
+
     public GameObject youWin;
     public GameObject youLose;
     public GameObject hitGO;
@@ -160,43 +163,33 @@ public class BattleUI : MonoBehaviour
 
     public IEnumerator CardProjectileEffect(bool isPlayerWin, Action HitEffect, Action LoseCoin)
     {
-        /*
-        Vector3 rightTargetPos;
-        Vector3 leftTargetPos;
-        Vector3 rightStartingPos;
-        Vector3  leftStartingPos;
+     
         if (isPlayerWin)
         {
-            rightStartingPos = rightCardStartPositionWin;
-            leftStartingPos = leftCardStartPositionWin;
-            rightTargetPos = rightCardStartPositionLose;
-            leftTargetPos = leftCardStartPositionLose;
+            rightCard.transform.position = Values.Instance.winCardRightStart.position;
+            leftCard.transform.position = Values.Instance.winCardLeftStart.position;
         }
         else
         {
-
-            rightStartingPos = leftCardStartPositionWin;
-            leftStartingPos = rightCardStartPositionWin;
-            rightTargetPos = leftCardStartPositionLose;
-            leftTargetPos = rightCardStartPositionLose;
-        }*/
-
+            rightCard.transform.position = Values.Instance.winCardRightEnd.position;
+            leftCard.transform.position = Values.Instance.winCardLeftEnd.position;
+        }
         HitEffect?.Invoke();
+        yield return new WaitForSeconds(0.25f);
         rightCard.SetActive(true);
         leftCard.SetActive(true);
-        yield return new WaitForSeconds(0.15f);
         StartCoroutine(AnimationManager.Instance.SpinRotateValue(rightCardChildSprite, null));
-        StartCoroutine(AnimationManager.Instance.SmoothMoveCardProjectile(isPlayerWin, true, rightCard.transform, rightCard.transform.localScale, rightCard.transform.rotation, 1f, null, null, null, () =>
-        {
-            rightCard.SetActive(false);
-        }));
+        StartCoroutine(AnimationManager.Instance.SmoothMoveCardProjectile(isPlayerWin, true, rightCard.transform, rightCard.transform.localScale, Values.Instance.winningCardProjectileMoveDuration, LoseCoin, () =>
+       {
+           rightCard.SetActive(false);
+       }));
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash1);
         yield return new WaitForSeconds(0.2f);
         StartCoroutine(AnimationManager.Instance.SpinRotateValue(leftCardChildSprite, null));
-        StartCoroutine(AnimationManager.Instance.SmoothMoveCardProjectile(isPlayerWin, false, leftCard.transform, leftCard.transform.localScale, leftCard.transform.rotation, 1f, null, null, LoseCoin, () =>
-        {
-            leftCard.SetActive(false);
-        }));
+        StartCoroutine(AnimationManager.Instance.SmoothMoveCardProjectile(isPlayerWin, false, leftCard.transform, leftCard.transform.localScale, Values.Instance.winningCardProjectileMoveDuration, null, () =>
+       {
+           leftCard.SetActive(false);
+       }));
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash2);
 
     }
@@ -213,17 +206,18 @@ public class BattleUI : MonoBehaviour
         winParticle.Play();
     }
 
-
     public void LoseLifeUi(bool isPlayer, int lifeIndex)
     {
+        SpriteRenderer spTarget;
         if (isPlayer)
         {
-            AnimationManager.Instance.LoseLife(playerLifeUi[lifeIndex]);
+            spTarget = playerLifeUi[lifeIndex];
         }
         else
         {
-            AnimationManager.Instance.LoseLife(enemyLifeUi[lifeIndex]);
+            spTarget = enemyLifeUi[lifeIndex];
         }
+        StartCoroutine(AnimationManager.Instance.LoseLifeAnimation(spTarget, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(spTarget, false, 0.5f, null))));
     }
 
     internal void InitAvatars()
@@ -334,7 +328,7 @@ public class BattleUI : MonoBehaviour
         if (!sliding)
         {
             sliding = true;
-            StartCoroutine(AnimationManager.Instance.SmoothMoveRank(rankingImg.transform, 1f, () => rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_empty", typeof(Sprite)) as Sprite,
+            StartCoroutine(AnimationManager.Instance.SmoothMoveRank(rankingImg.transform, Values.Instance.rankInfoMoveDuration, () => rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_empty", typeof(Sprite)) as Sprite,
                 () => rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_full", typeof(Sprite)) as Sprite, () => sliding = false));
         }
 
@@ -416,16 +410,15 @@ public class BattleUI : MonoBehaviour
     public void WhosTurnAnimation(bool isPlayer, bool yourLastTurn, bool finalMove)
     {
 
-        Debug.LogError("isP " + isPlayer + " last " + yourLastTurn + " final " + finalMove);
         string targetTurnTextPath;
         Action endAction = null;
         Action enableBGPulse = null;
         turnTextGO.transform.localScale = new Vector2(0.1f, 0.1f);
         turnTextGO.transform.position = new Vector2(0f, 0f);
         turnTextGO.SetActive(true);
-
         targetTurnTextPath = GetTurnTextPath(isPlayer, yourLastTurn, finalMove);
         SpriteRenderer spriteRenderer = turnTextGO.GetComponent<SpriteRenderer>();
+        AnimationManager.Instance.SetAlpha(spriteRenderer, 1f);
         spriteRenderer.sprite = Resources.Load(targetTurnTextPath, typeof(Sprite)) as Sprite;
 
 
@@ -442,10 +435,10 @@ public class BattleUI : MonoBehaviour
              }));
 
          }*/
-        endAction = () => StartCoroutine(AnimationManager.Instance.SmoothMove(turnTextGO.transform, targetTurnSymbol.transform.position, targetTurnSymbol.transform.localScale, turnTextGO.transform.rotation, 1.9f, null, null, null, () =>
+        endAction = () => StartCoroutine(AnimationManager.Instance.SmoothMove(turnTextGO.transform, targetTurnSymbol.transform.position, targetTurnSymbol.transform.localScale, Values.Instance.turnTextMoveDuration, null, null, null, () =>
                 turnTextGO.transform.localPosition = new Vector3(turnTextGO.transform.localPosition.x, turnTextGO.transform.localPosition.y, 19.5f)));
 
-        StartCoroutine(AnimationManager.Instance.ScaleObject(false, 11f, 1.3f, turnTextGO.transform, enableBGPulse, endAction));
+        StartCoroutine(AnimationManager.Instance.ScaleObject(false, 11f, Values.Instance.turnTextScaleDuration, turnTextGO.transform, enableBGPulse, endAction));
     }
 
     public void EnableBgColor(bool enable)
@@ -725,6 +718,17 @@ public class BattleUI : MonoBehaviour
                 }
             }
         }
+    }
+
+    internal void DisableClickBtnReplace()
+    {
+        StartCoroutine(AnimationManager.Instance.Shake(btnReplaceRenderer.material));
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick);
+    }
+    public void ClickCoinEffect(int index)
+    {
+        StartCoroutine(AnimationManager.Instance.Shake(coinsSpriteRend[index].material));
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinHit);
     }
 
 

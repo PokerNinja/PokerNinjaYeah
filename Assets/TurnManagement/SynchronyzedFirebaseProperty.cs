@@ -26,8 +26,9 @@ public class SynchronyzedFirebaseProperty<T> : SynchronyzedProperty<T>
     
     public async void BindToFirebaseValue(DatabaseReference referenceToValue)
     {
-            Debug.LogWarning("bindThis");
         var result = await referenceToValue.GetValueAsync();
+           // Debug.LogWarning("bindThis" + result.ToString());
+            Debug.LogWarning("BindShi " + result.Value);
         boundToFirebaseValue = result.Exists;
         if (!boundToFirebaseValue)
         {
@@ -60,7 +61,7 @@ public class SynchronyzedFirebaseProperty<T> : SynchronyzedProperty<T>
                             if (!rt.Equals(initialValue))
                             {
                                 Value = rt;
-
+                                LocalTurnSystem.Instance.BindCheck = true;
                             }
                         }
                         else

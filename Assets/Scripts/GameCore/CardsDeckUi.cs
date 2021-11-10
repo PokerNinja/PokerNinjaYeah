@@ -404,12 +404,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardScale = cardVectorBoard;
         }
 
-        //cardObject.tag = cardTag;
-
         cardObject.name = cardPlace;
         cardObject.transform.position = new Vector3(cardTransform.position.x, cardTransform.position.y, 1); ;
         cardObject.transform.localScale = cardTransform.localScale;
-        cardObject.transform.rotation = cardTransform.rotation;
         cardObject.Init(cardTag,newCard, isFaceDown, aboveDarkScreen, cardPlace);
         Vector3 targetPosition = new Vector3(cardParent.transform.position.x, cardParent.transform.position.y, cardObject.transform.position.z);
         Action closeDrawer = null;
@@ -417,8 +414,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             closeDrawer = () => AnimateDrawer(false, null);
         }
-        StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale, cardParent.transform.rotation,
-        2f, null, () => cardObject.CardReveal(!isFaceDown), disableDarkScreen,()=> {
+        StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
+        Values.Instance.cardDrawMoveDuration, null, () => cardObject.CardReveal(!isFaceDown), disableDarkScreen,()=> {
             closeDrawer?.Invoke();
         AddCardToList(cardTag, cardObject,indexToInsert);
             }));
@@ -691,8 +688,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     }
     internal void SwapTwoCards(string cardPlace1, string cardPlace2, Action DisableDarkScreen)
     {
-        Debug.LogWarning("SWAPI");
-        Debug.LogWarning("S:"+ cardPlace1+" "+ cardPlace2);
+      
         //COPy WASTE
         CardUi cardSwap1 = GameObject.Find(cardPlace1).GetComponent<CardUi>();
         CardUi cardSwap2 = GameObject.Find(cardPlace2).GetComponent<CardUi>();
@@ -701,8 +697,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         bool card2WasFaceDown = cardSwap2.GetisFaceDown(); // NOT IMPLENMANETD
         Transform tempTransform1 = cardSwap1.transform;
         Transform tempTransform2 = cardSwap2.transform;
-        StartCoroutine(AnimationManager.Instance.SmoothMove(cardSwap1.transform, tempTransform2.position, tempTransform2.localScale, cardSwap1.transform.rotation, 2f, () => SwitchCardsInfo(cardSwap1, cardSwap2), () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2)), null, null));
-        StartCoroutine(AnimationManager.Instance.SmoothMove(cardSwap2.transform, tempTransform1.position, tempTransform1.localScale, cardSwap1.transform.rotation, 2f, null, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1)), DisableDarkScreen, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(cardSwap1.transform, tempTransform2.position, tempTransform2.localScale, Values.Instance.cardSwapMoveDuration, () => SwitchCardsInfo(cardSwap1, cardSwap2), () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2)), null, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(cardSwap2.transform, tempTransform1.position, tempTransform1.localScale, Values.Instance.cardSwapMoveDuration, null, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1)), DisableDarkScreen, null));
 
         Card tempCard1 = Card.StringToCard(cardSwap1.cardDescription);
         Card tempCard2 = Card.StringToCard(cardSwap2.cardDescription);
@@ -737,7 +733,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Transform tempTransform1 = cardFromDeckUI.transform;
         Transform tempTransform2 = playerCardUI.transform;
         SwapCardUiList(cardFromDeckUI, playerCardUI);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(cardFromDeckUI.transform, tempTransform2.position, tempTransform2.localScale, cardFromDeckUI.transform.rotation, 2f,
+        StartCoroutine(AnimationManager.Instance.SmoothMove(cardFromDeckUI.transform, tempTransform2.position, tempTransform2.localScale,Values.Instance.cardSwapMoveDuration,
             () => ResetExtraDeckCards(), null, DisableDarkScreen, null));
         Card tempCard1 = Card.StringToCard(cardFromDeckUI.cardDescription);
         Card tempCard2 = Card.StringToCard(playerCardUI.cardDescription);
@@ -812,7 +808,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer);
             targetX = -1.15f;
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
-            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), 0.9f, null, action));
+            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, action));
         }
         else
         {
@@ -820,7 +816,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             targetX = 1.1f;
             action?.Invoke();
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
-            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), 0.9f, null, null));
+            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, null));
         }
     }
         public void DeleteAllCards(Action DealHands)

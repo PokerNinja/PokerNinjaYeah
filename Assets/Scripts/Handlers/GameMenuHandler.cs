@@ -43,7 +43,7 @@ public class GameMenuHandler : MonoBehaviour
         if (CheckIfStringOnlyLettersAndDigits(playerName.text.ToString()))
         {
             SavePlayerNickName(playerName.text.ToString());
-            DatabaseAPI.InitializeDatabase();
+          //  DatabaseAPI.InitializeDatabase();
             MainManager.Instance.currentLocalPlayerId = playerName.text + UnityEngine.Random.Range(1, 999).ToString();
             SceneManager.LoadScene("MatchMakingScene");
         }

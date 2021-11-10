@@ -119,7 +119,6 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
     private void OnLongPress()
     {
-        Debug.LogError("P");
 
         held = true;
         onLongPress.Invoke();

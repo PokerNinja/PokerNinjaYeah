@@ -9,6 +9,8 @@ public class SoundManager : Singleton<SoundManager>
 {
     // Audio players components.
     //public AudioSource effectsSource1, effectsSource2, effectsSource3, effectsSource4, effectsSource5, effectsSource6, effectsSource7, effectsSource8, effectsSource9, effectsSource10, effectsSource11, effectsSource12, effectsSource13, effectsSource14, effectsSource15, effectsSource16, effectsSource17, effectsSource18;
+    public float GLOBAL_SFX_VOLUME = 1f;
+    public float MAX_VOL_MUSIC = 0.65f;
     public AudioSource[] constantsSounds;
     public enum ConstantSoundsEnum { Music, LastSeconds, Vision, }
     private Queue<AudioSource> soundPool;
@@ -47,6 +49,7 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip visionDrone;
     public AudioClip musicSound;
     public AudioClip endRoundGong;
+    public AudioClip coinHit;
 
 
 
@@ -55,7 +58,6 @@ public class SoundManager : Singleton<SoundManager>
     public float HighPitchRange = 1.05f;
 
     private bool musicOn;
-    private static float MAX_VOL_MUSIC = 0.65f;
 
     private void Awake()
     {
@@ -105,6 +107,7 @@ public class SoundManager : Singleton<SoundManager>
     {
         AudioSource currentSource = await GetAvailableAudioSource();
         currentSource.clip = clip;
+        currentSource.volume = GLOBAL_SFX_VOLUME;
         currentSource.Play();
         soundPool.Enqueue(currentSource);
     }
@@ -177,7 +180,7 @@ public class SoundManager : Singleton<SoundManager>
 
     }
 
-    public static IEnumerator FadeIn(AudioSource audioSource, float FadeTime)
+    public  IEnumerator FadeIn(AudioSource audioSource, float FadeTime)
     {
         audioSource.volume = 0f;
         audioSource.Play();
@@ -409,6 +412,11 @@ public class SoundManager : Singleton<SoundManager>
                     soundToPlay = endRoundGong;
                     break;
                 }
+            case SoundName.CoinHit:
+                {
+                    soundToPlay = coinHit;
+                    break;
+                }
         }
 
         await PlayAsync(soundToPlay);
@@ -450,5 +458,6 @@ public class SoundManager : Singleton<SoundManager>
         FireProjectile,
         VisionDrone,
         EndRoundGong,
+        CoinHit,
     }
 }

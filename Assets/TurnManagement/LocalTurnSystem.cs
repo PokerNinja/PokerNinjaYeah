@@ -9,6 +9,8 @@ using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 using Firebase;
 using Firebase.Database;
+using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
 public class LocalTurnSystem : Singleton<LocalTurnSystem>
 {
@@ -74,7 +76,7 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
     private void Awake()
     {
         Debug.LogWarning("awwake LRA");
-       // InitializeSingleton(true);
+        // InitializeSingleton(true);
         DontDestroyOnLoad(this.gameObject);
     }
 
@@ -90,18 +92,21 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
                 TurnCounter.Value = -1;
 
             }
-           else if (TurnCounter.Value > 0)
+            else if (TurnCounter.Value > 0)
             {
                 TurnCounter.Value -= 1;
                 CurrentPlayerID.Value = OtherPlayerID;
                 // TurnStartedNotificationTrigger.Value += 1;
             }
-            
+
         }
     }
 
     public bool IsPlayerStartRound()
     {
+        Debug.LogWarning("ME " + PlayerID.Value);
+        Debug.LogWarning("1" + FirstPlayerStr);
+        Debug.LogWarning("2" + SecondPlayerStr);
         if (RoundCounter.Value % 2 == 0)
         {
             return PlayerID.Value.Equals(SecondPlayerStr);
@@ -139,20 +144,50 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
 
     public event Action onTurnStarted;
     public event Action onGameStarted;
+    public DatabaseReference dbRef;
+    public string[] playerIDs;
+    public string MyPlayerID;
+    internal bool BindCheck = false;
 
-    [Button]
     public void Init(DatabaseReference dbRef, string[] playerIDs, string MyPlayerID)
     {
-        TurnCounter.Value = MaxTurns;
-        FirebaseTurnMangementNetworkBinder.Initialize(dbRef, playerIDs, MyPlayerID);
 
-       /* TurnCounter.onValueChanged += x =>
+        this.dbRef = dbRef;
+        this.playerIDs = playerIDs;
+        this.MyPlayerID = MyPlayerID;
+
+    }
+    [Button]
+    public async void Inito(Action startRound)
+    {
+
+        await Task.Delay(1000);
+        TurnCounter.Value = MaxTurns;
+        isPlayerFirstPlayer = playerIDs[0].ToString().Equals(MyPlayerID);
+        FirebaseTurnMangementNetworkBinder.Initialize(dbRef, playerIDs, MyPlayerID);
+        await Task.Delay(1000);
+        if (BindCheck)
         {
-            if (x <= 0)
+            startRound.Invoke();
+        }
+        while (!BindCheck)
+        {
+            await Task.Delay(1000);
+            if (BindCheck)
             {
-                RoundEnded();
+                startRound.Invoke();
             }
-        };*/
+        }
+       
+        // SceneManager.LoadScene("GameScene2");
+
+        /* TurnCounter.onValueChanged += x =>
+         {
+             if (x <= 0)
+             {
+                 RoundEnded();
+             }
+         };*/
         //   GameStartedNotificationTrigger.onValueChanged += b => { onGameStarted?.Invoke();};
         /*onGameStarted += () => { Debug.LogWarning($"Game Started! {PlayerID.Value}"); };
 
@@ -180,6 +215,7 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
     public void InitBind(string FirstPlayer)
     {
         FirebaseTurnMangementNetworkBinder.BindPlayerToTurnManagement("");
+
     }
 
     public event Action onRoundEnded;
@@ -200,10 +236,9 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
     [Button]
     public bool IsPlayerTurn()
     {
-        Debug.LogWarning("IsPT: " + CurrentPlayerID.Value.ToString());
-        Debug.LogWarning("IsPT: " + PlayerID.Value.ToString());
-        return CurrentPlayerID.Value.ToString().Equals(PlayerID.Value.ToString()); 
+
+        return CurrentPlayerID.Value.ToString().Equals(PlayerID.Value.ToString());
     }
 
- 
+
 }

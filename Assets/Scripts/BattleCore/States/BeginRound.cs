@@ -9,6 +9,7 @@ public class BeginRound : State
     private float delayForStart;
     public BeginRound(BattleSystem battleSystem , bool isPlayerTurn, bool isFirstRound) : base(battleSystem)
     {
+        Debug.LogWarning("Begin Round" + isPlayerTurn + isFirstRound);
         this.isPlayerTurn = isPlayerTurn;
         delayForStart = 2f;
         if (isFirstRound)

@@ -84,7 +84,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     private IEnumerator OnClickHandler()
     {
             yield return new WaitForSeconds(0.1f);
-        if (!BattleSystem.Instance.TemproryUnclickable && clickbleForPU && !flipInProgress/* && BattleSystem.Instance.cardsToSelectCounter > 0*/)
+        if (!BattleSystem.Instance.TemproryUnclickable && clickbleForPU && !flipInProgress && BattleSystem.Instance.cardsToSelectCounter > 0)
         {
             BattleSystem.Instance.TemproryUnclickable = true;
             --BattleSystem.Instance.cardsToSelectCounter;
@@ -106,6 +106,8 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
         else
         {
+            StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick);
         }
     }
 
