@@ -15,8 +15,8 @@ public class Timer : MonoBehaviour
     private bool updateTime;
     private bool countDownRunning;
     private bool isPlayer;
-    const float totalTime = 40f;
-    float countTimer = totalTime;
+    private float totalTime = 40;
+    private float countTimer ;
     private int starting;
     private Coroutine thereCanBeOnlyOne;
 

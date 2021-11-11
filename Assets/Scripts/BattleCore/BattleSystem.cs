@@ -95,7 +95,7 @@ public class BattleSystem : StateMachine, ITimeOut
     public event Action onGameStarted;
     private void Start()
     {
-        TEST_MODE = Values.Instance.TEST_MODE ;
+        TEST_MODE = Values.Instance.TEST_MODE;
         //Debug.LogWarning("S:" + PowerUpStruct.PowerUpNamesEnum.f1.ToString());
         Debug.LogWarning("Start LRA");
 
@@ -110,7 +110,7 @@ public class BattleSystem : StateMachine, ITimeOut
             currentGameInfo.EnemyId = "2";
             currentGameInfo.cardDeck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
                 "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
-                "Ac", "Ah","4s","2h","6c", "5h","Ts","Jh","Qc", "Ah","As","Kh"};
+                "Ac", "Ah","4s","2h","6c", "5h","Ts","Jh","Qc", "Ks","As","Kh"};
             currentGameInfo.puDeck = new String[] {"f2","i3","f3","f2","i3","f3",
                  "i1","f1","i2",
                  "w1","w2","w3","f2","i3","w1","w2","w3","f2","i3","f3",
@@ -211,20 +211,12 @@ public class BattleSystem : StateMachine, ITimeOut
                 StartCoroutine(ResetSortingOrder(false));
                 puDeckUi.EnablePusZ(true, false);
                 cardsDeckUi.DisableCardsSelection(Constants.AllCardsTag);
-                if (endTurn)
-                {
-                    ui.EnablePlayerButtons(false);
-                }
-                else
-                {
-                    ui.EnablePlayerButtons(true);
-                    ActivatePlayerPus();
-                }
+                ActivatePlayerButtons(!endTurn, false);
             });
         }
         if (replaceMode)
         {
-            EnableReplaceDialog();
+            EnableReplaceDialog(endTurn);
         }
     }
     public void LoadMenuScene(bool playAgain)
@@ -328,9 +320,9 @@ public class BattleSystem : StateMachine, ITimeOut
     }
 
 
-    public void UpdateHandRank()
+    public void UpdateHandRank(bool reset)
     {
-        if (!AreBoardCardsFlipped())
+        if (!AreBoardCardsFlipped() && !reset)
         {
             Hand bestHand = cardsDeckUi.CalculateHand(false);
             ui.UpdateCardRank(bestHand.Rank);
@@ -358,10 +350,10 @@ public class BattleSystem : StateMachine, ITimeOut
                 firstDeck = false;
                 waitForDrawerAnimationToEnd = true;
                 //  yield return new WaitForSeconds(0.7f);
-                cardsDeckUi.DealCardsForBoard(true, () => waitForDrawerAnimationToEnd = false, () => UpdateHandRank());
+                cardsDeckUi.DealCardsForBoard(true, () => waitForDrawerAnimationToEnd = false, () => UpdateHandRank(false));
                 break;
             case 2:
-                cardsDeckUi.DealCardsForBoard(true, () => waitForDrawerAnimationToEnd = false, () => UpdateHandRank());
+                cardsDeckUi.DealCardsForBoard(true, () => waitForDrawerAnimationToEnd = false, () => UpdateHandRank(false));
                 break;
             case 1:
                 break;
@@ -420,7 +412,7 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         DisableSelectMode(true);
         ui.EnableBgColor(false);
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, 1f, null));
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
         DisablePlayerPus();
         ResetTimers();
         gameManager.AddGameActionLog(GameManager.ActionEnum.EndTurn, "end of turn: " + currentTurn, () => { }, Debug.Log);
@@ -460,9 +452,9 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         cardsDeckUi = CardsDeckUi.Instance();
         cardsDeckUi.InitDeckFromServer(currentGameInfo.cardDeck);
-        
-            cardsDeckUi.isPlayerFirst = IsPlayerTurn();
-        
+
+        cardsDeckUi.isPlayerFirst = IsPlayerTurn();
+
 
         puDeckUi = PuDeckUi.Instance();
         if (firstDeck)
@@ -572,7 +564,7 @@ public class BattleSystem : StateMachine, ITimeOut
             if (s == LocalTurnSystem.Instance.PlayerID.Value)
             {
                 ResetTimers();
-                StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, 1f, null));
+                StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
                 StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
             }
             else
@@ -652,6 +644,7 @@ public class BattleSystem : StateMachine, ITimeOut
             }
             firstRound = false;
         }
+        UpdateHandRank(true);
         cardsDeckUi.DeleteAllCards(() => DealHands(FinishCallbac));
     }
 
@@ -726,7 +719,7 @@ public class BattleSystem : StateMachine, ITimeOut
 
     public void DissolvePuAfterUse(bool isPlayer, int index)
     {
-        puDeckUi.GetPuFromList(isPlayer, index).DissolvePu(2f, 2.5f, null, () => ResetPuUi(isPlayer, index));
+        puDeckUi.GetPuFromList(isPlayer, index).DissolvePu(2f, Values.Instance.puDissolveDuration, null, () => ResetPuUi(isPlayer, index));
     }
 
     private void ListenForPowerupUse()
@@ -878,14 +871,14 @@ public class BattleSystem : StateMachine, ITimeOut
         {
             if (isPlayer)
             {
-                EnableReplaceDialog();
+                EnableReplaceDialog(false);
                 if (energyCounter == 0)
                 {
                     EndTurn();
                 }
                 else
                 {
-                    ActivatePlayerPus();
+                    //  ActivatePlayerPus();
                 }
             }
             /*  if (isPlayer && energyCounter == 0)
@@ -1052,7 +1045,7 @@ public class BattleSystem : StateMachine, ITimeOut
 
     private IEnumerator ResetSortingOrder(bool enable)
     {
-        UpdateHandRank();
+        UpdateHandRank(false);
         yield return new WaitForFixedUpdate();
         if (!enable)
         {
@@ -1079,7 +1072,6 @@ public class BattleSystem : StateMachine, ITimeOut
         else if (energyCounter == 0 || energyCounter == 1 && puDeckUi.GetPuListCount(true) == 0 && !skillUsed)
         {
             yield return new WaitForSeconds(1.5f);
-            Debug.LogError("ENDING");
             EndTurn();
         }
         else
@@ -1213,12 +1205,12 @@ public class BattleSystem : StateMachine, ITimeOut
 
     #region Buttons
 
-    public void EnableReplaceDialog()
+    public void EnableReplaceDialog(bool endTurn)
     {
         if (btnReplaceClickable)
         {
 
-            if (replaceMode || IsPlayerTurn() && energyCounter > 0)
+            if (/*replaceMode ||*/ IsPlayerTurn() && energyCounter > 0)
             {
                 PowerUpUi[] playerPus = puDeckUi.GetPuList(true);
                 if (playerPus[0] != null || playerPus[1] != null)
@@ -1226,15 +1218,15 @@ public class BattleSystem : StateMachine, ITimeOut
                     replaceMode = !replaceMode;
                     if (replaceMode)
                     {
-                        puDeckUi.EnablePusSlotZ(true, replaceMode);
-                        ui.EnableDarkScreen(replaceMode, null);
+                        puDeckUi.EnablePusSlotZ(true, true);
+                        ui.EnableDarkScreen(true, null);
                     }
                     else
                     {
-                        ui.EnableDarkScreen(replaceMode, () =>
+                        ui.EnableDarkScreen(false, () =>
                         {
-                            puDeckUi.EnablePusSlotZ(true, replaceMode);
-                            ActivatePlayerPus();
+                            puDeckUi.EnablePusSlotZ(true, false);
+                            ActivatePlayerButtons(!endTurn, false);
                         });
                     }
                     if (playerPus[0] != null)
@@ -1316,9 +1308,25 @@ public class BattleSystem : StateMachine, ITimeOut
     }
 
 
-    internal void ActivatePlayerButtons()
+    internal void ActivatePlayerButtons(bool enable, bool delay)
     {
-        StartCoroutine(ActivePlayerButtonWithDelay());
+        if (delay)
+        {
+            StartCoroutine(ActivePlayerButtonWithDelay());
+        }
+        else
+        {
+            if (enable)
+            {
+                ui.EnablePlayerButtons(true);
+                ActivatePlayerPus();
+            }
+            else
+            {
+                ui.EnablePlayerButtons(false);
+                DisablePlayerPus();
+            }
+        }
     }
 
     private IEnumerator ActivePlayerButtonWithDelay()

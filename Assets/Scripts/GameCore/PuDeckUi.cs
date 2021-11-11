@@ -76,7 +76,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void DestroyPu(PowerUpUi pu, Action RemoveFromList, Action OnEnd)
     {
-        pu.DissolvePu(0f, 4f, RemoveFromList, () => ResetPuUI(pu, OnEnd));
+        pu.DissolvePu(0f, Values.Instance.puDissolveDuration, RemoveFromList, () => ResetPuUI(pu, OnEnd));
       //  StartCoroutine(AnimationManager.Instance.FadeBurnPU(pu.spriteRenderer.material, 0f , false, 4f, null, RemoveFromList, () => ResetPuUI(pu, OnEnd)));
     }
 

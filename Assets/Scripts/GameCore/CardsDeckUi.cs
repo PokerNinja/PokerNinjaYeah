@@ -13,9 +13,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 {
 
     [SerializeField] public Transform cardTransform;
-    [SerializeField] public float delayBetweenDealBoardCards = 0.18f;
-    [SerializeField] public float delayBetweenDealHandsCards = 0.18f;
-    [SerializeField] public float delayBetweenHandsAndFlopDeal = 0.6f;
     private List<Card> EnemyHand;
     private List<Card> playerHand;
     Deck deck;
@@ -122,6 +119,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     private IEnumerator DealCardsToHands(Action WaitForCloseDrawerAnimation, Action FinishCallback)
     {
+        float delayBetweenDealHandsCards = Values.Instance.delayBetweenDealPlayersCards;
+        float delayBetweenHandsAndFlopDeal = Values.Instance.delayBetweenHandsAndFlopDeal;
+
         GameObject[] parentForHands = CreateParentForHands();
         string[] cardName = CreateCardNamesForHands();
         bool dealToPlayer = isPlayerFirst;
@@ -152,6 +152,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     private IEnumerator DealCardsForBoardRoutine(Action FinishCallback, Action closeDrawer)
     {
+        float delayBetweenDealBoardCards = Values.Instance.delayBetweenDealBoardCards;
         Card newCard;
         int indexCard = boardCards.Count;
         bool keepDealingForBoard = true;
@@ -215,7 +216,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         objectPooler.ReturnCard(cardToReset);
     }
 
-    private void updateCardsList(string cardPlace, Card newCard, bool isAddToList)
+    private void UpdateCardsList(string cardPlace, Card newCard, bool isAddToList)
     {
 
         switch (cardPlace)
@@ -345,8 +346,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     {
         return FindObjectsOfType<CardUi>();
     }
-
-
 
 
     public string CardPlaceToTag(string cardPlace)
@@ -583,6 +582,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal IEnumerator Draw2Cards(bool isEnemy, Action endAction)
     {
+        float delayBetweenDealBoardCards = Values.Instance.delayBetweenDealBoardCards;
         CardCreatorUi(deck.Pop(), isEnemy, true, deckCardAParent, Constants.deckCardsNames[0], null, false, -1);
         yield return new WaitForSecondsRealtime(delayBetweenDealBoardCards);
         CardCreatorUi(deck.Pop(), isEnemy, true, deckCardBParent, Constants.deckCardsNames[1], null, true, -1);
@@ -675,7 +675,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     {
 
         Card newCard = deck.Pop();
-        updateCardsList(cardPlace, newCard, true);
+        UpdateCardsList(cardPlace, newCard, true);
         int indexToInsert = ConvertCardPlaceToIndex(cardPlace);
         if (isFirstCard)
         {
@@ -702,8 +702,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
         Card tempCard1 = Card.StringToCard(cardSwap1.cardDescription);
         Card tempCard2 = Card.StringToCard(cardSwap2.cardDescription);
-        updateCardsList(cardPlace1, tempCard2, true);
-        updateCardsList(cardPlace2, tempCard1, true);
+        UpdateCardsList(cardPlace1, tempCard2, true);
+        UpdateCardsList(cardPlace2, tempCard1, true);
 
     }
 
@@ -713,12 +713,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         int index2 = GetIndexOfCard(cardSwap2);
         GetListByTag(cardSwap1.tag)[index1] = cardSwap2;
         GetListByTag(cardSwap2.tag)[index2] = cardSwap1;
-    }
-
-    private void SwapItems(List<CardUi> lists1, int index1, List<CardUi> lists2, int index2, CardUi cardSwap2, CardUi cardSwap1)
-    {
-        lists1[index1] = cardSwap1;
-        lists2[index2] = cardSwap2;
     }
 
  
@@ -737,7 +731,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             () => ResetExtraDeckCards(), null, DisableDarkScreen, null));
         Card tempCard1 = Card.StringToCard(cardFromDeckUI.cardDescription);
         Card tempCard2 = Card.StringToCard(playerCardUI.cardDescription);
-        updateCardsList(playerCard, tempCard1, true);
+        UpdateCardsList(playerCard, tempCard1, true);
         cardFromDeckUI.transform.SetParent(playerCardUI.transform.parent);
         cardFromDeckUI.name = playerCardUI.name;
         //cardFromDeckUI.tag = playerCardUI.tag;

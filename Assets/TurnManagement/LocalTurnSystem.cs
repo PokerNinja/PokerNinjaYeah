@@ -104,9 +104,6 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
 
     public bool IsPlayerStartRound()
     {
-        Debug.LogWarning("ME " + PlayerID.Value);
-        Debug.LogWarning("1" + FirstPlayerStr);
-        Debug.LogWarning("2" + SecondPlayerStr);
         if (RoundCounter.Value % 2 == 0)
         {
             return PlayerID.Value.Equals(SecondPlayerStr);

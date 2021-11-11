@@ -88,7 +88,6 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         // TODO move this to battleSystem
         // BattleSystem battleSystem = GameObject.Find("BattleSystem").GetComponent<BattleSystem>();
         //Maybe Better One
-        Debug.LogError("WW");
         if (BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.HideDialog();
@@ -118,7 +117,6 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick);
-            Debug.LogError("WWSASDS");
         }
     }
     public void OnPointerUp(PointerEventData eventData)
@@ -177,7 +175,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             if (enable)
             {
-                StartCoroutine(AnimationManager.Instance.ShinePU(true, 1, 3, spriteRenderer.material, () => LoopShine(true)));
+                StartCoroutine(AnimationManager.Instance.ShinePU(true, 1, Values.Instance.puShineEvery, spriteRenderer.material, () => LoopShine(true)));
             }
             else
             {
@@ -222,7 +220,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             EnableShake(enable);
         }
 
-        StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", spriteRenderer.material, value, () => isClickable = enable));
+        StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, spriteRenderer.material, value, () => isClickable = enable));
     }
 
     public void EnableShake(bool enable)
@@ -251,7 +249,8 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         OnStart?.Invoke();
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuUse);
-        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -25f);
+        EnableSelecetPositionZ(true);
+       // transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -25f);
         if (isPlayer)
         {
             StartCoroutine(AnimationManager.Instance.PulseSize(true, transform, 1.15f, 0.4f, true,
@@ -288,7 +287,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         isFaceDown = !reveal;
         flipInProgress = true;
-        StartCoroutine(AnimationManager.Instance.FlipCard(gameObject.transform, 0.45f, () => flipInProgress = false, () =>
+        StartCoroutine(AnimationManager.Instance.FlipCard(gameObject.transform, Values.Instance.cardFlipDuration, () => flipInProgress = false, () =>
         {
             LoadSprite(reveal);
             if (isPlayer)
@@ -296,7 +295,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 spriteRenderer.material.SetFloat("_GradBlend", 0.65f);
             }
         }, onFinish));
-        StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform.parent, 1.15f, 0.45f, false, null));
+        StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform.parent, 1.15f, Values.Instance.cardFlipDuration, false, null));
 
     }
 
@@ -310,7 +309,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         //  isClickable = !enable;
         if (enable)
         {
-            StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", spriteRenderer.material, 0f, null));
+            StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, spriteRenderer.material, 0f, null));
         }
     }
 
@@ -319,9 +318,9 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         float interval = 0f;
         if (aboveDarkScreen)
         {
-            interval = -26f;
+            interval = -11f;
         }
-        transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, interval);
+        transform.parent.localPosition = new Vector3(transform.parent.localPosition.x, transform.parent.localPosition.y, interval - puIndex);
     }
 
     #endregion

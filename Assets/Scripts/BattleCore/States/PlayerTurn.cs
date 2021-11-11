@@ -39,7 +39,7 @@ public class PlayerTurn : State
         }
         battleSystem.DealPu(true, () =>
         {
-            battleSystem.ActivatePlayerButtons();
+            battleSystem.ActivatePlayerButtons(true, true);
             battleSystem.Interface.WhosTurnAnimation(true, yourLastTurn, finalTurn);
             battleSystem.ChargeEnergyCounter(2);
         }

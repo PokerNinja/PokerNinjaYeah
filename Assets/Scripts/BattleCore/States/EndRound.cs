@@ -14,7 +14,6 @@ public class EndRound : State
 
     public EndRound(BattleSystem battleSystem, bool enemyStartsNextRound, bool isTimedOut) : base(battleSystem)
     {
-        Debug.LogError("EndRound!!!");
         this.isTimedOut = isTimedOut;
         this.enemyStartsNextRound = enemyStartsNextRound;
     }

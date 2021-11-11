@@ -76,7 +76,7 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
             BattleSystem.Instance.HideDialog();
         }
       
-            BattleSystem.Instance.EnableReplaceDialog();
+            BattleSystem.Instance.EnableReplaceDialog(false);
         
     }
     public void OnPointerUp(PointerEventData eventData)

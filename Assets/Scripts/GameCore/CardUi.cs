@@ -163,8 +163,8 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     {
         isFaceDown = !reveal;
         flipInProgress = true;
-        StartCoroutine(AnimationManager.Instance.FlipCard(gameObject.transform, 0.45f, () => flipInProgress = false, () => LoadSprite(reveal), onFinish));
-        StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform.parent, 1.15f, 0.45f, false, null));
+        StartCoroutine(AnimationManager.Instance.FlipCard(gameObject.transform, Values.Instance.cardFlipDuration, () => flipInProgress = false, () => LoadSprite(reveal), onFinish));
+        StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform.parent, 1.15f, Values.Instance.cardFlipDuration, false, null));
     }
 
     public void CardReveal(bool reveal)
@@ -183,6 +183,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
         spriteRenderer.material = burnMaterial;
 
+        float dissolveDuration = Values.Instance.cardBurnDuration;
         float dissolveAmount = -0.01f;
         float offsetX = UnityEngine.Random.Range(-1.18f, -0.73f);
         spriteRenderer.material.SetTextureOffset("_FadeTex", new Vector2(offsetX, -0.14f));
@@ -190,7 +191,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.BurnCard);
         while (dissolveAmount < 1)
         {
-            dissolveAmount += Time.deltaTime;
+            dissolveAmount += Time.deltaTime / dissolveDuration ;
             spriteRenderer.material.SetFloat("_FadeAmount", dissolveAmount);
             yield return new WaitForFixedUpdate();
             if (dissolveAmount >= 1)

@@ -9,12 +9,11 @@ public class BeginRound : State
     private float delayForStart;
     public BeginRound(BattleSystem battleSystem , bool isPlayerTurn, bool isFirstRound) : base(battleSystem)
     {
-        Debug.LogWarning("Begin Round" + isPlayerTurn + isFirstRound);
         this.isPlayerTurn = isPlayerTurn;
-        delayForStart = 2f;
+        delayForStart = Values.Instance.delayBeforeStartNewRound;
         if (isFirstRound)
         {
-        delayForStart = 1f;
+        delayForStart = Values.Instance.delayBeforeStartFirstRound;
         }
     }
 
@@ -33,7 +32,7 @@ public class BeginRound : State
         battleSystem.Interface.EnableBgColor(false);
         battleSystem.isPlayerActivatePu = false;
         battleSystem.readyToPlay = true;
-        battleSystem.UpdateHandRank();
+        battleSystem.UpdateHandRank(false);
         if (isPlayerTurn)
         {
             battleSystem.SetState(new PlayerTurn(battleSystem,6));

@@ -115,6 +115,7 @@ public class BattleUI : MonoBehaviour
     private string playerName, enemyName;
 
     private bool sliding;
+    private int lastHandRank = 10;
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy)
     {
@@ -133,7 +134,7 @@ public class BattleUI : MonoBehaviour
 
     private void StartShineEffectLoop(Material material, float interval)
     {
-        StartCoroutine(AnimationManager.Instance.ShinePU(true, interval, 3, material, () => StartShineEffectLoop(material, interval)));
+        StartCoroutine(AnimationManager.Instance.ShinePU(true, interval, Values.Instance.coinShineEvery, material, () => StartShineEffectLoop(material, interval)));
     }
 
     private void InitializePlayer(PlayerInfo player)
@@ -163,7 +164,7 @@ public class BattleUI : MonoBehaviour
 
     public IEnumerator CardProjectileEffect(bool isPlayerWin, Action HitEffect, Action LoseCoin)
     {
-     
+
         if (isPlayerWin)
         {
             rightCard.transform.position = Values.Instance.winCardRightStart.position;
@@ -217,7 +218,7 @@ public class BattleUI : MonoBehaviour
         {
             spTarget = enemyLifeUi[lifeIndex];
         }
-        StartCoroutine(AnimationManager.Instance.LoseLifeAnimation(spTarget, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(spTarget, false, 0.5f, null))));
+        StartCoroutine(AnimationManager.Instance.LoseLifeAnimation(spTarget, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(spTarget, false, Values.Instance.LoseLifeDuration, null))));
     }
 
     internal void InitAvatars()
@@ -258,7 +259,7 @@ public class BattleUI : MonoBehaviour
             hitSpriteRen.color = new Color(hitSpriteRen.color.r, hitSpriteRen.color.g, hitSpriteRen.color.b, 1f);
             // StartCoroutine(AnimationManager.HitEffect(hitSpriteRen, () => hitGO.SetActive(false)));
 
-            StartCoroutine(AnimationManager.Instance.ScaleObject(false, 10f, 2f, hitGO.transform, null, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(hitSpriteRen, false, 2f, null))));
+            StartCoroutine(AnimationManager.Instance.ScaleObject(false, 10f, Values.Instance.hitTextScaleDuration, hitGO.transform, null, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(hitSpriteRen, false, Values.Instance.hitTextFDuration, null))));
 
 
         }
@@ -278,14 +279,14 @@ public class BattleUI : MonoBehaviour
                 InitDialog(puDisplayName, PowerUpStruct.Instance.GetPuInfoByName(puName), isBtnOn);
             }
             StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialogTransform, OnEnd));
-            StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, true, 2f, null));
+            StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, true, Values.Instance.showDialogMoveDuration, null));
         }
         else
         {
             if (dialogSprite.color.a > 0)
             {
-                StartCoroutine(AnimationManager.Instance.AlphaAnimation(dialogSprite, false, 5f, OnEnd));
-                StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, false, 5f, null));
+                StartCoroutine(AnimationManager.Instance.AlphaAnimation(dialogSprite, false, Values.Instance.infoDialogFadeOutDuration, OnEnd));
+                StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, false, Values.Instance.infoDialogFadeOutDuration, null));
             }
         }
 
@@ -443,7 +444,7 @@ public class BattleUI : MonoBehaviour
 
     public void EnableBgColor(bool enable)
     {
-        StartCoroutine(AnimationManager.Instance.PulseColorAnimation(bgSpriteRenderer, enable));
+        StartCoroutine(AnimationManager.Instance.PulseColorAnimation(bgSpriteRenderer, enable , Values.Instance.bgPulseColorSwapDuration));
     }
 
     private string GetTurnTextPath(bool isPlayer, bool yourLastTurn, bool finalMove)
@@ -496,7 +497,7 @@ public class BattleUI : MonoBehaviour
             default:
                 break;
         }
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(spriteTarget, fadeIn, 0.8f, OnFinish));
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(spriteTarget, fadeIn, Values.Instance.turnIndicatorFadeDuration, OnFinish));
     }
 
     internal void InitLargeText(bool enable, string text)
@@ -509,8 +510,28 @@ public class BattleUI : MonoBehaviour
     }
     internal void UpdateCardRank(int handRank)
     {
-        currentRankNumber.text = "" + ConvertHandRankToTextNumber(handRank);
+        int currentHandRank = ConvertHandRankToTextNumber(handRank);
+        if (lastHandRank != currentHandRank)
+        {
+            UpdateVisionColor(currentHandRank);
+            currentRankNumber.text = "" + currentHandRank;
+            StartCoroutine(AnimationManager.Instance.PulseSize(true, currentRankNumber.transform, 1.2f, Values.Instance.pulseDuration, false, null));
+            if (lastHandRank > currentHandRank)
+            {
+                //SoundManager.Instance.PlaySingleSound(HAPPY);
+            }
+            else
+            {
+                //SoundManager.Instance.PlaySingleSound(SAD);
+            }
+        }
+        lastHandRank = currentHandRank;
         // currentRankText.text = ConvertHandRankToTextDescription(handRank);
+    }
+
+    private void UpdateVisionColor(int currentHandRank)
+    {
+        Values.Instance.currentVisionColor = Values.Instance.visionColorsByRank[currentHandRank -1];
     }
 
     public string ConvertHandRankToTextDescription(int handRank)
@@ -542,34 +563,34 @@ public class BattleUI : MonoBehaviour
         }
         return "X";
     }
-    private string ConvertHandRankToTextNumber(int handRank)
+    private int ConvertHandRankToTextNumber(int handRank)
     {
         switch (handRank)
         {
             case 1:
-                return "1";
+                return 1;
             case int n when (n <= 10 && n >= 2):
-                return "2";
+                return 2;
             case int n when (n <= 166 && n >= 11):
-                return "3";
+                return 3;
             case int n when (n <= 322 && n >= 167):
-                return "4";
+                return 4;
             case int n when (n <= 1599 && n >= 323):
-                return "5";
+                return 5;
             case int n when (n <= 1609 && n >= 1600):
-                return "6";
+                return 6;
             case int n when (n <= 2467 && n >= 1610):
-                return "7";
+                return 7;
             case int n when (n <= 3325 && n >= 2468):
-                return "8";
+                return 8;
             case int n when (n <= 6185 && n >= 3326):
-                return "9";
+                return 9;
             case int n when (n <= 7462 && n >= 6186):
-                return "10";
+                return 10;
             default:
                 break;
         }
-        return "X";
+        return 10;
     }
     internal void InitProjectile(Vector2 startingPos, bool inlargeProjectile, string powerUpElement, Vector2 posTarget1, Vector2 posTarget2, Action PuIgnite)
     {
@@ -613,7 +634,7 @@ public class BattleUI : MonoBehaviour
         else
         {
             StartCoroutine(AnimationManager.Instance.AnimateWind(windSpriteRenderer, PuIgnite,
-                () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(windSpriteRenderer, false, 1f, null))));
+                () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(windSpriteRenderer, false, Values.Instance.windFadeOutDuration, null))));
         }
     }
 
@@ -633,7 +654,7 @@ public class BattleUI : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
         }
         StartCoroutine(AnimationManager.Instance.AnimateShootProjectile(false, projectile.transform, new Vector3(posTarget.x, posTarget.y, projectile.transform.position.z),
-        () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(headRenderer, false, 1.5f, () => projectile.SetActive(false))), EndAction));
+        () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(headRenderer, false, Values.Instance.puProjectileFadeOutDuration, () => projectile.SetActive(false))), EndAction));
         //   () => projectile.SetActive(false), EndAction));
 
     }

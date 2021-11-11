@@ -24,8 +24,8 @@ public class EnergyUi : MonoBehaviour
     {
         UpdateDistortionInterval(available);
         StartCoroutine(AnimationManager.Instance.FadeEnergy(
-            ()=>StartCoroutine(AnimationManager.Instance.PulseSize(true,transform,1.5f,1f,false,null)),
-            index * 0.2f, spriteRenderer.material, available,0.8f, null));
+            ()=>StartCoroutine(AnimationManager.Instance.PulseSize(true,transform,1.5f,Values.Instance.pulseDuration,false,null)),
+            index * 0.2f, spriteRenderer.material, available,Values.Instance.enrgyDissolveDuration, null));
     }
 
     private void UpdateDistortionInterval(bool available)
