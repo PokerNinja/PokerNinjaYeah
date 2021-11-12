@@ -2210,7 +2210,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &333540118
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2271,7 +2271,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 3aaccd8dac172f64d8bde9149e578c44, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3215,10 +3215,10 @@ MonoBehaviour:
   onClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 924643556}
-        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
-        m_MethodName: EnableReplaceDialog
-        m_Mode: 6
+      - m_Target: {fileID: 401379078}
+        m_TargetAssemblyTypeName: ClickHandler, Assembly-CSharp
+        m_MethodName: OnClick
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -6585,7 +6585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e3ce115113eea42bbf042a3e756011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TEST_MODE: 0
+  TEST_MODE: 1
   objectMoveDuration: 2
   FreezeDuration: 3
   LoseLifeDuration: 1
@@ -6650,6 +6650,12 @@ MonoBehaviour:
   windMoveDuration: 0.3
   windFadeOutDuration: 1
   puProjectileFadeOutDuration: 0.7
+  turnBtnAlphaDuration: 1
+  delayTimerStart: 1
+  replaceUseLimit: 1
+  skillUseLimit: 1
+  resetReplaceEvery: 0
+  resetSkillEvery: 1
 --- !u!198 &884457560 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 4783028347898946969, guid: a0541a2ff66d0a24099aae12176ad678, type: 3}
@@ -7094,24 +7100,26 @@ MonoBehaviour:
   cardsDeckUi: {fileID: 1064032605134543352}
   puDeckUi: {fileID: 1064032605821642493}
   skillBtn: {fileID: 1214913975}
+  newPowerUpName: 
   prizeAmount: 1000
-  turnTimeCounter: 60
   currentTurn: 6
   turnTimer: {fileID: 565274803}
   enemyPuIsRunning: 0
   isPlayerActivatePu: 0
   playerLifeLeft: 0
   enemyLifeLeft: 0
+  replacePuLeft: 0
+  skillUseLeft: 0
   sameCardsSelection: 0
   selectMode: 0
-  energyCounter: 0
-  replaceMode: 0
   endRoutineFinished: 0
   gameOver: 0
   startNewRound: 0
   infoShow: 0
   skillUsed: 0
   btnReplaceClickable: 0
+  energyCounter: 0
+  replaceMode: 0
 --- !u!4 &924643557
 Transform:
   m_ObjectHideFlags: 0
@@ -9831,7 +9839,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: AllIn1SpriteShader/AllIn1SpriteShaderUiMask
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
-  m_ShaderKeywords: SHAKEUV_ON
+  m_ShaderKeywords: GRADIENT_ON SHAKEUV_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -9938,7 +9946,7 @@ Material:
     - _GlitchSize: 1
     - _Glow: 10
     - _GlowTexUsed: 0
-    - _GradBlend: 1
+    - _GradBlend: 0
     - _GradBoostX: 1.2
     - _GradBoostY: 1.2
     - _GradIsRadial: 0
@@ -10048,10 +10056,10 @@ Material:
     - _ColorSwapRed: {r: 1, g: 1, b: 1, a: 1}
     - _FadeBurnColor: {r: 1, g: 1, b: 0, a: 1}
     - _GlowColor: {r: 1, g: 1, b: 1, a: 1}
-    - _GradBotLeftCol: {r: 0, g: 0, b: 1, a: 1}
-    - _GradBotRightCol: {r: 0, g: 0, b: 1, a: 1}
-    - _GradTopLeftCol: {r: 1, g: 0, b: 0, a: 1}
-    - _GradTopRightCol: {r: 1, g: 0, b: 0, a: 1}
+    - _GradBotLeftCol: {r: 0.05882353, g: 0.14509805, b: 0.20392157, a: 1}
+    - _GradBotRightCol: {r: 0.023529412, g: 0.023529412, b: 0.023529412, a: 1}
+    - _GradTopLeftCol: {r: 0.078431375, g: 0.38431373, b: 0.23921569, a: 1}
+    - _GradTopRightCol: {r: 0.14117648, g: 0.43529412, b: 0.29803923, a: 1}
     - _GreyscaleTintColor: {r: 1, g: 1, b: 1, a: 1}
     - _HitEffectColor: {r: 1, g: 1, b: 1, a: 1}
     - _HologramStripeColor: {r: 0, g: 1, b: 1, a: 1}
@@ -11936,6 +11944,7 @@ MonoBehaviour:
   dialogTitleUi: {fileID: 1229164857}
   dialogContentUi: {fileID: 820231259}
   turnBtn: {fileID: 333540117}
+  turnBtnSpriteREnderer: {fileID: 333540119}
   replaceBtn: {fileID: 401379075}
   currentRankText: {fileID: 172212462}
   currentRankNumber: {fileID: 1337639257}
@@ -17829,6 +17838,7 @@ MonoBehaviour:
   enemyPuBParent: {fileID: 8642770792649992748}
   playerPusUi: []
   enemyPusUi: []
+  playerSkillUi: {fileID: 1214913975}
 --- !u!1 &1064032605821642494
 GameObject:
   m_ObjectHideFlags: 0

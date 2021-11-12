@@ -8,15 +8,14 @@ public class Timer : MonoBehaviour
 {
 
     [SerializeField] private Image countdownCircleTimer;
-    [SerializeField] private float startTime;
+    [SerializeField] private float countTimer ;
     private bool endTurnByPlayer;
 
     //  [SerializeField] private float countTimer;
     private bool updateTime;
     private bool countDownRunning;
     private bool isPlayer;
-    private float totalTime = 40;
-    private float countTimer ;
+    private float totalTime;
     private int starting;
     private Coroutine thereCanBeOnlyOne;
 
@@ -31,12 +30,12 @@ public class Timer : MonoBehaviour
         countdownCircleTimer.fillAmount = 1.0f;
         thereCanBeOnlyOne = null;
     }
-    public IEnumerator StartTimer()
+    public IEnumerator StartTimer(float timerDuration)
     {
-        yield return new WaitForSeconds(3);
-        //audioSource.Play();
+        yield return new WaitForSeconds(Values.Instance.delayTimerStart);
         endTurnByPlayer = false;
         updateTime = true;
+        totalTime = timerDuration;
         countTimer = totalTime;
         if (thereCanBeOnlyOne == null)
         {
@@ -78,11 +77,7 @@ public class Timer : MonoBehaviour
 
     private IEnumerator CountDown()
     {
-        bool isPlayerTurn = false;
-        if (!Values.Instance.TEST_MODE)
-        {
-        isPlayerTurn = LocalTurnSystem.Instance.IsPlayerTurn();
-        }
+        bool isPlayerTurn = BattleSystem.Instance.IsPlayerTurn();
         bool isLastSeconds = false;
         while (countTimer > 0 && updateTime)
         {
@@ -96,7 +91,7 @@ public class Timer : MonoBehaviour
             float normalizedValue = Mathf.Clamp(
             countTimer / totalTime, 0.0f, 1.0f);
             countdownCircleTimer.fillAmount = normalizedValue;
-            if (countTimer <= 0 || !updateTime)
+            /*if (countTimer <= 0 || !updateTime)
             {
                 if (isLastSeconds)
                 {
@@ -107,7 +102,7 @@ public class Timer : MonoBehaviour
                     BattleSystem.Instance.OnTimeOut();
                 }
                 break;
-            }
+            }*/
             yield return null; //Don't freeze Unity
         }
         if (countTimer <= 0 || !updateTime)
@@ -125,9 +120,5 @@ public class Timer : MonoBehaviour
     }
 
 
-    internal void InitTimer(float startTime)
-    {
-
-        this.startTime = startTime;
-    }
+ 
 }

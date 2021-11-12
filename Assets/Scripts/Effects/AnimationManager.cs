@@ -642,6 +642,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
     public IEnumerator AnimateShootProjectile(bool activateFade, Transform projectile, Vector3 posTarget, Action FadeOut, Action endAction)
     {
+        
         float startTime = Time.time;
         float t;
         float speed = 3f;

@@ -522,7 +522,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void DisableCardsSelection(string cardPlace)
     {
-
+        Debug.LogError("disable" + cardPlace);
         foreach (CardUi card in GetListByTag(CardPlaceToTag(cardPlace)))
         {
             card.SetSelection(false,"");
@@ -718,7 +718,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
  
     internal void SwapAndDestroy(string cardFromDeck, string playerCard, Action DisableDarkScreen)
     {
-
+        Debug.LogError("card" + cardFromDeck);
+        Debug.LogError("card" + playerCard);
         CardUi cardFromDeckUI = GameObject.Find(cardFromDeck).GetComponent<CardUi>();
         CardUi playerCardUI = GameObject.Find(playerCard).GetComponent<CardUi>();
         /*int sortingOrder1 = cardFromDeckUI.GetComponent<Renderer>().sortingOrder;

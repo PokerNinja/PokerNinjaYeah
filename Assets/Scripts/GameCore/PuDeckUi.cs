@@ -36,6 +36,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     public PowerUpUi[] playerPusUi;
     public PowerUpUi[] enemyPusUi;
+    public PowerUpUi playerSkillUi;
 
 
     public static PuDeckUi Instance()
@@ -231,10 +232,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         enemyPusUi[1] = null;
     }
 
-    private IEnumerable<CardUi> FindAllCardsObjects()
-    {
-        return FindObjectsOfType<CardUi>();
-    }
+  
 
 
     public void DealRoutine(bool isPlayer, Action OnEnd)
@@ -402,25 +400,10 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     }
 
 
-    private GameObject GetParentByPlace(string cardPlace)
-    {
-        return GameObject.Find(cardPlace + "Slut");
-    }
 
 
-    public string CardPlaceToTag(string cardPlace)
-    {
-        if (cardPlace.Contains("Player"))
-        {
-            return "PuP";
-        }
-        else if (cardPlace.Contains("Enemy"))
-        {
-            return "PuE";
 
-        }
-        return "";
-    }
+ 
 
     internal PowerUpUi GetPu(bool isPlayer, int puIndex)
     {
@@ -472,5 +455,10 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         {
             return enemyPusUi[puIndex];
         }
+    }
+
+    internal void EnablePlayerSkill(bool enable)
+    {
+        playerSkillUi.EnablePu(enable);
     }
 }

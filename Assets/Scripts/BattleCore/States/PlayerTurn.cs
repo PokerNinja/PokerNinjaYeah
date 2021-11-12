@@ -32,13 +32,23 @@ public class PlayerTurn : State
     public override IEnumerator Start()
     {
         battleSystem.skillUsed = false;
-        battleSystem.Interface.SetTurnIndicator(true, true);
-        if (!cancaleTimer)
+        battleSystem.newPowerUpName = "x";
+        if(Values.Instance.resetReplaceEvery == Values.GamePhase.Turn)
         {
-        battleSystem.NewTimerStarter(true);
+            battleSystem.replacePuLeft = Values.Instance.replaceUseLimit;
         }
+        if(Values.Instance.resetSkillEvery == Values.GamePhase.Turn)
+        {
+            battleSystem.skillUseLeft = Values.Instance.skillUseLimit;
+        }
+        battleSystem.Interface.SetTurnIndicator(true, true);
+       
         battleSystem.DealPu(true, () =>
         {
+            if (!cancaleTimer)
+            {
+                battleSystem.NewTimerStarter(true);
+            }
             battleSystem.ActivatePlayerButtons(true, true);
             battleSystem.Interface.WhosTurnAnimation(true, yourLastTurn, finalTurn);
             battleSystem.ChargeEnergyCounter(2);

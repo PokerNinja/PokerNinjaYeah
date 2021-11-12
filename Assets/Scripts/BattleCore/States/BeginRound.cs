@@ -32,6 +32,14 @@ public class BeginRound : State
         battleSystem.Interface.EnableBgColor(false);
         battleSystem.isPlayerActivatePu = false;
         battleSystem.readyToPlay = true;
+        if (Values.Instance.resetReplaceEvery == Values.GamePhase.Round)
+        {
+            battleSystem.replacePuLeft = Values.Instance.replaceUseLimit;
+        }
+        if (Values.Instance.resetSkillEvery == Values.GamePhase.Round)
+        {
+            battleSystem.skillUseLeft = Values.Instance.skillUseLimit;
+        }
         battleSystem.UpdateHandRank(false);
         if (isPlayerTurn)
         {

@@ -106,6 +106,7 @@ public class BattleUI : MonoBehaviour
 
 
     [SerializeField] private GameObject turnBtn;
+    [SerializeField] private SpriteRenderer turnBtnSpriteREnderer;
     [SerializeField] private Button replaceBtn;
     //  [SerializeField] private SpriteRenderer turnIndicator;
     [SerializeField] public TextMeshProUGUI currentRankText;
@@ -236,9 +237,12 @@ public class BattleUI : MonoBehaviour
 
     public void EnablePlayerButtons(bool enable)
     {
-        turnBtn.GetComponent<Button>().interactable = enable;
-        turnBtn.SetActive(enable);
-        BattleSystem.Instance.btnReplaceClickable = enable;
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnBtnSpriteREnderer, enable, Values.Instance.turnBtnAlphaDuration, () => turnBtn.GetComponent<Button>().interactable = enable));
+        
+        if (BattleSystem.Instance.replacePuLeft > 0)
+        {
+            EnableBtnReplace(enable);
+        }
         isPlayerTurn = enable;
     }
 
@@ -444,7 +448,7 @@ public class BattleUI : MonoBehaviour
 
     public void EnableBgColor(bool enable)
     {
-        StartCoroutine(AnimationManager.Instance.PulseColorAnimation(bgSpriteRenderer, enable , Values.Instance.bgPulseColorSwapDuration));
+        StartCoroutine(AnimationManager.Instance.PulseColorAnimation(bgSpriteRenderer, enable, Values.Instance.bgPulseColorSwapDuration));
     }
 
     private string GetTurnTextPath(bool isPlayer, bool yourLastTurn, bool finalMove)
@@ -531,7 +535,7 @@ public class BattleUI : MonoBehaviour
 
     private void UpdateVisionColor(int currentHandRank)
     {
-        Values.Instance.currentVisionColor = Values.Instance.visionColorsByRank[currentHandRank -1];
+        Values.Instance.currentVisionColor = Values.Instance.visionColorsByRank[currentHandRank - 1];
     }
 
     public string ConvertHandRankToTextDescription(int handRank)
@@ -750,6 +754,16 @@ public class BattleUI : MonoBehaviour
     {
         StartCoroutine(AnimationManager.Instance.Shake(coinsSpriteRend[index].material));
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinHit);
+    }
+
+    internal void EnableBtnReplace(bool enable)
+    {
+        float value = 0.65f;
+        if (enable)
+        {
+            value = 0;
+        }
+        StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, btnReplaceRenderer.material, value, () => BattleSystem.Instance.btnReplaceClickable = enable));
     }
 
 

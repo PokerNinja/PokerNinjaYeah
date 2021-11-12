@@ -1,10 +1,13 @@
 using MyBox;
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Values : Singleton<Values>
 {
+    [Title("Titles and Headers")]
+    [GUIColor(1f, 1f, 0f)]
     public bool TEST_MODE = false;
     public float objectMoveDuration;
     public float FreezeDuration =3 ;
@@ -70,4 +73,19 @@ public class Values : Singleton<Values>
     public float windFadeOutDuration =1f;
     public float puProjectileFadeOutDuration = 0.4f;
 
+    public float turnBtnAlphaDuration = 1f;
+
+    public int delayTimerStart = 3;
+
+    public int replaceUseLimit = 1;
+    public int skillUseLimit = 1;
+    public GamePhase resetReplaceEvery = GamePhase.Turn;
+    public GamePhase resetSkillEvery = GamePhase.Round;
+
+    public enum GamePhase
+    {
+        Turn,
+        Round,
+        Game,
+    }
 }

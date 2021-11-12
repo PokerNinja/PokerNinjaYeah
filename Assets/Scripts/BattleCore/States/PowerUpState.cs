@@ -117,6 +117,7 @@ public class PowerUpState : State
         if (puIndex != -1)
         {
             battleSystem.DissolvePuAfterUse(isPlayerActivate, puIndex);
+            battleSystem.ReduceSkillUse();
         }
         if (isPlayerActivate)
         {
