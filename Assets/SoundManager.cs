@@ -61,7 +61,8 @@ public class SoundManager : Singleton<SoundManager>
 
     private void Awake()
     {
-      
+        GLOBAL_SFX_VOLUME = Values.Instance.sfxVolume;
+        MAX_VOL_MUSIC = Values.Instance.musicVolume;
         InitPool();
 
     }
