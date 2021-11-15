@@ -6059,7 +6059,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TEST_MODE: 1
-  turnTimerDuration: 40
+  turnTimerDuration: 35
   sfxVolume: 0.9
   musicVolume: 0.9
   delayBeforeStartNewRound: 2
