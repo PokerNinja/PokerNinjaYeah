@@ -58,3 +58,6 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+ProjectSettings/HDRPProjectSettings.asset
+Assets/StreamingAssets/google-services-desktop.json.meta
+UserSettings/EditorUserSettings.asset
