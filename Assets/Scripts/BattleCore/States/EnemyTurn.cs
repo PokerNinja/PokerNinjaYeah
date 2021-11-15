@@ -18,9 +18,13 @@ public class EnemyTurn : State
     {
         battleSystem.Interface.EnableBgColor(false);
         battleSystem.Interface.EnablePlayerButtons(false);
-       battleSystem.NewTimerStarter(false);
         battleSystem.Interface.SetTurnIndicator(false, true);
-        battleSystem.DealPu(false,()=> battleSystem.Interface.WhosTurnAnimation(false, false, isFinalTurn));
+        battleSystem.DealPu(false, () =>
+         {
+             battleSystem.NewTimerStarter(false);
+             battleSystem.Interface.WhosTurnAnimation(false, false, isFinalTurn);
+         }
+        );
         yield break;
 
     }

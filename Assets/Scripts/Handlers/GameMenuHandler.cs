@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using static DataBaseAPI;
 using System.Text.RegularExpressions;
 using System;
+using Sirenix.OdinInspector;
 
 public class GameMenuHandler : MonoBehaviour
 {
@@ -14,9 +15,6 @@ public class GameMenuHandler : MonoBehaviour
     public GameObject wrongTypeText;
     public GameObject tutorialImage;
     private bool tutorialVisible = false;
-
-    public string RegexPattern;
-    public string textToCheck;
 
     public void Awake()
     {
@@ -53,6 +51,11 @@ public class GameMenuHandler : MonoBehaviour
         }
     }
 
+    [Button]
+    private void GetGameLogByNicnName(string nickname)
+    {
+        DatabaseAPI.GetGameLogByNicnName(nickname);
+    }
     private void SavePlayerNickName(string playerNickName)
     {
         PlayerPrefs.SetString("player_name", playerNickName);

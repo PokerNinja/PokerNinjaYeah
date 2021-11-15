@@ -186,7 +186,7 @@ public class AnimationManager : Singleton<AnimationManager>
             OnFinish?.Invoke();
         }
     }
-    public IEnumerator AlphaFontAnimation(TMPro.TextMeshProUGUI txtMesh, bool fadeIn, float speedInterval, Action OnFinish)
+    public IEnumerator AlphaFontAnimation(TMPro.TextMeshProUGUI txtMesh, bool fadeIn, float duration, Action OnFinish)
     {
         float r = txtMesh.color.r;
         float g = txtMesh.color.g;
@@ -206,14 +206,14 @@ public class AnimationManager : Singleton<AnimationManager>
             yield return new WaitForFixedUpdate();
             if (fadeIn)
             {
-                dissolveAmount += Time.deltaTime;
+                dissolveAmount += Time.deltaTime / duration;
             }
             else
             {
-                dissolveAmount -= Time.deltaTime;
+                dissolveAmount -= Time.deltaTime / duration;
             }
 
-            txtMesh.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount * speedInterval));
+            txtMesh.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
             if (txtMesh.color.a == alphaTarget)
             {
                 OnFinish?.Invoke();

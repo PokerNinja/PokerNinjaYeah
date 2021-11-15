@@ -49,6 +49,7 @@ public class Values : Singleton<Values>
     public float showDialogMoveDuration = 0.5f;
 
     [Title("CardUi", bold: false)]
+    public Color cardSelectionColor ;
     public float FreezeDuration =3f ;
     public float cardDrawMoveDuration = 2f;
     public float cardSwapMoveDuration = 2f;

@@ -31,6 +31,7 @@ public class PlayerTurn : State
 
     public override IEnumerator Start()
     {
+        battleSystem.endTurnInProcess = false;
         battleSystem.skillUsed = false;
         battleSystem.newPowerUpName = "x";
         if(Values.Instance.resetReplaceEvery == Values.GamePhase.Turn)

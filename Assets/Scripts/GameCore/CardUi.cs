@@ -120,11 +120,16 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     {
         if (!freeze || freeze && puElement.Equals("f") || freeze && !selectionEnable)
         {
+
             if (BattleSystem.Instance.cardsToSelectCounter > 0)
                 clickbleForPU = selectionEnable;
             cardSelection.SetActive(selectionEnable);
             if (selectionEnable)
             {
+                Debug.LogWarning("cardS " + cardPlace);
+
+                //DELETE when sure
+                cardSelectionRenderer.color = Values.Instance.cardSelectionColor;
                 StartCoroutine(CardSelectionPulse(cardSelectionRenderer));
             }
         }

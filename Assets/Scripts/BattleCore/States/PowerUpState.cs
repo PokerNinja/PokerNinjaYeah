@@ -123,6 +123,7 @@ public class PowerUpState : State
         {
             battleSystem.ReduceEnergy(energyCost);
             battleSystem.selectMode = false;
+            battleSystem.playerPuInProcess = true;
         }
         switch (powerUpName)
         {
@@ -255,9 +256,17 @@ public class PowerUpState : State
     }
     private void EnableSelectForCardsList(List<CardUi> cardsList, bool enable)
     {
+        Debug.LogWarning("ActivitingSelect");
+        string puElement = powerUpName.Substring(0, 1);
+        if (powerUpName.Equals("fm1"))
+        {
+            puElement = "x";
+            Debug.LogWarning("POPO");
+
+        }
         foreach (CardUi card in cardsList)
         {
-            card.SetSelection(enable, powerUpName.Substring(0,1));
+            card.SetSelection(enable, puElement);
         }
     }
 
@@ -278,6 +287,7 @@ public class PowerUpState : State
 
     private void ActivateCardSelection(string[] cardsToActivate)
     {
+        Debug.LogWarning("Activiting");
         if (cardsToActivate[0] == Constants.AllCardsTag)
         {
             battleSystem.resetAllCardsSelectionWhenCardClicked = true;

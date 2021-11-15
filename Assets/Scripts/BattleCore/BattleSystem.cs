@@ -66,6 +66,7 @@ public class BattleSystem : StateMachine, ITimeOut
     internal bool resetAllCardsSelectionWhenCardClicked;
 
     public bool selectMode;
+    public bool playerPuInProcess;
     private bool waitForDrawerAnimationToEnd = false;
 
     private int currentRound = 1;
@@ -110,6 +111,8 @@ public class BattleSystem : StateMachine, ITimeOut
 
 
     public bool replaceMode = false;
+    public bool endTurnInProcess = false;
+
     public event Action onGameStarted;
     private void Start()
     {
@@ -204,6 +207,7 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         if (selectMode && !TemproryUnclickable)
         {
+            TemproryUnclickable = true;
             selectMode = false;
             sameCardsSelection = false;
             isPlayerActivatePu = false;
@@ -219,6 +223,7 @@ public class BattleSystem : StateMachine, ITimeOut
                 puDeckUi.EnablePusZ(true, false);
                 cardsDeckUi.DisableCardsSelection(Constants.AllCardsTag);
                 ActivatePlayerButtons(!endTurn, false);
+                TemproryUnclickable = false;
             });
         }
         if (replaceMode && !TemproryUnclickable)
@@ -293,14 +298,6 @@ public class BattleSystem : StateMachine, ITimeOut
         {
             ui.winLabel.SetActive(false);
             SetState(new BeginRound(this, LocalTurnSystem.Instance.IsPlayerStartRound(), false));
-            if (LocalTurnSystem.Instance.IsPlayerStartRound())
-            {
-                ui.playerNameText.text = "I Start " + currentRound;
-            }
-            else
-            {
-                ui.enemyNameText.text = "E Start " + currentRound;
-            }
         }
         else
         {
@@ -417,14 +414,18 @@ public class BattleSystem : StateMachine, ITimeOut
 
     public void EndTurn()
     {
-        DisableSelectMode(true);
-        ui.EnableBgColor(false);
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
-        DisablePlayerPus();
-        ResetTimers();
-        gameManager.AddGameActionLog(GameManager.ActionEnum.EndTurn, "end of turn: " + currentTurn, () => { }, Debug.Log);
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong);
-        LocalTurnSystem.Instance.PassTurn();
+        if (!endTurnInProcess)
+        {
+            endTurnInProcess = true;
+            DisableSelectMode(true);
+            ui.EnableBgColor(false);
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
+            DisablePlayerPus();
+            ResetTimers();
+            gameManager.AddGameActionLog(GameManager.ActionEnum.EndTurn, "end of turn: " + currentTurn, () => { }, Debug.Log);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong);
+            LocalTurnSystem.Instance.PassTurn();
+        }
     }
 
 
@@ -449,10 +450,36 @@ public class BattleSystem : StateMachine, ITimeOut
                 SetState(new PowerUpState(this, true, newEnergyCost, newPowerUpName, Constants.PlayerCard1, Constants.deckCardsNames[0], cardsDeckUi.GetCardPosition(Constants.PlayerCard1), cardsDeckUi.GetCardPosition(Constants.deckCardsNames[0]), newPuSlotIndexUse));
                 timedOut = true;
             }
+            else 
+            {
+                StartCoroutine(WaitForPuToEndLoop());
+            }
+            
+        }
+    }
+
+    private IEnumerator WaitForPuToEndLoop()
+    {
+        /*if (selectMode)
+        {
+            DisableSelectMode(true);
+        }*/
+        while (playerPuInProcess)
+        {
+            yield return new WaitForSeconds(0.3f);
+            if (playerPuInProcess)
+            {
+                StartCoroutine(WaitForPuToEndLoop());
+                break;
+            }
             else
             {
                 EndTurn();
             }
+        }
+        if (!playerPuInProcess)
+        {
+            EndTurn();
         }
     }
 
@@ -788,6 +815,8 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         if (cardsToSelectCounter == 0)
         {
+            playerPuInProcess = true;
+
             ResetValuesAfterCardSelection(cardPlace);
 
             yield return new WaitForSeconds(0.5f);
@@ -1102,6 +1131,7 @@ public class BattleSystem : StateMachine, ITimeOut
         if (!enable)
         {
             enemyPuIsRunning = false;
+            playerPuInProcess = false;
             foreach (CardUi card in cardsDeckUi.GetListByTag("All"))
             {
                 card.EnableSelecetPositionZ(false);
@@ -1370,12 +1400,12 @@ public class BattleSystem : StateMachine, ITimeOut
         }
         else
         {
-            if (enable)
+            if (enable && !endTurnInProcess)
             {
                 ui.EnablePlayerButtons(true);
                 ActivatePlayerPus();
             }
-            else
+            else if(!enable)
             {
                 ui.EnablePlayerButtons(false);
                 DisablePlayerPus();

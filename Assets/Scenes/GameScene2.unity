@@ -6622,8 +6622,9 @@ MonoBehaviour:
   darkScreenAlphaDuration: 0.4
   shineDuration: 0.4
   coinShineEvery: 3
-  infoDialogFadeOutDuration: 0.2
-  showDialogMoveDuration: 0.5
+  infoDialogFadeOutDuration: 0.1
+  showDialogMoveDuration: 0.4
+  cardSelectionColor: {r: 0.92941177, g: 0.654902, b: 0.21960784, a: 0}
   FreezeDuration: 3
   cardDrawMoveDuration: 2
   cardSwapMoveDuration: 2
@@ -6654,10 +6655,10 @@ MonoBehaviour:
   bgPulseColorSwapDuration: 1.4
   hitTextScaleDuration: 2
   hitTextFDuration: 0.5
-  disableClickShakeSpeed: 1.8
-  disableClickShakeX: 1
-  disableClickShakeY: 0.05
-  disableClickShakeDuration: 0.3
+  disableClickShakeSpeed: 1.33
+  disableClickShakeX: 1.11
+  disableClickShakeY: 0.06
+  disableClickShakeDuration: 0.21
 --- !u!198 &884457560 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 4783028347898946969, guid: a0541a2ff66d0a24099aae12176ad678, type: 3}
@@ -7114,6 +7115,7 @@ MonoBehaviour:
   skillUseLeft: 0
   sameCardsSelection: 0
   selectMode: 0
+  playerPuInProcess: 0
   endRoutineFinished: 0
   gameOver: 0
   startNewRound: 0
@@ -7122,6 +7124,7 @@ MonoBehaviour:
   btnReplaceClickable: 0
   energyCounter: 0
   replaceMode: 0
+  endTurnInProcess: 0
 --- !u!4 &924643557
 Transform:
   m_ObjectHideFlags: 0
@@ -12320,7 +12323,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1425635193
 Transform:
   m_ObjectHideFlags: 0
@@ -12329,7 +12332,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1425635192}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.65, z: -8.793528}
+  m_LocalPosition: {x: 0, y: -2.26, z: -8.793528}
   m_LocalScale: {x: 0.87935275, y: 0.87935275, z: 0.87935275}
   m_Children: []
   m_Father: {fileID: 1086262519}
@@ -14243,7 +14246,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1733580383
 Transform:
   m_ObjectHideFlags: 0

@@ -236,6 +236,5 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
 
         return CurrentPlayerID.Value.ToString().Equals(PlayerID.Value.ToString());
     }
-
-
+ 
 }
