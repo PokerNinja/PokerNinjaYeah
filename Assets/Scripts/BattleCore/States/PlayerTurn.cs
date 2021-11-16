@@ -34,10 +34,10 @@ public class PlayerTurn : State
         battleSystem.endTurnInProcess = false;
         battleSystem.skillUsed = false;
         battleSystem.newPowerUpName = "x";
-        if(Values.Instance.resetReplaceEvery == Values.GamePhase.Turn)
+       /* if(Values.Instance.resetReplaceEvery == Values.GamePhase.Turn)
         {
             battleSystem.replacePuLeft = Values.Instance.replaceUseLimit;
-        }
+        }*/
         if(Values.Instance.resetSkillEvery == Values.GamePhase.Turn)
         {
             battleSystem.skillUseLeft = Values.Instance.skillUseLimit;

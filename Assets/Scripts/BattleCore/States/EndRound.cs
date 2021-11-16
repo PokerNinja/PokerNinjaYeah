@@ -24,7 +24,9 @@ public class EndRound : State
         battleSystem.ResetTimers();
         battleSystem.Interface.EnablePlayerButtons(false);
         battleSystem.Interface.SetTurnIndicator(false, false);
-       // yield return new WaitForSeconds(2.5f);
+        battleSystem.Interface.EnableVisionClick(false);
+
+        // yield return new WaitForSeconds(2.5f);
         //bool playerStartNextRound = battleSystem.FirstToPlay(false); // MAYBE here 
 
         string winningText = "ERROR";

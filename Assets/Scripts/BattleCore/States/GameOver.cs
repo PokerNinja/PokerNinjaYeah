@@ -19,6 +19,10 @@ public class GameOver : State
              battleSystem.WinParticleEffect();
             battleSystem.UpdateWinnerDB();
         }
+        else
+        {
+            battleSystem.Interface.BgFadeInColor();
+        }
     }
 
    

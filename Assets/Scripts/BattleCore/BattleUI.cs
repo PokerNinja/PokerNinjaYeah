@@ -1,10 +1,8 @@
-﻿using Com.InfallibleCode.TurnBasedGame.Combat;
-using Serializables;
+﻿
 using StandardPokerHandEvaluator;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,8 +14,8 @@ public class BattleUI : MonoBehaviour
 
     [SerializeField] public TextMeshProUGUI playerNameText;
     [SerializeField] public TextMeshProUGUI enemyNameText;
-    [SerializeField] public SpriteRenderer[] playerLifeUi;
-    [SerializeField] public SpriteRenderer[] enemyLifeUi;
+    [SerializeField] public GameObject[] playerLifeUi;
+    [SerializeField] public GameObject[] enemyLifeUi;
     [SerializeField] public PowerUpUi[] enemyPus;
     [SerializeField] public PowerUpUi[] playerPus;
 
@@ -38,6 +36,7 @@ public class BattleUI : MonoBehaviour
 
     [SerializeField] public GameObject rankingImg;
     [SerializeField] public SpriteRenderer darkScreenRenderer;
+    [SerializeField] public SpriteRenderer cancelDarkScreenRenderer;
     [SerializeField] public TextMeshProUGUI largeText;
     [SerializeField] public GameObject largeTextGO;
 
@@ -92,11 +91,9 @@ public class BattleUI : MonoBehaviour
 
     public SpriteRenderer rightCardChildSprite, leftCardChildSprite;
     public Transform rightCardTarget, leftCardTarget;
-    private Vector3 rightCardStartPositionWin = new Vector3(3.18f, -6.2f, 60f);
-    private Vector3 leftCardStartPositionWin = new Vector3(-3.94f, -6.2f, 60f);
-    private Vector3 rightCardStartPositionLose = new Vector3(-6.97f, 13.3f, 60f);
-    private Vector3 leftCardStartPositionLose = new Vector3(4.98f, 13.14f, 60f);
 
+    public Transform enemyHandLocation;
+    public Transform playerHandLocation;
 
     //Buttons
 
@@ -177,21 +174,25 @@ public class BattleUI : MonoBehaviour
             leftCard.transform.position = Values.Instance.winCardLeftEnd.position;
         }
         HitEffect?.Invoke();
+        LoseCoin?.Invoke();
         yield return new WaitForSeconds(0.25f);
         rightCard.SetActive(true);
         leftCard.SetActive(true);
         StartCoroutine(AnimationManager.Instance.SpinRotateValue(rightCardChildSprite, null));
-        StartCoroutine(AnimationManager.Instance.SmoothMoveCardProjectile(isPlayerWin, true, rightCard.transform, rightCard.transform.localScale, Values.Instance.winningCardProjectileMoveDuration, LoseCoin, () =>
+        StartCoroutine(AnimationManager.Instance.SmoothMoveCardProjectile(isPlayerWin, true, rightCard.transform, rightCard.transform.localScale, Values.Instance.winningCardProjectileMoveDuration, null, () =>
        {
            rightCard.SetActive(false);
        }));
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash1);
         yield return new WaitForSeconds(0.2f);
         StartCoroutine(AnimationManager.Instance.SpinRotateValue(leftCardChildSprite, null));
         StartCoroutine(AnimationManager.Instance.SmoothMoveCardProjectile(isPlayerWin, false, leftCard.transform, leftCard.transform.localScale, Values.Instance.winningCardProjectileMoveDuration, null, () =>
        {
            leftCard.SetActive(false);
        }));
+
+        yield return new WaitForSeconds(1f);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash1);
+        yield return new WaitForSeconds(0.2f);
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash2);
 
     }
@@ -211,15 +212,19 @@ public class BattleUI : MonoBehaviour
     public void LoseLifeUi(bool isPlayer, int lifeIndex)
     {
         SpriteRenderer spTarget;
+        Transform tTarget;
         if (isPlayer)
         {
-            spTarget = playerLifeUi[lifeIndex];
+            spTarget = playerLifeUi[lifeIndex].GetComponent<SpriteRenderer>();
+            tTarget = playerLifeUi[lifeIndex].transform;
         }
         else
         {
-            spTarget = enemyLifeUi[lifeIndex];
+            spTarget = enemyLifeUi[lifeIndex].GetComponent<SpriteRenderer>();
+            tTarget = enemyLifeUi[lifeIndex].transform;
         }
         StartCoroutine(AnimationManager.Instance.LoseLifeAnimation(spTarget, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(spTarget, false, Values.Instance.LoseLifeDuration, null))));
+        StartCoroutine(AnimationManager.Instance.SpinCoin(tTarget, 0.4f, null));
     }
 
     internal void InitAvatars()
@@ -238,12 +243,11 @@ public class BattleUI : MonoBehaviour
     public void EnablePlayerButtons(bool enable)
     {
         StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnBtnSpriteREnderer, enable, Values.Instance.turnBtnAlphaDuration, () => turnBtn.GetComponent<Button>().interactable = enable));
-        
-        if (BattleSystem.Instance.replacePuLeft > 0)
-        {
-            EnableBtnReplace(enable);
-        }
-        isPlayerTurn = enable;
+        EnableBtnReplace(enable);
+        /* if (BattleSystem.Instance.replacePuLeft > 0)
+         {
+             EnableBtnReplace(enable);
+         }*/
     }
 
 
@@ -254,11 +258,12 @@ public class BattleUI : MonoBehaviour
             SpriteRenderer hitSpriteRen = hitGO.GetComponent<SpriteRenderer>();
             if (isPlayerHit)
             {
-                hitGO.transform.position = youLose.transform.position;
+               // hitGO.transform.position = youLose.transform.position;
+                hitGO.transform.position = enemyHandLocation.position;
             }
             else
             {
-                hitGO.transform.position = youWin.transform.position;
+                hitGO.transform.position = playerHandLocation.position;
             }
             hitSpriteRen.color = new Color(hitSpriteRen.color.r, hitSpriteRen.color.g, hitSpriteRen.color.b, 1f);
             // StartCoroutine(AnimationManager.HitEffect(hitSpriteRen, () => hitGO.SetActive(false)));
@@ -270,6 +275,7 @@ public class BattleUI : MonoBehaviour
     }
     public void ShowPuInfoDialog(Vector2 startingPosition, string puName, string puDisplayName, bool isEnable, bool isBtnOn, Action OnEnd)
     {
+        Vector2 targetDialog = new Vector2(startingPosition.x,startingPosition.y + 2.5f);
         if (isEnable)
         {
             infoDialog.position = new Vector2(0, -7f);
@@ -282,7 +288,8 @@ public class BattleUI : MonoBehaviour
             {
                 InitDialog(puDisplayName, PowerUpStruct.Instance.GetPuInfoByName(puName), isBtnOn);
             }
-            StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialogTransform, OnEnd));
+            StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialog, OnEnd));
+            //StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialogTransform, OnEnd));
             StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, true, Values.Instance.showDialogMoveDuration, null));
         }
         else
@@ -344,6 +351,7 @@ public class BattleUI : MonoBehaviour
     {
         darkScreenRenderer.GetComponent<BoxCollider2D>().enabled = enable;
         AnimationManager.Instance.FadeBurnDarkScreen(darkScreenRenderer.material, enable, ResetSortingOrder);
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(cancelDarkScreenRenderer, enable, Values.Instance.darkScreenAlphaDuration, null));
     }
 
     public void EnableVisionClick(bool enable)
@@ -764,6 +772,11 @@ public class BattleUI : MonoBehaviour
             value = 0;
         }
         StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, btnReplaceRenderer.material, value, () => BattleSystem.Instance.btnReplaceClickable = enable));
+    }
+
+    public void BgFadeInColor()
+    {
+        StartCoroutine(AnimationManager.Instance.FadeColorSwapBlend(bgSpriteRenderer,true,Values.Instance.bgMaxValueSwapColor,Values.Instance.bgPulseColorSwapDuration));
     }
 
 

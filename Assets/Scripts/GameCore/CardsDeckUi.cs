@@ -522,7 +522,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void DisableCardsSelection(string cardPlace)
     {
-        Debug.LogError("disable" + cardPlace);
         foreach (CardUi card in GetListByTag(CardPlaceToTag(cardPlace)))
         {
             card.SetSelection(false,"");

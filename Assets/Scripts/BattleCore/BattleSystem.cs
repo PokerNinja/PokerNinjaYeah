@@ -179,10 +179,7 @@ public class BattleSystem : StateMachine, ITimeOut
             }
         }
     }
-
-
-
-
+ 
 
     public void Awake()
     {
@@ -228,7 +225,7 @@ public class BattleSystem : StateMachine, ITimeOut
         }
         if (replaceMode && !TemproryUnclickable)
         {
-            EnableReplaceDialog(endTurn, true);
+            EnableReplaceDialog(true, endTurn);
         }
     }
     public void LoadMenuScene(bool playAgain)
@@ -450,37 +447,42 @@ public class BattleSystem : StateMachine, ITimeOut
                 SetState(new PowerUpState(this, true, newEnergyCost, newPowerUpName, Constants.PlayerCard1, Constants.deckCardsNames[0], cardsDeckUi.GetCardPosition(Constants.PlayerCard1), cardsDeckUi.GetCardPosition(Constants.deckCardsNames[0]), newPuSlotIndexUse));
                 timedOut = true;
             }
-            else 
+            else
             {
                 StartCoroutine(WaitForPuToEndLoop());
             }
-            
+
         }
     }
 
     private IEnumerator WaitForPuToEndLoop()
     {
-        /*if (selectMode)
+        DisableSelectMode(true);
+        if (playerPuInProcess)
         {
-            DisableSelectMode(true);
-        }*/
-        while (playerPuInProcess)
-        {
-            yield return new WaitForSeconds(0.3f);
-            if (playerPuInProcess)
-            {
-                StartCoroutine(WaitForPuToEndLoop());
-                break;
-            }
-            else
-            {
-                EndTurn();
-            }
+            playerPuInProcess = false;
+
+            yield return new WaitForSeconds(5f);
         }
-        if (!playerPuInProcess)
-        {
-            EndTurn();
-        }
+        EndTurn();
+
+        /* while (playerPuInProcess)
+         {
+             yield return new WaitForSeconds(0.3f);
+             if (playerPuInProcess)
+             {
+                 StartCoroutine(WaitForPuToEndLoop());
+                 break;
+             }
+             else
+             {
+                 EndTurn();
+             }
+         }
+         if (!playerPuInProcess)
+         {
+             EndTurn();
+         }*/
     }
 
     internal void NewTimerStarter(bool isPlayer)
@@ -738,6 +740,7 @@ public class BattleSystem : StateMachine, ITimeOut
         if (IsPlayerTurn() && energyCounter - energyCost >= 0)
         {
             //  ResetTimers();
+            playerPuInProcess = true;
             isPlayerActivatePu = true;
             ui.EnableVisionClick(false);
             this.newPowerUpName = newPowerUpName;
@@ -755,13 +758,10 @@ public class BattleSystem : StateMachine, ITimeOut
 
     public void ReduceSkillUse()
     {
-        if (newPuSlotIndexUse == -1)
-        {
 
-            if (--skillUseLeft == 0)
-            {
-                puDeckUi.EnablePlayerSkill(false);
-            }
+        if (--skillUseLeft == 0)
+        {
+            puDeckUi.EnablePlayerSkill(false);
         }
     }
 
@@ -815,7 +815,7 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         if (cardsToSelectCounter == 0)
         {
-            playerPuInProcess = true;
+            //  playerPuInProcess = true;
 
             ResetValuesAfterCardSelection(cardPlace);
 
@@ -930,10 +930,10 @@ public class BattleSystem : StateMachine, ITimeOut
             TemproryUnclickable = true;
             DisablePlayerPus();
             ReduceEnergy(1);
-            if (--replacePuLeft == 0)
-            {
-                EnableBtnReplace(false);
-            }
+            /* if (--replacePuLeft == 0)
+             {
+                 EnableBtnReplace(false);
+             }*/
             //  energyCounter--;
             UpdateReplacePuInDb(puIndex);
             // EnableReplaceDialog();
@@ -1006,7 +1006,7 @@ public class BattleSystem : StateMachine, ITimeOut
     }
     public void CheckIfPuAvailable(PowerUpUi puUi)
     {
-        if (energyCounter - puUi.energyCost < 0)
+        if (energyCounter - puUi.energyCost < 0 || puUi.puIndex == -1 && skillUseLeft == 0)
         {
             puUi.EnablePu(false);
         }
@@ -1291,7 +1291,18 @@ public class BattleSystem : StateMachine, ITimeOut
 
     public void EnableReplaceDialog(bool disable, bool endTurn)
     {
-        if (btnReplaceClickable || endTurn || disable)
+        if (btnReplaceClickable && energyCounter > 0 && !disable && puDeckUi.GetPuListCount(true) < 2)
+        {
+            ReduceEnergy(1);
+            ui.EnablePlayerButtons(false);
+            DisablePlayerPus();
+            DealPu(true, () =>
+            {
+                ui.EnablePlayerButtons(true);
+                ActivatePlayerPus();
+            });
+        }
+        else if (btnReplaceClickable || endTurn || disable)
         {
 
             if (/*replaceMode ||*/ IsPlayerTurn() && energyCounter > 0)
@@ -1405,7 +1416,7 @@ public class BattleSystem : StateMachine, ITimeOut
                 ui.EnablePlayerButtons(true);
                 ActivatePlayerPus();
             }
-            else if(!enable)
+            else if (!enable)
             {
                 ui.EnablePlayerButtons(false);
                 DisablePlayerPus();

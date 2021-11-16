@@ -54,7 +54,7 @@ public class SoundManager : Singleton<SoundManager>
 
 
     // Random pitch adjustment range.
-    public float LowPitchRange = .95f;
+    public float LowPitchRange = 0.95f;
     public float HighPitchRange = 1.05f;
 
     private bool musicOn;
@@ -63,6 +63,8 @@ public class SoundManager : Singleton<SoundManager>
     {
         GLOBAL_SFX_VOLUME = Values.Instance.sfxVolume;
         MAX_VOL_MUSIC = Values.Instance.musicVolume;
+        LowPitchRange = Values.Instance.lowPitchRange;
+        HighPitchRange = Values.Instance.highPitchRange;
         InitPool();
 
     }
@@ -108,7 +110,8 @@ public class SoundManager : Singleton<SoundManager>
     {
         AudioSource currentSource = await GetAvailableAudioSource();
         currentSource.clip = clip;
-        currentSource.volume = GLOBAL_SFX_VOLUME;
+        currentSource.volume = Values.Instance.sfxVolume;
+        currentSource.pitch = Random.Range(LowPitchRange, HighPitchRange);
         currentSource.Play();
         soundPool.Enqueue(currentSource);
     }
@@ -166,7 +169,7 @@ public class SoundManager : Singleton<SoundManager>
         if (enable)
         {
             constantsSounds[audioSourceIndex].Play();
-            StartCoroutine(FadeIn(constantsSounds[audioSourceIndex], 1f));
+            StartCoroutine(FadeIn(constantsSounds[audioSourceIndex], Values.Instance.musicVolume));
             if (sound == ConstantSoundsEnum.Music)
             {
 
@@ -185,12 +188,12 @@ public class SoundManager : Singleton<SoundManager>
     {
         audioSource.volume = 0f;
         audioSource.Play();
-        while (audioSource.volume < MAX_VOL_MUSIC)
+        while (audioSource.volume < FadeTime)
         {
             audioSource.volume +=  Time.deltaTime/2 ;
-            if (audioSource.volume >= MAX_VOL_MUSIC)
+            if (audioSource.volume >= FadeTime)
             {
-                audioSource.volume = MAX_VOL_MUSIC;
+                audioSource.volume = FadeTime;
                 break;
             }
             yield return null;
@@ -260,9 +263,9 @@ public class SoundManager : Singleton<SoundManager>
         }
 
         int randomIndex = Random.Range(0, targetClipSound.Length);
-        float randomPitch = Random.Range(LowPitchRange, HighPitchRange);
+        
 
-        //EffectsSource.pitch = randomPitch;
+        
         await PlayAsync(targetClipSound[randomIndex]);
 
 

@@ -113,7 +113,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             BattleSystem.Instance.ReplacePu(true, puIndex);
         }
-        else if(isPlayer || !isPlayer)
+        else if (isPlayer || !isPlayer)
         {
             StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick);
@@ -121,7 +121,8 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
     public void OnPointerUp(PointerEventData eventData)
     {
-
+    /*    Debug.LogError("count " + eventData.clickCount);
+        Debug.LogError("time " + eventData.clickTime);*/
         CancelInvoke("OnLongPress");
         if (isPlayer || isSkill)
         {
@@ -250,7 +251,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         OnStart?.Invoke();
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuUse);
         EnableSelecetPositionZ(true);
-       // transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -25f);
+        // transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -25f);
         if (isPlayer)
         {
             StartCoroutine(AnimationManager.Instance.PulseSize(true, transform, 1.15f, 0.4f, true,

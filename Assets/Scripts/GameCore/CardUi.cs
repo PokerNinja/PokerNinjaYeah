@@ -83,7 +83,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
     private IEnumerator OnClickHandler()
     {
-            yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.1f);
         if (!BattleSystem.Instance.TemproryUnclickable && clickbleForPU && !flipInProgress && BattleSystem.Instance.cardsToSelectCounter > 0)
         {
             BattleSystem.Instance.TemproryUnclickable = true;
@@ -120,15 +120,11 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     {
         if (!freeze || freeze && puElement.Equals("f") || freeze && !selectionEnable)
         {
-
-            if (BattleSystem.Instance.cardsToSelectCounter > 0)
-                clickbleForPU = selectionEnable;
+            //   if (BattleSystem.Instance.cardsToSelectCounter > 0)
+            clickbleForPU = selectionEnable;
             cardSelection.SetActive(selectionEnable);
             if (selectionEnable)
             {
-                Debug.LogWarning("cardS " + cardPlace);
-
-                //DELETE when sure
                 cardSelectionRenderer.color = Values.Instance.cardSelectionColor;
                 StartCoroutine(CardSelectionPulse(cardSelectionRenderer));
             }
@@ -196,7 +192,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.BurnCard);
         while (dissolveAmount < 1)
         {
-            dissolveAmount += Time.deltaTime / dissolveDuration ;
+            dissolveAmount += Time.deltaTime / dissolveDuration;
             spriteRenderer.material.SetFloat("_FadeAmount", dissolveAmount);
             yield return new WaitForFixedUpdate();
             if (dissolveAmount >= 1)

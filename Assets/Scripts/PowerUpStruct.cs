@@ -36,7 +36,7 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         (PowerUpNamesEnum.fm1.ToString(), "DRAW 2 CARDS", "Draw two cards from the deck, Burn and replace one with one of yours.", "Choose one card and replace with one of yours", 2, Constants.PlayerCardsTag, Constants.DeckCardsTag);
     /*16*/
     public PuStructInfo flip = new PuStructInfo
-        (PowerUpNamesEnum.sflip.ToString(), "FLIP", "Flip 1 card", "Choose one card to flip", 1, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.sflip.ToString(), "FLIP", "Flip 1 card", "Choose one card to flip", 1, Constants.PlayerCardsTag, Constants.EnemyCardsTag);
     /*17*/
     public PuStructInfo armagedon = new PuStructInfo
         (PowerUpNamesEnum.fm2.ToString(), "ARMAGEDON", "Burn all the cards in play and replace them with new ones.", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
