@@ -100,6 +100,8 @@ public class BattleUI : MonoBehaviour
     public Material freezeMaterial;
     public TextMeshProUGUI dialogTitleUi;
     public TextMeshProUGUI dialogContentUi;
+    public CanvasGroup emojisWheel;
+    public SpriteRenderer emojiSelector;
 
 
     [SerializeField] private GameObject turnBtn;
@@ -777,6 +779,12 @@ public class BattleUI : MonoBehaviour
     public void BgFadeInColor()
     {
         StartCoroutine(AnimationManager.Instance.FadeColorSwapBlend(bgSpriteRenderer,true,Values.Instance.bgMaxValueSwapColor,Values.Instance.bgPulseColorSwapDuration));
+    }
+
+    internal void ShowEmojiWheel(bool enable)
+    {
+        StartCoroutine(AnimationManager.Instance.FadeCanvasGroup(emojisWheel, enable,Values.Instance.emojiWheelFadeDuration));
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiSelector, enable,Values.Instance.emojiWheelFadeDuration,null));
     }
 
 

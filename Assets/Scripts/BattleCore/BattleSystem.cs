@@ -45,6 +45,9 @@ public class BattleSystem : StateMachine, ITimeOut
 
     //Game Settings
     private bool firstDeck = true;
+
+
+
     public int prizeAmount = 1000;
     public int currentTurn = 6;
     private bool firstRound = true;
@@ -79,6 +82,7 @@ public class BattleSystem : StateMachine, ITimeOut
     public bool skillUsed = false;
     public bool btnReplaceClickable = false;
     private bool timedOut;
+    private bool emojisWheelDisplay;
     private readonly long TURN_COUNTER_INIT = 6;
     private readonly float DELAY_BEFORE_NEW_ROUND = 6f;
 
@@ -179,7 +183,7 @@ public class BattleSystem : StateMachine, ITimeOut
             }
         }
     }
- 
+
 
     public void Awake()
     {
@@ -226,6 +230,10 @@ public class BattleSystem : StateMachine, ITimeOut
         if (replaceMode && !TemproryUnclickable)
         {
             EnableReplaceDialog(true, endTurn);
+        }
+        if (!endTurn && emojisWheelDisplay)
+        {
+            ShowEmojiWheel(false);
         }
     }
     public void LoadMenuScene(bool playAgain)
@@ -1466,7 +1474,24 @@ public class BattleSystem : StateMachine, ITimeOut
             ui.UpdateEnergy(false, amountToSub);
         }
     }
+    internal void EmojiSelected(int id)
+    {
+        ShowEmojiWheel(false);
+        UpdateEmojiDB(id);
+    }
+    public void ShowEmojiWheel(bool enable)
+    {
+        ui.ShowEmojiWheel(enable);
+        //ui.EnableDarkScreen(enable, null);
+        emojisWheelDisplay = enable;
+    }
 
+    private void UpdateEmojiDB(int emojiId)
+    {
+        gameManager.UpdateEmojiDB(new EmojiInfo(currentGameInfo.localPlayerId, emojiId, CreateTimeStamp()), () =>
+                             Debug.Log("EmojiSent" + emojiId),
+                            Debug.LogError);
+    }
 
     [Button]
     internal void WinParticleEffect()

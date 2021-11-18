@@ -640,6 +640,18 @@ public class AnimationManager : Singleton<AnimationManager>
         }
         yield break;
     }
+    public IEnumerator ScaleObjectWheel(Transform selector, float target, float flipDuration)
+    {
+        float startTime = Time.time;
+        float t;
+        while (selector.localScale.x != target)
+        {
+            t = (Time.time - startTime) / flipDuration;
+            selector.localScale = new Vector2(Mathf.SmoothStep(selector.localScale.x, target, t), Mathf.SmoothStep(selector.localScale.y, target, t));
+            yield return new WaitForFixedUpdate();
+        }
+        yield break;
+    }
 
     public IEnumerator ScaleObject(bool scaleDown, float scaleTarget, float scaleDuration, Transform selector, Action RedBgEnable, Action onEnd)
     {
@@ -804,6 +816,35 @@ public class AnimationManager : Singleton<AnimationManager>
         yield break;
     }
 
+    internal IEnumerator FadeCanvasGroup(CanvasGroup emojisWheel, bool enable, float duration)
+    {
+        float targetAlpha = 0f;
+        float alphaAmount = 1f;
+        if (enable)
+        {
+            targetAlpha = 1f;
+            alphaAmount = 0f;
+        }
+        while(emojisWheel.alpha != targetAlpha)
+        {
+            if (enable)
+            {
+              alphaAmount += Time.deltaTime / duration;
+            }
+            else
+            {
+              alphaAmount -= Time.deltaTime / duration;
+            }
+            yield return new WaitForFixedUpdate();
+            emojisWheel.alpha = alphaAmount;
+            if(alphaAmount> 1f || alphaAmount< 0)
+            {
+                emojisWheel.alpha = targetAlpha;
+                break;
+            }
+        }
+
+    }
 
     public void VisionEffect(List<CardUi> winningPlayersCards, bool enable)
     {

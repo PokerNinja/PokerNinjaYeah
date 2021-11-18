@@ -51,6 +51,7 @@ public class Values : Singleton<Values>
     public int coinShineEvery = 3;
     public float infoDialogFadeOutDuration = 0.2f;
     public float showDialogMoveDuration = 0.5f;
+    public float emojiWheelFadeDuration =0.5f;
 
     [Title("CardUi", bold: false)]
     public Color cardSelectionColor ;

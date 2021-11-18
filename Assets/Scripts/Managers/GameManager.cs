@@ -227,10 +227,8 @@ namespace Managers
         {
 
             DatabaseAPI.PostObject($"games/{currentGameInfo.gameId}/gameInfo/powerup", newPowerUp,
-               () =>
-               {
-                   callback();
-               }, fallback);
+                   callback
+                   ,fallback);
         }
 
 
@@ -241,5 +239,11 @@ namespace Managers
                          fallback);
         }
 
+        internal void UpdateEmojiDB(EmojiInfo emojiInfo, Action callback, Action<AggregateException> fallback)
+        {
+            DatabaseAPI.PostObject($"games/{currentGameInfo.gameId}/emoji/", emojiInfo,
+                                    callback,
+                                    fallback);
+        }
     }
 }
