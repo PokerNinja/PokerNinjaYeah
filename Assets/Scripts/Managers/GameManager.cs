@@ -20,6 +20,7 @@ namespace Managers
         private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> currentGameInfoListener;
         private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> newDeckListener;
         private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> currentPowerupListener;
+        private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> currentEmojiListener;
 
         public void GetCurrentGameInfo(string gameId, string localPlayerId, Action<GameInfo> callback,
             Action<AggregateException> fallback)
@@ -171,6 +172,25 @@ namespace Managers
                                     {
                                         callbackPuReplace(currentGameInfo.powerup);
                                     }
+                                }
+                            },
+                           fallback);
+        }
+        internal void ListenForEmoji(string currentPlayerId,Action<int> callbackEmoji,
+            Action<AggregateException> fallback)
+        {
+            currentEmojiListener =
+                           DatabaseAPI.ListenForValueChanged($"games/" + currentGameInfo.gameId + "/emoji", args =>
+                            {
+                                if (!args.Snapshot.Exists) return;
+
+                                var emoji =
+                                    StringSerializationAPI.Deserialize(typeof(EmojiInfo), args.Snapshot.GetRawJsonValue()) as
+                                        EmojiInfo;
+                               // currentGameInfo.powerup = powerup;
+                                if (!emoji.playerId.Equals(currentPlayerId))
+                                {
+                                    callbackEmoji(emoji.emojiId);
                                 }
                             },
                            fallback);

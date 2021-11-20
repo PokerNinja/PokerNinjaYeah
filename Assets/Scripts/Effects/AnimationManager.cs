@@ -437,7 +437,6 @@ public class AnimationManager : Singleton<AnimationManager>
         }
         if (toFull)
         {
-
             endActionFullScroll?.Invoke();
         }
         while (selector.localPosition.x != targetPositionX)

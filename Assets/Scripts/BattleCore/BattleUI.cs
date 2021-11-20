@@ -100,8 +100,9 @@ public class BattleUI : MonoBehaviour
     public Material freezeMaterial;
     public TextMeshProUGUI dialogTitleUi;
     public TextMeshProUGUI dialogContentUi;
-    public CanvasGroup emojisWheel;
+    public SpriteRenderer[] emojis;
     public SpriteRenderer emojiSelector;
+    public SpriteRenderer emojiToDisplay;
 
 
     [SerializeField] private GameObject turnBtn;
@@ -260,7 +261,7 @@ public class BattleUI : MonoBehaviour
             SpriteRenderer hitSpriteRen = hitGO.GetComponent<SpriteRenderer>();
             if (isPlayerHit)
             {
-               // hitGO.transform.position = youLose.transform.position;
+                // hitGO.transform.position = youLose.transform.position;
                 hitGO.transform.position = enemyHandLocation.position;
             }
             else
@@ -277,7 +278,7 @@ public class BattleUI : MonoBehaviour
     }
     public void ShowPuInfoDialog(Vector2 startingPosition, string puName, string puDisplayName, bool isEnable, bool isBtnOn, Action OnEnd)
     {
-        Vector2 targetDialog = new Vector2(startingPosition.x,startingPosition.y + 2.5f);
+        Vector2 targetDialog = new Vector2(startingPosition.x, startingPosition.y + 2.5f);
         if (isEnable)
         {
             infoDialog.position = new Vector2(0, -7f);
@@ -342,8 +343,8 @@ public class BattleUI : MonoBehaviour
         if (!sliding)
         {
             sliding = true;
-            StartCoroutine(AnimationManager.Instance.SmoothMoveRank(rankingImg.transform, Values.Instance.rankInfoMoveDuration, () => rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_empty", typeof(Sprite)) as Sprite,
-                () => rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_full", typeof(Sprite)) as Sprite, () => sliding = false));
+            StartCoroutine(AnimationManager.Instance.SmoothMoveRank(rankingImg.transform, Values.Instance.rankInfoMoveDuration, () => rankingImg.SetActive(false)/*rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_empty", typeof(Sprite)) as Sprite*/,
+                () => rankingImg.SetActive(true)/*rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_full", typeof(Sprite)) as Sprite*/, () => sliding = false));
         }
 
     }
@@ -778,13 +779,28 @@ public class BattleUI : MonoBehaviour
 
     public void BgFadeInColor()
     {
-        StartCoroutine(AnimationManager.Instance.FadeColorSwapBlend(bgSpriteRenderer,true,Values.Instance.bgMaxValueSwapColor,Values.Instance.bgPulseColorSwapDuration));
+        StartCoroutine(AnimationManager.Instance.FadeColorSwapBlend(bgSpriteRenderer, true, Values.Instance.bgMaxValueSwapColor, Values.Instance.bgPulseColorSwapDuration));
     }
 
     internal void ShowEmojiWheel(bool enable)
     {
-        StartCoroutine(AnimationManager.Instance.FadeCanvasGroup(emojisWheel, enable,Values.Instance.emojiWheelFadeDuration));
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiSelector, enable,Values.Instance.emojiWheelFadeDuration,null));
+        for (int i = 0; i < emojis.Length; i++)
+        {
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojis[i], enable, Values.Instance.emojiMenuFadeDuration,null));
+        }
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiSelector, enable, Values.Instance.emojiMenuFadeDuration, null ));
+    }
+
+    internal IEnumerator DisplayEmoji(int id, Action coolDownEmoji)
+    {
+        emojiToDisplay.sprite = emojis[id].sprite;
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiToDisplay, true, Values.Instance.emojiDisplayFadeDuration, null));
+        yield return new WaitForSeconds(Values.Instance.emojiStay);
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiToDisplay, false, Values.Instance.emojiDisplayFadeDuration, null));
+        yield return new WaitForSeconds(Values.Instance.emojiCoolDown - Values.Instance.emojiStay);
+        coolDownEmoji?.Invoke();
+
+
     }
 
 

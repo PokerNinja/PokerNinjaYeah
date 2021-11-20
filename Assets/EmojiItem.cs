@@ -4,16 +4,16 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class WheelControllerBtn : MonoBehaviour, IDropHandler
+public class EmojiItem : MonoBehaviour 
 {
     public int id;
-    public string itemName;
-    public Sprite icon;
+    /*public string itemName;
+    public Sprite icon;*/
 
   
 
-  /*  
-    public void HoverEnter()
+    
+  /*  public void HoverEnter()
     {
         StartCoroutine(AnimationManager.Instance.ScaleObjectWheel(transform, 1.15f, 0.2f));
     }
@@ -35,15 +35,28 @@ public class WheelControllerBtn : MonoBehaviour, IDropHandler
     public void OnPointerClick(PointerEventData eventData)
     {
        // BattleSystem.Instance.EmojiSelected(id);
-    }*/
+    }
+*/
 
-    public void OnDrop(PointerEventData eventData)
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        StartCoroutine(AnimationManager.Instance.ScaleObjectWheel(transform, 1f, 0.2f));
+
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        StartCoroutine(AnimationManager.Instance.ScaleObjectWheel(transform, 0.8f, 0.2f));
+
+    }
+   /* public void OnDrop(PointerEventData eventData)
     {
         Debug.LogError("WOEKING");
         if (eventData.pointerDrag != null)
         {
-        BattleSystem.Instance.EmojiSelected(id);
         Debug.LogError("WOEKING!!!!!!!");
+        BattleSystem.Instance.EmojiSelected(id);
         }
-    }
+    }*/
 }

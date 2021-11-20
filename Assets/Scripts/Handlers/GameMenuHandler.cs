@@ -41,7 +41,7 @@ public class GameMenuHandler : MonoBehaviour
         if (CheckIfStringOnlyLettersAndDigits(playerName.text.ToString()))
         {
             SavePlayerNickName(playerName.text.ToString());
-          //  DatabaseAPI.InitializeDatabase();
+            //  DatabaseAPI.InitializeDatabase();
             MainManager.Instance.currentLocalPlayerId = playerName.text + UnityEngine.Random.Range(1, 999).ToString();
             SceneManager.LoadScene("MatchMakingScene");
         }
@@ -62,7 +62,7 @@ public class GameMenuHandler : MonoBehaviour
     }
     private string LoadPlayerNickName()
     {
-         return PlayerPrefs.GetString("player_name", "Ninja");
+        return PlayerPrefs.GetString("player_name", "Ninja");
     }
 
     public void StartPractice()
@@ -104,6 +104,87 @@ public class GameMenuHandler : MonoBehaviour
     public bool MatchRegex(string t)
     {
         return Regex.Match(t, "^[A-Za-z][A-Za-z0-9]{1,13}$").Success;
+    }
+
+    [Button]
+    public void Cal()
+    {
+        int counter = 0;
+        int dounter = 0;
+        for (int a = 0; a < 8; a++)
+        {
+            for (int b = a + 1; b < 8; b++)
+            {
+               
+                    Debug.LogWarning("a:" + a + " b:" + b );
+                    if (a == b )
+                    {
+                        dounter++;
+                    }
+                    else
+                    {
+                        counter++;
+                    }
+                
+            }
+        }
+        Debug.LogError("count " + counter);
+        Debug.LogError("dount " + dounter);
+    }
+    [Button]
+    public void Cal1()
+    {
+        int counter = 0;
+        int dounter = 0;
+        for (int a = 0; a < 8; a++)
+        {
+            for (int b = a + 1; b < 8; b++)
+            {
+                for (int c = b + 1; c < 8; c++)
+                {
+                    Debug.LogWarning("a:" + a + " b:" + b + " c:" + c);
+                    if (a == b || a == c || b == c)
+                    {
+                        dounter++;
+                    }
+                    else
+                    {
+                        counter++;
+                    }
+                }
+            }
+        }
+        Debug.LogError("count " + counter);
+        Debug.LogError("dount " + dounter);
+    }
+    [Button]
+    public void Cal2()
+    {
+        int counter = 0;
+        int dounter = 0;
+        for (int a = 0; a < 9; a++)
+        {
+            for (int b = a + 1; b < 9; b++)
+            {
+                for (int c = b + 1; c < 9; c++)
+                {
+                    for (int d = c + 1; d < 9; d++)
+                    {
+                        Debug.LogWarning("a:" + a + " b:" + b + " c:" + c+ " d:" + d);
+                        if (a == b || a == c || a == d|| b == c|| b == d|| c == d)
+                        {
+                            dounter++;
+                        }
+                        else
+                        {
+                            counter++;
+                        }
+                    }
+                }
+            }
+        }
+        Debug.LogError("count " + counter);
+        Debug.LogError("dount " + dounter);
     }
 }
 

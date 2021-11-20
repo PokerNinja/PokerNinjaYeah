@@ -83,6 +83,7 @@ public class BattleSystem : StateMachine, ITimeOut
     public bool btnReplaceClickable = false;
     private bool timedOut;
     private bool emojisWheelDisplay;
+    private bool emojiCooledDown = true;
     private readonly long TURN_COUNTER_INIT = 6;
     private readonly float DELAY_BEFORE_NEW_ROUND = 6f;
 
@@ -280,8 +281,17 @@ public class BattleSystem : StateMachine, ITimeOut
         BindCurrentPlayer();
         ListenForNewDeck();
         ListenForPowerupUse();
+        ListenForEmoji();
 
 
+    }
+
+    private void ListenForEmoji()
+    {
+        gameManager.ListenForEmoji(player.id, emojiId =>
+        {
+            StartCoroutine(ui.DisplayEmoji(emojiId,null));
+        }, Debug.Log) ;
     }
 
     [Button]
@@ -1477,7 +1487,16 @@ public class BattleSystem : StateMachine, ITimeOut
     internal void EmojiSelected(int id)
     {
         ShowEmojiWheel(false);
-        UpdateEmojiDB(id);
+        if (emojiCooledDown && id != -1)
+        {
+            emojiCooledDown = false;
+            StartCoroutine(ui.DisplayEmoji(id,() => emojiCooledDown = true));
+            UpdateEmojiDB(id);
+        }
+        else if(!emojiCooledDown)
+        {
+            Debug.LogError("Wait A Sec");
+        }
     }
     public void ShowEmojiWheel(bool enable)
     {
