@@ -1,4 +1,5 @@
-﻿using StandardPokerHandEvaluator;
+﻿using Sirenix.OdinInspector;
+using StandardPokerHandEvaluator;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -454,7 +455,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    public Hand CalculateHand(bool isPlayer)
+    public Hand CalculateHand(bool isPlayer , bool isFlusher, bool isStrighter)
     {
 
         TexasHand playerCards;
@@ -502,9 +503,64 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             }
         }
         handsOptions = handsOptions.OrderBy(h => h.Rank).ToList<Hand>();
+        if (isFlusher && handsOptions[0].Rank > 1610)
+        {
+            handsOptions = CheckIfFlusher(handsOptions);
+        }
         return handsOptions[0];
 
     }
+
+    private List<Hand> CheckIfFlusher(List<Hand> handsOptions)
+    {
+        foreach(Hand hand in handsOptions)
+        {
+            if (IsHandWithFourSameSuit(hand))
+            {
+
+            }
+        }
+        return handsOptions;
+    }
+
+    
+    private bool IsHandWithFourSameSuit(Hand hand)
+    {
+        int sameSuitCounter = 0;
+        List<Card> cards = hand.getCards().OrderBy(c => c.CardSuit).ToList<Card>();
+        for (int i =0; i<4; i++)
+        {
+            if(cards[i].CardSuit == cards[i + 1].CardSuit)
+            {
+                sameSuitCounter++;
+            }
+        }
+       if(sameSuitCounter == 3)
+        {
+            return true;
+        }
+        return false;
+    }
+    [Button]
+    public void CheckFlush()
+    {
+        Card a = new Card(CardEnum.Ace, SuitEnum.Diamonds);
+        Card b = new Card(CardEnum.King, SuitEnum.Hearts);
+        Card c = new Card(CardEnum.Queen, SuitEnum.Diamonds);
+        Card d = new Card(CardEnum.Jack, SuitEnum.Diamonds);
+        Card e = new Card(CardEnum.Six, SuitEnum.Diamonds);
+        Hand hand1 = new Hand(a, b, c, d, e, new PokerHandRankingTable());
+        Hand hand2 = new Hand(a, d, c, b, e, new PokerHandRankingTable());
+        Hand hand3 = new Hand(a, c, e, d, b, new PokerHandRankingTable());
+        List<Card> cards1 = hand1.getCards().OrderBy(c => c.CardSuit).ToList<Card>();
+        List<Card> cards2 = hand2.getCards().OrderBy(c => c.CardSuit).ToList<Card>();
+        List<Card> cards3 = hand3.getCards().OrderBy(c => c.CardSuit).ToList<Card>();
+        handToPrint(cards1);
+        handToPrint(cards2);
+        handToPrint(cards3);
+        Debug.LogError("Is " + IsHandWithFourSameSuit(hand1));
+    }
+
 
     internal Vector2 GetCardPosition(string cardPlace)
     {
@@ -828,13 +884,14 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         DealHands();
         }
 
-        private void handToPrint(List<Card> cardsList, String msg)
+        private void handToPrint(List<Card> cardsList)
         {
             String totalCards = " ";
             foreach (Card c in cardsList)
             {
                 totalCards += c.ToString(CardToStringFormatEnum.ShortCardName) + " ,";
             }
+        Debug.LogWarning(totalCards);
         }
 
     }

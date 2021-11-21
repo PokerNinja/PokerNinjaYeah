@@ -87,6 +87,8 @@ public class BattleSystem : StateMachine, ITimeOut
     private readonly long TURN_COUNTER_INIT = 6;
     private readonly float DELAY_BEFORE_NEW_ROUND = 6f;
 
+    private bool isFlusher = false;
+    private bool isStrighter = false;
 
 
     [SerializeField]
@@ -343,7 +345,7 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         if (!AreBoardCardsFlipped() && !reset)
         {
-            Hand bestHand = cardsDeckUi.CalculateHand(false);
+            Hand bestHand = cardsDeckUi.CalculateHand(false,isFlusher,isStrighter);
             ui.UpdateCardRank(bestHand.Rank);
         }
         else
@@ -1372,7 +1374,8 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         if (!AreBoardCardsFlipped() && !selectMode)
         {
-            Hand bestHand = cardsDeckUi.CalculateHand(false);
+            //STORE LAST HAND RANK INSTEAED
+            Hand bestHand = cardsDeckUi.CalculateHand(false ,false,false);
             ui.VisionEffect(bestHand.getCards(), cardsDeckUi.boardCardsUi, cardsDeckUi.playerCardsUi);
             ui.UpdateCardRank(bestHand.Rank);
             ui.UpdateRankTextInfo(true, bestHand.Rank);

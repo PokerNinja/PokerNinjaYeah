@@ -45,9 +45,11 @@ public class EndRound : State
 
     public string WinnerCalculator()
     {
+        bool isFlusher = false;
+        bool isStrighter = false;
         //MAKE IT BETTER
-        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(true);
-        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(false);
+        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(true, isFlusher,isStrighter);
+        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(false, isFlusher, isStrighter);
         string winnerMsg = "";
         // Opponent win
         // Make it better
