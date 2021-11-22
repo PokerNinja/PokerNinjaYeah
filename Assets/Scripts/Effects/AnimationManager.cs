@@ -424,7 +424,7 @@ public class AnimationManager : Singleton<AnimationManager>
         float targetFull = 2.61f;
         float targetEmpty = 14.72f;
 
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer,false);
         if (selector.localPosition.x <= targetFull)
         {
             toFull = false;

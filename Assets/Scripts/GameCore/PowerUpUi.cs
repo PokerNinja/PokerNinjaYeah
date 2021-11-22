@@ -98,7 +98,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             aboutToDestroy = true;
             BattleSystem.Instance.Interface.EnablePlayerButtons(false);
             BattleSystem.Instance.DisablePlayerPus();
-            BattleSystem.Instance.Interface.EnableDarkScreen(true, null);
+            BattleSystem.Instance.Interface.EnableDarkScreen(isPlayer, true, null);
             if (puIndex != -1)
             {
                 AnimatePuUse(() => BattleSystem.Instance.OnPowerUpPress(puName, puIndex, energyCost), null);
@@ -116,7 +116,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         else if (isPlayer || !isPlayer)
         {
             StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick,false);
         }
     }
     public void OnPointerUp(PointerEventData eventData)
@@ -249,7 +249,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void AnimatePuUse(Action OnStart, Action OnEndRoutine3)
     {
         OnStart?.Invoke();
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuUse);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuUse,false);
         EnableSelecetPositionZ(true);
         // transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -25f);
         if (isPlayer)

@@ -79,7 +79,7 @@ public class BattleSystem : StateMachine, ITimeOut
     public bool startNewRound;
     private bool deckGenerate = false;
     public bool infoShow = false;
-    public bool skillUsed = false;
+    public bool skillUsed = false; // IS needed?
     public bool btnReplaceClickable = false;
     private bool timedOut;
     private bool emojisWheelDisplay;
@@ -89,6 +89,7 @@ public class BattleSystem : StateMachine, ITimeOut
 
     private bool isFlusher = false;
     private bool isStrighter = false;
+    public bool playerHandIsFlusher = false;
 
 
     [SerializeField]
@@ -124,6 +125,7 @@ public class BattleSystem : StateMachine, ITimeOut
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
+        isFlusher = Values.Instance.flusherOn;
         //Debug.LogWarning("S:" + PowerUpStruct.PowerUpNamesEnum.f1.ToString());
         Debug.LogWarning("Start LRA");
 
@@ -138,7 +140,7 @@ public class BattleSystem : StateMachine, ITimeOut
             currentGameInfo.EnemyId = "2";
             currentGameInfo.cardDeck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
                 "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
-                "Ac", "Ah","4s","2h","6c", "5h","Ts","Jh","Qc", "Ks","As","Kh"};
+                "Ac", "Ah","4s","2h","6c", "5h","Th","Jh","Qh", "Ks","Ah","Kh"};
             currentGameInfo.puDeck = new String[] {"f2","i3","f3","f2","i3","f3",
                  "i1","f1","i2",
                  "w1","w2","w3","f2","i3","w1","w2","w3","f2","i3","f3",
@@ -147,7 +149,7 @@ public class BattleSystem : StateMachine, ITimeOut
                     "f2","i3","f3",
                  "i1","f1","i2",
                  "w1","w2","w3",
-                 "fm1","w3"};
+                 "fm1","wm1"};
             currentGameInfo.turn = "1";
         }
         else
@@ -220,15 +222,15 @@ public class BattleSystem : StateMachine, ITimeOut
             ui.InitLargeText(false, "");
             firstCardTargetPU = "";
             firstPosTargetPU = new Vector2(0, 0);
-            ui.EnableDarkScreen(false, () =>
-            {
+            ui.EnableDarkScreen(true, false, () =>
+             {
 
-                StartCoroutine(ResetSortingOrder(false));
-                puDeckUi.EnablePusZ(true, false);
-                cardsDeckUi.DisableCardsSelection(Constants.AllCardsTag);
-                ActivatePlayerButtons(!endTurn, false);
-                TemproryUnclickable = false;
-            });
+                 StartCoroutine(ResetSortingOrder(false));
+                 puDeckUi.EnablePusZ(true, false);
+                 cardsDeckUi.DisableCardsSelection(Constants.AllCardsTag);
+                 ActivatePlayerButtons(!endTurn, false);
+                 TemproryUnclickable = false;
+             });
         }
         if (replaceMode && !TemproryUnclickable)
         {
@@ -292,14 +294,14 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         gameManager.ListenForEmoji(player.id, emojiId =>
         {
-            StartCoroutine(ui.DisplayEmoji(emojiId,null));
-        }, Debug.Log) ;
+            StartCoroutine(ui.DisplayEmoji(false, emojiId, null));
+        }, Debug.Log);
     }
 
     [Button]
     public void SoundCheck()
     {
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndRoundGong);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndRoundGong, true);
     }
 
     public IEnumerator StartNewRound()
@@ -345,8 +347,13 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         if (!AreBoardCardsFlipped() && !reset)
         {
-            Hand bestHand = cardsDeckUi.CalculateHand(false,isFlusher,isStrighter);
-            ui.UpdateCardRank(bestHand.Rank);
+            Hand bestHand = cardsDeckUi.CalculateHand(false, isFlusher, isStrighter);
+            int handRank = bestHand.Rank;
+            if (playerHandIsFlusher)
+            {
+                handRank = 1599;
+            }
+            ui.UpdateCardRank(handRank);
         }
         else
         {
@@ -406,7 +413,7 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         if (!enemyPuIsRunning)
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
             SetState(new PlayerTurn(this, currentTurn));
         }
         else
@@ -440,7 +447,7 @@ public class BattleSystem : StateMachine, ITimeOut
             DisablePlayerPus();
             ResetTimers();
             gameManager.AddGameActionLog(GameManager.ActionEnum.EndTurn, "end of turn: " + currentTurn, () => { }, Debug.Log);
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
             LocalTurnSystem.Instance.PassTurn();
         }
     }
@@ -448,7 +455,7 @@ public class BattleSystem : StateMachine, ITimeOut
 
     public void OnEndTurnButton()
     {
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick1);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick1, false);
         EndTurn();
     }
     private void SaveTurnOf(string whatPlayer)
@@ -807,7 +814,7 @@ public class BattleSystem : StateMachine, ITimeOut
             {
                 isPlayerActivatePu = false;
                 enemyPuIsRunning = true;
-                ui.EnableDarkScreen(true, null);
+                ui.EnableDarkScreen(false, true, null);
                 currentGameInfo.powerup = powerUpInfo;
                 if (powerUpInfo.slot != -1)
                 {
@@ -824,7 +831,14 @@ public class BattleSystem : StateMachine, ITimeOut
         {
             if (!powerUpInfo.playerId.Equals(player.id))
             {
-                ReplacePu(false, powerUpInfo.slot);
+                if (powerUpInfo.slot == -1)
+                {
+                    DealPu(false, null);
+                }
+                else
+                {
+                    ReplacePu(false, powerUpInfo.slot);
+                }
             }
         }, Debug.Log);
     }
@@ -837,7 +851,8 @@ public class BattleSystem : StateMachine, ITimeOut
         {
             //  playerPuInProcess = true;
 
-            ResetValuesAfterCardSelection(cardPlace);
+            ResetValuesAfterCardSelection(Constants.AllCardsTag);
+            // ResetValuesAfterCardSelection(cardPlace);
 
             yield return new WaitForSeconds(0.5f);
             //   selectMode = false;
@@ -1032,7 +1047,7 @@ public class BattleSystem : StateMachine, ITimeOut
         }
         else
         {
-            if (puUi.puElement.Equals("i") || puUi.puElement.Equals("w") && !puUi.puElement.Contains("wm"))
+            if (puUi.puElement.Equals("i") || puUi.puElement.Equals("w") && !puUi.isMonster || puUi.puName.Equals("fm1"))
             {
                 string[] cardsTag = PowerUpStruct.Instance.GetReleventTagCards(puUi.name, true);
                 int cardsLimit = 0;
@@ -1133,7 +1148,7 @@ public class BattleSystem : StateMachine, ITimeOut
             newPowerUpName = "x";
             //selectCardsMode = true;
         }
-        ui.EnableDarkScreen(enable, () => StartCoroutine(ResetSortingOrder(enable)));
+        ui.EnableDarkScreen(isPlayerActivatePu, enable, () => StartCoroutine(ResetSortingOrder(enable)));
     }
 
     public void UpdateZPos(bool aboveDarkScreen, string tag)
@@ -1171,7 +1186,7 @@ public class BattleSystem : StateMachine, ITimeOut
             EndTurn();
         }
 
-        else if (timedOut || energyCounter == 0 || energyCounter == 1 && puDeckUi.GetPuListCount(true) == 0 && !skillUsed)
+        else if (timedOut || energyCounter == 0 /*|| energyCounter == 1 && puDeckUi.GetPuListCount(true) == 0 && !skillUsed*/)
         {
             timedOut = false;
             yield return new WaitForSeconds(1.5f);
@@ -1239,7 +1254,7 @@ public class BattleSystem : StateMachine, ITimeOut
 
     internal void FlipCard(string cardTarget2, bool isPlayerActivate)
     {
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuSee);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuSee, false);
         cardsDeckUi.FlipCardPu(cardTarget2, isPlayerActivate, () =>
         {
             EnableDarkAndSorting(false);
@@ -1313,6 +1328,7 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         if (btnReplaceClickable && energyCounter > 0 && !disable && puDeckUi.GetPuListCount(true) < 2)
         {
+            UpdateReplacePuInDb(-1);
             ReduceEnergy(1);
             ui.EnablePlayerButtons(false);
             DisablePlayerPus();
@@ -1334,15 +1350,15 @@ public class BattleSystem : StateMachine, ITimeOut
                     if (replaceMode)
                     {
                         puDeckUi.EnablePusSlotZ(true, true);
-                        ui.EnableDarkScreen(true, null);
+                        ui.EnableDarkScreen(isPlayerActivatePu, true, null);
                     }
                     else
                     {
-                        ui.EnableDarkScreen(false, () =>
-                        {
-                            puDeckUi.EnablePusSlotZ(true, false);
-                            ActivatePlayerButtons(!endTurn, false);
-                        });
+                        ui.EnableDarkScreen(isPlayerActivatePu, false, () =>
+                         {
+                             puDeckUi.EnablePusSlotZ(true, false);
+                             ActivatePlayerButtons(!endTurn, false);
+                         });
                     }
                     if (playerPus[0] != null)
                     {
@@ -1375,10 +1391,15 @@ public class BattleSystem : StateMachine, ITimeOut
         if (!AreBoardCardsFlipped() && !selectMode)
         {
             //STORE LAST HAND RANK INSTEAED
-            Hand bestHand = cardsDeckUi.CalculateHand(false ,false,false);
+            Hand bestHand = cardsDeckUi.CalculateHand(false, isFlusher, false);
             ui.VisionEffect(bestHand.getCards(), cardsDeckUi.boardCardsUi, cardsDeckUi.playerCardsUi);
-            ui.UpdateCardRank(bestHand.Rank);
-            ui.UpdateRankTextInfo(true, bestHand.Rank);
+            int handRank = bestHand.Rank;
+            if (playerHandIsFlusher)
+            {
+                handRank = 1599;
+            }
+            ui.UpdateCardRank(handRank);
+            ui.UpdateRankTextInfo(true, handRank);
             SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.Vision, true);
 
         }
@@ -1463,7 +1484,7 @@ public class BattleSystem : StateMachine, ITimeOut
                 case 0:
                 case 1:
                     {
-                        ui.UpdateEnergy(true, 2);
+                        ui.UpdateEnergy(true, amountToAdd);
                         break;
                     }
                 case 2:
@@ -1493,10 +1514,10 @@ public class BattleSystem : StateMachine, ITimeOut
         if (emojiCooledDown && id != -1)
         {
             emojiCooledDown = false;
-            StartCoroutine(ui.DisplayEmoji(id,() => emojiCooledDown = true));
+            StartCoroutine(ui.DisplayEmoji(true, id, () => emojiCooledDown = true));
             UpdateEmojiDB(id);
         }
-        else if(!emojiCooledDown)
+        else if (!emojiCooledDown)
         {
             Debug.LogError("Wait A Sec");
         }
@@ -1510,9 +1531,13 @@ public class BattleSystem : StateMachine, ITimeOut
 
     private void UpdateEmojiDB(int emojiId)
     {
-        gameManager.UpdateEmojiDB(new EmojiInfo(currentGameInfo.localPlayerId, emojiId, CreateTimeStamp()), () =>
-                             Debug.Log("EmojiSent" + emojiId),
-                            Debug.LogError);
+        if (!TEST_MODE)
+        {
+
+            gameManager.UpdateEmojiDB(new EmojiInfo(currentGameInfo.localPlayerId, emojiId, CreateTimeStamp()), () =>
+                                 Debug.Log("EmojiSent" + emojiId),
+                                Debug.LogError);
+        }
     }
 
     [Button]

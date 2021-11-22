@@ -102,7 +102,14 @@ public class BattleUI : MonoBehaviour
     public TextMeshProUGUI dialogContentUi;
     public SpriteRenderer[] emojis;
     public SpriteRenderer emojiSelector;
-    public SpriteRenderer emojiToDisplay;
+    public SpriteRenderer emojiToDisplayRendererPlayer;
+    public SpriteRenderer emojiToDisplayRendererEnemy;
+    public GameObject emojiToDisplayTransformPlayer;
+    public GameObject emojiToDisplayTransformEnemy;
+    public Transform emojiStartPosPlayer;
+    public Transform emojiStartPosEnemy;
+    public Transform emojiTarget;
+
 
 
     [SerializeField] private GameObject turnBtn;
@@ -157,7 +164,7 @@ public class BattleUI : MonoBehaviour
         StartCoroutine(AnimationManager.Instance.FreezeEffect(isToFreeze, isFaceDown, spriteTarget, freezeMaterial, onReset));
         if (enableSound)
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuFreeze);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuFreeze, false);
         }
     }
 
@@ -194,18 +201,18 @@ public class BattleUI : MonoBehaviour
        }));
 
         yield return new WaitForSeconds(1f);
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash1);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash1, true);
         yield return new WaitForSeconds(0.2f);
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash2);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash2, true);
 
     }
     public IEnumerator SlashEffect()
     {
         rightSlash.Play();
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash1);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash1, true);
         yield return new WaitForSeconds(0.1f);
         leftSlash.Play();
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash2);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash2, true);
     }
     public void WinParticleEffect()
     {
@@ -350,11 +357,14 @@ public class BattleUI : MonoBehaviour
     }
 
 
-    public void EnableDarkScreen(bool enable, Action ResetSortingOrder)
+    public void EnableDarkScreen(bool isPlayerActivate, bool enable, Action ResetSortingOrder)
     {
         darkScreenRenderer.GetComponent<BoxCollider2D>().enabled = enable;
         AnimationManager.Instance.FadeBurnDarkScreen(darkScreenRenderer.material, enable, ResetSortingOrder);
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(cancelDarkScreenRenderer, enable, Values.Instance.darkScreenAlphaDuration, null));
+        if (isPlayerActivate)
+        {
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(cancelDarkScreenRenderer, enable, Values.Instance.darkScreenAlphaDuration, null));
+        }
     }
 
     public void EnableVisionClick(bool enable)
@@ -614,7 +624,7 @@ public class BattleUI : MonoBehaviour
         switch (powerUpElement)
         {
             case "f":
-                SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.FireProjectile);
+                SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.FireProjectile, false);
                 projectile1 = fireProjectile1;
                 projectile2 = fireProjectile2;
                 if (inlargeProjectile)
@@ -624,7 +634,7 @@ public class BattleUI : MonoBehaviour
                 }
                 break;
             case "i":
-                SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.IceProjectile);
+                SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.IceProjectile, false);
                 projectile1 = iceProjectile1;
                 projectile2 = iceProjectile2;
                 break;
@@ -759,12 +769,12 @@ public class BattleUI : MonoBehaviour
     internal void DisableClickBtnReplace()
     {
         StartCoroutine(AnimationManager.Instance.Shake(btnReplaceRenderer.material));
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
     }
     public void ClickCoinEffect(int index)
     {
         StartCoroutine(AnimationManager.Instance.Shake(coinsSpriteRend[index].material));
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinHit);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinHit, false);
     }
 
     internal void EnableBtnReplace(bool enable)
@@ -786,17 +796,34 @@ public class BattleUI : MonoBehaviour
     {
         for (int i = 0; i < emojis.Length; i++)
         {
-            StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojis[i], enable, Values.Instance.emojiMenuFadeDuration,null));
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojis[i], enable, Values.Instance.emojiMenuFadeDuration, null));
         }
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiSelector, enable, Values.Instance.emojiMenuFadeDuration, null ));
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiSelector, enable, Values.Instance.emojiMenuFadeDuration, null));
     }
 
-    internal IEnumerator DisplayEmoji(int id, Action coolDownEmoji)
+    internal IEnumerator DisplayEmoji(bool isPlayer, int id, Action coolDownEmoji)
     {
-        emojiToDisplay.sprite = emojis[id].sprite;
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiToDisplay, true, Values.Instance.emojiDisplayFadeDuration, null));
-        yield return new WaitForSeconds(Values.Instance.emojiStay);
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiToDisplay, false, Values.Instance.emojiDisplayFadeDuration, null));
+        GameObject emojiGO;
+        SpriteRenderer emojiRenderer;
+        if (isPlayer)
+        {
+            emojiRenderer = emojiToDisplayRendererPlayer;
+            emojiGO = emojiToDisplayTransformPlayer;
+            emojiGO.transform.position = emojiStartPosPlayer.position;
+        }
+        else
+        {
+            emojiRenderer = emojiToDisplayRendererEnemy;
+            emojiGO = emojiToDisplayTransformEnemy;
+            emojiGO.transform.position = emojiStartPosEnemy.position;
+        }
+        Vector3 targetPos = new Vector3(0,  1.3f,0f);
+        emojiRenderer.sprite = emojis[id].sprite;
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, true, Values.Instance.emojiDisplayFadeDuration, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(emojiGO.transform, emojiGO.transform.position + targetPos, emojiGO.transform.localScale, Values.Instance.emojiStay, null, null, null,
+            () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, false, Values.Instance.emojiDisplayFadeDuration, null /*()=> emojiToDisplayTransform.position = startingPos*/))));
+        // yield return new WaitForSeconds(Values.Instance.emojiStay);
+        //   StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiToDisplayRenderer, false, Values.Instance.emojiDisplayFadeDuration, null));
         yield return new WaitForSeconds(Values.Instance.emojiCoolDown - Values.Instance.emojiStay);
         coolDownEmoji?.Invoke();
 

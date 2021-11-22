@@ -110,7 +110,7 @@ public class DataBaseAPI : MonoBehaviour
                     return;
                 }
 
-                Debug.Log("JSON posted successfully");
+               // Debug.Log("JSON posted successfully");
                 callback();
             });
         }
@@ -137,7 +137,7 @@ public class DataBaseAPI : MonoBehaviour
                     return;
                 }
 
-                Debug.Log("JSON posted successfully");
+               // Debug.Log("JSON posted successfully");
                 callback();
             });
         }

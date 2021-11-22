@@ -30,9 +30,9 @@ public class EndRound : State
         //bool playerStartNextRound = battleSystem.FirstToPlay(false); // MAYBE here 
 
         string winningText = "ERROR";
-      //  yield return new WaitForSeconds(1f);
+        //  yield return new WaitForSeconds(1f);
         battleSystem.RevealEnemyCards();
-      //  yield return new WaitForSeconds(0.7f);
+        //  yield return new WaitForSeconds(0.7f);
         battleSystem.RevealBoardCards();
         yield return new WaitForSeconds(1.5f);
 
@@ -45,17 +45,25 @@ public class EndRound : State
 
     public string WinnerCalculator()
     {
-        bool isFlusher = false;
+        bool isFlusher = Values.Instance.flusherOn;
         bool isStrighter = false;
         //MAKE IT BETTER
-        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(true, isFlusher,isStrighter);
+        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
+        if (battleSystem.playerHandIsFlusher)
+        {
+            bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestOpponentHand);
+        }
         Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(false, isFlusher, isStrighter);
+        if (battleSystem.playerHandIsFlusher)
+        {
+            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestOpponentHand);
+        }
         string winnerMsg = "";
         // Opponent win
         // Make it better
         if (bestPlayerHand.Rank.CompareTo(bestOpponentHand.Rank) == 1)
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Lose);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Lose, true);
             if (battleSystem.DealDamage(true))
             {
                 //battleSystem.gameOver = false;
@@ -69,14 +77,14 @@ public class EndRound : State
                 winnerMsg = battleSystem.enemy.id + " Wins With ";
             }
             AnimateWinWithHand(bestOpponentHand.getCards(), false);
-           
+
             winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestOpponentHand.Rank); ;
-          //  winnerMsg += bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
+            //  winnerMsg += bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
         }
         // Player win
         else if (bestPlayerHand.Rank.CompareTo(bestOpponentHand.Rank) == -1)
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Win);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Win, true);
             if (battleSystem.DealDamage(false))
             {
                 startNewRound = false;
@@ -91,7 +99,7 @@ public class EndRound : State
             }
 
             AnimateWinWithHand(bestPlayerHand.getCards(), true);
-            winnerMsg +=  battleSystem.Interface.ConvertHandRankToTextDescription(bestPlayerHand.Rank);
+            winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestPlayerHand.Rank);
             // winnerMsg += bestPlayerHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
         }
         else
@@ -117,6 +125,7 @@ public class EndRound : State
          }*/
         return winnerMsg;
     }
+
 
     private void AnimateWinWithHand(List<Card> winningCards, bool isPlayerWin)
     {
@@ -177,7 +186,7 @@ public class EndRound : State
             }
         }
         losingBoardCards.RemoveAll(item => winningBoardCards.Contains(item));
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndRoundGong);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndRoundGong, true);
         AnimationManager.Instance.AnimateWinningHandToBoard(winningPlayersCards, losingBoardCards,
             () =>
             {

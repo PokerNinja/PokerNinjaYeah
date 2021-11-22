@@ -7,13 +7,14 @@ public class PlayerTurn : State
     private bool yourLastTurn = false;
     private bool finalTurn = false;
     private bool cancaleTimer;
+    private int energyChargeCount;
 
     public PlayerTurn(BattleSystem battleSystem, int turnCounter) : base(battleSystem)
     {
         cancaleTimer = false;
-
         yourLastTurn = false;
         finalTurn = false;
+        energyChargeCount = 2;
         if (turnCounter == 2)
         {
             yourLastTurn = true;
@@ -21,12 +22,14 @@ public class PlayerTurn : State
         else if (turnCounter == 1)
         {
             finalTurn = true;
+            energyChargeCount = 1;
         }
-       /* if(turnCounter == 6 || turnCounter == 5)
-        {
-            cancaleTimer = true;
-        }*/
-        
+
+        /* if(turnCounter == 6 || turnCounter == 5)
+         {
+             cancaleTimer = true;
+         }*/
+
     }
 
     public override IEnumerator Start()
@@ -52,7 +55,7 @@ public class PlayerTurn : State
             }
             battleSystem.ActivatePlayerButtons(true, true);
             battleSystem.Interface.WhosTurnAnimation(true, yourLastTurn, finalTurn);
-            battleSystem.ChargeEnergyCounter(2);
+            battleSystem.ChargeEnergyCounter(energyChargeCount);
         }
         );
         yield break;

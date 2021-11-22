@@ -106,12 +106,17 @@ public class SoundManager : Singleton<SoundManager>
 
 
     // Play a single clip through the sound effects source.
-    public async Task PlayAsync(AudioClip clip)
+    public async Task PlayAsync(AudioClip clip,bool normalPitch)
     {
+        float pitch = 1f;
         AudioSource currentSource = await GetAvailableAudioSource();
         currentSource.clip = clip;
         currentSource.volume = Values.Instance.sfxVolume;
-        currentSource.pitch = Random.Range(LowPitchRange, HighPitchRange);
+        if (!normalPitch)
+        {
+            pitch = Random.Range(LowPitchRange, HighPitchRange);
+        }
+        currentSource.pitch = pitch;
         currentSource.Play();
         soundPool.Enqueue(currentSource);
     }
@@ -234,7 +239,7 @@ public class SoundManager : Singleton<SoundManager>
         Task task = RandomSoundEffectTask(whatSounds);
         task.Wait();
     }
-    private async Task RandomSoundEffectTask(SoundName whatSounds)
+    private async Task RandomSoundEffectTask(SoundName whatSounds )
     {
 
         AudioClip[] targetClipSound = null;
@@ -266,17 +271,17 @@ public class SoundManager : Singleton<SoundManager>
         
 
         
-        await PlayAsync(targetClipSound[randomIndex]);
+        await PlayAsync(targetClipSound[randomIndex] , false);
 
 
     }
 
-    public void PlaySingleSound(SoundName whatSound)
+    public void PlaySingleSound(SoundName whatSound, bool normalPitch)
     {
-        Task task = PlaySingleSoundTask(whatSound);
+        Task task = PlaySingleSoundTask(whatSound, normalPitch);
         task.Wait();
     }
-    private async Task PlaySingleSoundTask(SoundName whatSound)
+    private async Task PlaySingleSoundTask(SoundName whatSound,bool normalPitch)
     {
         AudioClip soundToPlay = null;
         switch (whatSound)
@@ -423,7 +428,7 @@ public class SoundManager : Singleton<SoundManager>
                 }
         }
 
-        await PlayAsync(soundToPlay);
+        await PlayAsync(soundToPlay, normalPitch);
 
     }
 

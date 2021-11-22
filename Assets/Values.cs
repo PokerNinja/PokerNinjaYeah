@@ -9,6 +9,7 @@ public class Values : Singleton<Values>
     [GUIColor(0.3f, 0.8f, 0.8f)]
     [Title("Settings")]
     public bool TEST_MODE = false;
+    public bool flusherOn = false;
     public float turnTimerDuration = 40f;
     public float sfxVolume = 0.9f;
     public float musicVolume = 0.6f;

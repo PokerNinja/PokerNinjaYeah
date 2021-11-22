@@ -107,8 +107,13 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         else
         {
             StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick,false);
         }
+    }
+
+    internal void LoadNewFlusherSprite()
+    {
+        LoadSprite(true);
     }
 
     public bool GetisFaceDown()

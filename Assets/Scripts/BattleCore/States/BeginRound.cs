@@ -19,7 +19,7 @@ public class BeginRound : State
 
     public override IEnumerator Start()
     {
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.StartRound);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.StartRound,true);
         battleSystem.InitDecks();
         yield return new WaitForSeconds(delayForStart);
         battleSystem.ResetRoundSettings(()=> StartTurn());

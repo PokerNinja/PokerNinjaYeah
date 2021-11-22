@@ -14,8 +14,10 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
     public Canvas canvas;
     public CanvasGroup canvasGroup;
     public Transform startingPosition;
+    public Transform btnTransform;
     private int currentEmojiId = 0;
-
+    public BoxCollider2D boxCollider;
+    private Vector2 largeBox, smallBox;
     //private bool held = false;
     //public UnityEvent onClick = new UnityEvent();
 
@@ -24,34 +26,66 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
     private void Start()
     {
         holdTime = Values.Instance.holdTimeForEmojiSelector;
+        smallBox = new Vector2(0.1f, 0.1f);
+        largeBox = new Vector2(1.6f, 2.5f);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
+      //  var position = Input.mousePosition/ canvas.scaleFactor;
+      //  Debug.LogWarning("" + position);
+        currentEmojiId = -1;
         Debug.LogError("Down");
         //held = false;
+        // btnTransform.position = eventData.pointerPress.transform.position;
+        //Vector3 s = (Vector3)(rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor);
+       // s.z = 0;
+        //btnTransform.position = new Vector3(10f,-2f,0f);
+       // Debug.LogError("ds " + PointerDataToRelativePos(eventData));
+        //Debug.LogError("d " + eventData.position /canvas.scaleFactor);
+
         Invoke("OnLongPress", holdTime);
+        //  transform.position = eventData.pointerPress.transform.position;
+
+    }
+
+    private Vector2 PointerDataToRelativePos(PointerEventData eventData)
+    {
+        Vector2 result;
+        Vector2 clickPosition = eventData.position;
+        RectTransform thisRect = GetComponent<RectTransform>();
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(thisRect, clickPosition, null, out result);
+        result += thisRect.sizeDelta / 2;
+
+        return result;
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         Debug.LogError("Up");
-        CancelInvoke("OnLongPress");
+        transform.position = startingPosition.position;
+        boxCollider.size = largeBox;
+        BattleSystem.Instance.EmojiSelected(currentEmojiId);
 
+        CancelInvoke("OnLongPress");
         //if (!held)
         //    onClick.Invoke();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        Debug.LogError("Exit");
+
         CancelInvoke("OnLongPress");
     }
 
     void OnLongPress()
     {
         //held = true;
-        Debug.LogError("LongPress");
+        //Debug.LogError("LongPress");
         onLongPress.Invoke();
+        boxCollider.size = smallBox;
     }
 
 
@@ -62,24 +96,23 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        Debug.LogError("EndDrag");
         canvasGroup.blocksRaycasts = true;
-        transform.position = startingPosition.position;
-        BattleSystem.Instance.EmojiSelected(currentEmojiId);
+      //  BattleSystem.Instance.EmojiSelected(currentEmojiId);
+
     }
 
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.LogError("OnBeginDrag");
+        Debug.LogError("d " + eventData.delta / canvas.scaleFactor);
+        // rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
         canvasGroup.blocksRaycasts = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         currentEmojiId = ConvertNameToId(collision.name);
-        Debug.LogError("E" + currentEmojiId);
-        Debug.LogError("E" + collision.name);
-
     }
 
     private int ConvertNameToId(string name)
@@ -105,15 +138,4 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
         currentEmojiId = -1;
     }
 
-    /*    public void OnDrop(PointerEventData eventData)
-        {
-            Debug.LogError("OnDrop");
-
-           *//* foreach(var GO in eventData.hovered)
-            {
-                Debug.LogError("MYMAN " + GO.name);
-            }*//*
-
-
-        }*/
 }
