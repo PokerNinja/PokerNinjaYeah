@@ -9,16 +9,19 @@ public class Values : Singleton<Values>
     [GUIColor(0.3f, 0.8f, 0.8f)]
     [Title("Settings")]
     public bool TEST_MODE = false;
+    public bool flusherOn = false;
     public float turnTimerDuration = 40f;
     public float sfxVolume = 0.9f;
     public float musicVolume = 0.6f;
+    public float lowPitchRange = 0.95f;
+    public float highPitchRange = 1.05f;
     public float delayBeforeStartNewRound =2f;
     public float delayBeforeStartFirstRound = 1f;
     public int delayTimerStart = 3;
-    public int replaceUseLimit = 1;
     public int skillUseLimit = 1;
-    public GamePhase resetReplaceEvery = GamePhase.Turn;
     public GamePhase resetSkillEvery = GamePhase.Round;
+    // public int replaceUseLimit = 1;
+    //    public GamePhase resetReplaceEvery = GamePhase.Turn;
 
     //[GUIColor(0, 1, 0)]
     [Title("Effects")]
@@ -26,6 +29,8 @@ public class Values : Singleton<Values>
     public float puProjectileFadeOutDuration = 0.4f;
     public float windMoveDuration = 0.3f;
     public float windFadeOutDuration =1f;
+
+    public float winningCardProjectileMoveDuration = 1f;
 
     public Transform winCardRightStart;
     public Transform winCardLeftStart;
@@ -47,6 +52,13 @@ public class Values : Singleton<Values>
     public int coinShineEvery = 3;
     public float infoDialogFadeOutDuration = 0.2f;
     public float showDialogMoveDuration = 0.5f;
+
+    [Title("Emojis", bold: false)]
+    public float holdTimeForEmojiSelector = 0.25f;
+    public float emojiMenuFadeDuration =0.5f;
+    public float emojiDisplayFadeDuration =0.15f;
+    public float emojiStay =3f;
+    public float emojiCoolDown = 5f;
 
     [Title("CardUi", bold: false)]
     public Color cardSelectionColor ;
@@ -80,10 +92,10 @@ public class Values : Singleton<Values>
     public float turnIndicatorFadeDuration = 1.2f;
 
     [Title("End", bold: false)]
-    public float winningCardProjectileMoveDuration = 1f;
     public float winningCardsMoveDuration =4f;
     public float LoseLifeDuration = 1f;
     public float bgPulseColorSwapDuration = 1f;
+    public float bgMaxValueSwapColor = 0.67f;
     public float hitTextScaleDuration = 2f;
     public float hitTextFDuration = 0.5f;
 

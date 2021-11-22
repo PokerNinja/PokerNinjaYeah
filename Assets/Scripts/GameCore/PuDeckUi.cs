@@ -316,12 +316,12 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         float targetX;
         if (open)
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer,false);
             targetX = 5.2f;
         }
         else
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CloseDrawer);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CloseDrawer,false);
             targetX = 3.2f;
         }
 

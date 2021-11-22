@@ -98,7 +98,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             aboutToDestroy = true;
             BattleSystem.Instance.Interface.EnablePlayerButtons(false);
             BattleSystem.Instance.DisablePlayerPus();
-            BattleSystem.Instance.Interface.EnableDarkScreen(true, null);
+            BattleSystem.Instance.Interface.EnableDarkScreen(isPlayer, true, null);
             if (puIndex != -1)
             {
                 AnimatePuUse(() => BattleSystem.Instance.OnPowerUpPress(puName, puIndex, energyCost), null);
@@ -113,15 +113,16 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             BattleSystem.Instance.ReplacePu(true, puIndex);
         }
-        else if(isPlayer || !isPlayer)
+        else if (isPlayer || !isPlayer)
         {
             StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick,false);
         }
     }
     public void OnPointerUp(PointerEventData eventData)
     {
-
+    /*    Debug.LogError("count " + eventData.clickCount);
+        Debug.LogError("time " + eventData.clickTime);*/
         CancelInvoke("OnLongPress");
         if (isPlayer || isSkill)
         {
@@ -248,9 +249,9 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void AnimatePuUse(Action OnStart, Action OnEndRoutine3)
     {
         OnStart?.Invoke();
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuUse);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuUse,false);
         EnableSelecetPositionZ(true);
-       // transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -25f);
+        // transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -25f);
         if (isPlayer)
         {
             StartCoroutine(AnimationManager.Instance.PulseSize(true, transform, 1.15f, 0.4f, true,

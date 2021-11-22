@@ -117,13 +117,16 @@ public class PowerUpState : State
         if (puIndex != -1)
         {
             battleSystem.DissolvePuAfterUse(isPlayerActivate, puIndex);
+        }
+        else if(puIndex == -1 && isPlayerActivate)
+        {
             battleSystem.ReduceSkillUse();
         }
         if (isPlayerActivate)
         {
             battleSystem.ReduceEnergy(energyCost);
             battleSystem.selectMode = false;
-            battleSystem.playerPuInProcess = true;
+          //  battleSystem.playerPuInProcess = true;
         }
         switch (powerUpName)
         {
@@ -256,7 +259,6 @@ public class PowerUpState : State
     }
     private void EnableSelectForCardsList(List<CardUi> cardsList, bool enable)
     {
-        Debug.LogWarning("ActivitingSelect");
         string puElement = powerUpName.Substring(0, 1);
         if (powerUpName.Equals("fm1"))
         {
@@ -287,7 +289,6 @@ public class PowerUpState : State
 
     private void ActivateCardSelection(string[] cardsToActivate)
     {
-        Debug.LogWarning("Activiting");
         if (cardsToActivate[0] == Constants.AllCardsTag)
         {
             battleSystem.resetAllCardsSelectionWhenCardClicked = true;

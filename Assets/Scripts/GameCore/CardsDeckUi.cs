@@ -1,4 +1,5 @@
-﻿using StandardPokerHandEvaluator;
+﻿using Sirenix.OdinInspector;
+using StandardPokerHandEvaluator;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     ObjectPooler objectPooler;
 
-    
+
 
 
     public GameObject playerCardAParent;
@@ -48,6 +49,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     public List<CardUi> extraDeckCardsUi;
     public Material burnMaterial;
     public Material dissolveMaterial;
+    private PokerHandRankingTable poker;
 
     #region Settings
 
@@ -68,8 +70,91 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         boardParents = new GameObject[] { flopAParent, flopBParent, flopCParent, turnParent, riverParent };
         cardHandVector = new Vector3(1f, 1f, 1f);
         cardVectorBoard = new Vector3(0.75f, 0.75f, 0.75f);
+        poker = new PokerHandRankingTable();
     }
 
+    private Card cardToSave;
+    private SuitEnum targetSiut;
+    internal Hand ReplaceCardToFlusher(Hand hand)
+    {
+        List<Card> cards = hand.getCards();
+        for (int i = 0; i < 4; i++)
+        {
+            if (cards[i] == cardToSave)
+            {
+                cards[i] = GetNewSuitCard(targetSiut, cards, cards[i]);
+                ReplaceUiCardForFlusher(cardToSave.ToString(CardToStringFormatEnum.ShortCardName), cards[i].ToString(CardToStringFormatEnum.ShortCardName));
+            }
+        }
+        return new Hand(cards[0], cards[1], cards[2], cards[3], cards[4], poker);
+    }
+
+    private void ReplaceUiCardForFlusher(string oldCard, string newCard)
+    {
+        Debug.LogError("o " + oldCard);
+        Debug.LogError("n " + newCard);
+        CardUi targetCardUi = GetCardUiByDescription(oldCard);
+        targetCardUi.cardDescription = newCard;
+        targetCardUi.LoadNewFlusherSprite();
+    }
+
+    private Card GetNewSuitCard(SuitEnum targetSiut, List<Card> cards, Card cardToRemove)
+    {
+        List<Card> newCards = new List<Card>();
+        List<Card> newCardsOptions = new List<Card>();
+        newCardsOptions = InitCardsOptionsFlusher(targetSiut);
+        foreach (Card card in cards)
+        {
+            if (card.CardSuit == targetSiut)
+            {
+                newCards.Add(card);
+            }
+        }
+        newCards = newCards.OrderBy(h => h.CardValue).ToList<Card>();
+        foreach (Card card in newCardsOptions)
+        {
+            if (!CheckIfChanceForSfOrDuplicate(card, cards))
+            {
+                return card;
+            }
+        }
+
+        return new Card(CardEnum.Nine, targetSiut);
+    }
+
+    private bool CheckIfChanceForSfOrDuplicate(Card card, List<Card> cards)
+    {
+        if (cards.Contains(card))
+        {
+            return true;
+        }
+        else
+        {
+            cards.Add(card);
+            Hand hand = new Hand(cards[0], cards[1], cards[2], cards[3], cards[4], poker);
+            if (hand.Rank <= 10)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    private List<Card> InitCardsOptionsFlusher(SuitEnum targetSiut)
+    {
+        List<Card> newCardsOptions = new List<Card>();
+        newCardsOptions.Add(new Card(CardEnum.Two, targetSiut));
+        newCardsOptions.Add(new Card(CardEnum.Three, targetSiut));
+        newCardsOptions.Add(new Card(CardEnum.Four, targetSiut));
+        newCardsOptions.Add(new Card(CardEnum.Five, targetSiut));
+        newCardsOptions.Add(new Card(CardEnum.Six, targetSiut));
+        newCardsOptions.Add(new Card(CardEnum.Seven, targetSiut));
+        newCardsOptions.Add(new Card(CardEnum.Eight, targetSiut));
+        return newCardsOptions;
+    }
 
     internal void InitDeckFromServer(string[] deckFromDB)
     {
@@ -96,7 +181,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         yield return new WaitForSeconds(1f);
         AnimateDrawer(true, () => StartCoroutine(DealCardsToHands(WaitForCloseDrawerAnimation, FinishCallback)));
     }
- 
+
 
     public void InitBoardAndDeal(Action WaitForDrawerToClose, Action FinishCallback)
     {
@@ -137,7 +222,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 EnemyHand.Add(playerCard);
             }
             dealToPlayer = !dealToPlayer;
-            CardCreatorUi(playerCard, dealToPlayer, false, parentForHands[i], cardName[i], null, false,-1);
+            CardCreatorUi(playerCard, dealToPlayer, false, parentForHands[i], cardName[i], null, false, -1);
             yield return new WaitForSecondsRealtime(delayBetweenDealHandsCards);
             if (i == 3)
             {
@@ -161,7 +246,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             newCard = deck.Pop();
             boardCards.Add(newCard);
 
-            CardCreatorUi(newCard, false, false, boardParents[indexCard], Constants.BoardCards[indexCard], null, false,-1);
+            CardCreatorUi(newCard, false, false, boardParents[indexCard], Constants.BoardCards[indexCard], null, false, -1);
             yield return new WaitForSecondsRealtime(delayBetweenDealBoardCards);
             indexCard++;
             if (indexCard == 3 || indexCard == 4 || indexCard == 5)
@@ -181,6 +266,18 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         for (int i = 0; i <= allCardsUi.Count; i++)
         {
             if (allCardsUi[i].cardPlace.Equals(cardTarget2))
+            {
+                return allCardsUi[i];
+            }
+        }
+        return null;
+    }
+    private CardUi GetCardUiByDescription(string cardDesc)
+    {
+        List<CardUi> allCardsUi = playerCardsUi.Concat(enemyCardsUi).Concat(boardCardsUi).ToList();
+        for (int i = 0; i <= allCardsUi.Count; i++)
+        {
+            if (allCardsUi[i].cardDescription.Equals(cardDesc))
             {
                 return allCardsUi[i];
             }
@@ -247,7 +344,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             return 0;
         }
-        if (cardPlace.Equals(Constants.PlayerCard2) || cardPlace.Equals(Constants.EnemyCard2)  || cardPlace.Equals(Constants.BoardCards[1]))
+        if (cardPlace.Equals(Constants.PlayerCard2) || cardPlace.Equals(Constants.EnemyCard2) || cardPlace.Equals(Constants.BoardCards[1]))
         {
             return 1;
         }
@@ -406,7 +503,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         cardObject.name = cardPlace;
         cardObject.transform.position = new Vector3(cardTransform.position.x, cardTransform.position.y, 1); ;
         cardObject.transform.localScale = cardTransform.localScale;
-        cardObject.Init(cardTag,newCard, isFaceDown, aboveDarkScreen, cardPlace);
+        cardObject.Init(cardTag, newCard, isFaceDown, aboveDarkScreen, cardPlace);
         Vector3 targetPosition = new Vector3(cardParent.transform.position.x, cardParent.transform.position.y, cardObject.transform.position.z);
         Action closeDrawer = null;
         if (isCloseDrawer)
@@ -414,16 +511,17 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             closeDrawer = () => AnimateDrawer(false, null);
         }
         StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
-        Values.Instance.cardDrawMoveDuration, null, () => cardObject.CardReveal(!isFaceDown), disableDarkScreen,()=> {
+        Values.Instance.cardDrawMoveDuration, null, () => cardObject.CardReveal(!isFaceDown), disableDarkScreen, () =>
+        {
             closeDrawer?.Invoke();
-        AddCardToList(cardTag, cardObject,indexToInsert);
-            }));
+            AddCardToList(cardTag, cardObject, indexToInsert);
+        }));
 
     }
 
     private void AddCardToList(string cardTag, CardUi cardObject, int indexToInsert)
     {
-        if(indexToInsert == -1 || GetListByTag(cardTag).Count < indexToInsert)
+        if (indexToInsert == -1 || GetListByTag(cardTag).Count < indexToInsert)
         {
             GetListByTag(cardTag).Add(cardObject);
         }
@@ -454,7 +552,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    public Hand CalculateHand(bool isPlayer)
+    public Hand CalculateHand(bool isPlayer, bool isFlusher, bool isStrighter)
     {
 
         TexasHand playerCards;
@@ -466,14 +564,22 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             playerCards = GetPlayerHand();
         }
-        PokerHandRankingTable rankingTable = new PokerHandRankingTable();
 
         List<Card> totalCards = new List<Card>();
         totalCards.AddRange(playerCards.getCards());
         totalCards.AddRange(boardCards);
         if (boardCards.Count == 3)
         {
-            return new Hand(totalCards[0], totalCards[1], totalCards[2], totalCards[3], totalCards[4], rankingTable); ;
+            Hand hand = new Hand(totalCards[0], totalCards[1], totalCards[2], totalCards[3], totalCards[4], poker);
+            if (isFlusher && hand.Rank > 1600)
+            {
+                BattleSystem.Instance.playerHandIsFlusher = IsHandWithFourSameSuit(hand);
+            }
+            else
+            {
+                BattleSystem.Instance.playerHandIsFlusher = false;
+            }
+            return hand;
         }
         List<Hand> handsOptions = new List<Hand>();
         List<Card> currentHandList = new List<Card>();
@@ -484,10 +590,19 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 currentHandList = new List<Card>(totalCards.ToList<Card>());
                 currentHandList.RemoveAt(i);
-                currentHand = new Hand(currentHandList[0], currentHandList[1], currentHandList[2], currentHandList[3], currentHandList[4], rankingTable);
+                currentHand = new Hand(currentHandList[0], currentHandList[1], currentHandList[2], currentHandList[3], currentHandList[4], poker);
                 handsOptions.Add(currentHand);
             }
             handsOptions = handsOptions.OrderBy(h => h.Rank).ToList<Hand>();
+            if (isFlusher && handsOptions[0].Rank > 1600)
+            {
+                Hand newHand = ConvertCardListToHand(CheckIfFlusher(handsOptions));
+                handsOptions.Insert(0, newHand);
+            }
+            else
+            {
+                BattleSystem.Instance.playerHandIsFlusher = false;
+            }
             return handsOptions[0];
         }
         for (int i = 0; i < totalCards.Count; i++)
@@ -497,13 +612,154 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 currentHandList = new List<Card>(totalCards.ToList<Card>());
                 currentHandList.RemoveAt(j);
                 currentHandList.RemoveAt(i);
-                currentHand = new Hand(currentHandList[0], currentHandList[1], currentHandList[2], currentHandList[3], currentHandList[4], rankingTable);
+                currentHand = new Hand(currentHandList[0], currentHandList[1], currentHandList[2], currentHandList[3], currentHandList[4], poker);
                 handsOptions.Add(currentHand);
             }
         }
         handsOptions = handsOptions.OrderBy(h => h.Rank).ToList<Hand>();
+        if (isFlusher && handsOptions[0].Rank > 1600)
+        {
+            Hand newHand = ConvertCardListToHand(CheckIfFlusher(handsOptions));
+
+            handsOptions.Insert(0, newHand);
+        }
+        else
+        {
+            BattleSystem.Instance.playerHandIsFlusher = false;
+        }
+        //MAYBE SMARTER^
         return handsOptions[0];
 
+    }
+
+    private Hand ConvertCardListToHand(List<Card> cards)
+    {
+        return new Hand(cards[0], cards[1], cards[2], cards[3], cards[4], poker);
+    }
+
+    /* private Hand ReplaceCardForFlusher(Hand hand)
+     {
+         SuitEnum targetSuit = GetSuitFromHand(hand);
+        Card newCardAvailable = SearchForLowestSuitInField()
+     }*/
+
+    private List<Card> CheckIfFlusher(List<Hand> handsOptions)
+    {
+        List<Card> option1 = null;
+        List<Card> option2 = null;
+        foreach (Hand hand in handsOptions)
+        {
+            if (IsHandWithFourSameSuit(hand))
+            {
+                if (option1 == null)
+                {
+                    BattleSystem.Instance.playerHandIsFlusher = true;
+                    option1 = hand.getCards();
+                }
+                else if (option1[2].CardSuit != hand.getCards()[2].CardSuit)
+                {
+                    option2 = hand.getCards();
+                }
+            }
+        }
+        if (option2 != null)
+        {
+            if (IsOptionOneOfFlusherHigher(option1, option2))
+            {
+                return option1;
+            }
+            else
+            {
+                return option2;
+            }
+        }
+        else if (option1 != null)
+        {
+            return option1;
+        }
+        BattleSystem.Instance.playerHandIsFlusher = false;
+
+        return handsOptions[0].getCards();
+    }
+
+    private bool IsOptionOneOfFlusherHigher(List<Card> option1, List<Card> option2)
+    {
+        List<Card> option1Cards = option1.OrderBy(c => c.CardValue).ToList<Card>();
+        List<Card> option2Cards = option2.OrderBy(c => c.CardValue).ToList<Card>();
+        for (int i = 4; i > 0; i--)
+        {
+            if (option1Cards[i].CardValue < option2Cards[i].CardValue)
+            {
+                Debug.LogError("card " + option1Cards[i].CardValue);
+                Debug.LogError("card " + option2Cards[i].CardValue);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private bool IsHandWithFourSameSuit(Hand hand)
+    {
+        int sameSuitCounter = 0;
+        SuitEnum sameSuit = SuitEnum.Clubs;
+        Card tempCardToSave = null ;
+        List<Card> cards = hand.getCards().OrderBy(c => c.CardSuit).ToList<Card>();
+        for (int i = 0; i < 4; i++)
+        {
+            if (cards[i].CardSuit == cards[i + 1].CardSuit)
+            {
+                if (sameSuitCounter == 0)
+                {
+                    sameSuit = cards[i].CardSuit;
+                    targetSiut = cards[i].CardSuit;
+                    sameSuitCounter++;
+                }
+                else if (sameSuit == cards[i].CardSuit)
+                {
+                    sameSuitCounter++;
+                }
+            }
+            else
+            {
+                if (i == 0)
+                {
+                    // cards[0] = new Card(cards[0].CardValue, targetSiut);
+                    tempCardToSave = cards[0];
+                    Debug.LogError("c " + cardToSave);
+                }
+                else if (i == 3)
+                {
+                    tempCardToSave = cards[4];
+                    Debug.LogError("c " + cardToSave);
+                }
+            }
+        }
+        if (sameSuitCounter == 3)
+        {
+            //Problem if option12
+            cardToSave = tempCardToSave;
+            return true;
+        }
+        return false;
+    }
+    [Button]
+    public void CheckFlush()
+    {
+        Card a = new Card(CardEnum.Ace, SuitEnum.Diamonds);
+        Card b = new Card(CardEnum.King, SuitEnum.Hearts);
+        Card c = new Card(CardEnum.Queen, SuitEnum.Diamonds);
+        Card d = new Card(CardEnum.Jack, SuitEnum.Clubs);
+        Card e = new Card(CardEnum.Six, SuitEnum.Diamonds);
+        Card x = new Card(CardEnum.Seven, SuitEnum.Diamonds);
+        Hand hand1 = new Hand(a, b, c, d, e, poker);
+        Hand hand2 = new Hand(c, x, d, b, e, poker);
+        Hand hand3 = new Hand(e, c, b, d, a, poker);
+        List<Card> cards1 = hand1.getCards().OrderBy(c => c.CardValue).ToList<Card>();
+        List<Card> cards2 = hand2.getCards().OrderBy(c => c.CardValue).ToList<Card>();
+        List<Card> cards3 = hand3.getCards().OrderBy(c => c.CardValue).ToList<Card>();
+        handToPrint(cards1);
+        handToPrint(cards2);
+        handToPrint(cards3);
     }
 
     internal Vector2 GetCardPosition(string cardPlace)
@@ -522,14 +778,13 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void DisableCardsSelection(string cardPlace)
     {
-        Debug.LogError("disable" + cardPlace);
         foreach (CardUi card in GetListByTag(CardPlaceToTag(cardPlace)))
         {
-            card.SetSelection(false,"");
+            card.SetSelection(false, "");
         }
     }
 
-    
+
     private GameObject GetParentByPlace(string cardPlace)
     {
         // Make It batter
@@ -557,11 +812,11 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
         if (isPlayerFirst)
         {
-            names = new string[] { Constants.PlayerCard1, Constants.EnemyCard1, Constants.PlayerCard2, Constants.EnemyCard2};
+            names = new string[] { Constants.PlayerCard1, Constants.EnemyCard1, Constants.PlayerCard2, Constants.EnemyCard2 };
         }
         else
         {
-            names = new string[] { Constants.EnemyCard1, Constants.PlayerCard1, Constants.EnemyCard2, Constants.PlayerCard2};
+            names = new string[] { Constants.EnemyCard1, Constants.PlayerCard1, Constants.EnemyCard2, Constants.PlayerCard2 };
         }
         return names;
 
@@ -593,8 +848,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         else
         {
-            extraDeckCardsUi[0].SetSelection(true,"");
-            extraDeckCardsUi[1].SetSelection(true,"");
+            extraDeckCardsUi[0].SetSelection(true, "");
+            extraDeckCardsUi[1].SetSelection(true, "");
         }
         endAction?.Invoke();
     }
@@ -636,7 +891,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
         }
     }
-   
+
 
     internal void DestroyCardObject(string cardPlace, Action OnEnd)
     {
@@ -663,12 +918,12 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         else
         {
-            StartCoroutine(cardToDestroy.Dissolve(0f,() =>
-                    RestAfterDestroy(cardToDestroy, OnEnd)));
+            StartCoroutine(cardToDestroy.Dissolve(0f, () =>
+                     RestAfterDestroy(cardToDestroy, OnEnd)));
         }
     }
 
-  
+
 
 
     internal void DrawAndReplaceCard(string cardPlace, bool isFlip, Action disableDarkScreen, bool isFirstCard, bool isLastCard)
@@ -683,12 +938,12 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         else
         {
-            CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard , indexToInsert);
+            CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert);
         }
     }
     internal void SwapTwoCards(string cardPlace1, string cardPlace2, Action DisableDarkScreen)
     {
-      
+
         //COPy WASTE
         CardUi cardSwap1 = GameObject.Find(cardPlace1).GetComponent<CardUi>();
         CardUi cardSwap2 = GameObject.Find(cardPlace2).GetComponent<CardUi>();
@@ -715,7 +970,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         GetListByTag(cardSwap2.tag)[index2] = cardSwap1;
     }
 
- 
+
     internal void SwapAndDestroy(string cardFromDeck, string playerCard, Action DisableDarkScreen)
     {
         Debug.LogError("card" + cardFromDeck);
@@ -728,7 +983,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Transform tempTransform1 = cardFromDeckUI.transform;
         Transform tempTransform2 = playerCardUI.transform;
         SwapCardUiList(cardFromDeckUI, playerCardUI);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(cardFromDeckUI.transform, tempTransform2.position, tempTransform2.localScale,Values.Instance.cardSwapMoveDuration,
+        StartCoroutine(AnimationManager.Instance.SmoothMove(cardFromDeckUI.transform, tempTransform2.position, tempTransform2.localScale, Values.Instance.cardSwapMoveDuration,
             () => ResetExtraDeckCards(), null, DisableDarkScreen, null));
         Card tempCard1 = Card.StringToCard(cardFromDeckUI.cardDescription);
         Card tempCard2 = Card.StringToCard(playerCardUI.cardDescription);
@@ -765,9 +1020,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         SwapTwoCards(Constants.EnemyCard2, Constants.PlayerCard2, DisableDarkScreen);
     }
 
-  
 
-  
+
+
     private void SwitchCardsInfo(CardUi cardSwap1, CardUi cardSwap2)
     {
         Transform tempParent1 = cardSwap1.transform.parent;
@@ -780,7 +1035,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         cardSwap1.cardPlace = cardSwap2.cardPlace;
         cardSwap2.transform.SetParent(tempParent1);
         cardSwap2.name = tempName1;
-      //  cardSwap2.tag = tempTag1;
+        //  cardSwap2.tag = tempTag1;
         cardSwap2.cardPlace = tempPlace1;
         cardSwap1.InitCardsTag(cardSwap2.tag);
         cardSwap2.InitCardsTag(tempTag1);
@@ -793,62 +1048,63 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
 
 
-   
+
 
     private void AnimateDrawer(bool open, Action action)
     {
         float targetX;
         if (open)
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
             targetX = -1.15f;
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
             new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, action));
         }
         else
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CloseDrawer);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CloseDrawer, false);
             targetX = 1.1f;
             action?.Invoke();
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
             new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, null));
         }
     }
-        public void DeleteAllCards(Action DealHands)
+    public void DeleteAllCards(Action DealHands)
+    {
+        ResetUiLists();
+        foreach (CardUi cardToDestroy in FindAllCardsObjects())
         {
-            ResetUiLists();
-            foreach (CardUi cardToDestroy in FindAllCardsObjects())
-            {
             if (cardToDestroy.cardMark.activeSelf)
             {
                 cardToDestroy.cardMark.SetActive(false);
             }
-                StartCoroutine(cardToDestroy.Dissolve(0, ()=>ResetCardUI(cardToDestroy)));
-            }
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve);
+            StartCoroutine(cardToDestroy.Dissolve(0, () => ResetCardUI(cardToDestroy)));
+        }
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve, false);
         DealHands();
-        }
+    }
 
-        private void handToPrint(List<Card> cardsList, String msg)
+    private void handToPrint(List<Card> cardsList)
+    {
+        String totalCards = " ";
+        foreach (Card c in cardsList)
         {
-            String totalCards = " ";
-            foreach (Card c in cardsList)
-            {
-                totalCards += c.ToString(CardToStringFormatEnum.ShortCardName) + " ,";
-            }
+            totalCards += c.ToString(CardToStringFormatEnum.ShortCardName) + " ,";
         }
-
-    }
-    /* internal void Blind2RandomCards(bool isPlayerActivate, string firstToBlind, string secondToBlind, Action endAction)
-    {
-
-        BlindCard(isPlayerActivate, firstToBlind, null);
-        BlindCard(isPlayerActivate, secondToBlind, endAction);
+        Debug.LogWarning(totalCards);
     }
 
-    internal void BlindCard(bool isPlayerActivate, string cardTarget2, Action onFinish)
-    {
-        CardUi cardToBlind = GameObject.Find(cardTarget2).GetComponent<CardUi>();
-        cardToBlind.FlipCard(false, onFinish);
-    }*/
+}
+/* internal void Blind2RandomCards(bool isPlayerActivate, string firstToBlind, string secondToBlind, Action endAction)
+{
+
+    BlindCard(isPlayerActivate, firstToBlind, null);
+    BlindCard(isPlayerActivate, secondToBlind, endAction);
+}
+
+internal void BlindCard(bool isPlayerActivate, string cardTarget2, Action onFinish)
+{
+    CardUi cardToBlind = GameObject.Find(cardTarget2).GetComponent<CardUi>();
+    cardToBlind.FlipCard(false, onFinish);
+}*/
 

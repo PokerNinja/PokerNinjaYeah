@@ -20,6 +20,7 @@ namespace Managers
         private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> currentGameInfoListener;
         private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> newDeckListener;
         private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> currentPowerupListener;
+        private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> currentEmojiListener;
 
         public void GetCurrentGameInfo(string gameId, string localPlayerId, Action<GameInfo> callback,
             Action<AggregateException> fallback)
@@ -175,6 +176,25 @@ namespace Managers
                             },
                            fallback);
         }
+        internal void ListenForEmoji(string currentPlayerId,Action<int> callbackEmoji,
+            Action<AggregateException> fallback)
+        {
+            currentEmojiListener =
+                           DatabaseAPI.ListenForValueChanged($"games/" + currentGameInfo.gameId + "/emoji", args =>
+                            {
+                                if (!args.Snapshot.Exists) return;
+
+                                var emoji =
+                                    StringSerializationAPI.Deserialize(typeof(EmojiInfo), args.Snapshot.GetRawJsonValue()) as
+                                        EmojiInfo;
+                               // currentGameInfo.powerup = powerup;
+                                if (!emoji.playerId.Equals(currentPlayerId))
+                                {
+                                    callbackEmoji(emoji.emojiId);
+                                }
+                            },
+                           fallback);
+        }
 
         public void StopListeningForAllPlayersReady() => DatabaseAPI.StopListeningForChildAdded(readyListener);
         public void StopListeningForAllPlayersReadyInGame() => DatabaseAPI.StopListeningForChildChanged(readyListenerInGame);
@@ -227,10 +247,8 @@ namespace Managers
         {
 
             DatabaseAPI.PostObject($"games/{currentGameInfo.gameId}/gameInfo/powerup", newPowerUp,
-               () =>
-               {
-                   callback();
-               }, fallback);
+                   callback
+                   ,fallback);
         }
 
 
@@ -241,5 +259,11 @@ namespace Managers
                          fallback);
         }
 
+        internal void UpdateEmojiDB(EmojiInfo emojiInfo, Action callback, Action<AggregateException> fallback)
+        {
+            DatabaseAPI.PostObject($"games/{currentGameInfo.gameId}/emoji/", emojiInfo,
+                                    callback,
+                                    fallback);
+        }
     }
 }

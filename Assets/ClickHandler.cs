@@ -70,7 +70,6 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         // TODO move this to battleSystem
         // BattleSystem battleSystem = GameObject.Find("BattleSystem").GetComponent<BattleSystem>();
         //Maybe Better One
-        Debug.LogError("Clicking");
         if (BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.HideDialog();

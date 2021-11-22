@@ -19,7 +19,7 @@ public class BeginRound : State
 
     public override IEnumerator Start()
     {
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.StartRound);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.StartRound,true);
         battleSystem.InitDecks();
         yield return new WaitForSeconds(delayForStart);
         battleSystem.ResetRoundSettings(()=> StartTurn());
@@ -32,10 +32,11 @@ public class BeginRound : State
         battleSystem.Interface.EnableBgColor(false);
         battleSystem.isPlayerActivatePu = false;
         battleSystem.readyToPlay = true;
-        if (Values.Instance.resetReplaceEvery == Values.GamePhase.Round)
-        {
-            battleSystem.replacePuLeft = Values.Instance.replaceUseLimit;
-        }
+        battleSystem.Interface.EnableVisionClick(true);
+        /*  if (Values.Instance.resetReplaceEvery == Values.GamePhase.Round)
+          {
+              battleSystem.replacePuLeft = Values.Instance.replaceUseLimit;
+          }*/
         if (Values.Instance.resetSkillEvery == Values.GamePhase.Round)
         {
             battleSystem.skillUseLeft = Values.Instance.skillUseLimit;

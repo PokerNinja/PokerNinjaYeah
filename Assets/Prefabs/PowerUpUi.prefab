@@ -112,8 +112,8 @@ MonoBehaviour:
   isMonster: 0
   isSkill: 0
   availableForReuse: 0
+  aboutToDestroy: 0
   freeze: 0
-  infoShow: 0
   isClickable: 0
   replaceMode: 0
   energyCost: 0

@@ -38,16 +38,7 @@ namespace Serializables
 
         }
 
-        //Initial PU
-        public PowerUpInfo(string playerId, string powerupName, int amount)
-        {
-            this.playerId = playerId;
-            this.powerupName = powerupName;
-            this.cardPlace1 = "";
-            this.cardPlace2 = "";
-            this.timeStamp = 0;
-
-        }
+       
 
 
 
@@ -55,37 +46,5 @@ namespace Serializables
     }
 
 
-
-    public enum CardSelectedEnum
-    {
-        [Description("IM_Desc")]
-
-        NoCard = -1,
-        PlayerA = 0,
-        PlayerB = 1,
-        EnemyA = 2,
-        EnemyB = 3,
-        [Description("IM_Desc")]
-
-        BoardA = 4,
-        BoardB = 5,
-        BoardC = 6,
-        BoardD = 7,
-        BoardE = 8,
-        DeckA = 9,
-        DeckB = 10,
-        DeckC = 11,
-    }
-
-    public enum CardsToSelectEnum
-    {
-        NoCards = -1,
-        PlayerCards = 0,
-        EnemyCards = 1,
-        BoardCards = 2,
-        Deck1Card = 3,
-        Deck2Cards = 4,
-        Deck3Cards = 5,
-    }
     
 }

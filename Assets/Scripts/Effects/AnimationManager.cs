@@ -48,7 +48,7 @@ public class AnimationManager : Singleton<AnimationManager>
             {
                 while (valueToUpdate < target)
                 {
-                    valueToUpdate += Time.deltaTime/ duration;
+                    valueToUpdate += Time.deltaTime / duration;
                     material.SetFloat(valueName, valueToUpdate);
                     yield return new WaitForFixedUpdate();
                     /*  if (valueToUpdate >= target)
@@ -64,7 +64,7 @@ public class AnimationManager : Singleton<AnimationManager>
             {
                 while (valueToUpdate > target)
                 {
-                    valueToUpdate -= Time.deltaTime/ duration;
+                    valueToUpdate -= Time.deltaTime / duration;
                     material.SetFloat(valueName, valueToUpdate);
                     yield return new WaitForFixedUpdate();
                     /* if (valueToUpdate <= target)
@@ -84,7 +84,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
     public void FadeBurnDarkScreen(Material darkScreenMaterial, bool enable, Action ResetSortingOrder)
     {
-        StartCoroutine(FadeDarkScreen(darkScreenMaterial, enable, Values.Instance.darkScreenAlphaDuration, null, null, ResetSortingOrder));
+        StartCoroutine(FadeDarkScreen(darkScreenMaterial, enable, Values.Instance.darkScreenAlphaDuration, ResetSortingOrder));
     }
 
 
@@ -98,7 +98,7 @@ public class AnimationManager : Singleton<AnimationManager>
             material.SetFloat("_ShakeUvSpeed", Values.Instance.disableClickShakeSpeed);
             material.SetFloat("_ShakeUvX", Values.Instance.disableClickShakeX);
             material.SetFloat("_ShakeUvY", Values.Instance.disableClickShakeY);
-        yield return new WaitForSeconds(Values.Instance.disableClickShakeDuration);
+            yield return new WaitForSeconds(Values.Instance.disableClickShakeDuration);
             material.SetFloat("_ShakeUvSpeed", 0f);
         }
 
@@ -315,7 +315,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
 
 
-    public IEnumerator SmoothMove(Transform selector, Vector3 targetPosition, Vector2 targetScale,  float movementDuration, Action beginAction, Action endAction, Action Reset, Action CloseDrawer)
+    public IEnumerator SmoothMove(Transform selector, Vector3 targetPosition, Vector2 targetScale, float movementDuration, Action beginAction, Action endAction, Action Reset, Action CloseDrawer)
     {
         beginAction?.Invoke();
         float startTime = Time.time;
@@ -345,11 +345,11 @@ public class AnimationManager : Singleton<AnimationManager>
 
 
 
-    public IEnumerator SmoothMoveCardProjectile(bool isPlayerWin, bool isRight, Transform selector, Vector2 targetScale,  float movementDuration, Action LoseLife, Action Unactive)
+    public IEnumerator SmoothMoveCardProjectile(bool isPlayerWin, bool isRight, Transform selector, Vector2 targetScale, float movementDuration, Action LoseLife, Action Unactive)
     {
         Vector3 targetPosition;
         float startTime = Time.time;
-        float t;
+        float t = 0;
         bool endLoop = false;
         if (isPlayerWin)
         {
@@ -368,9 +368,10 @@ public class AnimationManager : Singleton<AnimationManager>
             }
 
         }
-       // selector.position = startingPosition;
+        // selector.position = startingPosition;
         while (selector.position != targetPosition || (Vector2)selector.localScale != targetScale)
         {
+            // t = (Time.time - startTime) / movementDuration;
             t = (Time.time - startTime) / movementDuration;
             selector.position = new Vector3(Mathf.SmoothStep(selector.position.x, targetPosition.x, t), Mathf.SmoothStep(selector.position.y, targetPosition.y, t), targetPosition.z);
             if (selector.localScale.x != targetScale.x)
@@ -423,6 +424,7 @@ public class AnimationManager : Singleton<AnimationManager>
         float targetFull = 2.61f;
         float targetEmpty = 14.72f;
 
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer,false);
         if (selector.localPosition.x <= targetFull)
         {
             toFull = false;
@@ -435,7 +437,6 @@ public class AnimationManager : Singleton<AnimationManager>
         }
         if (toFull)
         {
-
             endActionFullScroll?.Invoke();
         }
         while (selector.localPosition.x != targetPositionX)
@@ -491,22 +492,23 @@ public class AnimationManager : Singleton<AnimationManager>
         }
         yield break;
     }
-    public IEnumerator ShowDialogFromPu(Transform selector, SpriteRenderer dialogSprite, Vector2 startingPosition, Transform targetTransform, Action EndAction)
+    public IEnumerator ShowDialogFromPu(Transform selector, SpriteRenderer dialogSprite, Vector2 startingPosition, Vector2 targetTransform, Action EndAction)
     {
         float startTime = Time.time;
         float t;
         float interval = 1.5f;
         float movementDuration = Values.Instance.showDialogMoveDuration;
+        Vector2 targetScale = new Vector2(1, 1);
         SetAlpha(dialogSprite, 1f);
 
-        while ((Vector2)selector.position != (Vector2)targetTransform.position || (Vector2)selector.localScale != (Vector2)targetTransform.localScale)
+        while ((Vector2)selector.position != targetTransform || (Vector2)selector.localScale != targetScale)
         {
 
             t = (Time.time - startTime) / movementDuration;
             yield return new WaitForFixedUpdate();
-            selector.position = new Vector2(Mathf.SmoothStep(startingPosition.x, targetTransform.position.x, t * interval), Mathf.SmoothStep(startingPosition.y, targetTransform.position.y, t * interval));
-            selector.localScale = new Vector2(Mathf.SmoothStep(selector.localScale.x, targetTransform.localScale.x, t * interval), Mathf.SmoothStep(selector.localScale.y, targetTransform.localScale.y, t * interval));
-            if (selector == targetTransform)
+            selector.position = new Vector2(Mathf.SmoothStep(startingPosition.x, targetTransform.x, t * interval), Mathf.SmoothStep(startingPosition.y, targetTransform.y, t * interval));
+            selector.localScale = new Vector2(Mathf.SmoothStep(selector.localScale.x, targetScale.x, t * interval), Mathf.SmoothStep(selector.localScale.y, targetScale.y, t * interval));
+            if ((Vector2)selector.position == targetTransform && (Vector2)selector.localScale == targetScale)
             {
                 EndAction?.Invoke();
                 yield break;
@@ -603,6 +605,53 @@ public class AnimationManager : Singleton<AnimationManager>
         yield break;
     }
 
+    public IEnumerator SpinCoin(Transform selector, float flipDuration, Action endAction)
+    {
+        float startTime = Time.time;
+        float t;
+        bool shrinking = true;
+        int totalSpinCounter = 6;
+        float target = 0.01f;
+        selector.localScale = new Vector2(selector.localScale.x - 0.01f, selector.localScale.y);
+        while (totalSpinCounter > 0)
+        {
+            t = (Time.time - startTime) / flipDuration;
+            if (shrinking && selector.localScale.x <= 0.01f)
+            {
+                t = 0;
+                shrinking = false;
+                target = 1f;
+                startTime = Time.time;
+                yield return new WaitForSeconds(0.01f);
+            }
+            selector.localScale = new Vector2(Mathf.SmoothStep(selector.localScale.x, target, t), selector.localScale.y);
+            if (!shrinking && selector.localScale.x >= 1f)
+            {
+                shrinking = true;
+                target = 0.01f;
+                startTime = Time.time;
+                totalSpinCounter--;
+                yield return new WaitForSeconds(0.01f);
+                flipDuration -= 0.08f;
+            }
+
+            yield return new WaitForFixedUpdate();
+        }
+        yield break;
+    }
+    public IEnumerator ScaleObjectWheel(Transform selector, float target, float flipDuration)
+    {
+        float startTime = Time.time;
+        float t;
+        while (selector.localScale.x != target)
+        {
+            t = (Time.time - startTime) / flipDuration;
+            selector.localScale = new Vector2(Mathf.SmoothStep(selector.localScale.x, target, t), Mathf.SmoothStep(selector.localScale.y, target, t));
+            yield return new WaitForFixedUpdate();
+        }
+        yield break;
+    }
+
     public IEnumerator ScaleObject(bool scaleDown, float scaleTarget, float scaleDuration, Transform selector, Action RedBgEnable, Action onEnd)
     {
         float startTime = Time.time;
@@ -642,7 +691,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
     public IEnumerator AnimateShootProjectile(bool activateFade, Transform projectile, Vector3 posTarget, Action FadeOut, Action endAction)
     {
-        
+
         float startTime = Time.time;
         float t;
         float speed = 3f;
@@ -692,7 +741,7 @@ public class AnimationManager : Singleton<AnimationManager>
         while (zoomAmount > 0)
         {
             zoomAmount -= Time.deltaTime / windMoveDuration;
-            rotateAmount -= Time.deltaTime/ windMoveDuration;
+            rotateAmount -= Time.deltaTime / windMoveDuration;
             windSpriteRenderer.material.SetFloat("_ZoomUvAmount", zoomAmount);
             windSpriteRenderer.material.SetFloat("_RotateUvAmount", rotateAmount);
             yield return new WaitForFixedUpdate();
@@ -766,6 +815,35 @@ public class AnimationManager : Singleton<AnimationManager>
         yield break;
     }
 
+    internal IEnumerator FadeCanvasGroup(CanvasGroup emojisWheel, bool enable, float duration)
+    {
+        float targetAlpha = 0f;
+        float alphaAmount = 1f;
+        if (enable)
+        {
+            targetAlpha = 1f;
+            alphaAmount = 0f;
+        }
+        while(emojisWheel.alpha != targetAlpha)
+        {
+            if (enable)
+            {
+              alphaAmount += Time.deltaTime / duration;
+            }
+            else
+            {
+              alphaAmount -= Time.deltaTime / duration;
+            }
+            yield return new WaitForFixedUpdate();
+            emojisWheel.alpha = alphaAmount;
+            if(alphaAmount> 1f || alphaAmount< 0)
+            {
+                emojisWheel.alpha = targetAlpha;
+                break;
+            }
+        }
+
+    }
 
     public void VisionEffect(List<CardUi> winningPlayersCards, bool enable)
     {
@@ -804,7 +882,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
 
 
-    public IEnumerator FadeDarkScreen(Material targetObj, bool fadeIn, float duration, Action onFinishDissolve, Action onFinishDissolve2, Action onFinishDissolve3)
+    public IEnumerator FadeDarkScreen(Material targetObj, bool fadeIn, float duration, Action onFinishDissolve3)
     {
         float tiling = UnityEngine.Random.Range(0.07f, 0.15f);
         //  float tiling = UnityEngine.Random.Range(0.07f, 0.15f);
@@ -830,10 +908,8 @@ public class AnimationManager : Singleton<AnimationManager>
             yield return new WaitForFixedUpdate();
             if (dissolveAmount < -0.1f || dissolveAmount > 1f)
             {
-                onFinishDissolve?.Invoke();
+
                 yield return new WaitForSeconds(0.1f);
-                onFinishDissolve2?.Invoke();
-                yield return new WaitForSeconds(0.5f);
                 onFinishDissolve3?.Invoke();
                 break;
             }
@@ -841,7 +917,7 @@ public class AnimationManager : Singleton<AnimationManager>
     }
     public IEnumerator FadeBurnPU(Material targetObj, float delayBefore, bool fadeIn, float duration, Action onFinishDissolve, Action onFinishDissolve2, Action onFinishDissolve3)
     {
-       // float tiling = UnityEngine.Random.Range(0.07f, 0.15f);
+        // float tiling = UnityEngine.Random.Range(0.07f, 0.15f);
         //  float tiling = UnityEngine.Random.Range(0.07f, 0.15f);
         // targetObj.SetTextureScale("_FadeTex", new Vector2(tiling, tiling));
         // targetObj.SetTextureOffset("_FadeTex", new Vector2(tiling, tiling));
@@ -907,13 +983,36 @@ public class AnimationManager : Singleton<AnimationManager>
     }
 
 
+    public IEnumerator FadeColorSwapBlend(SpriteRenderer targetObj, bool increas, float target, float duration)
+    {
+        float dissolveAmount = targetObj.material.GetFloat("_ColorSwapBlend");
 
+        while (dissolveAmount != target)
+        {
+            Debug.LogError("walla" + dissolveAmount);
+            yield return new WaitForFixedUpdate();
+            if (increas)
+            {
+                dissolveAmount += Time.deltaTime / duration;
+            }
+            else
+            {
+                dissolveAmount -= Time.deltaTime / duration;
+            }
+            if (dissolveAmount < 0 || dissolveAmount > target)
+            {
+                targetObj.material.SetFloat("_ColorSwapBlend", target);
+                break;
+            }
+            targetObj.material.SetFloat("_ColorSwapBlend", dissolveAmount);
+        }
+    }
 
     public IEnumerator PulseColorAnimation(SpriteRenderer targetObj, bool enable, float duration)
     {
         yield return new WaitForSeconds(0.5f);
         bgAnimation = enable;
-
+        float maxValue = Values.Instance.bgMaxValueSwapColor;
         float dissolveAmount = targetObj.material.GetFloat("_ColorSwapBlend");
         bool floatUp = true;
         if (bgAnimation && dissolveAmount == 0)
@@ -925,7 +1024,7 @@ public class AnimationManager : Singleton<AnimationManager>
                 {
                     yield return new WaitForFixedUpdate();
 
-                    dissolveAmount -= Time.deltaTime/ duration;
+                    dissolveAmount -= Time.deltaTime / duration;
                     // value = Mathf.SmoothStep(0f, 0.5f, dissolveAmount );
                     if (dissolveAmount < 0)
                     {
@@ -938,13 +1037,13 @@ public class AnimationManager : Singleton<AnimationManager>
 
                 if (floatUp)
                 {
-                    dissolveAmount += Time.deltaTime/ duration;
+                    dissolveAmount += Time.deltaTime / duration;
                 }
                 else
                 {
-                    dissolveAmount -= Time.deltaTime/ duration;
+                    dissolveAmount -= Time.deltaTime / duration;
                 }
-                if (dissolveAmount >= 0.67f)
+                if (dissolveAmount >= maxValue)
                 {
                     yield return new WaitForSeconds(0.11f);
                     floatUp = false;

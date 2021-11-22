@@ -12,12 +12,16 @@ public class GameOver : State
 
     public override IEnumerator Start()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(4f);
         battleSystem.Interface.ShowGameOverPanel(isPlayerWin);
         if (isPlayerWin)
         {
              battleSystem.WinParticleEffect();
             battleSystem.UpdateWinnerDB();
+        }
+        else
+        {
+            battleSystem.Interface.BgFadeInColor();
         }
     }
 
