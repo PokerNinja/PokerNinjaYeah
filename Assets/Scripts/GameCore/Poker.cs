@@ -25,6 +25,9 @@ namespace StandardPokerHandEvaluator
         King = 37,
         Ace = 41
     }
+
+
+    
     public enum SuitEnum : int
     {
         Spades,
@@ -155,6 +158,43 @@ namespace StandardPokerHandEvaluator
             return new Card(cardEnum, cardSuit);
         }
 
+        internal CardEnum GetLowerValuer()
+        {
+            switch (CardValue)
+            {
+                case CardEnum.Two:
+                    return CardEnum.Ace;
+                case CardEnum.Three:
+                    return CardEnum.Two;
+                case CardEnum.Four:
+                    return CardEnum.Three;
+                case CardEnum.Five:
+                    return CardEnum.Four;
+                case CardEnum.Six:
+                    return CardEnum.Five;
+                case CardEnum.Seven:
+                    return CardEnum.Six;
+                case CardEnum.Eight:
+                    return CardEnum.Seven;
+                case CardEnum.Nine:
+                    return CardEnum.Eight;
+                case CardEnum.Ten:
+                    return CardEnum.Nine;
+                case CardEnum.Jack:
+                    return CardEnum.Ten;
+                case CardEnum.Queen:
+                    return CardEnum.Jack;
+                case CardEnum.King:
+                    return CardEnum.Queen;
+                case CardEnum.Ace:
+                    return CardEnum.King;
+                default:
+                    break;
+            }
+            return 0;
+        }
+    
+
         private static SuitEnum StringSuitToEnum(string suit)
         {
             switch (suit)
@@ -237,6 +277,41 @@ namespace StandardPokerHandEvaluator
                     }
             }
             return CardEnum.Ace;
+        }
+        public int GetCardValueInSimpleInt()
+        {
+            switch (CardValue)
+            {
+                case CardEnum.Two:
+                    return 2;
+                case CardEnum.Three:
+                    return 3;
+                case CardEnum.Four:
+                    return 4;
+                case CardEnum.Five:
+                    return 5;
+                case CardEnum.Six:
+                    return 6;
+                case CardEnum.Seven:
+                    return 7;
+                case CardEnum.Eight:
+                    return 8;
+                case CardEnum.Nine:
+                    return 9;
+                case CardEnum.Ten:
+                    return 10;
+                case CardEnum.Jack:
+                    return 11;
+                case CardEnum.Queen:
+                    return 12;
+                case CardEnum.King:
+                    return 13;
+                case CardEnum.Ace:
+                    return 14;
+                default:
+                    break;
+            }
+            return 0;
         }
     }
 
@@ -710,7 +785,7 @@ namespace StandardPokerHandEvaluator
         }
     }
 
-   
-  
+
+
 }
 

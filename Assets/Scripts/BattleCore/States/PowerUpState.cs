@@ -188,6 +188,7 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.fm2):  //armagedon = fm2
                 {
+                    SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Armagedon, true);
                     //MAKE IT LOOK BETTER WHOS FIRST MAYNBE FUCKED HERE
                     battleSystem.UpdateZPos(true, "All");
                     int boardCount = battleSystem.cardsDeckUi.boardCardsUi.Count;
@@ -264,7 +265,6 @@ public class PowerUpState : State
         {
             puElement = "x";
             Debug.LogWarning("POPO");
-
         }
         foreach (CardUi card in cardsList)
         {

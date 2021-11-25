@@ -455,6 +455,7 @@ MonoBehaviour:
   appVersion: {fileID: 1694170014}
   wrongTypeText: {fileID: 1118640352}
   tutorialImage: {fileID: 701653087}
+  TEST_MODE: 0
 --- !u!4 &608648980
 Transform:
   m_ObjectHideFlags: 0
@@ -960,8 +961,6 @@ MonoBehaviour:
   clickbleForPU: 0
   cardDescription: 
   availableForReuse: 0
-  burnMaterial: {fileID: 0}
-  dissolveMaterial: {fileID: 0}
   spriteRenderer: {fileID: 0}
   cardSelectionRenderer: {fileID: 0}
   cardMark: {fileID: 0}

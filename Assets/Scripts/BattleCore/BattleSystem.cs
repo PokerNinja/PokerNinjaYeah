@@ -12,7 +12,7 @@ using UniRx;
 using StandardPokerHandEvaluator;
 using Sirenix.OdinInspector;
 
-public class BattleSystem : StateMachine, ITimeOut
+public class BattleSystem : StateMachine
 {
     public static BattleSystem Instance { get; private set; }
 
@@ -90,6 +90,7 @@ public class BattleSystem : StateMachine, ITimeOut
     private bool isFlusher = false;
     private bool isStrighter = false;
     public bool playerHandIsFlusher = false;
+    public bool playerHandIsStrighter = false;
 
 
     [SerializeField]
@@ -120,12 +121,14 @@ public class BattleSystem : StateMachine, ITimeOut
 
     public bool replaceMode = false;
     public bool endTurnInProcess = false;
+    private bool fm1Activated;
 
     public event Action onGameStarted;
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
         isFlusher = Values.Instance.flusherOn;
+        isStrighter = Values.Instance.strighterOn;
         //Debug.LogWarning("S:" + PowerUpStruct.PowerUpNamesEnum.f1.ToString());
         Debug.LogWarning("Start LRA");
 
@@ -136,11 +139,11 @@ public class BattleSystem : StateMachine, ITimeOut
             currentGameInfo.gameId = "zxc";
             currentGameInfo.prize = 1000;
             currentGameInfo.playersIds = new String[] { "1", "2" };
-            currentGameInfo.localPlayerId = "1";
-            currentGameInfo.EnemyId = "2";
+            currentGameInfo.localPlayerId = "TEST";
+            currentGameInfo.EnemyId = "TEST";
             currentGameInfo.cardDeck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
                 "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
-                "Ac", "Ah","4s","2h","6c", "5h","Th","Jh","Qh", "Ks","Ah","Kh"};
+                "Ac", "Ah","4s","2s","6c", "5h","Th","Jh","Qc", "Qs","Ac","Kh"};
             currentGameInfo.puDeck = new String[] {"f2","i3","f3","f2","i3","f3",
                  "i1","f1","i2",
                  "w1","w2","w3","f2","i3","w1","w2","w3","f2","i3","f3",
@@ -347,11 +350,14 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         if (!AreBoardCardsFlipped() && !reset)
         {
-            Hand bestHand = cardsDeckUi.CalculateHand(false, isFlusher, isStrighter);
+            Hand bestHand = cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
             int handRank = bestHand.Rank;
             if (playerHandIsFlusher)
             {
                 handRank = 1599;
+            }else if (playerHandIsStrighter)
+            {
+                handRank = 1609;
             }
             ui.UpdateCardRank(handRank);
         }
@@ -463,13 +469,18 @@ public class BattleSystem : StateMachine, ITimeOut
         PlayerPrefs.SetString("turn", whatPlayer);
     }
 
-    public void OnTimeOut()
+    public IEnumerator OnTimeOut()
     {
+        cardsToSelectCounter = 0;
+        /*TemproryUnclickable = true;
+        yield return new WaitForSeconds(2f);
+        TemproryUnclickable = false;
+*/
         if (IsPlayerTurn())
         {
-            if (newPowerUpName.Equals("fm1"))
+            yield return new WaitForSeconds(0.5f);
+            if (!fm1Activated && newPowerUpName.Equals("fm1"))
             {
-                Debug.LogError("howmany");
                 ResetValuesAfterCardSelection(Constants.AllCardsTag);
                 SetState(new PowerUpState(this, true, newEnergyCost, newPowerUpName, Constants.PlayerCard1, Constants.deckCardsNames[0], cardsDeckUi.GetCardPosition(Constants.PlayerCard1), cardsDeckUi.GetCardPosition(Constants.deckCardsNames[0]), newPuSlotIndexUse));
                 timedOut = true;
@@ -543,7 +554,6 @@ public class BattleSystem : StateMachine, ITimeOut
     {
         waitForDrawerAnimationToEnd = true;
         StartCoroutine(cardsDeckUi.CreateHands(() => waitForDrawerAnimationToEnd = false, FinishCallback));
-
     }
 
     private void ListenForNewDeck()
@@ -718,6 +728,7 @@ public class BattleSystem : StateMachine, ITimeOut
             firstRound = false;
         }
         UpdateHandRank(true);
+        
         cardsDeckUi.DeleteAllCards(() => DealHands(FinishCallbac));
     }
 
@@ -850,7 +861,10 @@ public class BattleSystem : StateMachine, ITimeOut
         if (cardsToSelectCounter == 0)
         {
             //  playerPuInProcess = true;
-
+            if (newPowerUpName.Equals("fm1"))
+            {
+                fm1Activated = true;
+            }
             ResetValuesAfterCardSelection(Constants.AllCardsTag);
             // ResetValuesAfterCardSelection(cardPlace);
 
@@ -1146,6 +1160,7 @@ public class BattleSystem : StateMachine, ITimeOut
         {
             ui.EnableVisionClick(true);
             newPowerUpName = "x";
+            fm1Activated = false;
             //selectCardsMode = true;
         }
         ui.EnableDarkScreen(isPlayerActivatePu, enable, () => StartCoroutine(ResetSortingOrder(enable)));
@@ -1391,12 +1406,16 @@ public class BattleSystem : StateMachine, ITimeOut
         if (!AreBoardCardsFlipped() && !selectMode)
         {
             //STORE LAST HAND RANK INSTEAED
-            Hand bestHand = cardsDeckUi.CalculateHand(false, isFlusher, false);
+            Hand bestHand = cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
             ui.VisionEffect(bestHand.getCards(), cardsDeckUi.boardCardsUi, cardsDeckUi.playerCardsUi);
             int handRank = bestHand.Rank;
             if (playerHandIsFlusher)
             {
                 handRank = 1599;
+            }
+            else if (playerHandIsStrighter)
+            {
+                handRank = 1609;
             }
             ui.UpdateCardRank(handRank);
             ui.UpdateRankTextInfo(true, handRank);
@@ -1499,6 +1518,7 @@ public class BattleSystem : StateMachine, ITimeOut
         {
             energyCounter = 3;
         }
+
     }
     internal void ReduceEnergy(int amountToSub)
     {
@@ -1544,6 +1564,16 @@ public class BattleSystem : StateMachine, ITimeOut
     internal void WinParticleEffect()
     {
         ui.WinParticleEffect();
+    }
+    [Button]
+    internal void DealBoard()
+    {
+       cardsDeckUi.DealCardsForBoard(true, null, () => UpdateHandRank(false));
+    }
+    [Button]
+    internal void EndRoundManual()
+    {
+        SetState(new EndRound(this, false, false));
     }
     /* internal void FreezePu(string puTarget, bool isToFreeze)
      {

@@ -10,6 +10,7 @@ public class Values : Singleton<Values>
     [Title("Settings")]
     public bool TEST_MODE = false;
     public bool flusherOn = false;
+    public bool strighterOn = false;
     public float turnTimerDuration = 40f;
     public float sfxVolume = 0.9f;
     public float musicVolume = 0.6f;

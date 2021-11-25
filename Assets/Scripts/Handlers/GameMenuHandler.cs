@@ -14,6 +14,9 @@ public class GameMenuHandler : MonoBehaviour
     public TextMeshProUGUI appVersion;
     public GameObject wrongTypeText;
     public GameObject tutorialImage;
+
+    [GUIColor(0.3f, 0.8f, 0.8f)]
+    public bool TEST_MODE;
     private bool tutorialVisible = false;
 
     public void Awake()
@@ -38,7 +41,11 @@ public class GameMenuHandler : MonoBehaviour
 
     public void StartMultiplayer()
     {
-        if (CheckIfStringOnlyLettersAndDigits(playerName.text.ToString()))
+        if (TEST_MODE)
+        {
+            SceneManager.LoadScene("GameScene2");
+        }
+        else if (CheckIfStringOnlyLettersAndDigits(playerName.text.ToString()))
         {
             SavePlayerNickName(playerName.text.ToString());
             //  DatabaseAPI.InitializeDatabase();
@@ -115,17 +122,17 @@ public class GameMenuHandler : MonoBehaviour
         {
             for (int b = a + 1; b < 8; b++)
             {
-               
-                    Debug.LogWarning("a:" + a + " b:" + b );
-                    if (a == b )
-                    {
-                        dounter++;
-                    }
-                    else
-                    {
-                        counter++;
-                    }
-                
+
+                Debug.LogWarning("a:" + a + " b:" + b);
+                if (a == b)
+                {
+                    dounter++;
+                }
+                else
+                {
+                    counter++;
+                }
+
             }
         }
         Debug.LogError("count " + counter);
@@ -170,8 +177,8 @@ public class GameMenuHandler : MonoBehaviour
                 {
                     for (int d = c + 1; d < 9; d++)
                     {
-                        Debug.LogWarning("a:" + a + " b:" + b + " c:" + c+ " d:" + d);
-                        if (a == b || a == c || a == d|| b == c|| b == d|| c == d)
+                        Debug.LogWarning("a:" + a + " b:" + b + " c:" + c + " d:" + d);
+                        if (a == b || a == c || a == d || b == c || b == d || c == d)
                         {
                             dounter++;
                         }

@@ -252,7 +252,15 @@ public class BattleUI : MonoBehaviour
 
     public void EnablePlayerButtons(bool enable)
     {
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnBtnSpriteREnderer, enable, Values.Instance.turnBtnAlphaDuration, () => turnBtn.GetComponent<Button>().interactable = enable));
+        if (enable)
+        {
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnBtnSpriteREnderer, true, Values.Instance.turnBtnAlphaDuration, () => turnBtn.GetComponent<Button>().interactable = true));
+        }
+        else
+        {
+            turnBtn.GetComponent<Button>().interactable = false;
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnBtnSpriteREnderer, false, Values.Instance.turnBtnAlphaDuration, () => turnBtn.GetComponent<Button>().interactable = false));
+        }
         EnableBtnReplace(enable);
         /* if (BattleSystem.Instance.replacePuLeft > 0)
          {
@@ -817,7 +825,7 @@ public class BattleUI : MonoBehaviour
             emojiGO = emojiToDisplayTransformEnemy;
             emojiGO.transform.position = emojiStartPosEnemy.position;
         }
-        Vector3 targetPos = new Vector3(0,  1.3f,0f);
+        Vector3 targetPos = new Vector3(0, 1.3f, 0f);
         emojiRenderer.sprite = emojis[id].sprite;
         StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, true, Values.Instance.emojiDisplayFadeDuration, null));
         StartCoroutine(AnimationManager.Instance.SmoothMove(emojiGO.transform, emojiGO.transform.position + targetPos, emojiGO.transform.localScale, Values.Instance.emojiStay, null, null, null,

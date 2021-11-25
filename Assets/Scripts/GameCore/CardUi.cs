@@ -12,8 +12,8 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     [SerializeField] public bool clickbleForPU = false;
     [SerializeField] public string cardDescription;
     public bool availableForReuse;
-    public Material burnMaterial;
-    public Material dissolveMaterial;
+   // public Material burnMaterial;
+   // public Material dissolveMaterial;
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer cardSelectionRenderer;
     public GameObject cardMark;
@@ -184,7 +184,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
 
 
-    public IEnumerator FadeBurnOut(Action onFinishDissolve)
+    public IEnumerator FadeBurnOut(Material burnMaterial, Action onFinishDissolve)
     {
 
         spriteRenderer.material = burnMaterial;
@@ -289,7 +289,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
 
 
-    internal IEnumerator Dissolve(float delayInSec, Action onFinishDissolve)
+    internal IEnumerator Dissolve(Material dissolveMaterial, float delayInSec, Action onFinishDissolve)
     {
         spriteRenderer.material = dissolveMaterial;
         float dissolveAmount = -0.01f;

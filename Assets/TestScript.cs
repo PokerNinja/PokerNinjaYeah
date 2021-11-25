@@ -9,6 +9,7 @@ public class TestScript : MonoBehaviour
     [Required]
     public KobiTestScript KobiTestScript;
     public int magicNumber = 4;
+   
 
     public void dostuffWhenAviadsIntChanged(int original, int newValue)
     {

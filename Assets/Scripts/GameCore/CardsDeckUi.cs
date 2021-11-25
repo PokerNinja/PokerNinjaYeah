@@ -78,18 +78,122 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     internal Hand ReplaceCardToFlusher(Hand hand)
     {
         List<Card> cards = hand.getCards();
-        for (int i = 0; i < 4; i++)
+        handToPrint(cards);
+        cards = cards.OrderBy(h => h.CardSuit).ToList<Card>();
+        handToPrint(cards);
+
+        for (int i = 0; i < 5; i++)
         {
-            if (cards[i] == cardToSave)
+            Debug.LogWarning("card: " + cards[i].ToString(CardToStringFormatEnum.ShortCardName));
+            if (cards[i].CardSuit != highestSuitForFlusher)
             {
-                cards[i] = GetNewSuitCard(targetSiut, cards, cards[i]);
-                ReplaceUiCardForFlusher(cardToSave.ToString(CardToStringFormatEnum.ShortCardName), cards[i].ToString(CardToStringFormatEnum.ShortCardName));
+                /*cards[i] = GetNewSuitCard(highestSuitForFlusher, cards, cards[i]);
+                ReplaceUiCardForFlusher(cardToSave.ToString(CardToStringFormatEnum.ShortCardName), cards[i].ToString(CardToStringFormatEnum.ShortCardName));*/
+                Card newCard = GetNewSuitCard(highestSuitForFlusher, cards, cards[i]);
+                ReplaceUiCard(cards[i].ToString(CardToStringFormatEnum.ShortCardName), newCard.ToString(CardToStringFormatEnum.ShortCardName));
+                cards[i] = newCard;
             }
         }
-        return new Hand(cards[0], cards[1], cards[2], cards[3], cards[4], poker);
+        return ConvertCardListToHand(cards);
     }
 
-    private void ReplaceUiCardForFlusher(string oldCard, string newCard)
+    private void ReplaceUiCard(string oldCard, string newCard)
+    {
+        Debug.LogError("o " + oldCard);
+        Debug.LogError("n " + newCard);
+        CardUi targetCardUi = GetCardUiByDescription(oldCard);
+        targetCardUi.cardDescription = newCard;
+        targetCardUi.LoadNewFlusherSprite();
+    }
+    internal Hand ReplaceCardToStrighter(Hand hand)
+    {
+        List<Card> cards = hand.getCards();
+        handToPrint(cards);
+        bool firstCardToRemove = false;
+        int counter = 0;
+        //cards = cards.OrderBy(h => h.CardValue).ToList<Card>();
+        //handToPrint(cards);
+        if (IsBabyStrightFourCards(cards))
+        {
+            if (cards[0].CardValue == CardEnum.Three)
+            {
+                cards[3] = UpdateCardForStrighter(cards[3], cards[0]);
+            }
+            else // First is Two
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    if (cards[i].GetCardValueInSimpleInt() + 1 != cards[i + 1].GetCardValueInSimpleInt())
+                    {
+                        if (i == 2)
+                        {
+                            cards[3] = UpdateCardForStrighter(cards[3], new Card(CardEnum.Six, cards[4].CardSuit));
+                        }
+                        else
+                        {
+                            cards[3] = UpdateCardForStrighter(cards[3], cards[i + 1]);
+                            i = 3;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Debug.LogWarning("card: " + cards[i].ToString(CardToStringFormatEnum.ShortCardName));
+                if (!firstCardToRemove && counter == 3)
+                {
+                    cards[4] = UpdateCardForStrighter(cards[4], cards[0]);
+                    i = 5;
+                }
+                else if (firstCardToRemove && counter == 3)
+                {
+                    cards[0] = UpdateCardForStrighter(cards[0], cards[1]);
+                    i = 5;
+                }
+                else if (cards[i].GetCardValueInSimpleInt() + 1 == cards[i + 1].GetCardValueInSimpleInt())
+                {
+                    counter++;
+                }
+                else if (cards[i].GetCardValueInSimpleInt() + 2 == cards[i + 1].GetCardValueInSimpleInt())
+                {
+                    /*cardToReplace = cards[4].ToString(CardToStringFormatEnum.ShortCardName);
+                    cards[4] = CreateLowerValueCard(cards[i + 1]);
+                    ReplaceUiCardForFlusher(cardToReplace, cards[4].ToString(CardToStringFormatEnum.ShortCardName));*/
+                    cards[4] = UpdateCardForStrighter(cards[4], cards[i + 1]);
+                    i = 5;
+                }
+                else // First card Off
+                {
+                    firstCardToRemove = true;
+                }
+            }
+        }
+        return ConvertCardListToHand(cards);
+    }
+
+    private Card UpdateCardForStrighter(Card cardToReplace, Card cardTarget)
+    {
+        Card newCard = CreateLowerValueCard(cardTarget);
+        ReplaceUiCard(cardToReplace.ToString(CardToStringFormatEnum.ShortCardName), newCard.ToString(CardToStringFormatEnum.ShortCardName));
+        return newCard;
+    }
+
+    private Card CreateLowerValueCard(Card card)
+    {
+        SuitEnum newSuit = SuitEnum.Hearts;
+        if (card.CardSuit == SuitEnum.Hearts)
+        {
+            newSuit = SuitEnum.Spades;
+        }
+        return new Card(card.GetLowerValuer(), newSuit);
+    }
+
+
+
+    private void ReplaceUiCardForStrighter(string oldCard, string newCard)
     {
         Debug.LogError("o " + oldCard);
         Debug.LogError("n " + newCard);
@@ -180,6 +284,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         playerHand = new List<Card>();
         yield return new WaitForSeconds(1f);
         AnimateDrawer(true, () => StartCoroutine(DealCardsToHands(WaitForCloseDrawerAnimation, FinishCallback)));
+
     }
 
 
@@ -191,6 +296,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     public void DealCardsForBoard(bool openDrawer, Action StartCloseDrawer, Action FinishCallback)
     {
+        Debug.LogError("HERE2");
         if (openDrawer)
         {
             AnimateDrawer(true, () => StartCoroutine(DealCardsForBoardRoutine(FinishCallback, () => AnimateDrawer(false, StartCloseDrawer))));
@@ -558,11 +664,11 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         TexasHand playerCards;
         if (isPlayer)
         {
-            playerCards = GetEnemyHand();
+            playerCards = GetPlayerHand();
         }
         else
         {
-            playerCards = GetPlayerHand();
+            playerCards = GetEnemyHand();
         }
 
         List<Card> totalCards = new List<Card>();
@@ -575,8 +681,13 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 BattleSystem.Instance.playerHandIsFlusher = IsHandWithFourSameSuit(hand);
             }
+            else if (isStrighter && hand.Rank > 1609)
+            {
+                BattleSystem.Instance.playerHandIsStrighter = IsHandWithFourStright(hand.getCards());
+            }
             else
             {
+                BattleSystem.Instance.playerHandIsStrighter = false;
                 BattleSystem.Instance.playerHandIsFlusher = false;
             }
             return hand;
@@ -596,11 +707,17 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             handsOptions = handsOptions.OrderBy(h => h.Rank).ToList<Hand>();
             if (isFlusher && handsOptions[0].Rank > 1600)
             {
-                Hand newHand = ConvertCardListToHand(CheckIfFlusher(handsOptions));
+                Hand newHand = CheckIfFlusher(handsOptions);
+                handsOptions.Insert(0, newHand);
+            }
+            else if (isStrighter && handsOptions[0].Rank > 1609)
+            {
+                Hand newHand = CheckIfStrighter(handsOptions);
                 handsOptions.Insert(0, newHand);
             }
             else
             {
+                BattleSystem.Instance.playerHandIsStrighter = false;
                 BattleSystem.Instance.playerHandIsFlusher = false;
             }
             return handsOptions[0];
@@ -619,17 +736,94 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         handsOptions = handsOptions.OrderBy(h => h.Rank).ToList<Hand>();
         if (isFlusher && handsOptions[0].Rank > 1600)
         {
-            Hand newHand = ConvertCardListToHand(CheckIfFlusher(handsOptions));
-
+            Hand newHand = CheckIfFlusher(handsOptions);
+            handsOptions.Insert(0, newHand);
+        }
+        else if (isStrighter && handsOptions[0].Rank > 1609)
+        {
+            Hand newHand = CheckIfStrighter(handsOptions);
             handsOptions.Insert(0, newHand);
         }
         else
         {
+            BattleSystem.Instance.playerHandIsStrighter = false;
             BattleSystem.Instance.playerHandIsFlusher = false;
         }
         //MAYBE SMARTER^
         return handsOptions[0];
 
+    }
+
+    private bool IsHandWithFourStright(List<Card> cards)
+    {
+        int strightCounter = 0;
+
+        //SuitEnum sameSuit = SuitEnum.Clubs;
+        //  Card tempCardToSave = null;
+        //   handToPrint(originCard);
+        cards = cards.OrderBy(c => c.CardValue).ToList<Card>();
+        //   handToPrint(cards);
+        bool haveGapOfTwo = false;
+        if (IsBabyStrightFourCards(cards))
+        {
+            strightCounter = 3;
+        }
+        else
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                int x = cards[i].GetCardValueInSimpleInt();
+                int y = cards[i + 1].GetCardValueInSimpleInt();
+                if (cards[i].GetCardValueInSimpleInt() + 1 == cards[i + 1].GetCardValueInSimpleInt())
+                {
+                    strightCounter++;
+                }
+                else if (cards[i].GetCardValueInSimpleInt() + 2 == cards[i + 1].GetCardValueInSimpleInt())
+                {
+                    if (!haveGapOfTwo)
+                    {
+                        strightCounter++;
+                    }
+                    haveGapOfTwo = true;
+                }
+
+            }
+        }
+        if (strightCounter == 3 || haveGapOfTwo && strightCounter == 4)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private bool IsBabyStrightFourCards(List<Card> cards)
+    {
+        int strightCounter = 0;
+        bool haveGapOfTwo = false;
+        if (cards[4].CardValue == CardEnum.Ace && cards[0].CardValue == CardEnum.Two || cards[0].CardValue == CardEnum.Three)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                if (cards[i].GetCardValueInSimpleInt() + 1 == cards[i + 1].GetCardValueInSimpleInt())
+                {
+                    strightCounter++;
+                }
+                else if (!haveGapOfTwo)
+                {
+                    if (cards[i].GetCardValueInSimpleInt() + 2 == cards[i + 1].GetCardValueInSimpleInt())
+                    {
+                        haveGapOfTwo = true;
+                        strightCounter++;
+                    }
+                }
+            }
+
+            if (strightCounter == 2)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Hand ConvertCardListToHand(List<Card> cards)
@@ -643,66 +837,212 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Card newCardAvailable = SearchForLowestSuitInField()
      }*/
 
-    private List<Card> CheckIfFlusher(List<Hand> handsOptions)
+    [Button]
+    public void Check2()
+    {
+        Card a1 = new Card(CardEnum.Ace, SuitEnum.Hearts);
+        Card a2 = new Card(CardEnum.Two, SuitEnum.Hearts);
+        Card a3 = new Card(CardEnum.Three, SuitEnum.Hearts);
+        Card a4 = new Card(CardEnum.Four, SuitEnum.Hearts);
+        Card a5 = new Card(CardEnum.Five, SuitEnum.Hearts);
+        Card a6 = new Card(CardEnum.Six, SuitEnum.Hearts);
+        Card a7 = new Card(CardEnum.Seven, SuitEnum.Hearts);
+        Card a8 = new Card(CardEnum.Eight, SuitEnum.Clubs);
+        Card a9 = new Card(CardEnum.Nine, SuitEnum.Clubs);
+        Card a10 = new Card(CardEnum.Ten, SuitEnum.Clubs);
+        Card a11 = new Card(CardEnum.Jack, SuitEnum.Clubs);
+        Card a12 = new Card(CardEnum.Queen, SuitEnum.Clubs);
+        Card a13 = new Card(CardEnum.King, SuitEnum.Clubs);
+
+        Hand hand4 = new Hand(a2, a3, a1, a7, a5, new PokerHandRankingTable());
+        // Hand hand3 = new Hand(a9, a10, a11, a12, a1, new PokerHandRankingTable());
+        Hand hand1 = new Hand(a11, a8, a9, a10, a6, new PokerHandRankingTable());
+        Hand hand2 = new Hand(a7, a11, a13, a10, a9, new PokerHandRankingTable());
+        Hand hand3 = new Hand(a1, a2, a5, a3, a6, new PokerHandRankingTable());
+        Hand hand0 = new Hand(a1, a2, a7, a5, a6, new PokerHandRankingTable());
+        //   handToPrint(hand4.getCards());
+        //   handToPrint(hand0.getCards());
+        //  handToPrint(hand1.getCards());
+        //  handToPrint(hand2.getCards());
+        //   handToPrint(hand3.getCards());
+        Debug.Log("tocheck");
+        List<Hand> hands = new List<Hand>();
+        // hands.Add(hand4);
+        //  hands.Add(hand3);
+        // hands.Add(hand4);
+        hands.Add(hand1);
+        hands.Add(hand2);
+        hands.Add(hand3);
+        hands.Add(hand0);
+        // hands.Add(hand1);
+        // hands.Add(hand2);
+        CheckIfStrighter(hands);
+    }
+    private Hand CheckIfStrighter(List<Hand> handsOptions)
+    {
+        List<Hand> handsWithStrighter = new List<Hand>();
+        foreach (Hand hand in handsOptions)
+        {
+            List<Card> cards = hand.getCards().OrderBy(c => c.CardValue).ToList<Card>();
+            //handToPrint(hand.getCards());
+            Debug.LogError("__<>__");
+            handToPrint(cards);
+            if (IsHandWithFourStright(cards))
+            {
+                handsWithStrighter.Add(ConvertCardListToHand(cards));
+            }
+        }
+
+        if (handsWithStrighter.Count > 0)
+        {
+            BattleSystem.Instance.playerHandIsStrighter = true;
+
+            return GetHighestStrighterFromHands(handsWithStrighter);
+        }
+        BattleSystem.Instance.playerHandIsStrighter = false;
+
+        return handsOptions[0];
+    }
+
+    private Hand GetHighestStrighterFromHands(List<Hand> handsWithStrighter)
+    {
+        CardEnum cardValue = CardEnum.Two;
+        Card tempCard;
+        int indexOfTopHand = 0;
+        List<Card> cards;
+        for (int i = 0; i < handsWithStrighter.Count; i++)
+        {
+            // cards = handsWithStrighter[i].getCards().OrderBy(c => c.CardValue).ToList<Card>();
+            if (IsBabyStrightFourCards(handsWithStrighter[i].getCards()))
+            {
+                tempCard = handsWithStrighter[i].getCards()[2];
+                handToPrint(handsWithStrighter[i].getCards());
+                Debug.LogError("baby " + tempCard.ToString());
+            }
+            else
+            {
+                tempCard = GetTopValueForStrigher(handsWithStrighter[i]);
+                //  Debug.LogError("top " + i + " " + tempCard.CardValue.ToString() + tempCard.CardSuit.ToString());
+                if (tempCard.CardValue > cardValue)
+                {
+                    //    Debug.LogError("highest" + i);
+                    handToPrint(handsWithStrighter[i].getCards());
+                    Debug.LogError("Man " + tempCard.ToString());
+                    cardValue = tempCard.CardValue;
+                    // highestSuitForFlusher = tempCard.CardSuit;
+                    indexOfTopHand = i;
+                }
+            }
+        }
+        return handsWithStrighter[indexOfTopHand];
+    }
+
+    private Card GetTopValueForStrigher(Hand hand)
+    {
+        List<Card> cards = hand.getCards();
+        int lastCard = cards[4].GetCardValueInSimpleInt();
+        int preLastCard = cards[3].GetCardValueInSimpleInt();
+
+        if (lastCard - 1 == preLastCard || lastCard - 2 == preLastCard)
+        {
+            return cards[4];
+        }
+        else
+        {
+            return cards[3];
+        }
+    }
+
+    private Hand CheckIfFlusher(List<Hand> handsOptions)
     {
         List<Card> option1 = null;
         List<Card> option2 = null;
+        List<Hand> handsWithFlusher = new List<Hand>();
         foreach (Hand hand in handsOptions)
         {
             if (IsHandWithFourSameSuit(hand))
             {
-                if (option1 == null)
-                {
-                    BattleSystem.Instance.playerHandIsFlusher = true;
-                    option1 = hand.getCards();
-                }
-                else if (option1[2].CardSuit != hand.getCards()[2].CardSuit)
-                {
-                    option2 = hand.getCards();
-                }
+                handsWithFlusher.Add(hand);
             }
         }
-        if (option2 != null)
+
+        if (handsWithFlusher.Count > 0)
         {
-            if (IsOptionOneOfFlusherHigher(option1, option2))
-            {
-                return option1;
-            }
-            else
-            {
-                return option2;
-            }
-        }
-        else if (option1 != null)
-        {
-            return option1;
+            BattleSystem.Instance.playerHandIsFlusher = true;
+
+            return GetHighestFlusherFromHands(handsWithFlusher);
         }
         BattleSystem.Instance.playerHandIsFlusher = false;
 
-        return handsOptions[0].getCards();
+        return handsOptions[0];
     }
 
-    private bool IsOptionOneOfFlusherHigher(List<Card> option1, List<Card> option2)
+    public SuitEnum highestSuitForFlusher;
+    private Hand GetHighestFlusherFromHands(List<Hand> handsWithFlusher)
     {
-        List<Card> option1Cards = option1.OrderBy(c => c.CardValue).ToList<Card>();
-        List<Card> option2Cards = option2.OrderBy(c => c.CardValue).ToList<Card>();
-        for (int i = 4; i > 0; i--)
+        CardEnum cardValue = CardEnum.Two;
+        Card tempCard;
+        SuitEnum cardSuit;
+        int indexOfTopHand = 0;
+        for (int i = 0; i < handsWithFlusher.Count; i++)
         {
-            if (option1Cards[i].CardValue < option2Cards[i].CardValue)
+            tempCard = GetTopValueForFlusher(handsWithFlusher[i]);
+            //  Debug.LogError("top " + i + " " + tempCard.CardValue.ToString() + tempCard.CardSuit.ToString());
+            if (tempCard.CardValue > cardValue)
             {
-                Debug.LogError("card " + option1Cards[i].CardValue);
-                Debug.LogError("card " + option2Cards[i].CardValue);
-                return false;
+                //    Debug.LogError("highest" + i);
+                // handToPrint(handsWithFlusher[i].getCards());
+                cardValue = tempCard.CardValue;
+                highestSuitForFlusher = tempCard.CardSuit;
+                indexOfTopHand = i;
             }
         }
-        return true;
+        return handsWithFlusher[indexOfTopHand];
     }
+
+    private Card GetTopValueForFlusher(Hand hand)
+    {
+        int sameSuitCounter = 0;
+        int indexOfRedundentCard = 0;
+        SuitEnum sameSuit = SuitEnum.Clubs;
+        List<Card> cards = hand.getCards().OrderBy(c => c.CardSuit).ToList<Card>();
+        for (int i = 0; i < 4; i++)
+        {
+            if (cards[i].CardSuit == cards[i + 1].CardSuit)
+            {
+                if (sameSuitCounter == 0)
+                {
+                    sameSuit = cards[i].CardSuit;
+                    //targetSiut = cards[i].CardSuit;
+                    sameSuitCounter++;
+                }
+                else if (sameSuit == cards[i].CardSuit)
+                {
+                    sameSuitCounter++;
+                }
+            }
+            else
+            {
+                if (i == 0)
+                {
+                    indexOfRedundentCard = 0;
+                }
+                else if (i == 3)
+                {
+                    indexOfRedundentCard = 4;
+                }
+            }
+        }
+        cards.RemoveAt(indexOfRedundentCard);
+        return cards.OrderBy(c => c.CardValue).ToList<Card>()[3];
+
+    }
+
 
     private bool IsHandWithFourSameSuit(Hand hand)
     {
         int sameSuitCounter = 0;
         SuitEnum sameSuit = SuitEnum.Clubs;
-        Card tempCardToSave = null ;
         List<Card> cards = hand.getCards().OrderBy(c => c.CardSuit).ToList<Card>();
         for (int i = 0; i < 4; i++)
         {
@@ -719,25 +1059,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                     sameSuitCounter++;
                 }
             }
-            else
-            {
-                if (i == 0)
-                {
-                    // cards[0] = new Card(cards[0].CardValue, targetSiut);
-                    tempCardToSave = cards[0];
-                    Debug.LogError("c " + cardToSave);
-                }
-                else if (i == 3)
-                {
-                    tempCardToSave = cards[4];
-                    Debug.LogError("c " + cardToSave);
-                }
-            }
         }
         if (sameSuitCounter == 3)
         {
-            //Problem if option12
-            cardToSave = tempCardToSave;
             return true;
         }
         return false;
@@ -913,12 +1237,12 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 cardToDestroy.cardMark.SetActive(false);
             }
-            StartCoroutine(cardToDestroy.FadeBurnOut(() =>
-        RestAfterDestroy(cardToDestroy, OnEnd)));
+            StartCoroutine(cardToDestroy.FadeBurnOut(burnMaterial, () =>
+         RestAfterDestroy(cardToDestroy, OnEnd)));
         }
         else
         {
-            StartCoroutine(cardToDestroy.Dissolve(0f, () =>
+            StartCoroutine(cardToDestroy.Dissolve(dissolveMaterial, 0f, () =>
                      RestAfterDestroy(cardToDestroy, OnEnd)));
         }
     }
@@ -1078,13 +1402,13 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 cardToDestroy.cardMark.SetActive(false);
             }
-            StartCoroutine(cardToDestroy.Dissolve(0, () => ResetCardUI(cardToDestroy)));
+            StartCoroutine(cardToDestroy.Dissolve(dissolveMaterial, 0, () => ResetCardUI(cardToDestroy)));
         }
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve, false);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve, true);
         DealHands();
     }
 
-    private void handToPrint(List<Card> cardsList)
+    public void handToPrint(List<Card> cardsList)
     {
         String totalCards = " ";
         foreach (Card c in cardsList)

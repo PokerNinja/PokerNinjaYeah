@@ -45,18 +45,24 @@ public class EndRound : State
 
     public string WinnerCalculator()
     {
+        Debug.LogError("Ening");
+
         bool isFlusher = Values.Instance.flusherOn;
-        bool isStrighter = false;
+        bool isStrighter = Values.Instance.strighterOn;
         //MAKE IT BETTER
-        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
+        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(false, false, isStrighter);
         if (battleSystem.playerHandIsFlusher)
         {
             bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestOpponentHand);
         }
-        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(false, isFlusher, isStrighter);
+        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
         if (battleSystem.playerHandIsFlusher)
         {
-            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestOpponentHand);
+            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestPlayerHand);
+        }else if (battleSystem.playerHandIsStrighter)
+        {
+            Debug.LogError("EffectHere");
+            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(bestPlayerHand);
         }
         string winnerMsg = "";
         // Opponent win

@@ -113,7 +113,7 @@ public class Timer : MonoBehaviour
             }
             if (!endTurnByPlayer)
             {
-                BattleSystem.Instance.OnTimeOut();
+               StartCoroutine(BattleSystem.Instance.OnTimeOut());
             }
         }
         yield break;

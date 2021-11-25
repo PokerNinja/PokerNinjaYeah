@@ -50,6 +50,7 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip musicSound;
     public AudioClip endRoundGong;
     public AudioClip coinHit;
+    public AudioClip armagedon;
 
 
 
@@ -426,6 +427,11 @@ public class SoundManager : Singleton<SoundManager>
                     soundToPlay = coinHit;
                     break;
                 }
+            case SoundName.Armagedon:
+                {
+                    soundToPlay = armagedon;
+                    break;
+                }
         }
 
         await PlayAsync(soundToPlay, normalPitch);
@@ -468,5 +474,6 @@ public class SoundManager : Singleton<SoundManager>
         VisionDrone,
         EndRoundGong,
         CoinHit,
+        Armagedon,
     }
 }
