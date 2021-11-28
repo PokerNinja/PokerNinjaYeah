@@ -335,7 +335,7 @@ public class BattleUI : MonoBehaviour
         {
             if (card.GetisFaceDown())
             {
-                card.FlipCard(true, null);
+                card.FlipCard(true, null, null);
             }
         }
     }
@@ -387,14 +387,11 @@ public class BattleUI : MonoBehaviour
 
 
 
-    public void VisionEffect(List<Card> winningCards, List<CardUi> boardCardsUi, List<CardUi> playerCardsUi)
+    public void VisionEffect(List<Card> winningCards, List<CardUi> winningPlayersCards)
     {
 
 
-        List<CardUi> winningPlayersCards = new List<CardUi>();
         List<CardUi> cardsToGlow = new List<CardUi>();
-        winningPlayersCards.AddRange(boardCardsUi);
-        winningPlayersCards.AddRange(playerCardsUi);
         string winningCardDesc;
         for (int i = 0; i < 5; i++)
         {
@@ -596,6 +593,9 @@ public class BattleUI : MonoBehaviour
         }
         return "X";
     }
+
+   
+
     private int ConvertHandRankToTextNumber(int handRank)
     {
         switch (handRank)

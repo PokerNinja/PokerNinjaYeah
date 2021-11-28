@@ -122,7 +122,8 @@ public class BattleSystem : StateMachine
     public bool replaceMode = false;
     public bool endTurnInProcess = false;
     private bool fm1Activated;
-
+    public string[] playersHand = { "Ac", "2d" };
+    public string[] board = { "3s", "4h", "5s", "6d", "7d" };
     public event Action onGameStarted;
     private void Start()
     {
@@ -143,7 +144,7 @@ public class BattleSystem : StateMachine
             currentGameInfo.EnemyId = "TEST";
             currentGameInfo.cardDeck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
                 "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
-                "Ac", "Ah","4s","2s","6c", "5h","Th","Jh","Qc", "Qs","Ac","Kh"};
+                "Ac", "Ah","4s",board[4],board[3], board[2],board[1],board[0],"Qc", playersHand[1],"Ac",playersHand[0]};
             currentGameInfo.puDeck = new String[] {"f2","i3","f3","f2","i3","f3",
                  "i1","f1","i2",
                  "w1","w2","w3","f2","i3","w1","w2","w3","f2","i3","f3",
@@ -1107,6 +1108,12 @@ public class BattleSystem : StateMachine
         return true;
     }
 
+    [Button]
+    public void AddGhostCardPu(Constants.CardsOwener cardsOwener)
+    {
+        cardsDeckUi.GhostCardActivate(cardsOwener, ()=>UpdateHandRank(false));
+    }
+
     public void DestroyAndDrawCard(string cardPlace, float delay, bool ResetEnable, bool firstCard, bool lastCard)
     {
         /*if (currentTurn < 3 && cardPlace.Contains("River"))
@@ -1407,7 +1414,14 @@ public class BattleSystem : StateMachine
         {
             //STORE LAST HAND RANK INSTEAED
             Hand bestHand = cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
-            ui.VisionEffect(bestHand.getCards(), cardsDeckUi.boardCardsUi, cardsDeckUi.playerCardsUi);
+            List<CardUi> winningPlayersCards = new List<CardUi>();
+            winningPlayersCards.AddRange(cardsDeckUi.boardCardsUi);
+            winningPlayersCards.AddRange(cardsDeckUi.playerCardsUi);
+            if (cardsDeckUi.ghostCardUi != null && !cardsDeckUi.ghostCardUi.cardPlace.Contains("Enemy"))
+            {
+                winningPlayersCards.Add(cardsDeckUi.ghostCardUi);
+            }
+            ui.VisionEffect(bestHand.getCards(), winningPlayersCards);
             int handRank = bestHand.Rank;
             if (playerHandIsFlusher)
             {

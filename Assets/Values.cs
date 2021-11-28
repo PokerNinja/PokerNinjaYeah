@@ -40,6 +40,7 @@ public class Values : Singleton<Values>
 
     public Color[] visionColorsByRank;
     public Color currentVisionColor;
+    public Color ghostOutlineColor;
 
 
     //[GUIColor(1, 1, 0)]

@@ -1,4 +1,5 @@
-﻿using StandardPokerHandEvaluator;
+﻿using Sirenix.OdinInspector;
+using StandardPokerHandEvaluator;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -12,13 +13,14 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     [SerializeField] public bool clickbleForPU = false;
     [SerializeField] public string cardDescription;
     public bool availableForReuse;
-   // public Material burnMaterial;
-   // public Material dissolveMaterial;
+    // public Material burnMaterial;
+    // public Material dissolveMaterial;
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer cardSelectionRenderer;
     public GameObject cardMark;
     public GameObject cardSelection;
     public bool freeze;
+    public bool isGhost;
     public Constants.CardsOwener whosCards = Constants.CardsOwener.Pool;
     private bool flipInProgress = false;
 
@@ -30,11 +32,26 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         this.isFaceDown = isFaceDown;
         this.cardPlace = cardPlace;
         this.cardDescription = card.ToString(CardToStringFormatEnum.ShortCardName);
+        freeze = false;
+        isGhost = false;
         InitCardsTag(cardsTag);
         LoadSprite(false);
         EnableSelecetPositionZ(aboveDarkScreen);
     }
 
+
+    [Button]
+    public void ChangeBool(bool enable)
+    {
+        if (enable)
+        {
+        spriteRenderer.sharedMaterial.SetFloat("_OnlyInnerOutline", 0.0f);
+        }
+        else
+        {
+        spriteRenderer.sharedMaterial.SetFloat("_OnlyInnerOutline", 1.0f);
+        }
+    }
     #region Settings
 
     public void OnObjectSpawn()
@@ -107,7 +124,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         else
         {
             StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick,false);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
     }
 
@@ -165,34 +182,41 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
 
 
-    public void FlipCard(bool reveal, Action onFinish)
+    public void FlipCard(bool reveal, Action ghostEffect, Action onFinish)
     {
         isFaceDown = !reveal;
         flipInProgress = true;
-        StartCoroutine(AnimationManager.Instance.FlipCard(gameObject.transform, Values.Instance.cardFlipDuration, () => flipInProgress = false, () => LoadSprite(reveal), onFinish));
+        StartCoroutine(AnimationManager.Instance.FlipCard(gameObject.transform, Values.Instance.cardFlipDuration, () => flipInProgress = false, () =>
+        {
+            ghostEffect?.Invoke();
+            LoadSprite(reveal);
+        }, onFinish));
         StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform.parent, 1.15f, Values.Instance.cardFlipDuration, false, null));
     }
 
-    public void CardReveal(bool reveal)
+    public void CardReveal(bool reveal, Action ghostEffect)
     {
         if (reveal)
         {
-            FlipCard(reveal, null);
+            FlipCard(reveal, ghostEffect, null);
         }
     }
 
 
 
 
-    public IEnumerator FadeBurnOut(Material burnMaterial, Action onFinishDissolve)
+    public IEnumerator FadeBurnOut(Material burnMaterial, bool changeOffset, Action onFinishDissolve)
     {
 
         spriteRenderer.material = burnMaterial;
 
         float dissolveDuration = Values.Instance.cardBurnDuration;
         float dissolveAmount = -0.01f;
-        float offsetX = UnityEngine.Random.Range(-1.18f, -0.73f);
-        spriteRenderer.material.SetTextureOffset("_FadeTex", new Vector2(offsetX, -0.14f));
+        if (changeOffset)
+        {
+            float offsetX = UnityEngine.Random.Range(-1.18f, -0.73f);
+            spriteRenderer.material.SetTextureOffset("_FadeTex", new Vector2(offsetX, -0.14f));
+        }
         //  material.SetTextureScale("_FadeTex", new Vector2(offset, 0.07f));
         SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.BurnCard);
         while (dissolveAmount < 1)
@@ -203,7 +227,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             if (dissolveAmount >= 1)
             {
                 Activate(false);
-                onFinishDissolve();
+                onFinishDissolve?.Invoke();
                 break;
             }
         }
