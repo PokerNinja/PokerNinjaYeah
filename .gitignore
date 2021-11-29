@@ -70,3 +70,9 @@ ProjectSettings/ProjectSettings.asset
 ProjectSettings/HDRPProjectSettings.asset
 UserSettings/EditorUserSettings.asset
 ProjectSettings/HDRPProjectSettings.asset
+Packages/manifest.json
+Packages/packages-lock.json
+ProjectSettings/HDRPProjectSettings.asset
+ProjectSettings/ProjectSettings.asset
+UserSettings/EditorUserSettings.asset
+Assets/AllIn1SpriteShader/Textures/toonSeamlessNoise.png
