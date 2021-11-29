@@ -7442,9 +7442,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e3ce115113eea42bbf042a3e756011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TEST_MODE: 1
+  TEST_MODE: 0
   flusherOn: 0
-  strighterOn: 1
+  strighterOn: 0
   turnTimerDuration: 40
   sfxVolume: 0.3
   musicVolume: 0.1
@@ -7476,7 +7476,7 @@ MonoBehaviour:
   - {r: 0, g: 0.42352945, b: 1, a: 1}
   - {r: 0, g: 0.76470596, b: 1, a: 1}
   currentVisionColor: {r: 0, g: 0.76470596, b: 1, a: 1}
-  ghostOutlineColor: {r: 0.84705883, g: 0.34509805, b: 1, a: 1}
+  ghostOutlineColor: {r: 0.7647059, g: 0, b: 1, a: 1}
   fadeFlusherDuration: 0
   objectMoveDuration: 2
   pulseDuration: 1
@@ -20665,7 +20665,7 @@ MonoBehaviour:
   ghostCardUi: {fileID: 0}
   burnMaterial: {fileID: 2100000, guid: b7f697db8211edc4f90696f5c03c0370, type: 2}
   dissolveMaterial: {fileID: 2100000, guid: dd9d00014dff10a429878936e451eb33, type: 2}
-  ghostMaterial: {fileID: 2100000, guid: 45b8a53837225e6479e01d59e9fd2cad, type: 2}
+  ghostMaterial: {fileID: 2100000, guid: 56819362ee8949f4f858a91e178ef075, type: 2}
   highestSuitForFlusher: 0
 --- !u!212 &1064032605134543353
 SpriteRenderer:

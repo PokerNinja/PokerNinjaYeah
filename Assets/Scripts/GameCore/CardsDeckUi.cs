@@ -618,24 +618,30 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         cardObject.Init(cardTag, newCard, isFaceDown, aboveDarkScreen, cardPlace);
         Vector3 targetPosition = new Vector3(cardParent.transform.position.x, cardParent.transform.position.y, cardObject.transform.position.z);
         Action closeDrawer = null;
-        Action ghostEffect = null;
         if (isCloseDrawer)
         {
             closeDrawer = () => AnimateDrawer(false, null);
         }
         if (indexToInsert == -10)
         {
+            cardObject.transform.position = targetPosition;
+            cardObject.transform.localScale = cardScale;
             cardObject.isGhost = true;
-            ghostEffect = () => cardObject.spriteRenderer.material = ghostMaterial;
+            cardObject.spriteRenderer.material = ghostMaterial;
+            cardObject.LoadSprite(true);
+            AddCardToList(cardTag, cardObject, indexToInsert);
+            StartCoroutine(cardObject.FadeGhost(true, null));
         }
-
+        else
+        {
         StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
         Values.Instance.cardDrawMoveDuration, null, () =>
-            cardObject.CardReveal(!isFaceDown, ghostEffect), disableDarkScreen, () =>
+            cardObject.CardReveal(!isFaceDown), disableDarkScreen, () =>
         {
             closeDrawer?.Invoke();
             AddCardToList(cardTag, cardObject, indexToInsert);
         }));
+        }
 
     }
 
@@ -1265,7 +1271,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 index = 2;
                 break;
         }
-        AnimateDrawer(true, () => CardCreatorUi(newCard, false, true, ghostParents[index], Constants.ghostCardsNames[index], UpdateRank, true, -10));
+        CardCreatorUi(newCard, false, true, ghostParents[index], Constants.ghostCardsNames[index], UpdateRank, true, -10);
     }
 
     internal IEnumerator Draw2Cards(bool isEnemy, Action endAction)
@@ -1302,7 +1308,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 if (cardToSee.GetisFaceDown())
                 {
-                    cardToSee.FlipCard(true, null, () => cardToSee.ApplyEyeEffect(endAction, true, false));
+                    cardToSee.FlipCard(true,  () => cardToSee.ApplyEyeEffect(endAction, true, false));
                 }
                 else
                 {
@@ -1311,7 +1317,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             }
             else
             {
-                cardToSee.FlipCard(cardToSee.GetisFaceDown(), null, () => cardToSee.ApplyEyeEffect(endAction, true, false));
+                cardToSee.FlipCard(cardToSee.GetisFaceDown(),  () => cardToSee.ApplyEyeEffect(endAction, true, false));
             }
         }
         if (cardToSee.whosCards.Equals(Constants.CardsOwener.Player))
@@ -1320,7 +1326,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         if (cardToSee.whosCards.Equals(Constants.CardsOwener.Enemy))
         {
-            cardToSee.FlipCard(cardToSee.GetisFaceDown(), null, () => cardToSee.ApplyEyeEffect(endAction, cardToSee.GetisFaceDown(), false));
+            cardToSee.FlipCard(cardToSee.GetisFaceDown(),  () => cardToSee.ApplyEyeEffect(endAction, cardToSee.GetisFaceDown(), false));
 
         }
     }
@@ -1444,11 +1450,11 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
             if (tagFrom == Constants.EnemyCardsTag)
             {
-                cardToFlip.FlipCard(true, null, null);
+                cardToFlip.FlipCard(true, null);
             }
             else if (tagTo == Constants.EnemyCardsTag)
             {
-                cardToFlip.FlipCard(false, null, null);
+                cardToFlip.FlipCard(false,  null);
 
             }
         }
