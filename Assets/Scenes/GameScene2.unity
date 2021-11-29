@@ -13547,8 +13547,8 @@ MonoBehaviour:
   emojiStartPosPlayer: {fileID: 2037197158}
   emojiStartPosEnemy: {fileID: 1198150331}
   emojiTarget: {fileID: 1215868917}
-  pSmokePS: {fileID: 0}
-  eSmokePS: {fileID: 0}
+  pSmokePS: {fileID: 7122010345078994644, guid: 3ff1c63bf121ae44db78e4c25fbfc8d5, type: 3}
+  eSmokePS: {fileID: 334230851892204992, guid: 32fab0ca8d7f01a4c9d84ccd5e923f0e, type: 3}
   turnBtn: {fileID: 333540117}
   turnBtnSpriteREnderer: {fileID: 333540119}
   replaceBtn: {fileID: 401379075}
