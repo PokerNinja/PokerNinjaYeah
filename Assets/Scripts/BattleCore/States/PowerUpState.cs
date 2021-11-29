@@ -53,8 +53,14 @@ public class PowerUpState : State
                 if (puIndex != -1)
                 {
                     yield return new WaitForSecondsRealtime(1f);
-
+                    if(powerUpName.Substring(0, 1).Equals("s"))
+                    {
+                        IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
+                    }
+                    else
+                    {
                     battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
+                    }
                 }
                 else
                 {
