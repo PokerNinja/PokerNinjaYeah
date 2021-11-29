@@ -7442,9 +7442,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e3ce115113eea42bbf042a3e756011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TEST_MODE: 1
+  TEST_MODE: 0
   flusherOn: 0
-  strighterOn: 1
+  strighterOn: 0
   turnTimerDuration: 40
   sfxVolume: 0.3
   musicVolume: 0.1
@@ -14108,7 +14108,7 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 12.54902, y: 10}
+    oldSize: {x: 12.546296, y: 10}
     newSize: {x: 12.54902, y: 10}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
