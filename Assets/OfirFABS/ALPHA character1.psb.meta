@@ -8651,6 +8651,13 @@ ScriptedImporter:
     spriteID: b472dcdfd2252454aa677e63696a1175
     layerID: 50
     mosaicPosition: {x: 4, y: 895}
+  - name: FrontARM
+    spriteName: FrontARM
+    isGroup: 0
+    parentIndex: -1
+    spriteID: 65790d56a7bf04f4f9dafc8ac7988adc
+    layerID: 38
+    mosaicPosition: {x: 297, y: 134}
   - name: Head
     spriteName: 
     isGroup: 1
@@ -8661,31 +8668,24 @@ ScriptedImporter:
   - name: Layer 47
     spriteName: Layer 47
     isGroup: 0
-    parentIndex: 4
+    parentIndex: 5
     spriteID: 042310c95be948d4e927f9b058a952f0
     layerID: 44
     mosaicPosition: {x: 361, y: 214}
   - name: Layer 19
     spriteName: Layer 19
     isGroup: 0
-    parentIndex: 4
+    parentIndex: 5
     spriteID: 52924b9214282404597605b0e5130ab1
     layerID: 41
     mosaicPosition: {x: 161, y: 948}
   - name: Layer 3 copy
     spriteName: Layer 3 copy
     isGroup: 0
-    parentIndex: 4
+    parentIndex: 5
     spriteID: af5070c42f5716f4b87876f96ea9171c
     layerID: 40
     mosaicPosition: {x: 4, y: 483}
-  - name: FrontARM
-    spriteName: FrontARM
-    isGroup: 0
-    parentIndex: -1
-    spriteID: 65790d56a7bf04f4f9dafc8ac7988adc
-    layerID: 38
-    mosaicPosition: {x: 297, y: 134}
   - name: Body
     spriteName: Body
     isGroup: 0
