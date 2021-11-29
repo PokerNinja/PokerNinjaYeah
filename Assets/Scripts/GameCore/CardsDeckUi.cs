@@ -678,15 +678,18 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     public Hand CalculateHand(bool isPlayer, bool isFlusher, bool isStrighter)
     {
-
         TexasHand playerCards;
         if (isPlayer)
         {
             playerCards = GetPlayerHand();
+            BattleSystem.Instance.playerHandIsStrighter = false;
+            BattleSystem.Instance.playerHandIsFlusher = false;
         }
         else
         {
             playerCards = GetEnemyHand();
+            BattleSystem.Instance.enemyHandIsFlusher = false;
+            BattleSystem.Instance.enemyHandIsFlusher = false;
         }
 
         List<Card> totalCards = new List<Card>();
@@ -697,10 +700,12 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             if (isPlayer && ghostCardUi.whosCards == Constants.CardsOwener.Player)
             {
                 totalCards.Add(ghostCard);
-            }else if(!isPlayer && ghostCardUi.whosCards == Constants.CardsOwener.Enemy)
+            }
+            else if (!isPlayer && ghostCardUi.whosCards == Constants.CardsOwener.Enemy)
             {
                 totalCards.Add(ghostCard);
-            }else if(ghostCardUi.whosCards == Constants.CardsOwener.Board)
+            }
+            else if (ghostCardUi.whosCards == Constants.CardsOwener.Board)
             {
                 totalCards.Add(ghostCard);
             }
@@ -710,38 +715,39 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             Hand hand = new Hand(totalCards[0], totalCards[1], totalCards[2], totalCards[3], totalCards[4], poker);
             if (isFlusher && hand.Rank > 1600)
             {
-                BattleSystem.Instance.playerHandIsFlusher = IsHandWithFourSameSuit(hand);
+                if (isPlayer)
+                {
+                    BattleSystem.Instance.playerHandIsFlusher = IsHandWithFourSameSuit(hand);
+                }
+                else
+                {
+                    BattleSystem.Instance.enemyHandIsFlusher = IsHandWithFourSameSuit(hand);
+                }
             }
             else if (isStrighter && hand.Rank > 1609)
             {
-                BattleSystem.Instance.playerHandIsStrighter = IsHandWithFourStright(hand.getCards());
-            }
-            else
-            {
-                BattleSystem.Instance.playerHandIsStrighter = false;
-                BattleSystem.Instance.playerHandIsFlusher = false;
+                if (isPlayer)
+                {
+                    BattleSystem.Instance.playerHandIsStrighter = IsHandWithFourStright(hand.getCards());
+                }
+                else
+                {
+                    BattleSystem.Instance.enemyHandIsStrighter = IsHandWithFourStright(hand.getCards());
+                }
             }
             return hand;
         }
-        List<Hand> handsOptions = new List<Hand>();
-
-
-        handsOptions = GetBestHand(totalCards);
+        List<Hand> handsOptions = GetBestHand(totalCards);
 
         if (isFlusher && handsOptions[0].Rank > 1600)
         {
-            Hand newHand = CheckIfFlusher(handsOptions);
+            Hand newHand = CheckIfFlusher(isPlayer, handsOptions);
             handsOptions.Insert(0, newHand);
         }
         else if (isStrighter && handsOptions[0].Rank > 1609)
         {
-            Hand newHand = CheckIfStrighter(handsOptions);
+            Hand newHand = CheckIfStrighter(isPlayer, handsOptions);
             handsOptions.Insert(0, newHand);
-        }
-        else
-        {
-            BattleSystem.Instance.playerHandIsStrighter = false;
-            BattleSystem.Instance.playerHandIsFlusher = false;
         }
         //MAYBE SMARTER^
         return handsOptions[0];
@@ -901,45 +907,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     [Button]
     public void Check2()
     {
-        Card a1 = new Card(CardEnum.Ace, SuitEnum.Hearts);
-        Card a2 = new Card(CardEnum.Two, SuitEnum.Hearts);
-        Card a3 = new Card(CardEnum.Three, SuitEnum.Hearts);
-        Card a4 = new Card(CardEnum.Four, SuitEnum.Hearts);
-        Card a5 = new Card(CardEnum.Five, SuitEnum.Hearts);
-        Card a6 = new Card(CardEnum.Six, SuitEnum.Hearts);
-        Card a7 = new Card(CardEnum.Seven, SuitEnum.Hearts);
-        Card a8 = new Card(CardEnum.Eight, SuitEnum.Clubs);
-        Card a9 = new Card(CardEnum.Nine, SuitEnum.Clubs);
-        Card a10 = new Card(CardEnum.Ten, SuitEnum.Clubs);
-        Card a11 = new Card(CardEnum.Jack, SuitEnum.Clubs);
-        Card a12 = new Card(CardEnum.Queen, SuitEnum.Clubs);
-        Card a13 = new Card(CardEnum.King, SuitEnum.Clubs);
 
-        Hand hand4 = new Hand(a2, a3, a1, a7, a5, new PokerHandRankingTable());
-        // Hand hand3 = new Hand(a9, a10, a11, a12, a1, new PokerHandRankingTable());
-        Hand hand1 = new Hand(a11, a8, a9, a10, a6, new PokerHandRankingTable());
-        Hand hand2 = new Hand(a7, a11, a13, a10, a9, new PokerHandRankingTable());
-        Hand hand3 = new Hand(a1, a2, a5, a3, a6, new PokerHandRankingTable());
-        Hand hand0 = new Hand(a1, a2, a7, a5, a6, new PokerHandRankingTable());
-        //   handToPrint(hand4.getCards());
-        //   handToPrint(hand0.getCards());
-        //  handToPrint(hand1.getCards());
-        //  handToPrint(hand2.getCards());
-        //   handToPrint(hand3.getCards());
-        Debug.Log("tocheck");
-        List<Hand> hands = new List<Hand>();
-        // hands.Add(hand4);
-        //  hands.Add(hand3);
-        // hands.Add(hand4);
-        hands.Add(hand1);
-        hands.Add(hand2);
-        hands.Add(hand3);
-        hands.Add(hand0);
-        // hands.Add(hand1);
-        // hands.Add(hand2);
-        CheckIfStrighter(hands);
     }
-    private Hand CheckIfStrighter(List<Hand> handsOptions)
+    private Hand CheckIfStrighter(bool isPlayer, List<Hand> handsOptions)
     {
         List<Hand> handsWithStrighter = new List<Hand>();
         foreach (Hand hand in handsOptions)
@@ -954,12 +924,16 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
         if (handsWithStrighter.Count > 0)
         {
-            BattleSystem.Instance.playerHandIsStrighter = true;
-
+            if (isPlayer)
+            {
+                BattleSystem.Instance.playerHandIsStrighter = true;
+            }
+            else
+            {
+                BattleSystem.Instance.enemyHandIsStrighter = true;
+            }
             return GetHighestStrighterFromHands(handsWithStrighter);
         }
-        BattleSystem.Instance.playerHandIsStrighter = false;
-
         return handsOptions[0];
     }
 
@@ -1007,10 +981,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    private Hand CheckIfFlusher(List<Hand> handsOptions)
+    private Hand CheckIfFlusher(bool isPlayer, List<Hand> handsOptions)
     {
-        List<Card> option1 = null;
-        List<Card> option2 = null;
         List<Hand> handsWithFlusher = new List<Hand>();
         foreach (Hand hand in handsOptions)
         {
@@ -1022,11 +994,16 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
         if (handsWithFlusher.Count > 0)
         {
-            BattleSystem.Instance.playerHandIsFlusher = true;
-
+            if (isPlayer)
+            {
+                BattleSystem.Instance.playerHandIsFlusher = true;
+            }
+            else
+            {
+                BattleSystem.Instance.enemyHandIsFlusher = true;
+            }
             return GetHighestFlusherFromHands(handsWithFlusher);
         }
-        BattleSystem.Instance.playerHandIsFlusher = false;
 
         return handsOptions[0];
     }
@@ -1163,10 +1140,34 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     }
 
 
-    private GameObject GetParentByPlace(string cardPlace)
+    public GameObject GetParentByPlace(string cardPlace)
     {
-        // Make It batter
-        return GameObject.Find(cardPlace + "Slut");
+        switch (cardPlace)
+        {
+            case Constants.PlayerCard1:
+                return playerCardAParent;
+            case Constants.PlayerCard2:
+                return playerCardBParent;
+            case Constants.EnemyCard1:
+                return enemyCardAParent;
+            case Constants.EnemyCard2:
+                return enemyCardBParent;
+            case Constants.BFlop1:
+                return boardParents[0];
+            case Constants.BFlop2:
+                return boardParents[1];
+            case Constants.BFlop3:
+                return boardParents[2];
+            case Constants.BTurn4:
+                return boardParents[3];
+            case Constants.BRiver5:
+                return boardParents[4];
+            case Constants.Deck1:
+                return deckCardAParent;
+            case Constants.Deck2:
+                return deckCardBParent;
+        }
+        return null;
     }
 
     private GameObject[] CreateParentForHands()
@@ -1223,6 +1224,24 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         else
         {
             AddGhostCard(cardsOwener, UpdateRank);
+        }
+    }
+
+    internal void EnableCardSmoke(bool enable, bool isPlayerActivate, string cardPlace)
+    {
+        CardUi targetCard = GetCardUiByName(cardPlace);
+        if (targetCard != null)
+        {
+
+            targetCard.underSmoke = enable;
+            if (!isPlayerActivate)
+            {
+                targetCard.spriteRenderer.color = Color.black;
+            }
+            if (!enable)
+            {
+                targetCard.spriteRenderer.color = Color.white;
+            }
         }
     }
     internal void AddGhostCard(Constants.CardsOwener cardsOwener, Action UpdateRank)

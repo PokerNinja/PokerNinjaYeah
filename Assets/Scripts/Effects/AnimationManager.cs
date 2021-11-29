@@ -162,6 +162,7 @@ public class AnimationManager : Singleton<AnimationManager>
             dissolveAmount = 0;
             alphaTarget = 1;
         }
+        spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
         while (spriteRenderer.color.a != alphaTarget)
         {
             yield return new WaitForFixedUpdate();
@@ -849,14 +850,12 @@ public class AnimationManager : Singleton<AnimationManager>
     {
         float alphaAmoint = 0f;
         float burnAmoint = 0.6f;
-        float enableGhost = 0.0f;
         Color visionColor = Values.Instance.currentVisionColor;
         Color ghostColor = Values.Instance.ghostOutlineColor;
         if (enable)
         {
             alphaAmoint = 1f;
             burnAmoint = 0f;
-            enableGhost = 1.0f;
             ghostColor = visionColor;
         }
         foreach (CardUi cardUi in winningPlayersCards)
@@ -868,7 +867,6 @@ public class AnimationManager : Singleton<AnimationManager>
             if (cardUi.isGhost)
             {
                 cardUi.spriteRenderer.material.SetColor("_OutlineColor", ghostColor);
-               // cardUi.spriteRenderer.material.SetFloat("_OnlyInnerOutline", enableGhost);
             }
             else
             {
@@ -877,6 +875,8 @@ public class AnimationManager : Singleton<AnimationManager>
             }
         }
     }
+
+
 
     public async void AnimateWinningHandToBoard(List<CardUi> winningPlayerCards, List<CardUi> losingBoardCards, Action UpdateValueEndRoutine)
     {

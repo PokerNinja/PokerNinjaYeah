@@ -235,6 +235,41 @@ public class PowerUpState : State
                     battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2), true, true);
                     break;
                 }
+            case nameof(PowerUpNamesEnum.sm2): //sm2 = 22, //strighter
+                {
+                    battleSystem.StrighterPU(isPlayerActivate);
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.sm3): //sm3= 23, //flusher
+
+                {
+                    battleSystem.FlusherPU(isPlayerActivate);
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.s1): // 24, //smoke_player
+
+                {
+                    battleSystem.SmokeCardPu(cardTarget2,isPlayerActivate);
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.s2): // 25, //smoke_board
+
+                {
+                    battleSystem.SmokeTurnRiver(isPlayerActivate);
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.s3): //ghost_board
+
+                {
+                    battleSystem.GhostPu(isPlayerActivate, false);
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.sm1): //ghost_player
+
+                {
+                    battleSystem.GhostPu(isPlayerActivate, true);
+                    break;
+                }
         }
 
     }

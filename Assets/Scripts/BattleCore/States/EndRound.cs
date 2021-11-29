@@ -52,7 +52,11 @@ public class EndRound : State
         if (battleSystem.playerHandIsFlusher)
         {
             bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestOpponentHand);
+        }else if (battleSystem.enemyHandIsStrighter)
+        {
+            bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(bestOpponentHand);
         }
+
         Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
         if (battleSystem.playerHandIsFlusher)
         {

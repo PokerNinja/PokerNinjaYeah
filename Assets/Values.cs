@@ -41,6 +41,7 @@ public class Values : Singleton<Values>
     public Color[] visionColorsByRank;
     public Color currentVisionColor;
     public Color ghostOutlineColor;
+    public float fadeFlusherDuration = 1f;
 
 
     //[GUIColor(1, 1, 0)]

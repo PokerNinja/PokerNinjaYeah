@@ -110,7 +110,8 @@ public class BattleUI : MonoBehaviour
     public Transform emojiStartPosEnemy;
     public Transform emojiTarget;
 
-
+    public ParticleSystem pSmokePS;
+    public ParticleSystem eSmokePS;
 
     [SerializeField] private GameObject turnBtn;
     [SerializeField] private SpriteRenderer turnBtnSpriteREnderer;
@@ -119,11 +120,14 @@ public class BattleUI : MonoBehaviour
     [SerializeField] public TextMeshProUGUI currentRankText;
     [SerializeField] public TextMeshProUGUI currentRankNumber;
 
+    [SerializeField] private GameObject pFlusher, pStrighter, eFlusher, eStrighter;
+
     public static bool isPlayerTurn;
     private string playerName, enemyName;
 
     private bool sliding;
     private int lastHandRank = 10;
+    public GameObject psParent;
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy)
     {
@@ -594,7 +598,7 @@ public class BattleUI : MonoBehaviour
         return "X";
     }
 
-   
+
 
     private int ConvertHandRankToTextNumber(int handRank)
     {
@@ -692,6 +696,42 @@ public class BattleUI : MonoBehaviour
 
     }
 
+    public void FadeStrighterOrFlusher(bool isPlayer, bool isFlusher, bool enable)
+    {
+        GameObject target;
+        if (isPlayer)
+        {
+            if (isFlusher)
+            {
+                target = pFlusher;
+            }
+            else
+            {
+                target = pStrighter;
+            }
+        }
+        else
+        {
+            if (isFlusher)
+            {
+                target = eFlusher;
+            }
+            else
+            {
+                target = eStrighter;
+            }
+        }
+        SpriteRenderer sp = target.GetComponent<SpriteRenderer>();
+        if (enable)
+        {
+            target.SetActive(true);
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(sp, true, Values.Instance.fadeFlusherDuration, null));
+        }
+        else
+        {
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(sp, true, Values.Instance.fadeFlusherDuration, () => target.SetActive(false)));
+        }
+    }
     private Vector2 GetAvatarPosition(bool isPlayer)
     {
         if (isPlayer)
@@ -836,6 +876,38 @@ public class BattleUI : MonoBehaviour
         coolDownEmoji?.Invoke();
 
 
+    }
+
+    internal void InitSmoke(bool isPlayerActivate,GameObject parent, bool enable)
+    {
+        ParticleSystem target = pSmokePS;
+        if (!isPlayerActivate)
+        {
+            target = eSmokePS;
+        }
+        if (enable)
+        {
+            ParticleSystem ps = Instantiate(target, parent.transform.position, target.transform.rotation);
+            ps.name = parent.name + "S";
+            ps.transform.SetParent(psParent.transform, false);
+            ps.transform.position = parent.transform.position;
+        }
+        else
+        {
+            ParticleSystem ps = GameObject.Find(parent.name + "S").GetComponent<ParticleSystem>();
+            StartCoroutine(FadeOutParticleSystem(ps));
+
+            // StartCoroutine(AnimationManager.Instance.FadeOutPS(ps));
+        }
+    }
+
+    private IEnumerator FadeOutParticleSystem(ParticleSystem ps)
+    {
+        var main = ps.main;
+        main.startLifetime = 0;
+        main.simulationSpeed = 2.5f;
+        yield return new WaitForSeconds(3f);
+        Destroy(ps.gameObject);
     }
 
 

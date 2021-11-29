@@ -23,7 +23,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     public bool isGhost;
     public Constants.CardsOwener whosCards = Constants.CardsOwener.Pool;
     private bool flipInProgress = false;
-
+    public bool underSmoke;
 
 
     public void Init(string cardsTag, Card newCard, bool isFaceDown, bool aboveDarkScreen, string cardPlace)
@@ -34,6 +34,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         this.cardDescription = card.ToString(CardToStringFormatEnum.ShortCardName);
         freeze = false;
         isGhost = false;
+        underSmoke = false;
         InitCardsTag(cardsTag);
         LoadSprite(false);
         EnableSelecetPositionZ(aboveDarkScreen);

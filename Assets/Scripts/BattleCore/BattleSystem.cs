@@ -7,7 +7,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UniRx;
 
 using StandardPokerHandEvaluator;
 using Sirenix.OdinInspector;
@@ -87,10 +86,14 @@ public class BattleSystem : StateMachine
     private readonly long TURN_COUNTER_INIT = 6;
     private readonly float DELAY_BEFORE_NEW_ROUND = 6f;
 
-    private bool isFlusher = false;
-    private bool isStrighter = false;
+    private bool isPlayerFlusher = false;
+    private bool isPlayerStrighter = false;
+    private bool isEnemyFlusher = false;
+    private bool isEnemyStrighter = false;
     public bool playerHandIsFlusher = false;
     public bool playerHandIsStrighter = false;
+    public bool enemyHandIsFlusher = false;
+    public bool enemyHandIsStrighter = false;
 
 
     [SerializeField]
@@ -128,8 +131,6 @@ public class BattleSystem : StateMachine
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
-        isFlusher = Values.Instance.flusherOn;
-        isStrighter = Values.Instance.strighterOn;
         //Debug.LogWarning("S:" + PowerUpStruct.PowerUpNamesEnum.f1.ToString());
         Debug.LogWarning("Start LRA");
 
@@ -351,12 +352,13 @@ public class BattleSystem : StateMachine
     {
         if (!AreBoardCardsFlipped() && !reset)
         {
-            Hand bestHand = cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
+            Hand bestHand = cardsDeckUi.CalculateHand(true, isPlayerFlusher, isPlayerStrighter);
             int handRank = bestHand.Rank;
             if (playerHandIsFlusher)
             {
                 handRank = 1599;
-            }else if (playerHandIsStrighter)
+            }
+            else if (playerHandIsStrighter)
             {
                 handRank = 1609;
             }
@@ -398,6 +400,8 @@ public class BattleSystem : StateMachine
                 break;
         }
     }
+
+
 
     public void StartNewRoundRoutine(bool delay)
     {
@@ -706,6 +710,10 @@ public class BattleSystem : StateMachine
     #region Settings
     public void ResetRoundSettings(Action FinishCallbac)
     {
+        isPlayerFlusher = false;
+        isEnemyFlusher = false;
+        isPlayerStrighter = false;
+        isEnemyStrighter = false;
         TemproryUnclickable = false;
         ui.tieTitle.SetActive(false);
         ui.EnableBgColor(false);
@@ -729,7 +737,7 @@ public class BattleSystem : StateMachine
             firstRound = false;
         }
         UpdateHandRank(true);
-        
+
         cardsDeckUi.DeleteAllCards(() => DealHands(FinishCallbac));
     }
 
@@ -1111,9 +1119,51 @@ public class BattleSystem : StateMachine
     [Button]
     public void AddGhostCardPu(Constants.CardsOwener cardsOwener)
     {
-        cardsDeckUi.GhostCardActivate(cardsOwener, ()=>UpdateHandRank(false));
+        cardsDeckUi.GhostCardActivate(cardsOwener, () => UpdateHandRank(false));
     }
 
+
+    internal void StrighterPU(bool isPlayerActivate)
+    {
+        ui.FadeStrighterOrFlusher(isPlayerActivate, true, false);
+        ui.FadeStrighterOrFlusher(isPlayerActivate, false, true);
+        isPlayerStrighter = true;
+        isPlayerFlusher = false;
+    }
+    internal void FlusherPU(bool isPlayerActivate)
+    {
+        ui.FadeStrighterOrFlusher(isPlayerActivate, false, false);
+        ui.FadeStrighterOrFlusher(isPlayerActivate, true, true);
+        isPlayerStrighter = false;
+        isPlayerFlusher = true;
+    }
+    internal void SmokeCardPu(string cardTarget2, bool isPlayerActivate)
+    {
+        ui.InitSmoke(isPlayerActivate, cardsDeckUi.GetParentByPlace(cardTarget2), true);
+        cardsDeckUi.EnableCardSmoke(true, isPlayerActivate, cardTarget2);
+    }
+    internal void SmokeTurnRiver(bool isPlayerActivate)
+    {
+        SmokeCardPu(Constants.BTurn4, isPlayerActivate);
+        SmokeCardPu(Constants.BRiver5, isPlayerActivate);
+    }
+    internal void GhostPu(bool isPlayerActivate, bool isHand)
+    {
+        Constants.CardsOwener cardsOwener;
+        if (isHand)
+        {
+            cardsOwener = Constants.CardsOwener.Board;
+        }
+        else if (isPlayerActivate)
+        {
+            cardsOwener = Constants.CardsOwener.Player;
+        }
+        else
+        {
+            cardsOwener = Constants.CardsOwener.Enemy;
+        }
+        AddGhostCardPu(cardsOwener);
+    }
     public void DestroyAndDrawCard(string cardPlace, float delay, bool ResetEnable, bool firstCard, bool lastCard)
     {
         /*if (currentTurn < 3 && cardPlace.Contains("River"))
@@ -1413,7 +1463,7 @@ public class BattleSystem : StateMachine
         if (!AreBoardCardsFlipped() && !selectMode)
         {
             //STORE LAST HAND RANK INSTEAED
-            Hand bestHand = cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
+            Hand bestHand = cardsDeckUi.CalculateHand(true, isPlayerFlusher, isPlayerStrighter);
             List<CardUi> winningPlayersCards = new List<CardUi>();
             winningPlayersCards.AddRange(cardsDeckUi.boardCardsUi);
             winningPlayersCards.AddRange(cardsDeckUi.playerCardsUi);
@@ -1574,15 +1624,22 @@ public class BattleSystem : StateMachine
         }
     }
 
-    [Button]
     internal void WinParticleEffect()
     {
+
         ui.WinParticleEffect();
     }
+
+    /* [Button]
+     internal void SmokeCheck(bool enable)
+     {
+         ui.InitSmoke(cardsDeckUi.GetParentByPlace(Constants.PlayerCard1), enable);
+         cardsDeckUi.EnableCardSmoke(enable, false, Constants.PlayerCard1);
+     }*/
     [Button]
     internal void DealBoard()
     {
-       cardsDeckUi.DealCardsForBoard(true, null, () => UpdateHandRank(false));
+        cardsDeckUi.DealCardsForBoard(true, null, () => UpdateHandRank(false));
     }
     [Button]
     internal void EndRoundManual()
