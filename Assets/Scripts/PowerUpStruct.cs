@@ -55,11 +55,11 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
 
      /*22*/
     public PuStructInfo strighter = new PuStructInfo
-        (PowerUpNamesEnum.sm2.ToString(), "Strighter", "Achive stright with four cards until the end of the round.", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.sm2.ToString(), "Strighter", "Achive stright with four cards until the end of the round.", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
     
      /*23*/
     public PuStructInfo flusher = new PuStructInfo
-        (PowerUpNamesEnum.sm3.ToString(), "Flusher", "Achive flush with four cards until the end of the round.", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.sm3.ToString(), "Flusher", "Achive flush with four cards until the end of the round.", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
     
      /*24*/
     public PuStructInfo smoke_player = new PuStructInfo
@@ -67,19 +67,19 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
     
      /*25*/
     public PuStructInfo smoke_board = new PuStructInfo
-        (PowerUpNamesEnum.s2.ToString(), "Smoke", "Smoke the turn and the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.s2.ToString(), "Smoke", "Smoke the turn and the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them", "", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
     
      /*26*/
     public PuStructInfo ghost_board = new PuStructInfo
-        (PowerUpNamesEnum.s3.ToString(), "GHOST", "Add a ghost card to the board.", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.s3.ToString(), "GHOST", "Add a ghost card to the board.", "", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
     
      /*27*/
     public PuStructInfo ghost_player = new PuStructInfo
-        (PowerUpNamesEnum.sm1.ToString(), "GHOST", "Add a ghost card to your hand.", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.sm1.ToString(), "GHOST", "Add a ghost card to your hand.", "", 0, Constants.PlayerCardsTag, Constants.PoolCardTag);
 
     /*9*/
     public PuStructInfo shuffle_board = new PuStructInfo
-        (PowerUpNamesEnum.shuffle_board.ToString(), "TSUNAMI", "Shuffle new board cards", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.shuffle_board.ToString(), "TSUNAMI", "Shuffle new board cards", "", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
     /*10*/
     public PuStructInfo shuffle_hands = new PuStructInfo
         (PowerUpNamesEnum.shuffle_hands.ToString(), "SHUFFLE HANDS", "Shuffle new hands", "", 0, Constants.PlayerCardsTag, Constants.EnemyCardsTag);
