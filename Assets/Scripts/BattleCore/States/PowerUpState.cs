@@ -85,7 +85,14 @@ public class PowerUpState : State
                     {
                         posTarget2 = new Vector2(0, 0);
                     }
-                    battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
+                    if (powerUpName.Substring(0, 1).Equals("s"))
+                    {
+                        IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
+                    }
+                    else
+                    {
+                        battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
+                    }
                 }
                 else
                 {
