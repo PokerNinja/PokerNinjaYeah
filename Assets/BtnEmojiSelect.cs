@@ -35,6 +35,7 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
       //  var position = Input.mousePosition/ canvas.scaleFactor;
       //  Debug.LogWarning("" + position);
         currentEmojiId = -1;
+        transform.position = eventData.pointerCurrentRaycast.worldPosition;
         Debug.LogError("Down");
         //held = false;
         // btnTransform.position = eventData.pointerPress.transform.position;
@@ -105,7 +106,19 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.LogError("d " + eventData.delta / canvas.scaleFactor);
+        Debug.LogError("d14 " + PointerDataToRelativePos(eventData) / canvas.scaleFactor);
+        Debug.LogError("d51 " + eventData.pointerCurrentRaycast.worldPosition);
+        Debug.LogError("d12 " +Input.mousePosition);
+        transform.position = eventData.pointerCurrentRaycast.worldPosition;
+       // Debug.LogError("d13 " +Input.location);
+       // Debug.LogError("d14 " +Input.touches[0].position);
+       // Debug.LogError("d1 " + eventData.delta);
+       // Debug.LogError("d2 " + eventData.position / canvas.scaleFactor);
+       // Debug.LogError("d3 " + eventData.pressEventCamera.transform.position);
+       // Debug.LogError("d4 " + eventData.pressPosition / canvas.scaleFactor);
+       // Debug.LogError("d5 " + eventData.pointerDrag);
+       // Debug.LogError("d6 " + eventData.rawPointerPress.transform.position);
+
         // rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
         canvasGroup.blocksRaycasts = false;
     }

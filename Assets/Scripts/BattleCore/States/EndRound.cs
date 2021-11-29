@@ -46,17 +46,25 @@ public class EndRound : State
     public string WinnerCalculator()
     {
         bool isFlusher = Values.Instance.flusherOn;
-        bool isStrighter = false;
+        bool isStrighter = Values.Instance.strighterOn;
         //MAKE IT BETTER
-        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
+        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(false, false, false);
         if (battleSystem.playerHandIsFlusher)
         {
             bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestOpponentHand);
+        }else if (battleSystem.enemyHandIsStrighter)
+        {
+            bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(bestOpponentHand);
         }
-        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(false, isFlusher, isStrighter);
+
+        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
         if (battleSystem.playerHandIsFlusher)
         {
-            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestOpponentHand);
+            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestPlayerHand);
+        }else if (battleSystem.playerHandIsStrighter)
+        {
+            Debug.LogError("Effect Strighter");
+            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(bestPlayerHand);
         }
         string winnerMsg = "";
         // Opponent win
@@ -140,7 +148,7 @@ public class EndRound : State
         losingBoardCards.AddRange(boardCardsUi);
         playerCardsUi.AddRange(battleSystem.cardsDeckUi.GetListByTag("CardP"));
         EnemyCardsUi.AddRange(battleSystem.cardsDeckUi.GetListByTag("CardE"));
-        CardUi card1, card2;
+        CardUi card1, card2 , cardGhost;
         if (isPlayerWin)
         {
             card1 = playerCardsUi[0];
@@ -151,9 +159,30 @@ public class EndRound : State
             card1 = EnemyCardsUi[0];
             card2 = EnemyCardsUi[1];
         }
+        string cardGhostStr = "x";
+        string cardGhostOwener = "x";
+        if(battleSystem.cardsDeckUi.ghostCardUi!= null)
+        {
+            cardGhost = battleSystem.cardsDeckUi.ghostCardUi;
+            cardGhostStr = cardGhost.cardDescription.ToString();
+            cardGhostOwener = cardGhost.cardPlace.ToString();
+            if(cardGhostOwener.Contains("Player") && isPlayerWin)
+            {
 
-        string card1Str = card1.GetComponent<CardUi>().cardDescription.ToString();// Cant catch properly. catch it first place 
-        string card2Str = card2.GetComponent<CardUi>().cardDescription.ToString();
+            }else if (cardGhostOwener.Contains("Enemy") && !isPlayerWin)
+            {
+
+            } else if (cardGhostOwener.Contains("B"))
+            {
+
+            }
+            else
+            {
+                cardGhostStr = "x";
+            }
+        }
+        string card1Str = card1.cardDescription.ToString();// Cant catch properly. catch it first place 
+        string card2Str = card2.cardDescription.ToString();
         string winningCardDesc;
         for (int i = 0; i < 5; i++)
         {
@@ -176,9 +205,14 @@ public class EndRound : State
                 }
                 winningPlayersCards.Add(card2);
             }
+            if (cardGhostStr.Equals(winningCardDesc))
+            {
+                if(cardGhostOwener.Contains("B"))
+                winningPlayersCards.Add(battleSystem.cardsDeckUi.ghostCardUi);
+            }
             for (int j = 0; j < 5; j++)
             {
-                if (boardCardsUi[j].GetComponent<CardUi>().cardDescription.ToString().Equals(winningCardDesc))
+                if (boardCardsUi[j].cardDescription.ToString().Equals(winningCardDesc))
                 {
                     winningBoardCards.Add(boardCardsUi[j]);
                     j = 5;

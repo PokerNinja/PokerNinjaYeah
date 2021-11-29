@@ -162,6 +162,7 @@ public class AnimationManager : Singleton<AnimationManager>
             dissolveAmount = 0;
             alphaTarget = 1;
         }
+        spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
         while (spriteRenderer.color.a != alphaTarget)
         {
             yield return new WaitForFixedUpdate();
@@ -424,7 +425,7 @@ public class AnimationManager : Singleton<AnimationManager>
         float targetFull = 2.61f;
         float targetEmpty = 14.72f;
 
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer,false);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
         if (selector.localPosition.x <= targetFull)
         {
             toFull = false;
@@ -824,19 +825,19 @@ public class AnimationManager : Singleton<AnimationManager>
             targetAlpha = 1f;
             alphaAmount = 0f;
         }
-        while(emojisWheel.alpha != targetAlpha)
+        while (emojisWheel.alpha != targetAlpha)
         {
             if (enable)
             {
-              alphaAmount += Time.deltaTime / duration;
+                alphaAmount += Time.deltaTime / duration;
             }
             else
             {
-              alphaAmount -= Time.deltaTime / duration;
+                alphaAmount -= Time.deltaTime / duration;
             }
             yield return new WaitForFixedUpdate();
             emojisWheel.alpha = alphaAmount;
-            if(alphaAmount> 1f || alphaAmount< 0)
+            if (alphaAmount > 1f || alphaAmount < 0)
             {
                 emojisWheel.alpha = targetAlpha;
                 break;
@@ -850,21 +851,32 @@ public class AnimationManager : Singleton<AnimationManager>
         float alphaAmoint = 0f;
         float burnAmoint = 0.6f;
         Color visionColor = Values.Instance.currentVisionColor;
+        Color ghostColor = Values.Instance.ghostOutlineColor;
         if (enable)
         {
             alphaAmoint = 1f;
             burnAmoint = 0f;
+            ghostColor = visionColor;
         }
         foreach (CardUi cardUi in winningPlayersCards)
         {
-            cardUi.spriteRenderer.material.SetColor("_OutlineColor", visionColor);
             if (cardUi.freeze)
             {
                 cardUi.spriteRenderer.material.SetFloat("_FadeAmount", burnAmoint);
             }
-            cardUi.spriteRenderer.material.SetFloat("_OutlineAlpha", alphaAmoint);
+            if (cardUi.isGhost)
+            {
+                cardUi.spriteRenderer.material.SetColor("_OutlineColor", ghostColor);
+            }
+            else
+            {
+                cardUi.spriteRenderer.material.SetColor("_OutlineColor", visionColor);
+                cardUi.spriteRenderer.material.SetFloat("_OutlineAlpha", alphaAmoint);
+            }
         }
     }
+
+
 
     public async void AnimateWinningHandToBoard(List<CardUi> winningPlayerCards, List<CardUi> losingBoardCards, Action UpdateValueEndRoutine)
     {
@@ -876,6 +888,10 @@ public class AnimationManager : Singleton<AnimationManager>
             //winningPlayerCards[i].EnableSelecetPositionZ(true);
             Vector3 targetPosition = new Vector3(losingBoardCards[i].transform.position.x, losingBoardCards[i].transform.position.y, winningPlayerCards[i].transform.position.z);
             StartCoroutine(SmoothMove(winningPlayerCards[i].transform, targetPosition, losingBoardCards[i].transform.localScale, Values.Instance.winningCardsMoveDuration, null, UpdateValueEndRoutine, null, null));
+        }
+        foreach(CardUi card in losingBoardCards)
+        {
+            StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, null));
         }
     }
 

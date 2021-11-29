@@ -52,6 +52,31 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
     /*21*/
     public PuStructInfo block_player_hand = new PuStructInfo
         (PowerUpNamesEnum.im1.ToString(), "FREEZE PLAYER HAND", "Freeze your hand, making it un-targetable.", "", 0, Constants.PlayerCardsTag, Constants.PoolCardTag);
+
+     /*22*/
+    public PuStructInfo strighter = new PuStructInfo
+        (PowerUpNamesEnum.sm2.ToString(), "Strighter", "Achive stright with four cards until the end of the round.", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+    
+     /*23*/
+    public PuStructInfo flusher = new PuStructInfo
+        (PowerUpNamesEnum.sm3.ToString(), "Flusher", "Achive flush with four cards until the end of the round.", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+    
+     /*24*/
+    public PuStructInfo smoke_player = new PuStructInfo
+        (PowerUpNamesEnum.s1.ToString(), "Smoke", "Smoke on of your cards. This card is now untargetable (Except for wind), and the Opponent can't see this card", "", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
+    
+     /*25*/
+    public PuStructInfo smoke_board = new PuStructInfo
+        (PowerUpNamesEnum.s2.ToString(), "Smoke", "Smoke the turn and the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+    
+     /*26*/
+    public PuStructInfo ghost_board = new PuStructInfo
+        (PowerUpNamesEnum.s3.ToString(), "GHOST", "Add a ghost card to the board.", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+    
+     /*27*/
+    public PuStructInfo ghost_player = new PuStructInfo
+        (PowerUpNamesEnum.sm1.ToString(), "GHOST", "Add a ghost card to your hand.", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
+
     /*9*/
     public PuStructInfo shuffle_board = new PuStructInfo
         (PowerUpNamesEnum.shuffle_board.ToString(), "TSUNAMI", "Shuffle new board cards", "", 0, Constants.PoolCardTag, Constants.PoolCardTag);
@@ -112,6 +137,18 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
                 return block_player_hand;
             case nameof(PowerUpNamesEnum.sflip):
                 return flip;
+            case nameof(PowerUpNamesEnum.sm2):
+                return strighter;
+            case nameof(PowerUpNamesEnum.sm3):
+                return flusher;
+            case nameof(PowerUpNamesEnum.s1):
+                return smoke_player;
+            case nameof(PowerUpNamesEnum.s2):
+                return smoke_board;
+            case nameof(PowerUpNamesEnum.s3):
+                return ghost_board;
+            case nameof(PowerUpNamesEnum.sm1):
+                return ghost_player;
            
                 /*draw_all = 3,
                 shuffle_board = 9,
@@ -164,6 +201,12 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         heal_1000 = 13,
         card_less_straight = 14,
         card_less_flush = 15,
+        sm2 = 22, //strighter
+        sm3= 23, //flusher
+        s1 = 24, //smoke_player
+        s2 = 25, //smoke_board
+        s3 = 26, //ghost_board
+        sm1 = 27, //ghost_player
     }
 
     #region // PuInfo
@@ -174,7 +217,7 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
                               ConvertTagIfEnemyActivate(GetPowerUpStruct(puName).releventCards2, isPlayerActivate)};
     }
 
-    private string ConvertTagIfEnemyActivate(string releventCards, bool isPlayerActivate)
+    public string ConvertTagIfEnemyActivate(string releventCards, bool isPlayerActivate)
     {
         if (!isPlayerActivate)
         {
