@@ -46,11 +46,11 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     {
         if (enable)
         {
-        spriteRenderer.sharedMaterial.SetFloat("_OnlyInnerOutline", 0.0f);
+            spriteRenderer.sharedMaterial.SetFloat("_OnlyInnerOutline", 0.0f);
         }
         else
         {
-        spriteRenderer.sharedMaterial.SetFloat("_OnlyInnerOutline", 1.0f);
+            spriteRenderer.sharedMaterial.SetFloat("_OnlyInnerOutline", 1.0f);
         }
     }
     #region Settings
@@ -169,7 +169,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     #region Visual
 
 
-    private void LoadSprite(bool revealCard)
+    public void LoadSprite(bool revealCard)
     {
         string sprite = cardDescription;
 
@@ -183,23 +183,22 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
 
 
-    public void FlipCard(bool reveal, Action ghostEffect, Action onFinish)
+    public void FlipCard(bool reveal, Action onFinish)
     {
         isFaceDown = !reveal;
         flipInProgress = true;
         StartCoroutine(AnimationManager.Instance.FlipCard(gameObject.transform, Values.Instance.cardFlipDuration, () => flipInProgress = false, () =>
         {
-            ghostEffect?.Invoke();
             LoadSprite(reveal);
         }, onFinish));
         StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform.parent, 1.15f, Values.Instance.cardFlipDuration, false, null));
     }
 
-    public void CardReveal(bool reveal, Action ghostEffect)
+    public void CardReveal(bool reveal)
     {
         if (reveal)
         {
-            FlipCard(reveal, ghostEffect, null);
+            FlipCard(reveal, null);
         }
     }
 
@@ -235,7 +234,44 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     }
 
 
+    public IEnumerator FadeGhost(bool fadeIn, Action onFinishDissolve)
+    {
 
+        float dissolveDuration = Values.Instance.cardBurnDuration * 2;
+        float dissolveAmount = 0.12f;
+        if (fadeIn)
+        {
+            dissolveAmount = 1f;
+        }
+        //  material.SetTextureScale("_FadeTex", new Vector2(offset, 0.07f));
+        SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.BurnCard);
+        while (dissolveAmount < 1 || dissolveAmount > 0.12f)
+        {
+            if (fadeIn)
+            {
+                dissolveAmount -= Time.deltaTime / dissolveDuration;
+            }
+            else
+            {
+                dissolveAmount += Time.deltaTime / dissolveDuration;
+            }
+            spriteRenderer.material.SetFloat("_FadeAmount", dissolveAmount);
+            yield return new WaitForFixedUpdate();
+            if (dissolveAmount >= 1 || dissolveAmount <= 0.12f)
+            {
+                if (!fadeIn)
+                {
+                    Activate(false);
+                }
+                else
+                {
+                    spriteRenderer.material.SetFloat("_FadeAmount", 0.12f);
+                }
+                onFinishDissolve?.Invoke();
+                break;
+            }
+        }
+    }
 
 
     internal IEnumerator CardSelectionPulse(SpriteRenderer spriteRenderer)

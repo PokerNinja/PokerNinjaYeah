@@ -339,7 +339,7 @@ public class BattleUI : MonoBehaviour
         {
             if (card.GetisFaceDown())
             {
-                card.FlipCard(true, null, null);
+                card.FlipCard(true,  null);
             }
         }
     }
