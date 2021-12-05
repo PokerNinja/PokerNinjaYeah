@@ -10,9 +10,9 @@ Material:
   m_Name: GhostCompLEX
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
   m_ShaderKeywords: COLORRAMPOUTLINE_ON CONTRAST_ON DISTORT_ON ETC1_EXTERNAL_ALPHA
-    GRADIENT2COL_ON GRADIENTCOLORRAMP_ON GRADIENT_ON INNEROUTLINE_ON ONLYINNEROUTLINE_ON
-    OUTBASEPIXELPERF_ON OUTBASE_ON OUTDIST_ON OUTTEX_ON OVERLAYMULT_ON _COLORRAMPOUTLINE_ON
-    _ONLYINNEROUTLINE_ON _OUTLINEDISTORTTOGGLE_ON _OUTLINEISPIXEL_ON _OUTLINETEXTOGGLE_ON
+    GRADIENT2COL_ON INNEROUTLINE_ON ONLYINNEROUTLINE_ON OUTBASEPIXELPERF_ON OUTBASE_ON
+    OUTDIST_ON OUTTEX_ON OVERLAYMULT_ON _COLORRAMPOUTLINE_ON _ONLYINNEROUTLINE_ON
+    _OUTLINEDISTORTTOGGLE_ON _OUTLINEISPIXEL_ON _OUTLINETEXTOGGLE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -133,9 +133,9 @@ Material:
     - _GlitchSize: 0.95
     - _Glow: 100
     - _GlowTexUsed: 0
-    - _GradBlend: 0.319
+    - _GradBlend: 0.417
     - _GradBoostX: 1.2
-    - _GradBoostY: 0.53
+    - _GradBoostY: 1.93
     - _GradIsRadial: 0
     - _GrassManualAnim: 1
     - _GrassManualToggle: 0
@@ -242,7 +242,7 @@ Material:
     - _GlowColor: {r: 0.9056604, g: 0, b: 0, a: 0.7294118}
     - _GradBotLeftCol: {r: 0.7568628, g: 0, b: 0.98823535, a: 1}
     - _GradBotRightCol: {r: 0, g: 0, b: 1, a: 1}
-    - _GradTopLeftCol: {r: 0.9725491, g: 0.9686275, b: 0.9568628, a: 1}
+    - _GradTopLeftCol: {r: 0.89887714, g: 0, b: 1, a: 1}
     - _GradTopRightCol: {r: 1, g: 0, b: 0, a: 1}
     - _GreyscaleTintColor: {r: 1, g: 1, b: 1, a: 1}
     - _HitEffectColor: {r: 0.76315784, g: 0, b: 1, a: 1}
