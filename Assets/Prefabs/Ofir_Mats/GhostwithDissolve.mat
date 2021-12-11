@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
   m_ShaderKeywords: COLORRAMPOUTLINE_ON CONTRAST_ON DISTORT_ON ETC1_EXTERNAL_ALPHA
     FADE_ON GRADIENT2COL_ON GRADIENTCOLORRAMP_ON GRADIENT_ON INNEROUTLINE_ON ONLYINNEROUTLINE_ON
-    OUTBASE_ON OVERLAYMULT_ON _COLORRAMPOUTLINE_ON _ONLYINNEROUTLINE_ON
+    OUTBASEPIXELPERF_ON OUTBASE_ON OVERLAYMULT_ON SHADOW_ON _COLORRAMPOUTLINE_ON
+    _ONLYINNEROUTLINE_ON _OUTLINEISPIXEL_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -117,7 +118,7 @@ Material:
     - _DistortAmount: 0.33
     - _DistortTexXSpeed: -0.8
     - _DistortTexYSpeed: 1
-    - _FadeAmount: 0.12
+    - _FadeAmount: -0.1
     - _FadeBurnGlow: 21.38
     - _FadeBurnTransition: 0.01
     - _FadeBurnWidth: 0.1
@@ -180,7 +181,7 @@ Material:
     - _OutlineDistortTexYSpeed: -2.7
     - _OutlineDistortToggle: 0
     - _OutlineGlow: 2.1
-    - _OutlineIsPixel: 0
+    - _OutlineIsPixel: 1
     - _OutlinePixelWidth: 6.46
     - _OutlineTexGrey: 0
     - _OutlineTexToggle: 0
@@ -200,8 +201,8 @@ Material:
     - _RoundWaveSpeed: 1.27
     - _RoundWaveStrength: 0.053
     - _ShadowAlpha: 0.307
-    - _ShadowX: -0.151
-    - _ShadowY: -0.208
+    - _ShadowX: 0
+    - _ShadowY: 0
     - _ShakeUvSpeed: 0
     - _ShakeUvX: 3
     - _ShakeUvY: 3.5

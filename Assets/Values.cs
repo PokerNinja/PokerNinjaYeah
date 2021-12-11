@@ -21,6 +21,7 @@ public class Values : Singleton<Values>
     public int delayTimerStart = 3;
     public int skillUseLimit = 1;
     public GamePhase resetSkillEvery = GamePhase.Round;
+    public int energyCostForDraw = 1;
     // public int replaceUseLimit = 1;
     //    public GamePhase resetReplaceEvery = GamePhase.Turn;
 
@@ -41,7 +42,10 @@ public class Values : Singleton<Values>
     public Color[] visionColorsByRank;
     public Color currentVisionColor;
     public Color ghostOutlineColor;
-    public float fadeFlusherDuration = 1f;
+    public float fadeFlusherDuration = 5f;
+    public float durationGlitchBeforeChange = 2f;
+    public float durationGlitchAfterChange = 2f;
+    public float coinFlipEndMoveDuration = 1f;
 
 
     //[GUIColor(1, 1, 0)]

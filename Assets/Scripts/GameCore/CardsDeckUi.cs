@@ -16,34 +16,34 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     [SerializeField] public Transform cardTransform;
     private List<Card> EnemyHand;
     private List<Card> playerHand;
-    Deck deck;
+    private Deck deck;
     public bool isPlayerFirst { set; get; }
     public List<Card> boardCards { get; set; }
     public Card ghostCard;
     private static CardsDeckUi deckUi;
-    private GameObject[] boardParents;
+    private CardSlot[] boardParents;
 
-    private Vector3 cardHandVector, cardVectorBoard;
+    private Vector3 cardHandVector, cardVectorBoard, cardVectorGhostBoard;
 
     ObjectPooler objectPooler;
 
 
 
 
-    public GameObject playerCardAParent;
-    public GameObject playerCardBParent;
-    public GameObject enemyCardAParent;
-    public GameObject enemyCardBParent;
-    public GameObject deckCardAParent;
-    public GameObject deckCardBParent;
+    public CardSlot playerCardAParent;
+    public CardSlot playerCardBParent;
+    public CardSlot enemyCardAParent;
+    public CardSlot enemyCardBParent;
+    public CardSlot deckCardAParent;
+    public CardSlot deckCardBParent;
 
-    public GameObject flopAParent;
-    public GameObject flopBParent;
-    public GameObject flopCParent;
-    public GameObject turnParent;
-    public GameObject riverParent;
-
-    public GameObject[] ghostParents;
+    public CardSlot flopAParent;
+    public CardSlot flopBParent;
+    public CardSlot flopCParent;
+    public CardSlot turnParent;
+    public CardSlot riverParent;
+    public CardSlot[] allCardSlots;
+    public CardSlot[] ghostParents;
 
     public List<CardUi> playerCardsUi;
     public List<CardUi> enemyCardsUi;
@@ -53,6 +53,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     public Material burnMaterial;
     public Material dissolveMaterial;
     public Material ghostMaterial;
+    public Material glitchMaterial;
     private PokerHandRankingTable poker;
 
     #region Settings
@@ -71,10 +72,12 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     {
         objectPooler = ObjectPooler.Instance;
         AddPhysics2DRaycaster();
-        boardParents = new GameObject[] { flopAParent, flopBParent, flopCParent, turnParent, riverParent };
+        boardParents = new CardSlot[] { flopAParent, flopBParent, flopCParent, turnParent, riverParent };
         cardHandVector = new Vector3(1f, 1f, 1f);
         cardVectorBoard = new Vector3(0.75f, 0.75f, 0.75f);
+        cardVectorGhostBoard = new Vector3(0.6f, 0.6f, 0.6f);
         poker = new PokerHandRankingTable();
+        allCardSlots = new CardSlot[] { playerCardAParent, playerCardBParent, enemyCardAParent, enemyCardBParent, flopAParent, flopBParent, flopCParent, turnParent, riverParent };
     }
 
     private Card cardToSave;
@@ -315,7 +318,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         float delayBetweenDealHandsCards = Values.Instance.delayBetweenDealPlayersCards;
         float delayBetweenHandsAndFlopDeal = Values.Instance.delayBetweenHandsAndFlopDeal;
 
-        GameObject[] parentForHands = CreateParentForHands();
+        CardSlot[] parentForHands = CreateParentForHands();
         string[] cardName = CreateCardNamesForHands();
         bool dealToPlayer = isPlayerFirst;
         for (int i = 0; i < 4; i++)
@@ -368,10 +371,10 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         yield break;
     }
-    private CardUi GetCardUiByName(string cardTarget2)
+    public CardUi GetCardUiByName(string cardTarget2)
     {
         List<CardUi> allCardsUi = playerCardsUi.Concat(enemyCardsUi).Concat(boardCardsUi).ToList();
-        for (int i = 0; i <= allCardsUi.Count; i++)
+        for (int i = 0; i < allCardsUi.Count; i++)
         {
             if (allCardsUi[i].cardPlace.Equals(cardTarget2))
             {
@@ -383,7 +386,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     private CardUi GetCardUiByDescription(string cardDesc)
     {
         List<CardUi> allCardsUi = playerCardsUi.Concat(enemyCardsUi).Concat(boardCardsUi).ToList();
-        for (int i = 0; i <= allCardsUi.Count; i++)
+        for (int i = 0; i < allCardsUi.Count; i++)
         {
             if (allCardsUi[i].cardDescription.Equals(cardDesc))
             {
@@ -392,6 +395,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         return null;
     }
+
+
 
     private void RemoveFromList(List<CardUi> listToRemoveFrom, CardUi cardToDestroy)
     {
@@ -418,6 +423,10 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         cardToReset.transform.SetParent(objectPooler.transform);
         // cardToReset.tag = "Card";
         cardToReset.InitCardsTag(Constants.PoolCardTag);
+        if (cardToReset.underSmoke)
+        {
+            EnableCardSmoke(false, true, cardToReset);
+        }
         objectPooler.ReturnCard(cardToReset);
     }
 
@@ -599,23 +608,35 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return playerHandWithBoard;
     }
 
-    private void CardCreatorUi(Card newCard, bool isFaceDown, bool aboveDarkScreen, GameObject cardParent, string cardPlace, Action disableDarkScreen, bool isCloseDrawer, int indexToInsert)
+    private void CardCreatorUi(Card newCard, bool isFaceDown, bool aboveDarkScreen, CardSlot cardParent, string cardPlace, Action disableDarkScreen, bool isCloseDrawer, int indexToInsert)
     {
+        Action DarkCardUnderSmoke = null;
         Vector3 cardScale;
         // TODO add list value to catch the object and store it
         string cardTag = "Card" + cardPlace.Substring(0, 1);
         CardUi cardObject = objectPooler.SpwanCardFromPool(cardTag);
         cardScale = cardHandVector;
         cardObject.transform.SetParent(cardParent.transform);
-        if (cardParent.transform.parent.name == "Board" || indexToInsert == -10)
+        if (cardParent.transform.parent.name.Contains("Board") || indexToInsert == -10)
         {
-            cardScale = cardVectorBoard;
+            if (cardParent.transform.parent.name.Contains("Board") && indexToInsert == -10)
+            {
+                cardScale = cardVectorGhostBoard;
+            }
+            else
+            {
+                cardScale = cardVectorBoard;
+            }
         }
 
         cardObject.name = cardPlace;
         cardObject.transform.position = new Vector3(cardTransform.position.x, cardTransform.position.y, 1); ;
         cardObject.transform.localScale = cardTransform.localScale;
-        cardObject.Init(cardTag, newCard, isFaceDown, aboveDarkScreen, cardPlace);
+        cardObject.Init(cardTag, newCard.ToString(CardToStringFormatEnum.ShortCardName), isFaceDown, aboveDarkScreen, cardPlace);
+        if (cardParent.smokeEnable)
+        {
+            DarkCardUnderSmoke= ()=> EnableCardSmoke(true, cardParent.smokeActivateByPlayer, cardObject);
+        }
         Vector3 targetPosition = new Vector3(cardParent.transform.position.x, cardParent.transform.position.y, cardObject.transform.position.z);
         Action closeDrawer = null;
         if (isCloseDrawer)
@@ -630,13 +651,20 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardObject.spriteRenderer.material = ghostMaterial;
             cardObject.LoadSprite(true);
             AddCardToList(cardTag, cardObject, indexToInsert);
-            StartCoroutine(cardObject.FadeGhost(true, null));
+
+            StartCoroutine(cardObject.FadeGhost(true, disableDarkScreen));
         }
         else
         {
-        StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
+            cardObject.spriteRenderer.material = dissolveMaterial;
+
+            StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
         Values.Instance.cardDrawMoveDuration, null, () =>
-            cardObject.CardReveal(!isFaceDown), disableDarkScreen, () =>
+        {
+            DarkCardUnderSmoke?.Invoke();
+            cardObject.CardReveal(!isFaceDown);
+        }
+           , disableDarkScreen, () =>
         {
             closeDrawer?.Invoke();
             AddCardToList(cardTag, cardObject, indexToInsert);
@@ -1014,6 +1042,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return handsOptions[0];
     }
 
+
+
     public SuitEnum highestSuitForFlusher;
     private Hand GetHighestFlusherFromHands(List<Hand> handsWithFlusher)
     {
@@ -1146,7 +1176,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     }
 
 
-    public GameObject GetParentByPlace(string cardPlace)
+    public CardSlot GetParentByPlace(string cardPlace)
     {
         switch (cardPlace)
         {
@@ -1172,20 +1202,22 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 return deckCardAParent;
             case Constants.Deck2:
                 return deckCardBParent;
+            default:
+                break;
         }
         return null;
     }
 
-    private GameObject[] CreateParentForHands()
+    private CardSlot[] CreateParentForHands()
     {
-        GameObject[] parents;
+        CardSlot[] parents;
         if (isPlayerFirst)
         {
-            parents = new GameObject[] { playerCardAParent, enemyCardAParent, playerCardBParent, enemyCardBParent };
+            parents = new CardSlot[] { playerCardAParent, enemyCardAParent, playerCardBParent, enemyCardBParent };
         }
         else
         {
-            parents = new GameObject[] { enemyCardAParent, playerCardAParent, enemyCardBParent, playerCardBParent };
+            parents = new CardSlot[] { enemyCardAParent, playerCardAParent, enemyCardBParent, playerCardBParent };
         }
         return parents;
     }
@@ -1221,21 +1253,20 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     #region Pu Functions
 
 
-    public void GhostCardActivate(Constants.CardsOwener cardsOwener, Action UpdateRank)
+    public void GhostCardActivate(Constants.CardsOwener cardsOwener, Action UpdateRank, Action Reset)
     {
         if (ghostCardUi != null)
         {
-            DestroyCardObject(ghostCardUi.cardPlace, () => AddGhostCard(cardsOwener, UpdateRank));
+            DestroyCardObject(ghostCardUi.cardPlace, () => AddGhostCard(cardsOwener, UpdateRank, Reset));
         }
         else
         {
-            AddGhostCard(cardsOwener, UpdateRank);
+            AddGhostCard(cardsOwener, UpdateRank, Reset);
         }
     }
 
-    internal void EnableCardSmoke(bool enable, bool isPlayerActivate, string cardPlace)
+    internal void EnableCardSmoke(bool enable, bool isPlayerActivate, CardUi targetCard)
     {
-        CardUi targetCard = GetCardUiByName(cardPlace);
         if (targetCard != null)
         {
 
@@ -1250,7 +1281,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             }
         }
     }
-    internal void AddGhostCard(Constants.CardsOwener cardsOwener, Action UpdateRank)
+    internal void AddGhostCard(Constants.CardsOwener cardsOwener, Action UpdateRank, Action Reset)
     {
 
         Card newCard = deck.Pop();
@@ -1271,7 +1302,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 index = 2;
                 break;
         }
-        CardCreatorUi(newCard, false, true, ghostParents[index], Constants.ghostCardsNames[index], UpdateRank, true, -10);
+        CardCreatorUi(newCard, false, true, ghostParents[index], Constants.ghostCardsNames[index], UpdateRank += Reset, true, -10);
     }
 
     internal IEnumerator Draw2Cards(bool isEnemy, Action endAction)
@@ -1308,7 +1339,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 if (cardToSee.GetisFaceDown())
                 {
-                    cardToSee.FlipCard(true,  () => cardToSee.ApplyEyeEffect(endAction, true, false));
+                    cardToSee.FlipCard(true, () => cardToSee.ApplyEyeEffect(endAction, true, false));
                 }
                 else
                 {
@@ -1317,7 +1348,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             }
             else
             {
-                cardToSee.FlipCard(cardToSee.GetisFaceDown(),  () => cardToSee.ApplyEyeEffect(endAction, true, false));
+                cardToSee.FlipCard(cardToSee.GetisFaceDown(), () => cardToSee.ApplyEyeEffect(endAction, true, false));
             }
         }
         if (cardToSee.whosCards.Equals(Constants.CardsOwener.Player))
@@ -1326,7 +1357,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         if (cardToSee.whosCards.Equals(Constants.CardsOwener.Enemy))
         {
-            cardToSee.FlipCard(cardToSee.GetisFaceDown(),  () => cardToSee.ApplyEyeEffect(endAction, cardToSee.GetisFaceDown(), false));
+            cardToSee.FlipCard(cardToSee.GetisFaceDown(), () => cardToSee.ApplyEyeEffect(endAction, cardToSee.GetisFaceDown(), false));
 
         }
     }
@@ -1387,12 +1418,81 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert);
         }
     }
+
+    internal void UpdateCardValue(string cardTarget, int value, Action disableDarkScreen)
+    {
+        CardUi pickedCardUi = GetCardUiByName(cardTarget);
+        Card pickedCard = Card.StringToCard(pickedCardUi.cardDescription);
+        Card newCard = new Card(pickedCard.ConvertIntToValue(pickedCard.GetCardValueInSimpleInt() + value), pickedCard.CardSuit);
+        CardUi targetCardUi = GetCardUiByDescription(newCard.ToString(CardToStringFormatEnum.ShortCardName));
+        if (targetCardUi != null)
+        {
+            targetCardUi.cardDescription = pickedCard.ToString(CardToStringFormatEnum.ShortCardName);
+            if (!targetCardUi.GetisFaceDown())
+            {
+                StartCoroutine(GlitchEffect(targetCardUi, null));
+            }
+            UpdateCardsList(targetCardUi.cardPlace, pickedCard, true);
+        }
+        else
+        {
+            ReplaceCardsInDeck(newCard, pickedCard);
+        }
+
+        pickedCardUi.cardDescription = newCard.ToString(CardToStringFormatEnum.ShortCardName);
+        if (!pickedCardUi.GetisFaceDown())
+        {
+            StartCoroutine(GlitchEffect(pickedCardUi, disableDarkScreen));
+        }
+        else
+        {
+            disableDarkScreen?.Invoke();
+        }
+        UpdateCardsList(pickedCardUi.cardPlace, newCard, true);
+    }
+
+    private void ReplaceCardsInDeck(Card targetCard, Card newCard)
+    {
+        Card[] cards = deck.ToArray();
+        for (int i = 0; i < cards.Length; i++)
+        {
+            if (cards[i].ToString(CardToStringFormatEnum.ShortCardName).Equals(targetCard.ToString(CardToStringFormatEnum.ShortCardName)))
+            {
+                cards[i] = newCard;
+                i = 52;
+            }
+        }
+        deck = new Deck();
+        for (int i = cards.Length - 1; i >= 0; i--)
+        {
+            deck.Push(cards[i]);
+        }
+    }
+
+    private IEnumerator GlitchEffect(CardUi pickedCardUi, Action Reset)
+    {
+        pickedCardUi.spriteRenderer.material = glitchMaterial;
+        yield return new WaitForSeconds(Values.Instance.durationGlitchBeforeChange);
+        pickedCardUi.LoadSprite(true);
+        yield return new WaitForSeconds(Values.Instance.durationGlitchAfterChange);
+        pickedCardUi.spriteRenderer.material = dissolveMaterial;
+        Reset?.Invoke();
+    }
+
     internal void SwapTwoCards(string cardPlace1, string cardPlace2, Action DisableDarkScreen)
     {
 
         //COPy WASTE
         CardUi cardSwap1 = GameObject.Find(cardPlace1).GetComponent<CardUi>();
         CardUi cardSwap2 = GameObject.Find(cardPlace2).GetComponent<CardUi>();
+        if (cardSwap1.underSmoke)
+        {
+            EnableCardSmoke(false, false, cardSwap1);
+        }
+        if (cardSwap2.underSmoke)
+        {
+            EnableCardSmoke(false, false, cardSwap1);
+        }
         SwapCardUiList(cardSwap1, cardSwap2);
         bool card1WasFaceDown = cardSwap1.GetisFaceDown();
         bool card2WasFaceDown = cardSwap2.GetisFaceDown(); // NOT IMPLENMANETD
@@ -1454,7 +1554,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             }
             else if (tagTo == Constants.EnemyCardsTag)
             {
-                cardToFlip.FlipCard(false,  null);
+                cardToFlip.FlipCard(false, null);
 
             }
         }
@@ -1465,8 +1565,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         SwapTwoCards(Constants.PlayerCard1, Constants.EnemyCard1, null);
         SwapTwoCards(Constants.EnemyCard2, Constants.PlayerCard2, DisableDarkScreen);
     }
-
-
 
 
     private void SwitchCardsInfo(CardUi cardSwap1, CardUi cardSwap2)
@@ -1529,6 +1627,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     }
     public void DeleteAllCards(Action DealHands)
     {
+        ghostCardUi = null;
+        ghostCard = null;
         ResetUiLists();
         foreach (CardUi cardToDestroy in FindAllCardsObjects())
         {
@@ -1553,16 +1653,5 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     }
 
 }
-/* internal void Blind2RandomCards(bool isPlayerActivate, string firstToBlind, string secondToBlind, Action endAction)
-{
 
-    BlindCard(isPlayerActivate, firstToBlind, null);
-    BlindCard(isPlayerActivate, secondToBlind, endAction);
-}
-
-internal void BlindCard(bool isPlayerActivate, string cardTarget2, Action onFinish)
-{
-    CardUi cardToBlind = GameObject.Find(cardTarget2).GetComponent<CardUi>();
-    cardToBlind.FlipCard(false, onFinish);
-}*/
 

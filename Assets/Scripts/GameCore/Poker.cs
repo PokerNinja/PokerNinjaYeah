@@ -313,8 +313,48 @@ namespace StandardPokerHandEvaluator
             }
             return 0;
         }
-    }
 
+        public CardEnum ConvertIntToValue(int valueInInt)
+        {
+            switch (valueInInt)
+            {
+                
+                case 2:
+                case 15:
+                    return CardEnum.Two;
+                case 3:
+                case 16:
+                    return CardEnum.Three;
+                case 4:
+                    return CardEnum.Four;
+                case 5:
+                    return CardEnum.Five;
+                case 6:
+                    return CardEnum.Six;
+                case 7:
+                    return CardEnum.Seven;
+                case 8:
+                    return CardEnum.Eight;
+                case 9:
+                    return CardEnum.Nine;
+                case 10:
+                    return CardEnum.Ten;
+                case 11:
+                    return CardEnum.Jack;
+                case 12:
+                    return CardEnum.Queen;
+                case 0:
+                case 13:
+                    return CardEnum.King;
+                case 1:
+                case 14:
+                    return CardEnum.Ace;
+                default:
+                    break;
+            }
+            return CardEnum.Two;
+        }
+    }
 
 
     /// <summary>
@@ -778,11 +818,6 @@ namespace StandardPokerHandEvaluator
             return this.Pop();
         }
 
-        public int getIndexOf(Card indexOfCard)
-        {
-
-            return this.getIndexOf(indexOfCard);
-        }
     }
 
 

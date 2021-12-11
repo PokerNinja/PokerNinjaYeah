@@ -1,3 +1,5 @@
+using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,8 +12,8 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     public UnityEvent onClick = new UnityEvent();
     public UnityEvent onLongPress = new UnityEvent();
     private float holdTime = 0.3f;
-
-
+    public SpriteRenderer spriteRenderer;
+    public Animator animator;
     private bool held = false;
     /*public void OnClick()
     {
@@ -78,6 +80,8 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     }
     public void OnPointerUp(PointerEventData eventData)
     {
+        LoadSpriteBtn(false);
+        Debug.LogError("UUp");
 
         CancelInvoke("OnLongPress");
 
@@ -99,14 +103,30 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
     public void OnPointerDown(PointerEventData eventData)
     {
-
+        
+       LoadSpriteBtn(true);
         held = false;
         Invoke("OnLongPress", holdTime);
+        Debug.LogError("DDown");
 
     }
+    private void LoadSpriteBtn(bool press)
+    {
+        animator.SetBool("enable", !press);
+       /* string imgName;
+        if (press)
+        {
+            imgName = "draw_press";
+        }
+        else
+        {
+            imgName = "draw1";
+        }
+        spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + imgName, typeof(Sprite)) as Sprite;*/
+    }
+
     public void OND()
     {
-
         if (!BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.ShowPuInfo(transform.position, "replace", Constants.ReplacePuInfo);
@@ -116,7 +136,6 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
     private void OnLongPress()
     {
-
         held = true;
         onLongPress.Invoke();
     }

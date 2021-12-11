@@ -17,7 +17,7 @@ public class PowerUpState : State
     private Vector2 posTarget2;
     private int puIndex;
     private int energyCost;
-    public PowerUpState(BattleSystem battleSystem, bool isPlayerActivate, int energyCost,string powerUpName, string cardTarget1, string cardTarget2, Vector2 posTarget1, Vector2 posTarget2, int puIndex) : base(battleSystem)
+    public PowerUpState(BattleSystem battleSystem, bool isPlayerActivate, int energyCost, string powerUpName, string cardTarget1, string cardTarget2, Vector2 posTarget1, Vector2 posTarget2, int puIndex) : base(battleSystem)
     {
         this.isPlayerActivate = isPlayerActivate;
         this.powerUpName = powerUpName;
@@ -53,13 +53,13 @@ public class PowerUpState : State
                 if (puIndex != -1)
                 {
                     yield return new WaitForSecondsRealtime(1f);
-                    if(powerUpName.Substring(0, 1).Equals("s"))
+                    if (powerUpName.Substring(0, 1).Equals("s"))
                     {
                         IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
                     }
                     else
                     {
-                    battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
+                        battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
                     }
                 }
                 else
@@ -103,7 +103,7 @@ public class PowerUpState : State
             }
             else
             {
-               // battleSystem.selectCardsMode = true;
+                // battleSystem.selectCardsMode = true;
                 if (waitForAction)
                 { //DRAW 2 CARDS
                     EnableZpoitionForCardsList(battleSystem.cardsDeckUi.playerCardsUi, true);
@@ -131,7 +131,7 @@ public class PowerUpState : State
         {
             battleSystem.DissolvePuAfterUse(isPlayerActivate, puIndex);
         }
-        else if(puIndex == -1 && isPlayerActivate)
+        else if (puIndex == -1 && isPlayerActivate)
         {
             battleSystem.ReduceSkillUse();
         }
@@ -139,7 +139,7 @@ public class PowerUpState : State
         {
             battleSystem.ReduceEnergy(energyCost);
             battleSystem.selectMode = false;
-          //  battleSystem.playerPuInProcess = true;
+            //  battleSystem.playerPuInProcess = true;
         }
         switch (powerUpName)
         {
@@ -160,7 +160,7 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.w1): //swap_player_enemy = w1
                 {
 
-                    battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName,isPlayerActivate)[0]);
+                    battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[0]);
                     battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[1]);
                     battleSystem.SwapTwoCards(cardTarget1, cardTarget2);
                     break;
@@ -180,10 +180,10 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.shuffle_board): //shuffle_board
                 {
                     battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[0]);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[0] , 0.1f, false, true, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[1] , 0.35f, false, false, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[2] , 0.6f, false, false, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[3] , 0.85f, false, false, false);
+                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[0], 0.1f, false, true, false);
+                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[1], 0.35f, false, false, false);
+                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], 0.6f, false, false, false);
+                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[3], 0.85f, false, false, false);
                     battleSystem.DestroyAndDrawCard(Constants.BoardCards[4], 1.1f, true, false, true);
                     break;
                 }
@@ -208,7 +208,7 @@ public class PowerUpState : State
                     battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.PlayerCard2), 0.1f, false, true, false);
                     battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard2), 0.4f, false, false, false);
                     battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.PlayerCard1), 0.7f, false, false, false);
-                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard1),1f, false, false, false);
+                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard1), 1f, false, false, false);
                     battleSystem.DestroyAndDrawCard(Constants.BoardCards[0], 1.3f, false, false, false);
                     battleSystem.DestroyAndDrawCard(Constants.BoardCards[1], 1.6f, false, false, false);
                     if (boardCount == 3)
@@ -262,7 +262,7 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.s1): // 24, //smoke_player
 
                 {
-                    battleSystem.SmokeCardPu(cardTarget2,isPlayerActivate);
+                    battleSystem.SmokeCardPu(true,cardTarget2, isPlayerActivate, true, false);
                     break;
                 }
             case nameof(PowerUpNamesEnum.s2): // 25, //smoke_board
@@ -281,6 +281,18 @@ public class PowerUpState : State
 
                 {
                     battleSystem.GhostPu(isPlayerActivate, true);
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.s4): //player value up 2
+            case nameof(PowerUpNamesEnum.s6): //board value up 2
+                {
+                    battleSystem.ChangeValuePu(cardTarget2, 2);
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.s5): //player value down 2
+            case nameof(PowerUpNamesEnum.s7): //board value down 2
+                {
+                    battleSystem.ChangeValuePu(cardTarget2, -2);
                     break;
                 }
         }
@@ -316,7 +328,10 @@ public class PowerUpState : State
         }
         foreach (CardUi card in cardsList)
         {
-            card.SetSelection(enable, puElement);
+            if (card.underSmoke && puElement.Equals("w") || card.underSmoke && puElement.Equals("f") || !card.underSmoke)
+            {
+                card.SetSelection(enable, puElement);
+            }
         }
     }
 
@@ -350,5 +365,6 @@ public class PowerUpState : State
         {
             battleSystem.sameCardsSelection = true;
         }
+        battleSystem.Interface.FadeCancelSelectModeScreen(true);
     }
 }

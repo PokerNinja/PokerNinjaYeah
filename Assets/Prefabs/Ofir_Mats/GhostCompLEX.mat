@@ -43,7 +43,7 @@ Material:
         m_Scale: {x: 1, y: 0.73}
         m_Offset: {x: 0, y: 0.12}
     - _FadeTex:
-        m_Texture: {fileID: 2800000, guid: 48f72f9dd238f974aa27382ba845daf6, type: 3}
+        m_Texture: {fileID: 2800000, guid: 0c5ba51e009b87b43a8e12fda9c0b217, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _GlowTex:
@@ -115,13 +115,13 @@ Material:
     - _ColorSwapGreenLuminosity: -0.38
     - _ColorSwapRedLuminosity: 1
     - _Contrast: 3.74
-    - _DistortAmount: 0.43
+    - _DistortAmount: 0.33
     - _DistortTexXSpeed: -0.8
     - _DistortTexYSpeed: 1
-    - _FadeAmount: 0.07
-    - _FadeBurnGlow: 40
+    - _FadeAmount: 0.12
+    - _FadeBurnGlow: 22
     - _FadeBurnTransition: 0.01
-    - _FadeBurnWidth: 0.088
+    - _FadeBurnWidth: 0.1
     - _FishEyeUvAmount: 0
     - _FlickerAlpha: 0.131
     - _FlickerFreq: 1.4
@@ -160,7 +160,7 @@ Material:
     - _HsvShift: 44
     - _InnerOutlineAlpha: 1
     - _InnerOutlineGlow: 1
-    - _InnerOutlineThickness: 1.62
+    - _InnerOutlineThickness: 3
     - _MaxXUV: 1
     - _MaxYUV: 1
     - _MinXUV: 0
@@ -187,7 +187,7 @@ Material:
     - _OutlineTexToggle: 1
     - _OutlineTexXSpeed: -1.4
     - _OutlineTexYSpeed: -0.6
-    - _OutlineWidth: 0.09
+    - _OutlineWidth: 0.064
     - _OverlayBlend: 0.306
     - _OverlayGlow: 2.5
     - _PinchUvAmount: 0
@@ -238,7 +238,7 @@ Material:
     - _ColorSwapBlue: {r: 1, g: 1, b: 1, a: 1}
     - _ColorSwapGreen: {r: 1, g: 1, b: 1, a: 1}
     - _ColorSwapRed: {r: 0.061638594, g: 0.7924528, b: 0, a: 1}
-    - _FadeBurnColor: {r: 0.8470589, g: 0.34509805, b: 1, a: 1}
+    - _FadeBurnColor: {r: 0.7254902, g: 0, b: 1, a: 1}
     - _GlowColor: {r: 0.9056604, g: 0, b: 0, a: 0.7294118}
     - _GradBotLeftCol: {r: 0.7568628, g: 0, b: 0.98823535, a: 1}
     - _GradBotRightCol: {r: 0, g: 0, b: 1, a: 1}
@@ -248,7 +248,7 @@ Material:
     - _HitEffectColor: {r: 0.76315784, g: 0, b: 1, a: 1}
     - _HologramStripeColor: {r: 0, g: 0, b: 0, a: 1}
     - _InnerOutlineColor: {r: 0.544549, g: 0.17132434, b: 0.6603774, a: 1}
-    - _OutlineColor: {r: 0.84572685, g: 0.3443396, b: 1, a: 1}
+    - _OutlineColor: {r: 0.7254902, g: 0, b: 1, a: 1}
     - _OverlayColor: {r: 0.76555014, g: 0, b: 1, a: 1}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 1}
     - _ShineColor: {r: 1, g: 1, b: 1, a: 1}

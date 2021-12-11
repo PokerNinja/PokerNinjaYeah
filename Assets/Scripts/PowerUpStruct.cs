@@ -63,7 +63,7 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
     
      /*24*/
     public PuStructInfo smoke_player = new PuStructInfo
-        (PowerUpNamesEnum.s1.ToString(), "Smoke", "Smoke on of your cards. This card is now untargetable (Except for wind), and the Opponent can't see this card", "", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.s1.ToString(), "Smoke", "Smoke on of your cards. This card is now untargetable (Except for wind), and the Opponent can't see this card", "Choose one card to smoke", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
     
      /*25*/
     public PuStructInfo smoke_board = new PuStructInfo
@@ -76,6 +76,18 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
      /*27*/
     public PuStructInfo ghost_player = new PuStructInfo
         (PowerUpNamesEnum.sm1.ToString(), "GHOST", "Add a ghost card to your hand.", "", 0, Constants.PlayerCardsTag, Constants.PoolCardTag);
+     /*28*/
+    public PuStructInfo player_value_up_2 = new PuStructInfo
+        (PowerUpNamesEnum.s4.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
+     /*29*/
+    public PuStructInfo player_value_down_2 = new PuStructInfo
+        (PowerUpNamesEnum.s5.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
+     /*30*/
+    public PuStructInfo board_value_up_2 = new PuStructInfo
+        (PowerUpNamesEnum.s6.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
+     /*31*/
+    public PuStructInfo board_value_down_2 = new PuStructInfo
+        (PowerUpNamesEnum.s7.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
 
     /*9*/
     public PuStructInfo shuffle_board = new PuStructInfo
@@ -149,6 +161,14 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
                 return ghost_board;
             case nameof(PowerUpNamesEnum.sm1):
                 return ghost_player;
+            case nameof(PowerUpNamesEnum.s4):
+                return player_value_up_2;
+            case nameof(PowerUpNamesEnum.s5):
+                return player_value_down_2;
+            case nameof(PowerUpNamesEnum.s6):
+                return board_value_up_2;
+            case nameof(PowerUpNamesEnum.s7):
+                return board_value_down_2;
            
                 /*draw_all = 3,
                 shuffle_board = 9,
@@ -207,6 +227,10 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         s2 = 25, //smoke_board
         s3 = 26, //ghost_board
         sm1 = 27, //ghost_player
+        s4 = 28, // player value up 2
+        s5 = 29, //player value down 2
+        s6 = 30, //board value up 2
+        s7 = 31, //board value down 2
     }
 
     #region // PuInfo

@@ -12,6 +12,7 @@ using UnityEngine.UI;
 public class BattleUI : MonoBehaviour
 {
 
+    [SerializeField] public CoinFlipScript coinFlipTurn;
     [SerializeField] public TextMeshProUGUI playerNameText;
     [SerializeField] public TextMeshProUGUI enemyNameText;
     [SerializeField] public GameObject[] playerLifeUi;
@@ -110,8 +111,9 @@ public class BattleUI : MonoBehaviour
     public Transform emojiStartPosEnemy;
     public Transform emojiTarget;
 
-    public ParticleSystem pSmokePS;
-    public ParticleSystem eSmokePS;
+    public ParticleSystem hideSmokeBoard;
+    public ParticleSystem hideSmokeHand;
+    public ParticleSystem showSmoke;
 
     [SerializeField] private GameObject turnBtn;
     [SerializeField] private SpriteRenderer turnBtnSpriteREnderer;
@@ -239,8 +241,26 @@ public class BattleUI : MonoBehaviour
         }
         StartCoroutine(AnimationManager.Instance.LoseLifeAnimation(spTarget, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(spTarget, false, Values.Instance.LoseLifeDuration, null))));
         StartCoroutine(AnimationManager.Instance.SpinCoin(tTarget, 0.4f, null));
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinLose,true);
     }
 
+
+    internal IEnumerator CoinFlipStartGame(bool isPlayerStart)
+    {
+      //  coinFlipTurn.RevealCoinFlip();
+        yield return new WaitForSeconds(1);
+        float yPosition = 7f;
+        if (isPlayerStart)
+        {
+            yPosition = -7;
+        }
+        Vector3 targetPosition = new Vector3(0, yPosition, 0);
+        StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, new Vector3(0,0,0), coinFlipTurn.transform.localScale, Values.Instance.coinFlipEndMoveDuration, null, null, 
+            () => coinFlipTurn.SetDirection(isPlayerStart), () => coinFlipTurn.FlipCoinAnimation()));
+        yield return new WaitForSeconds(3);
+        //Todo dont stop
+        StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform,targetPosition,new Vector2(0.1f,0.1f),Values.Instance.coinFlipEndMoveDuration,null,() => coinFlipTurn.gameObject.SetActive(false),null,null));
+    }
     internal void InitAvatars()
     {
         playerAvatarAnimator.Play("idle", 0, 0f);
@@ -369,14 +389,19 @@ public class BattleUI : MonoBehaviour
     }
 
 
-    public void EnableDarkScreen(bool isPlayerActivate, bool enable, Action ResetSortingOrder)
+    public void EnableDarkScreen(bool isPlayerActivateSelectMode, bool enable, Action ResetSortingOrder)
     {
         darkScreenRenderer.GetComponent<BoxCollider2D>().enabled = enable;
         AnimationManager.Instance.FadeBurnDarkScreen(darkScreenRenderer.material, enable, ResetSortingOrder);
-        if (isPlayerActivate)
+        if (isPlayerActivateSelectMode && !enable)
         {
-            StartCoroutine(AnimationManager.Instance.AlphaAnimation(cancelDarkScreenRenderer, enable, Values.Instance.darkScreenAlphaDuration, null));
+            FadeCancelSelectModeScreen(false);
         }
+    }
+
+    public void FadeCancelSelectModeScreen(bool enable)
+    {
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(cancelDarkScreenRenderer, enable, Values.Instance.darkScreenAlphaDuration, null));
     }
 
     public void EnableVisionClick(bool enable)
@@ -550,13 +575,13 @@ public class BattleUI : MonoBehaviour
             UpdateVisionColor(currentHandRank);
             currentRankNumber.text = "" + currentHandRank;
             StartCoroutine(AnimationManager.Instance.PulseSize(true, currentRankNumber.transform, 1.2f, Values.Instance.pulseDuration, false, null));
-            if (lastHandRank > currentHandRank)
+            if (lastHandRank < currentHandRank)
             {
-                //SoundManager.Instance.PlaySingleSound(HAPPY);
+                SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankDown);
             }
             else
             {
-                //SoundManager.Instance.PlaySingleSound(SAD);
+                SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankUp);
             }
         }
         lastHandRank = currentHandRank;
@@ -696,7 +721,7 @@ public class BattleUI : MonoBehaviour
 
     }
 
-    public void FadeStrighterOrFlusher(bool isPlayer, bool isFlusher, bool enable)
+    public void FadeStrighterOrFlusher(bool isPlayer, bool isFlusher, bool enable, Action Reset)
     {
         GameObject target;
         if (isPlayer)
@@ -725,24 +750,18 @@ public class BattleUI : MonoBehaviour
         if (enable)
         {
             target.SetActive(true);
-            StartCoroutine(AnimationManager.Instance.AlphaAnimation(sp, true, Values.Instance.fadeFlusherDuration, null));
+            StartCoroutine(AnimationManager.Instance.AlphaFadeIn(sp, Values.Instance.fadeFlusherDuration, Reset));
         }
         else
         {
-            StartCoroutine(AnimationManager.Instance.AlphaAnimation(sp, true, Values.Instance.fadeFlusherDuration, () => target.SetActive(false)));
+            StartCoroutine(AnimationManager.Instance.AlphaFadeOut(sp,  Values.Instance.fadeFlusherDuration, () =>
+            {
+                target.SetActive(false);
+                Reset?.Invoke();
+            }));
         }
     }
-    private Vector2 GetAvatarPosition(bool isPlayer)
-    {
-        if (isPlayer)
-        {
-            return playerAvatar.transform.position;
-        }
-        else
-        {
-            return enemyAvatar.transform.position;
-        }
-    }
+
 
     public float CalculateAngle(Vector2 sourceTarget, Vector2 positionTarget)
     {
@@ -878,12 +897,30 @@ public class BattleUI : MonoBehaviour
 
     }
 
-    internal void InitSmoke(bool isPlayerActivate,GameObject parent, bool enable)
+    internal IEnumerator InitSmoke(bool isPlayerActivate,bool delay, CardSlot parent, bool enable, Action Reset)
     {
-        ParticleSystem target = pSmokePS;
-        if (!isPlayerActivate)
+        if (parent.smokeEnable)
         {
-            target = eSmokePS;
+            ParticleSystem ps = GameObject.Find(parent.name + "S").GetComponent<ParticleSystem>();
+            StartCoroutine(FadeOutParticleSystem(ps));
+        }
+
+        if (delay)
+        {
+            yield return new WaitForSeconds(1f);
+        }
+        ParticleSystem target;
+        
+        if (isPlayerActivate)
+        {
+            target = showSmoke;
+        }else if (parent.name.Contains("B"))
+        {
+            target = hideSmokeBoard;
+        }
+        else
+        {
+            target = hideSmokeHand;
         }
         if (enable)
         {
@@ -891,6 +928,8 @@ public class BattleUI : MonoBehaviour
             ps.name = parent.name + "S";
             ps.transform.SetParent(psParent.transform, false);
             ps.transform.position = parent.transform.position;
+            yield return new WaitForSeconds(1f);
+            Reset?.Invoke();
         }
         else
         {
@@ -899,6 +938,8 @@ public class BattleUI : MonoBehaviour
 
             // StartCoroutine(AnimationManager.Instance.FadeOutPS(ps));
         }
+        parent.smokeEnable = enable;
+        parent.smokeActivateByPlayer = isPlayerActivate;
     }
 
     private IEnumerator FadeOutParticleSystem(ParticleSystem ps)

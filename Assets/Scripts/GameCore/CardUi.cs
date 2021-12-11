@@ -7,7 +7,6 @@ using UnityEngine.EventSystems;
 
 public class CardUi : MonoBehaviour, IPointerClickHandler
 {
-    public Card card { get; set; }
     public string cardPlace;
     [SerializeField] bool isFaceDown = true;
     [SerializeField] public bool clickbleForPU = false;
@@ -26,12 +25,11 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     public bool underSmoke;
 
 
-    public void Init(string cardsTag, Card newCard, bool isFaceDown, bool aboveDarkScreen, string cardPlace)
+    public void Init(string cardsTag, string cardDescription, bool isFaceDown, bool aboveDarkScreen, string cardPlace)
     {
-        this.card = newCard;
         this.isFaceDown = isFaceDown;
         this.cardPlace = cardPlace;
-        this.cardDescription = card.ToString(CardToStringFormatEnum.ShortCardName);
+        this.cardDescription = cardDescription;
         freeze = false;
         isGhost = false;
         underSmoke = false;
@@ -238,14 +236,16 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     {
 
         float dissolveDuration = Values.Instance.cardBurnDuration * 2;
-        float dissolveAmount = 0.12f;
+      //  float dissolveAmount = 0.12f;
+        float dissolveAmount = -0.01f;
         if (fadeIn)
         {
+
             dissolveAmount = 1f;
         }
         //  material.SetTextureScale("_FadeTex", new Vector2(offset, 0.07f));
         SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.BurnCard);
-        while (dissolveAmount < 1 || dissolveAmount > 0.12f)
+        while (dissolveAmount < 1 || dissolveAmount > -0.01f)
         {
             if (fadeIn)
             {
@@ -257,7 +257,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             }
             spriteRenderer.material.SetFloat("_FadeAmount", dissolveAmount);
             yield return new WaitForFixedUpdate();
-            if (dissolveAmount >= 1 || dissolveAmount <= 0.12f)
+            if (dissolveAmount >= 1 || dissolveAmount <= -0.01f)
             {
                 if (!fadeIn)
                 {
@@ -265,7 +265,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
                 }
                 else
                 {
-                    spriteRenderer.material.SetFloat("_FadeAmount", 0.12f);
+                    spriteRenderer.material.SetFloat("_FadeAmount", -0.01f);
                 }
                 onFinishDissolve?.Invoke();
                 break;

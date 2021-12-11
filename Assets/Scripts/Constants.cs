@@ -26,10 +26,10 @@ public const string PlayerCard1 = "PlayerCard1";
     public const string Deck2 = "Deck2";
     public const string PlayerGhost = "PlayerGhost";
     public const string EnemyGhost = "EnemyGhost";
-    public const string BGhost = "BGhost";
+    public const string BoardGhost = "BoardGhost";
     public static readonly string[] BoardCards = { BFlop1, BFlop2, BFlop3, BTurn4, BRiver5 };
     public static readonly string[] deckCardsNames = { Deck1, Deck2 };
-    public static readonly string[] ghostCardsNames = { PlayerGhost, EnemyGhost, BGhost };
+    public static readonly string[] ghostCardsNames = { PlayerGhost, EnemyGhost, BoardGhost };
     public static string ReplacePuInfo = "Choose one PowerUp and replace it with a new one.";
 
     public  string ConvertCardPlaceForEnemy(string cardPlace)

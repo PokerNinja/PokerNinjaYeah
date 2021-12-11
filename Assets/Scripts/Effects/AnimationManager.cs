@@ -152,6 +152,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
     public IEnumerator AlphaAnimation(SpriteRenderer spriteRenderer, bool fadeIn, float duration, Action OnFinish)
     {
+            Debug.LogError("sp " + spriteRenderer.gameObject.name);
         float r = spriteRenderer.color.r;
         float g = spriteRenderer.color.g;
         float b = spriteRenderer.color.b;
@@ -162,8 +163,9 @@ public class AnimationManager : Singleton<AnimationManager>
             dissolveAmount = 0;
             alphaTarget = 1;
         }
-        spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
-        while (spriteRenderer.color.a != alphaTarget)
+        spriteRenderer.color = new Color(r, g, b, dissolveAmount);
+        //FIXIT
+        while (dissolveAmount != alphaTarget)
         {
             yield return new WaitForFixedUpdate();
             if (fadeIn)
@@ -176,16 +178,69 @@ public class AnimationManager : Singleton<AnimationManager>
             }
 
             spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
-            if (spriteRenderer.color.a == alphaTarget)
+            if (dissolveAmount >= 1 || dissolveAmount <=0)
             {
+               // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
+               // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
+
+                spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaTarget));
                 OnFinish?.Invoke();
                 break;
             }
         }
-        if (spriteRenderer.color.a == alphaTarget)
+    }
+    public IEnumerator AlphaFadeIn(SpriteRenderer spriteRenderer, float duration, Action OnFinish)
+    {
+        float r = spriteRenderer.color.r;
+        float g = spriteRenderer.color.g;
+        float b = spriteRenderer.color.b;
+        float dissolveAmount = 0;
+        float alphaTarget = 1;
+       
+        spriteRenderer.color = new Color(r, g, b, 0f);
+        while (dissolveAmount < alphaTarget)
         {
-            OnFinish?.Invoke();
+            yield return new WaitForFixedUpdate();
+            
+                dissolveAmount += Time.deltaTime / duration;
+            
+
+            spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
+            if (dissolveAmount >= alphaTarget)
+            {
+                spriteRenderer.color = new Color(r, g, b, 1f);
+                OnFinish?.Invoke();
+                break;
+            }
         }
+     
+    }
+
+    public IEnumerator AlphaFadeOut(SpriteRenderer spriteRenderer, float duration, Action OnFinish)
+    {
+        float r = spriteRenderer.color.r;
+        float g = spriteRenderer.color.g;
+        float b = spriteRenderer.color.b;
+        float dissolveAmount = 1;
+        float alphaTarget = 0;
+
+        spriteRenderer.color = new Color(r, g, b, 1f);
+        while (dissolveAmount > alphaTarget)
+        {
+            yield return new WaitForFixedUpdate();
+           
+                dissolveAmount -= Time.deltaTime / duration;
+            
+
+            spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
+            if (dissolveAmount <= alphaTarget)
+            {
+                spriteRenderer.color = new Color(r, g, b, 0f);
+                OnFinish?.Invoke();
+                break;
+            }
+        }
+
     }
     public IEnumerator AlphaFontAnimation(TMPro.TextMeshProUGUI txtMesh, bool fadeIn, float duration, Action OnFinish)
     {
@@ -305,6 +360,7 @@ public class AnimationManager : Singleton<AnimationManager>
             }
             if (!increas && !fadeout && brightnesstAmount < 0)
             {
+                fadeout = true;
                 Fadeout?.Invoke();
             }
             if (brightnesstAmount <= -1f)

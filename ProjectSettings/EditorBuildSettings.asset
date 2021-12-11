@@ -9,9 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/GameMenuScene.unity
     guid: 08b9bc743e0fddd4cac96312767c6ade
   - enabled: 1
-    path: Assets/Scenes/MatchmakingScene.unity
-    guid: b5d97a4e9deb3414a8f0870f66684664
-  - enabled: 1
     path: Assets/Scenes/GameScene2.unity
     guid: 1566d3d9a5768e84b96a35daac4287e6
+  - enabled: 1
+    path: Assets/Scenes/MatchmakingScene.unity
+    guid: b5d97a4e9deb3414a8f0870f66684664
   m_configObjects: {}

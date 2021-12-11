@@ -25,7 +25,7 @@ public class EndRound : State
         battleSystem.Interface.EnablePlayerButtons(false);
         battleSystem.Interface.SetTurnIndicator(false, false);
         battleSystem.Interface.EnableVisionClick(false);
-
+        battleSystem.DeactivateSmoke();
         // yield return new WaitForSeconds(2.5f);
         //bool playerStartNextRound = battleSystem.FirstToPlay(false); // MAYBE here 
 
@@ -48,8 +48,8 @@ public class EndRound : State
         bool isFlusher = Values.Instance.flusherOn;
         bool isStrighter = Values.Instance.strighterOn;
         //MAKE IT BETTER
-        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(false, false, false);
-        if (battleSystem.playerHandIsFlusher)
+        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(false, battleSystem.isEnemyFlusher, battleSystem.isEnemyStrighter);
+        if (battleSystem.enemyHandIsFlusher)
         {
             bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestOpponentHand);
         }else if (battleSystem.enemyHandIsStrighter)
@@ -57,7 +57,7 @@ public class EndRound : State
             bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(bestOpponentHand);
         }
 
-        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(true, isFlusher, isStrighter);
+        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(true, battleSystem.isPlayerFlusher, battleSystem.isPlayerStrighter);
         if (battleSystem.playerHandIsFlusher)
         {
             bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestPlayerHand);

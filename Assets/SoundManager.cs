@@ -21,6 +21,8 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip[] burnCardSounds;
     public AudioClip[] windCardSounds;
     public AudioClip[] shuffleCardsSounds;
+    public AudioClip[] rankUpSounds;
+    public AudioClip[] rankDownSounds;
     public AudioClip startSound;
     public AudioClip winSound;
     public AudioClip loseSound;
@@ -50,6 +52,7 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip musicSound;
     public AudioClip endRoundGong;
     public AudioClip coinHit;
+    public AudioClip coinLose;
     public AudioClip armagedon;
 
 
@@ -266,6 +269,16 @@ public class SoundManager : Singleton<SoundManager>
                     targetClipSound = windCardSounds;
                     break;
                 }
+            case SoundName.RankUp:
+                {
+                    targetClipSound = rankUpSounds;
+                    break;
+                }
+            case SoundName.RankDown:
+                {
+                    targetClipSound = rankDownSounds;
+                    break;
+                }
         }
 
         int randomIndex = Random.Range(0, targetClipSound.Length);
@@ -432,6 +445,11 @@ public class SoundManager : Singleton<SoundManager>
                     soundToPlay = armagedon;
                     break;
                 }
+            case SoundName.CoinLose:
+                {
+                    soundToPlay = coinLose;
+                    break;
+                }
         }
 
         await PlayAsync(soundToPlay, normalPitch);
@@ -475,5 +493,8 @@ public class SoundManager : Singleton<SoundManager>
         EndRoundGong,
         CoinHit,
         Armagedon,
+        RankUp,
+        RankDown,
+        CoinLose,
     }
 }
