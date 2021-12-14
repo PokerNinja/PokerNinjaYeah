@@ -89,7 +89,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
 
 
-    public IEnumerator Shake(Material material)
+    public IEnumerator Shake(Material material, float duration)
     {
 
         if (material.GetFloat("_ShakeUvSpeed") == 0)
@@ -98,7 +98,7 @@ public class AnimationManager : Singleton<AnimationManager>
             material.SetFloat("_ShakeUvSpeed", Values.Instance.disableClickShakeSpeed);
             material.SetFloat("_ShakeUvX", Values.Instance.disableClickShakeX);
             material.SetFloat("_ShakeUvY", Values.Instance.disableClickShakeY);
-            yield return new WaitForSeconds(Values.Instance.disableClickShakeDuration);
+            yield return new WaitForSeconds(duration);
             material.SetFloat("_ShakeUvSpeed", 0f);
         }
 
@@ -152,7 +152,6 @@ public class AnimationManager : Singleton<AnimationManager>
 
     public IEnumerator AlphaAnimation(SpriteRenderer spriteRenderer, bool fadeIn, float duration, Action OnFinish)
     {
-            Debug.LogError("sp " + spriteRenderer.gameObject.name);
         float r = spriteRenderer.color.r;
         float g = spriteRenderer.color.g;
         float b = spriteRenderer.color.b;

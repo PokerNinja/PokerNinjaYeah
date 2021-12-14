@@ -18,6 +18,7 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
     private int currentEmojiId = 0;
     public BoxCollider2D boxCollider;
     private Vector2 largeBox, smallBox;
+    private Vector2 largeOffset, smallOffset;
     //private bool held = false;
     //public UnityEvent onClick = new UnityEvent();
 
@@ -28,45 +29,24 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
         holdTime = Values.Instance.holdTimeForEmojiSelector;
         smallBox = new Vector2(0.1f, 0.1f);
         largeBox = new Vector2(1.6f, 2.5f);
+        smallOffset = new Vector2(0f, 0f);
+        largeOffset = new Vector2(0.1004553f, -0.7235291f);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-      //  var position = Input.mousePosition/ canvas.scaleFactor;
-      //  Debug.LogWarning("" + position);
         currentEmojiId = -1;
         transform.position = eventData.pointerCurrentRaycast.worldPosition;
-        Debug.LogError("Down");
-        //held = false;
-        // btnTransform.position = eventData.pointerPress.transform.position;
-        //Vector3 s = (Vector3)(rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor);
-       // s.z = 0;
-        //btnTransform.position = new Vector3(10f,-2f,0f);
-       // Debug.LogError("ds " + PointerDataToRelativePos(eventData));
-        //Debug.LogError("d " + eventData.position /canvas.scaleFactor);
-
         Invoke("OnLongPress", holdTime);
-        //  transform.position = eventData.pointerPress.transform.position;
 
     }
 
-    private Vector2 PointerDataToRelativePos(PointerEventData eventData)
-    {
-        Vector2 result;
-        Vector2 clickPosition = eventData.position;
-        RectTransform thisRect = GetComponent<RectTransform>();
-
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(thisRect, clickPosition, null, out result);
-        result += thisRect.sizeDelta / 2;
-
-        return result;
-    }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        Debug.LogError("Up");
         transform.position = startingPosition.position;
         boxCollider.size = largeBox;
+        boxCollider.offset = largeOffset;
         BattleSystem.Instance.EmojiSelected(currentEmojiId);
 
         CancelInvoke("OnLongPress");
@@ -87,6 +67,7 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
         //Debug.LogError("LongPress");
         onLongPress.Invoke();
         boxCollider.size = smallBox;
+        boxCollider.offset = smallOffset;
     }
 
 
@@ -97,29 +78,13 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Debug.LogError("EndDrag");
         canvasGroup.blocksRaycasts = true;
-      //  BattleSystem.Instance.EmojiSelected(currentEmojiId);
-
     }
 
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.LogError("d14 " + PointerDataToRelativePos(eventData) / canvas.scaleFactor);
-        Debug.LogError("d51 " + eventData.pointerCurrentRaycast.worldPosition);
-        Debug.LogError("d12 " +Input.mousePosition);
         transform.position = eventData.pointerCurrentRaycast.worldPosition;
-       // Debug.LogError("d13 " +Input.location);
-       // Debug.LogError("d14 " +Input.touches[0].position);
-       // Debug.LogError("d1 " + eventData.delta);
-       // Debug.LogError("d2 " + eventData.position / canvas.scaleFactor);
-       // Debug.LogError("d3 " + eventData.pressEventCamera.transform.position);
-       // Debug.LogError("d4 " + eventData.pressPosition / canvas.scaleFactor);
-       // Debug.LogError("d5 " + eventData.pointerDrag);
-       // Debug.LogError("d6 " + eventData.rawPointerPress.transform.position);
-
-        // rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
         canvasGroup.blocksRaycasts = false;
     }
 

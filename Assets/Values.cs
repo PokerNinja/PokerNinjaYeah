@@ -111,6 +111,7 @@ public class Values : Singleton<Values>
     public float disableClickShakeX = 1f;
     public float disableClickShakeY = 0.05f;
     public float disableClickShakeDuration = 0.3f;
+    public float disableClickShakeDurationForEmoji = 1f;
 
 
 

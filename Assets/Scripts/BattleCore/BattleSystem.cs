@@ -1715,16 +1715,19 @@ public class BattleSystem : StateMachine
     }
     internal void EmojiSelected(int id)
     {
-        ShowEmojiWheel(false);
         if (emojiCooledDown && id != -1)
         {
+            ShowEmojiWheel(false);
             emojiCooledDown = false;
             StartCoroutine(ui.DisplayEmoji(true, id, () => emojiCooledDown = true));
             UpdateEmojiDB(id);
+        }else if(id == -1)
+        {
+            ShowEmojiWheel(false);
         }
         else if (!emojiCooledDown)
         {
-            Debug.LogError("Wait A Sec");
+            StartCoroutine(ui.ShakeEmoji(id,() => ShowEmojiWheel(false)));
         }
     }
     public void ShowEmojiWheel(bool enable)

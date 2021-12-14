@@ -122,7 +122,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
         else
         {
-            StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
+            StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material, Values.Instance.disableClickShakeDuration));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
     }

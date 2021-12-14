@@ -835,12 +835,12 @@ public class BattleUI : MonoBehaviour
 
     internal void DisableClickBtnReplace()
     {
-        StartCoroutine(AnimationManager.Instance.Shake(btnReplaceRenderer.material));
+        StartCoroutine(AnimationManager.Instance.Shake(btnReplaceRenderer.material, Values.Instance.disableClickShakeDuration));
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
     }
     public void ClickCoinEffect(int index)
     {
-        StartCoroutine(AnimationManager.Instance.Shake(coinsSpriteRend[index].material));
+        StartCoroutine(AnimationManager.Instance.Shake(coinsSpriteRend[index].material, Values.Instance.disableClickShakeDuration));
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinHit, false);
     }
 
@@ -893,8 +893,14 @@ public class BattleUI : MonoBehaviour
         //   StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiToDisplayRenderer, false, Values.Instance.emojiDisplayFadeDuration, null));
         yield return new WaitForSeconds(Values.Instance.emojiCoolDown - Values.Instance.emojiStay);
         coolDownEmoji?.Invoke();
+    }
 
-
+    internal IEnumerator ShakeEmoji(int id, Action FadeEmojis)
+    {
+        StartCoroutine(AnimationManager.Instance.Shake(emojis[id].material, Values.Instance.disableClickShakeDurationForEmoji));
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
+        yield return new WaitForSeconds(1f);
+        FadeEmojis?.Invoke();
     }
 
     internal IEnumerator InitSmoke(bool isPlayerActivate,bool delay, CardSlot parent, bool enable, Action Reset)
