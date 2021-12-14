@@ -617,17 +617,19 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         CardUi cardObject = objectPooler.SpwanCardFromPool(cardTag);
         cardScale = cardHandVector;
         cardObject.transform.SetParent(cardParent.transform);
-        if (cardParent.transform.parent.name.Contains("Board") || indexToInsert == -10)
+        if (cardParent.name.Contains("B") || indexToInsert == -10)
         {
-            if (cardParent.transform.parent.name.Contains("Board") && indexToInsert == -10)
+            if (cardParent.name.Contains("B") && indexToInsert == -10)
             {
                 cardScale = cardVectorGhostBoard;
+                Debug.LogError("ghostboat");
             }
             else
             {
                 cardScale = cardVectorBoard;
             }
         }
+        Debug.LogError("cardParent.transform.parent.name" + cardParent.transform.parent.name);
 
         cardObject.name = cardPlace;
         cardObject.transform.position = new Vector3(cardTransform.position.x, cardTransform.position.y, 1); ;
@@ -635,7 +637,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         cardObject.Init(cardTag, newCard.ToString(CardToStringFormatEnum.ShortCardName), isFaceDown, aboveDarkScreen, cardPlace);
         if (cardParent.smokeEnable)
         {
-            DarkCardUnderSmoke= ()=> EnableCardSmoke(true, cardParent.smokeActivateByPlayer, cardObject);
+            DarkCardUnderSmoke = () => EnableCardSmoke(true, cardParent.smokeActivateByPlayer, cardObject);
         }
         Vector3 targetPosition = new Vector3(cardParent.transform.position.x, cardParent.transform.position.y, cardObject.transform.position.z);
         Action closeDrawer = null;
@@ -1428,10 +1430,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         if (targetCardUi != null)
         {
             targetCardUi.cardDescription = pickedCard.ToString(CardToStringFormatEnum.ShortCardName);
-            if (!targetCardUi.GetisFaceDown())
-            {
-                StartCoroutine(GlitchEffect(targetCardUi, null));
-            }
+            StartCoroutine(GlitchEffect(targetCardUi, targetCardUi.GetisFaceDown(), null));
             UpdateCardsList(targetCardUi.cardPlace, pickedCard, true);
         }
         else
@@ -1440,14 +1439,10 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
 
         pickedCardUi.cardDescription = newCard.ToString(CardToStringFormatEnum.ShortCardName);
-        if (!pickedCardUi.GetisFaceDown())
-        {
-            StartCoroutine(GlitchEffect(pickedCardUi, disableDarkScreen));
-        }
-        else
-        {
-            disableDarkScreen?.Invoke();
-        }
+
+        StartCoroutine(GlitchEffect(pickedCardUi, pickedCardUi.GetisFaceDown(), disableDarkScreen));
+
+
         UpdateCardsList(pickedCardUi.cardPlace, newCard, true);
     }
 
@@ -1469,11 +1464,14 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    private IEnumerator GlitchEffect(CardUi pickedCardUi, Action Reset)
+    private IEnumerator GlitchEffect(CardUi pickedCardUi, bool isFaceDown, Action Reset)
     {
         pickedCardUi.spriteRenderer.material = glitchMaterial;
         yield return new WaitForSeconds(Values.Instance.durationGlitchBeforeChange);
-        pickedCardUi.LoadSprite(true);
+        if (!isFaceDown)
+        {
+            pickedCardUi.LoadSprite(true);
+        }
         yield return new WaitForSeconds(Values.Instance.durationGlitchAfterChange);
         pickedCardUi.spriteRenderer.material = dissolveMaterial;
         Reset?.Invoke();

@@ -46,6 +46,9 @@ public class BattleUI : MonoBehaviour
 
     [SerializeField] public GameObject fireProjectile1;
     [SerializeField] public GameObject fireProjectile2;
+
+   
+
     [SerializeField] public GameObject largeFireProjectile1;
     [SerializeField] public GameObject iceProjectile1;
     [SerializeField] public GameObject iceProjectile2;
@@ -105,11 +108,11 @@ public class BattleUI : MonoBehaviour
     public SpriteRenderer emojiSelector;
     public SpriteRenderer emojiToDisplayRendererPlayer;
     public SpriteRenderer emojiToDisplayRendererEnemy;
-    public GameObject emojiToDisplayTransformPlayer;
-    public GameObject emojiToDisplayTransformEnemy;
+    public EmojiToDisplay emojiToDisplayPlayer;
+    public EmojiToDisplay emojiToDisplayEnemy;
     public Transform emojiStartPosPlayer;
     public Transform emojiStartPosEnemy;
-    public Transform emojiTarget;
+    public Transform emojiTargetPos;
 
     public ParticleSystem hideSmokeBoard;
     public ParticleSystem hideSmokeHand;
@@ -255,8 +258,10 @@ public class BattleUI : MonoBehaviour
             yPosition = -7;
         }
         Vector3 targetPosition = new Vector3(0, yPosition, 0);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, new Vector3(0,0,0), coinFlipTurn.transform.localScale, Values.Instance.coinFlipEndMoveDuration, null, null, 
-            () => coinFlipTurn.SetDirection(isPlayerStart), () => coinFlipTurn.FlipCoinAnimation()));
+        coinFlipTurn.SetDirection(isPlayerStart);
+        coinFlipTurn.FlipCoinAnimation();
+       /* StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, new Vector3(0,0,0), coinFlipTurn.transform.localScale, Values.Instance.coinFlipEndMoveDuration, null, null, 
+            () => coinFlipTurn.SetDirection(isPlayerStart), () => coinFlipTurn.FlipCoinAnimation()));*/
         yield return new WaitForSeconds(3);
         //Todo dont stop
         StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform,targetPosition,new Vector2(0.1f,0.1f),Values.Instance.coinFlipEndMoveDuration,null,() => coinFlipTurn.gameObject.SetActive(false),null,null));
@@ -859,6 +864,11 @@ public class BattleUI : MonoBehaviour
         StartCoroutine(AnimationManager.Instance.FadeColorSwapBlend(bgSpriteRenderer, true, Values.Instance.bgMaxValueSwapColor, Values.Instance.bgPulseColorSwapDuration));
     }
 
+
+    internal void InitNinjaAttackAnimation(bool isPlayer, string puElement)
+    {
+       
+    }
     internal void ShowEmojiWheel(bool enable)
     {
         for (int i = 0; i < emojis.Length; i++)
@@ -870,29 +880,37 @@ public class BattleUI : MonoBehaviour
 
     internal IEnumerator DisplayEmoji(bool isPlayer, int id, Action coolDownEmoji)
     {
-        GameObject emojiGO;
+        EmojiToDisplay emojiGO;
         SpriteRenderer emojiRenderer;
         if (isPlayer)
         {
             emojiRenderer = emojiToDisplayRendererPlayer;
-            emojiGO = emojiToDisplayTransformPlayer;
-            emojiGO.transform.position = emojiStartPosPlayer.position;
+            emojiGO = emojiToDisplayPlayer;
+          //  emojiGO.transform.parent.position = emojiStartPosPlayer.position;
         }
         else
         {
             emojiRenderer = emojiToDisplayRendererEnemy;
-            emojiGO = emojiToDisplayTransformEnemy;
-            emojiGO.transform.position = emojiStartPosEnemy.position;
+            emojiGO = emojiToDisplayEnemy;
+            //emojiGO.transform.parent.position = emojiStartPosEnemy.position;
         }
-        Vector3 targetPos = new Vector3(0, 1.3f, 0f);
-        emojiRenderer.sprite = emojis[id].sprite;
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, true, Values.Instance.emojiDisplayFadeDuration, null));
-        StartCoroutine(AnimationManager.Instance.SmoothMove(emojiGO.transform, emojiGO.transform.position + targetPos, emojiGO.transform.localScale, Values.Instance.emojiStay, null, null, null,
-            () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, false, Values.Instance.emojiDisplayFadeDuration, null /*()=> emojiToDisplayTransform.position = startingPos*/))));
-        // yield return new WaitForSeconds(Values.Instance.emojiStay);
-        //   StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiToDisplayRenderer, false, Values.Instance.emojiDisplayFadeDuration, null));
-        yield return new WaitForSeconds(Values.Instance.emojiCoolDown - Values.Instance.emojiStay);
+      //  Vector3 targetPos = new Vector3(0, 1.3f, 0f);
+       // emojiRenderer.sprite = emojis[id].sprite;
+        emojiGO.PlayEmoji(id);
+        if (isPlayer)
+        {
+        yield return new WaitForSeconds(Values.Instance.emojiCoolDown);
+        }
         coolDownEmoji?.Invoke();
+        //StartCoroutine(AnimationManager.Instance.SmoothMove(emojiGO.transform.parent, emojiTargetPos.position, emojiGO.transform.localScale, Values.Instance.emojiStay, null, null, null, () => coolDownEmoji?.Invoke()));
+        /* StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, true, Values.Instance.emojiDisplayFadeDuration, null));
+         StartCoroutine(AnimationManager.Instance.SmoothMove(emojiGO.transform, emojiGO.transform.position + targetPos, emojiGO.transform.localScale, Values.Instance.emojiStay, null, null, null,
+             () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, false, Values.Instance.emojiDisplayFadeDuration, () => emojiGO.PlayEmoji(-1) *//*()=> emojiToDisplayTransform.position = startingPos*//*))));
+    */     // yield return new WaitForSeconds(Values.Instance.emojiStay);
+           //   StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiToDisplayRenderer, false, Values.Instance.emojiDisplayFadeDuration, null));
+           // yield return new WaitForSeconds(Values.Instance.emojiStay);
+           //  yield return new WaitForSeconds(Values.Instance.emojiCoolDown - Values.Instance.emojiStay);
+
     }
 
     internal IEnumerator ShakeEmoji(int id, Action FadeEmojis)

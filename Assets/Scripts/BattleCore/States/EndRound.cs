@@ -71,7 +71,7 @@ public class EndRound : State
         // Make it better
         if (bestPlayerHand.Rank.CompareTo(bestOpponentHand.Rank) == 1)
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Lose, true);
+           // SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Lose, true);
             if (battleSystem.DealDamage(true))
             {
                 //battleSystem.gameOver = false;
@@ -92,7 +92,7 @@ public class EndRound : State
         // Player win
         else if (bestPlayerHand.Rank.CompareTo(bestOpponentHand.Rank) == -1)
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Win, true);
+           // SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Win, true);
             if (battleSystem.DealDamage(false))
             {
                 startNewRound = false;
@@ -207,7 +207,6 @@ public class EndRound : State
             }
             if (cardGhostStr.Equals(winningCardDesc))
             {
-                if(cardGhostOwener.Contains("B"))
                 winningPlayersCards.Add(battleSystem.cardsDeckUi.ghostCardUi);
             }
             for (int j = 0; j < 5; j++)

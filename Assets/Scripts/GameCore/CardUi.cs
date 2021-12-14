@@ -236,11 +236,12 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     {
 
         float dissolveDuration = Values.Instance.cardBurnDuration * 2;
-      //  float dissolveAmount = 0.12f;
+        //  float dissolveAmount = 0.12f;
         float dissolveAmount = -0.01f;
+        float shadowAlpha = 0.31f;
         if (fadeIn)
         {
-
+            shadowAlpha = 0f;
             dissolveAmount = 1f;
         }
         //  material.SetTextureScale("_FadeTex", new Vector2(offset, 0.07f));
@@ -250,12 +251,21 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             if (fadeIn)
             {
                 dissolveAmount -= Time.deltaTime / dissolveDuration;
+                if (shadowAlpha < 0.32f)
+                {
+                    shadowAlpha += Time.deltaTime / dissolveDuration;
+                }
             }
             else
             {
                 dissolveAmount += Time.deltaTime / dissolveDuration;
+                if (shadowAlpha > 0f)
+                {
+                    shadowAlpha -= Time.deltaTime / dissolveDuration;
+                }
             }
             spriteRenderer.material.SetFloat("_FadeAmount", dissolveAmount);
+            spriteRenderer.material.SetFloat("_ShadowAlpha", shadowAlpha);
             yield return new WaitForFixedUpdate();
             if (dissolveAmount >= 1 || dissolveAmount <= -0.01f)
             {

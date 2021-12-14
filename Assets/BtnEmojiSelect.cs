@@ -56,7 +56,7 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Debug.LogError("Exit");
+        //Debug.LogError("Exit");
 
         CancelInvoke("OnLongPress");
     }
