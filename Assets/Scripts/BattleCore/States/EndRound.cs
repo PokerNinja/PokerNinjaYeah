@@ -48,7 +48,7 @@ public class EndRound : State
         bool isFlusher = Values.Instance.flusherOn;
         bool isStrighter = Values.Instance.strighterOn;
         //MAKE IT BETTER
-        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(false, battleSystem.isEnemyFlusher, battleSystem.isEnemyStrighter);
+        Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(true, false, battleSystem.isEnemyFlusher, battleSystem.isEnemyStrighter);
         if (battleSystem.enemyHandIsFlusher)
         {
             bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestOpponentHand);
@@ -57,7 +57,7 @@ public class EndRound : State
             bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(bestOpponentHand);
         }
 
-        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(true, battleSystem.isPlayerFlusher, battleSystem.isPlayerStrighter);
+        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(true,true, battleSystem.isPlayerFlusher, battleSystem.isPlayerStrighter);
         if (battleSystem.playerHandIsFlusher)
         {
             bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestPlayerHand);
@@ -66,6 +66,7 @@ public class EndRound : State
             Debug.LogError("Effect Strighter");
             bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(bestPlayerHand);
         }
+        battleSystem.Interface.UpdateCardRank(bestPlayerHand.Rank);
         string winnerMsg = "";
         // Opponent win
         // Make it better

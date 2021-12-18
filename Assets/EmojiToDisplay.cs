@@ -12,16 +12,7 @@ public class EmojiToDisplay : MonoBehaviour
 
     public void PlayEmoji(int id)
     {
-
-        if (id != -1)
-        {
-            this.gameObject.SetActive(true);
-        }
         animator.SetInteger("emojiId",id);
-        if (id == -1)
-        {
-            this.gameObject.SetActive(false);
-        }
     }
 
 

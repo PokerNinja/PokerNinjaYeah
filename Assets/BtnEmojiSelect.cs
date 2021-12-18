@@ -10,6 +10,7 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
     
     //[Tooltip("How long must pointer be down on this object to trigger a long press")]
     private float holdTime;
+    private bool drag = false;
     public RectTransform rectTransform;
     public Canvas canvas;
     public CanvasGroup canvasGroup;
@@ -73,11 +74,13 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     public void OnDrag(PointerEventData eventData)
     {
+        drag = true;
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        drag = false;
         canvasGroup.blocksRaycasts = true;
     }
 
@@ -90,7 +93,10 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (drag)
+        {
         currentEmojiId = ConvertNameToId(collision.name);
+        }
     }
 
     private int ConvertNameToId(string name)

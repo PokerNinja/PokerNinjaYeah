@@ -129,7 +129,7 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     {
         if (!BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, "replace", Constants.ReplacePuInfo);
+            BattleSystem.Instance.ShowPuInfo(transform.position,false, "replace", Constants.ReplacePuInfo);
         }
     }
 

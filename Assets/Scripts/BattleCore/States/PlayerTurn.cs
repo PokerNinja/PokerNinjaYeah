@@ -45,7 +45,6 @@ public class PlayerTurn : State
         {
             battleSystem.skillUseLeft = Values.Instance.skillUseLimit;
         }
-        battleSystem.Interface.SetTurnIndicator(true, true);
        
         battleSystem.DealPu(true, () =>
         {
@@ -56,6 +55,8 @@ public class PlayerTurn : State
             battleSystem.ActivatePlayerButtons(true, true);
             battleSystem.Interface.WhosTurnAnimation(true, yourLastTurn, finalTurn);
             battleSystem.ChargeEnergyCounter(energyChargeCount);
+            battleSystem.Interface.SetTurnIndicator(true, true);
+
         }
         );
         yield break;

@@ -479,6 +479,7 @@ namespace StandardPokerHandEvaluator
             mEvalHand = EvalTable.EvalHands[key];
         }
 
+
         public List<Card> getCards()
         {
             List<Card> totalCardsList = new List<Card>();

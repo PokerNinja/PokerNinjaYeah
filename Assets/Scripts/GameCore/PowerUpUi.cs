@@ -166,7 +166,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         if (!BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, puName, puDisplayName);
+            BattleSystem.Instance.ShowPuInfo(transform.position, puIndex==1, puName, puDisplayName);
         }
     }
 

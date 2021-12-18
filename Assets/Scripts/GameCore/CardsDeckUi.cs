@@ -612,7 +612,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     {
         Action DarkCardUnderSmoke = null;
         Vector3 cardScale;
-        // TODO add list value to catch the object and store it
         string cardTag = "Card" + cardPlace.Substring(0, 1);
         CardUi cardObject = objectPooler.SpwanCardFromPool(cardTag);
         cardScale = cardHandVector;
@@ -622,14 +621,12 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             if (cardParent.name.Contains("B") && indexToInsert == -10)
             {
                 cardScale = cardVectorGhostBoard;
-                Debug.LogError("ghostboat");
             }
             else
             {
                 cardScale = cardVectorBoard;
             }
         }
-        Debug.LogError("cardParent.transform.parent.name" + cardParent.transform.parent.name);
 
         cardObject.name = cardPlace;
         cardObject.transform.position = new Vector3(cardTransform.position.x, cardTransform.position.y, 1); ;
@@ -712,8 +709,24 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    public Hand CalculateHand(bool isPlayer, bool isFlusher, bool isStrighter)
+    public Hand CalculateHand(bool isEndRound, bool isPlayer, bool isFlusher, bool isStrighter)
     {
+        List<Card> underSmokeCards = new List<Card>();
+
+        if (!isEndRound)
+        {
+            foreach (CardSlot cardSlot in allCardSlots)
+            {
+                if (cardSlot.smokeEnable && !cardSlot.smokeActivateByPlayer)
+                {
+                    if (cardSlot.transform.childCount > 0)
+                    {
+                        CardUi cardIO = cardSlot.transform.GetChild(0).GetComponent<CardUi>();
+                        underSmokeCards.Add(Card.StringToCard(cardIO.cardDescription));
+                    }
+                }
+            }
+        }
         TexasHand playerCards;
         if (isPlayer)
         {
@@ -731,6 +744,10 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         List<Card> totalCards = new List<Card>();
         totalCards.AddRange(playerCards.getCards());
         totalCards.AddRange(boardCards);
+        if (underSmokeCards.Count > 0)
+        {
+            totalCards = RemoveUnderSmokeCards(totalCards, underSmokeCards);
+        }
         if (ghostCardUi != null)
         {
             if (isPlayer && ghostCardUi.whosCards == Constants.CardsOwener.Player)
@@ -745,6 +762,15 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 totalCards.Add(ghostCard);
             }
+        }
+        if (totalCards.Count < 5)
+        {
+            BattleSystem.Instance.visionUnavailable = true;
+            return new Hand(Card.StringToCard("2d"), Card.StringToCard("4d"), Card.StringToCard("8d"), Card.StringToCard("Td"), Card.StringToCard("Qs"), poker);
+        }
+        else
+        {
+            BattleSystem.Instance.visionUnavailable = false;
         }
         if (totalCards.Count == 5)
         {
@@ -788,6 +814,21 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         //MAYBE SMARTER^
         return handsOptions[0];
 
+    }
+
+    private List<Card> RemoveUnderSmokeCards(List<Card> totalCards, List<Card> underSmokeCards)
+    {
+        for (int i = 0; i < underSmokeCards.Count; i++)
+        {
+            for (int j = totalCards.Count - 1; j >= 0; j--)
+            {
+                if (underSmokeCards[i].ToString(CardToStringFormatEnum.ShortCardName) == totalCards[j].ToString(CardToStringFormatEnum.ShortCardName))
+                {
+                    totalCards.RemoveAt(j);
+                }
+            }
+        }
+        return totalCards;
     }
 
     private List<Hand> GetBestHand(List<Card> totalCards)
@@ -1481,8 +1522,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     {
 
         //COPy WASTE
-        CardUi cardSwap1 = GameObject.Find(cardPlace1).GetComponent<CardUi>();
-        CardUi cardSwap2 = GameObject.Find(cardPlace2).GetComponent<CardUi>();
+
+        CardUi cardSwap1 = GetCardUiByName(cardPlace1);
+        CardUi cardSwap2 = GetCardUiByName(cardPlace2);
         if (cardSwap1.underSmoke)
         {
             EnableCardSmoke(false, false, cardSwap1);
@@ -1496,8 +1538,24 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         bool card2WasFaceDown = cardSwap2.GetisFaceDown(); // NOT IMPLENMANETD
         Transform tempTransform1 = cardSwap1.transform;
         Transform tempTransform2 = cardSwap2.transform;
-        StartCoroutine(AnimationManager.Instance.SmoothMove(cardSwap1.transform, tempTransform2.position, tempTransform2.localScale, Values.Instance.cardSwapMoveDuration, () => SwitchCardsInfo(cardSwap1, cardSwap2), () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2)), null, null));
-        StartCoroutine(AnimationManager.Instance.SmoothMove(cardSwap2.transform, tempTransform1.position, tempTransform1.localScale, Values.Instance.cardSwapMoveDuration, null, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1)), DisableDarkScreen, null));
+        //StartCoroutine(AnimationManager.Instance.SmoothMoveCircular(cardSwap1.transform, GetMiddlePosForWind(cardPlace1, cardPlace2), tempTransform2.position, tempTransform2.localScale, Values.Instance.cardSwapMoveDuration, () => SwitchCardsInfo(cardSwap1, cardSwap2), () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2)), null, null));
+        // StartCoroutine(AnimationManager.Instance.SmoothMoveCircular(cardSwap2.transform, GetMiddlePosForWind(cardPlace2, cardPlace1), tempTransform1.position, tempTransform1.localScale, Values.Instance.cardSwapMoveDuration, null, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1)), DisableDarkScreen, null));
+        SwitchCardsInfo(cardSwap1, cardSwap2);
+        Action Flip1 = null;
+        Action  Flip2 = null;
+        if (cardSwap1.transform.localScale != cardSwap2.transform.localScale)
+        {
+            StartCoroutine(AnimationManager.Instance.ScaleAnimation(cardSwap1.transform, cardSwap2.transform.localScale, Values.Instance.cardSwapMoveDuration, () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2))));
+            StartCoroutine(AnimationManager.Instance.ScaleAnimation(cardSwap2.transform, cardSwap1.transform.localScale, Values.Instance.cardSwapMoveDuration, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1))));
+        }
+        else
+        {
+            Flip1 = ()=> FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2));
+            Flip2 = ()=> FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1));
+        }
+        StartCoroutine(AnimationManager.Instance.FollowArc(cardSwap1.transform, cardSwap1.transform.position, cardSwap2.transform.position, -1f, Values.Instance.cardSwapMoveDuration / 2, null , Flip1, null));
+        StartCoroutine(AnimationManager.Instance.FollowArc(cardSwap2.transform, cardSwap2.transform.position, cardSwap1.transform.position, -1f, Values.Instance.cardSwapMoveDuration / 2, null, Flip2, DisableDarkScreen));
+
 
         Card tempCard1 = Card.StringToCard(cardSwap1.cardDescription);
         Card tempCard2 = Card.StringToCard(cardSwap2.cardDescription);
@@ -1505,6 +1563,41 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         UpdateCardsList(cardPlace2, tempCard1, true);
 
     }
+
+    /* private Vector3 GetMiddlePosForWind(string cardPlace1, string cardPlace2)
+     {
+         Vector3 middlePos;
+         if (cardPlace1.Contains("P") && cardPlace2.Contains("E"))
+         {
+             middlePos = new Vector3(4, 0, 0);
+         }
+         else if (cardPlace1.Contains("P") && cardPlace2.Contains("B"))
+         {
+             middlePos = new Vector3(2, -2, 0);
+         }
+         else if (cardPlace1.Contains("E") && cardPlace2.Contains("P"))
+         {
+             middlePos = new Vector3(-4, 0, 0);
+         }
+         else if (cardPlace1.Contains("E") && cardPlace2.Contains("B"))
+         {
+             middlePos = new Vector3(-2, 2, 0);
+         }
+         else if (cardPlace1.Contains("B") && cardPlace2.Contains("P"))
+         {
+             middlePos = new Vector3(-2, -2, 0);
+         }
+         else if (cardPlace1.Contains("B") && cardPlace2.Contains("E"))
+         {
+             middlePos = new Vector3(2, 2, 0);
+         }
+         else
+         {
+             middlePos = new Vector3(0, 0, 0);
+         }
+
+         return middlePos;
+     }*/
 
     private void SwapCardUiList(CardUi cardSwap1, CardUi cardSwap2)
     {

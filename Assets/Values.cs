@@ -31,6 +31,7 @@ public class Values : Singleton<Values>
     public float puProjectileFadeOutDuration = 0.4f;
     public float windMoveDuration = 0.3f;
     public float windFadeOutDuration =1f;
+    public float windRorationSpeed = 2f;
 
     public float winningCardProjectileMoveDuration = 1f;
 

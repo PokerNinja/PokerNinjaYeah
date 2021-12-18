@@ -177,10 +177,10 @@ public class AnimationManager : Singleton<AnimationManager>
             }
 
             spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
-            if (dissolveAmount >= 1 || dissolveAmount <=0)
+            if (dissolveAmount >= 1 || dissolveAmount <= 0)
             {
-               // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
-               // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
+                // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
+                // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
 
                 spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaTarget));
                 OnFinish?.Invoke();
@@ -195,14 +195,14 @@ public class AnimationManager : Singleton<AnimationManager>
         float b = spriteRenderer.color.b;
         float dissolveAmount = 0;
         float alphaTarget = 1;
-       
+
         spriteRenderer.color = new Color(r, g, b, 0f);
         while (dissolveAmount < alphaTarget)
         {
             yield return new WaitForFixedUpdate();
-            
-                dissolveAmount += Time.deltaTime / duration;
-            
+
+            dissolveAmount += Time.deltaTime / duration;
+
 
             spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
             if (dissolveAmount >= alphaTarget)
@@ -212,7 +212,7 @@ public class AnimationManager : Singleton<AnimationManager>
                 break;
             }
         }
-     
+
     }
 
     public IEnumerator AlphaFadeOut(SpriteRenderer spriteRenderer, float duration, Action OnFinish)
@@ -227,9 +227,9 @@ public class AnimationManager : Singleton<AnimationManager>
         while (dissolveAmount > alphaTarget)
         {
             yield return new WaitForFixedUpdate();
-           
-                dissolveAmount -= Time.deltaTime / duration;
-            
+
+            dissolveAmount -= Time.deltaTime / duration;
+
 
             spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
             if (dissolveAmount <= alphaTarget)
@@ -369,9 +369,82 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
+   public IEnumerator FollowArc(
+        Transform mover,
+        Vector2 start,
+        Vector2 end,
+        float radius, // Set this to negative if you want to flip the arc.
+        float duration,
+        Action BeginAction,
+        Action End1,
+        Action End2)
+    {
+        BeginAction?.Invoke();
+        Vector2 difference = end - start;
+        float span = difference.magnitude;
 
+        // Override the radius if it's too small to bridge the points.
+        float absRadius = Mathf.Abs(radius);
+        if (span > 2f * absRadius)
+        {
+            radius = absRadius = span / 2f;
+        }
 
-    public IEnumerator SmoothMove(Transform selector, Vector3 targetPosition, Vector2 targetScale, float movementDuration, Action beginAction, Action endAction, Action Reset, Action CloseDrawer)
+        Vector2 perpendicular = new Vector2(difference.y, -difference.x) / span;
+        perpendicular *= Mathf.Sign(radius) * Mathf.Sqrt(radius * radius - span * span / 4f);
+
+        Vector2 center = start + difference / 2f + perpendicular;
+
+        Vector2 toStart = start - center;
+        float startAngle = Mathf.Atan2(toStart.y, toStart.x);
+
+        Vector2 toEnd = end - center;
+        float endAngle = Mathf.Atan2(toEnd.y, toEnd.x);
+
+        // Choose the smaller of two angles separating the start & end
+        float travel = (endAngle - startAngle + 5f * Mathf.PI) % (2f * Mathf.PI) - Mathf.PI;
+
+        float progress = 0f;
+        bool EndMovement = false;
+        while(progress < 1f)
+        {
+            float angle = startAngle + progress * travel;
+            mover.position = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * absRadius;
+            progress += Time.deltaTime / duration;
+            yield return null;
+            if ( progress >= 1f)
+            {
+                mover.position = end;
+                End1?.Invoke();
+                End2?.Invoke();
+                break;
+            }
+        }
+    }
+
+   
+    public IEnumerator ScaleAnimation(Transform selector,  Vector2 targetScale, float scaleDuration, Action EndAction)
+    {
+        float startTime = Time.time;
+        float t;
+        while ( (Vector2)selector.localScale != targetScale)
+        {
+            t = (Time.time - startTime) / scaleDuration;
+            if (selector.localScale.x != targetScale.x)
+            {
+                selector.localScale = new Vector3(Mathf.SmoothStep(selector.localScale.x, targetScale.x, t), Mathf.SmoothStep(selector.localScale.y, targetScale.y, t ), 1f);
+            }
+            yield return null;
+            if ((Vector2)selector.localScale == targetScale)
+            {
+                EndAction?.Invoke();
+                break;
+            }
+        }
+        yield break;
+    }
+
+     public IEnumerator SmoothMove(Transform selector, Vector3 targetPosition, Vector2 targetScale, float movementDuration, Action beginAction, Action endAction, Action Reset, Action CloseDrawer)
     {
         beginAction?.Invoke();
         float startTime = Time.time;
@@ -571,6 +644,48 @@ public class AnimationManager : Singleton<AnimationManager>
             }
         }
         yield break;
+    }
+
+    public bool alphaLoopEnable = false;
+    internal IEnumerator AlphaLoop(SpriteRenderer spriteTarget, float duration, Action onFinish)
+    {
+        /*alphaLoopEnable = false;
+        yield return new WaitForFixedUpdate();*/
+        float r = spriteTarget.color.r;
+        float g = spriteTarget.color.g;
+        float b = spriteTarget.color.b;
+        float alphaAmount = 0;
+        bool fadeIn = true;
+        alphaLoopEnable = true;
+        while (alphaLoopEnable)
+        {
+            if (fadeIn)
+            {
+                alphaAmount += Time.deltaTime / duration;
+            }
+            else
+            {
+                alphaAmount -= Time.deltaTime / duration;
+            }
+            if (alphaAmount >= 1)
+            {
+                fadeIn = false;
+                alphaAmount = 1;
+            }
+            else if (alphaAmount <= 0)
+            {
+                fadeIn = true;
+                alphaAmount = 0;
+            }
+            yield return new WaitForFixedUpdate();
+            spriteTarget.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaAmount));
+            if (!alphaLoopEnable)
+            {
+                spriteTarget.color = new Color(r, g, b, 0f);
+                Debug.LogError("diasbleLoop");
+                break;
+            }
+        }
     }
     public IEnumerator SpinRotateValue(SpriteRenderer projectileSpriteRen, Action EndAction)
     {
@@ -783,21 +898,42 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
-    public IEnumerator AnimateWind(SpriteRenderer windSpriteRenderer, Action PuIgnite, Action FadeOut)
+    public IEnumerator AnimateWind(string puName, SpriteRenderer windSpriteRenderer, Action PuIgnite, Action FadeOut)
     {
+        float zoomTarget = 0.1f;
+        float newYcenter = 0;
+        if (puName.Equals("w2"))
+        {
+            zoomTarget = 2.5f;
+            newYcenter = -2f;
+        }
+        else if (puName.Equals("w3"))
+        {
+            zoomTarget = 2.5f;
+            newYcenter = 2f;
+        }
+
+        Vector3 windCenterPosition = new Vector3(0, newYcenter, 6);
+        windSpriteRenderer.transform.parent.position = windCenterPosition;
         SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.WindSound);
         float windMoveDuration = Values.Instance.windMoveDuration;
 
         bool activatePu = true;
+        bool stopZooming = false;
+        bool startFading = false;
         float zoomAmount = 5f;
-        float rotateAmount = 6.2831f;
+        float rotateAmount = 0;
+        float rotationSpeed = Values.Instance.windRorationSpeed;
         SetAlpha(windSpriteRenderer, 1f);
         windSpriteRenderer.material.SetFloat("_ZoomUvAmount", zoomAmount);
         windSpriteRenderer.material.SetFloat("_RotateUvAmount", rotateAmount);
         while (zoomAmount > 0)
         {
-            zoomAmount -= Time.deltaTime / windMoveDuration;
-            rotateAmount -= Time.deltaTime / windMoveDuration;
+            if (!stopZooming)
+            {
+                zoomAmount -= Time.deltaTime / windMoveDuration;
+            }
+            rotateAmount += Time.deltaTime / windMoveDuration * rotationSpeed;
             windSpriteRenderer.material.SetFloat("_ZoomUvAmount", zoomAmount);
             windSpriteRenderer.material.SetFloat("_RotateUvAmount", rotateAmount);
             yield return new WaitForFixedUpdate();
@@ -807,9 +943,18 @@ public class AnimationManager : Singleton<AnimationManager>
                 PuIgnite?.Invoke();
 
             }
-            if (zoomAmount <= 0.1)
+            if (!stopZooming && zoomAmount <= zoomTarget)
             {
+                stopZooming = true;
+
+            }
+            if(!startFading && rotateAmount >= 6.2831f)
+            {
+                startFading = true;
                 FadeOut?.Invoke();
+            }
+            if (6.2831f >= 10)
+            {
                 break;
             }
         }
@@ -944,7 +1089,7 @@ public class AnimationManager : Singleton<AnimationManager>
             Vector3 targetPosition = new Vector3(losingBoardCards[i].transform.position.x, losingBoardCards[i].transform.position.y, winningPlayerCards[i].transform.position.z);
             StartCoroutine(SmoothMove(winningPlayerCards[i].transform, targetPosition, losingBoardCards[i].transform.localScale, Values.Instance.winningCardsMoveDuration, null, UpdateValueEndRoutine, null, null));
         }
-        foreach(CardUi card in losingBoardCards)
+        foreach (CardUi card in losingBoardCards)
         {
             StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, null));
         }
