@@ -111,7 +111,8 @@ public class BattleUI : MonoBehaviour
 
     public ParticleSystem hideSmokeBoard;
     public ParticleSystem hideSmokeHand;
-    public ParticleSystem showSmoke;
+    public ParticleSystem showSmokeBoard;
+    public ParticleSystem showSmokeHand;
 
     [SerializeField] private GameObject turnBtn;
     [SerializeField] private SpriteRenderer turnBtnSpriteREnderer;
@@ -935,7 +936,14 @@ public class BattleUI : MonoBehaviour
 
         if (isPlayerActivate)
         {
-            target = showSmoke;
+            if (parent.name.Contains("B"))
+            {
+                target = showSmokeBoard;
+            }
+            else
+            {
+                target = showSmokeHand;
+            }
         }
         else if (parent.name.Contains("B"))
         {
