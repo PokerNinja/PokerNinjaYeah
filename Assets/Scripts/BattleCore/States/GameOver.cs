@@ -12,15 +12,18 @@ public class GameOver : State
 
     public override IEnumerator Start()
     {
+        SoundManager.Instance.StopMusic();
         yield return new WaitForSeconds(4f);
         battleSystem.Interface.ShowGameOverPanel(isPlayerWin);
         if (isPlayerWin)
         {
-             battleSystem.WinParticleEffect();
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Win, true);
+            battleSystem.WinParticleEffect();
             battleSystem.UpdateWinnerDB();
         }
         else
         {
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Lose, true);
             battleSystem.Interface.BgFadeInColor();
         }
     }

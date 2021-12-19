@@ -115,7 +115,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         else if (isPlayer || !isPlayer)
         {
-            StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
+            StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material, Values.Instance.disableClickShakeDuration));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick,false);
         }
     }
@@ -135,6 +135,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 BattleSystem.Instance.HideDialog();
             }
         }
+        PressSprite(false);
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -144,13 +145,28 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             held = false;
             Invoke("OnLongPress", holdTime);
         }
+        PressSprite(true);
     }
+
+    private void PressSprite(bool pressed)
+    {
+        if(puIndex == -1 && isPlayer)
+        {
+            string spritePath = "skill_white";
+            if (pressed)
+            {
+                spritePath = "skill_press";
+            }
+            spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + spritePath, typeof(Sprite)) as Sprite;
+        }
+    }
+
     public void OND()
     {
 
         if (!BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, puName, puDisplayName);
+            BattleSystem.Instance.ShowPuInfo(transform.position, puIndex==1, puName, puDisplayName);
         }
     }
 

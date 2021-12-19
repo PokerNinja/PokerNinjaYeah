@@ -1,4 +1,5 @@
 ﻿
+using Sirenix.OdinInspector;
 using StandardPokerHandEvaluator;
 using System;
 using System.Collections;
@@ -46,6 +47,9 @@ public class BattleUI : MonoBehaviour
 
     [SerializeField] public GameObject fireProjectile1;
     [SerializeField] public GameObject fireProjectile2;
+
+
+
     [SerializeField] public GameObject largeFireProjectile1;
     [SerializeField] public GameObject iceProjectile1;
     [SerializeField] public GameObject iceProjectile2;
@@ -54,18 +58,12 @@ public class BattleUI : MonoBehaviour
     [SerializeField] public GameObject gameOverPanel;
 
 
-    [SerializeField] public GameObject playerAvatar;
-    [SerializeField] public GameObject enemyAvatar;
-
-
-
 
     public GameObject cardDeckHolder;
     public GameObject puDeckHolder;
 
-    public SpriteRenderer playerTurnIndicator;
-    public SpriteRenderer enemyTurnIndicator;
-    public SpriteRenderer enemyNotTurnIndicator;
+    public SpriteRenderer playerFrameTurn;
+    public SpriteRenderer enemyFrameTurn;
     public SpriteRenderer playerLargeTurnIndicator;
     public SpriteRenderer playerLargeNotTurnIndicator;
 
@@ -105,11 +103,11 @@ public class BattleUI : MonoBehaviour
     public SpriteRenderer emojiSelector;
     public SpriteRenderer emojiToDisplayRendererPlayer;
     public SpriteRenderer emojiToDisplayRendererEnemy;
-    public GameObject emojiToDisplayTransformPlayer;
-    public GameObject emojiToDisplayTransformEnemy;
+    public EmojiToDisplay emojiToDisplayPlayer;
+    public EmojiToDisplay emojiToDisplayEnemy;
     public Transform emojiStartPosPlayer;
     public Transform emojiStartPosEnemy;
-    public Transform emojiTarget;
+    public Transform emojiTargetPos;
 
     public ParticleSystem hideSmokeBoard;
     public ParticleSystem hideSmokeHand;
@@ -117,8 +115,6 @@ public class BattleUI : MonoBehaviour
 
     [SerializeField] private GameObject turnBtn;
     [SerializeField] private SpriteRenderer turnBtnSpriteREnderer;
-    [SerializeField] private Button replaceBtn;
-    //  [SerializeField] private SpriteRenderer turnIndicator;
     [SerializeField] public TextMeshProUGUI currentRankText;
     [SerializeField] public TextMeshProUGUI currentRankNumber;
 
@@ -241,13 +237,13 @@ public class BattleUI : MonoBehaviour
         }
         StartCoroutine(AnimationManager.Instance.LoseLifeAnimation(spTarget, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(spTarget, false, Values.Instance.LoseLifeDuration, null))));
         StartCoroutine(AnimationManager.Instance.SpinCoin(tTarget, 0.4f, null));
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinLose,true);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinLose, true);
     }
 
 
     internal IEnumerator CoinFlipStartGame(bool isPlayerStart)
     {
-      //  coinFlipTurn.RevealCoinFlip();
+        //  coinFlipTurn.RevealCoinFlip();
         yield return new WaitForSeconds(1);
         float yPosition = 7f;
         if (isPlayerStart)
@@ -255,11 +251,13 @@ public class BattleUI : MonoBehaviour
             yPosition = -7;
         }
         Vector3 targetPosition = new Vector3(0, yPosition, 0);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, new Vector3(0,0,0), coinFlipTurn.transform.localScale, Values.Instance.coinFlipEndMoveDuration, null, null, 
-            () => coinFlipTurn.SetDirection(isPlayerStart), () => coinFlipTurn.FlipCoinAnimation()));
+        coinFlipTurn.SetDirection(isPlayerStart);
+        coinFlipTurn.FlipCoinAnimation();
+        /* StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, new Vector3(0,0,0), coinFlipTurn.transform.localScale, Values.Instance.coinFlipEndMoveDuration, null, null, 
+             () => coinFlipTurn.SetDirection(isPlayerStart), () => coinFlipTurn.FlipCoinAnimation()));*/
         yield return new WaitForSeconds(3);
         //Todo dont stop
-        StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform,targetPosition,new Vector2(0.1f,0.1f),Values.Instance.coinFlipEndMoveDuration,null,() => coinFlipTurn.gameObject.SetActive(false),null,null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, targetPosition, new Vector2(0.1f, 0.1f), Values.Instance.coinFlipEndMoveDuration, null, () => coinFlipTurn.gameObject.SetActive(false), null, null));
     }
     internal void InitAvatars()
     {
@@ -315,9 +313,17 @@ public class BattleUI : MonoBehaviour
 
         }
     }
-    public void ShowPuInfoDialog(Vector2 startingPosition, string puName, string puDisplayName, bool isEnable, bool isBtnOn, Action OnEnd)
+    public void ShowPuInfoDialog(Vector2 startingPosition, bool paddingRight, string puName, string puDisplayName, bool isEnable, bool isBtnOn, Action OnEnd)
     {
-        Vector2 targetDialog = new Vector2(startingPosition.x, startingPosition.y + 2.5f);
+        Vector2 targetDialog;
+        if (paddingRight)
+        {
+            targetDialog = new Vector2(startingPosition.x + 1f, startingPosition.y + 2.5f);
+        }
+        else
+        {
+            targetDialog = new Vector2(startingPosition.x, startingPosition.y + 2.5f);
+        }
         if (isEnable)
         {
             infoDialog.position = new Vector2(0, -7f);
@@ -359,7 +365,7 @@ public class BattleUI : MonoBehaviour
         {
             if (card.GetisFaceDown())
             {
-                card.FlipCard(true,  null);
+                card.FlipCard(true, null);
             }
         }
     }
@@ -441,30 +447,18 @@ public class BattleUI : MonoBehaviour
         AnimationManager.Instance.VisionEffect(cardsToGlow, true);
     }
 
-
     public void SetTurnIndicator(bool isPlayerTurn, bool enable)
     {
-        if (enable)
+        AnimationManager.Instance.alphaLoopEnable = false;
+        if (!enable)
         {
-
-            EnableTurnIndicator(-1, !isPlayerTurn, null);
-            EnableTurnIndicator(2, !isPlayerTurn, null);
-            EnableTurnIndicator(1, isPlayerTurn, null);
-            EnableTurnIndicator(3, isPlayerTurn, null);
-            if (isPlayerTurn)
-            {
-                EnableTurnIndicator(0, isPlayerTurn, () => EnableTurnIndicator(0, !isPlayerTurn, null));
-            }
+            AnimationManager.Instance.SetAlpha(playerFrameTurn, 0f);
+            AnimationManager.Instance.SetAlpha(enemyFrameTurn, 0f);
         }
         else
         {
-            EnableTurnIndicator(-1, false, null);
-            EnableTurnIndicator(0, false, null);
-            EnableTurnIndicator(1, false, null);
-            EnableTurnIndicator(2, false, null);
-            EnableTurnIndicator(3, false, null);
+            EnableTurnIndicator(isPlayerTurn, null);
         }
-
     }
 
     public void WhosTurnAnimation(bool isPlayer, bool yourLastTurn, bool finalMove)
@@ -533,30 +527,23 @@ public class BattleUI : MonoBehaviour
         turnTextGO.SetActive(false);
     }
 
-    public void EnableTurnIndicator(int whatSpriteTarget, bool fadeIn, Action OnFinish)
+    public void EnableTurnIndicator(bool playerTurn, Action OnFinish)
     {
-        SpriteRenderer spriteTarget = null;
-        switch (whatSpriteTarget)
+        if (playerTurn)
         {
-            case -1:
-                spriteTarget = playerLargeNotTurnIndicator;
-                break;
-            case 0:
-                spriteTarget = playerLargeTurnIndicator;
-                break;
-            case 1:
-                spriteTarget = playerTurnIndicator;
-                break;
-            case 2:
-                spriteTarget = enemyTurnIndicator;
-                break;
-            case 3:
-                spriteTarget = enemyNotTurnIndicator;
-                break;
-            default:
-                break;
+            //AnimationManager.Instance.SetAlpha(enemyFrameTurn, 0f);
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(playerLargeTurnIndicator, true, Values.Instance.turnIndicatorFadeDuration, () =>
+             StartCoroutine(AnimationManager.Instance.AlphaAnimation(playerLargeTurnIndicator, false, Values.Instance.turnIndicatorFadeDuration, null))));
+           // StartCoroutine(AnimationManager.Instance.AlphaAnimation(playerLargeNotTurnIndicator, false, Values.Instance.turnIndicatorFadeDuration, OnFinish));
+
+            StartCoroutine(AnimationManager.Instance.AlphaLoop(playerFrameTurn, Values.Instance.turnIndicatorFadeDuration, OnFinish));
         }
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(spriteTarget, fadeIn, Values.Instance.turnIndicatorFadeDuration, OnFinish));
+        else
+        {
+           // AnimationManager.Instance.SetAlpha(playerFrameTurn, 0f);
+           // StartCoroutine(AnimationManager.Instance.AlphaAnimation(playerLargeNotTurnIndicator, true, Values.Instance.turnIndicatorFadeDuration, null));
+            StartCoroutine(AnimationManager.Instance.AlphaLoop(enemyFrameTurn, Values.Instance.turnIndicatorFadeDuration, OnFinish));
+        }
     }
 
     internal void InitLargeText(bool enable, string text)
@@ -569,6 +556,10 @@ public class BattleUI : MonoBehaviour
     }
     internal void UpdateCardRank(int handRank)
     {
+        if(handRank == -1)
+        {
+            handRank = 7000;
+        }
         int currentHandRank = ConvertHandRankToTextNumber(handRank);
         if (lastHandRank != currentHandRank)
         {
@@ -617,6 +608,8 @@ public class BattleUI : MonoBehaviour
                 return "Pair";
             case int n when (n <= 7462 && n >= 6186):
                 return "High Card";
+            case -1:
+                return "not enough visible cards!";
             default:
                 break;
         }
@@ -654,11 +647,12 @@ public class BattleUI : MonoBehaviour
         }
         return 10;
     }
-    internal void InitProjectile(Vector2 startingPos, bool inlargeProjectile, string powerUpElement, Vector2 posTarget1, Vector2 posTarget2, Action PuIgnite)
+    internal void InitProjectile(Vector2 startingPos, bool inlargeProjectile, string powerUpName, Vector2 posTarget1, Vector2 posTarget2, Action PuIgnite)
     {
         GameObject projectile1 = null;
         GameObject projectile2 = null;
-        switch (powerUpElement)
+        string puElement = powerUpName[0].ToString();
+        switch (puElement)
         {
             case "f":
                 SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.FireProjectile, false);
@@ -676,7 +670,7 @@ public class BattleUI : MonoBehaviour
                 projectile2 = iceProjectile2;
                 break;
         }
-        if (!powerUpElement.Equals("w"))
+        if (!puElement.Equals("w"))
         {
 
             if (posTarget1 == new Vector2(0, 0))
@@ -695,7 +689,7 @@ public class BattleUI : MonoBehaviour
         }
         else
         {
-            StartCoroutine(AnimationManager.Instance.AnimateWind(windSpriteRenderer, PuIgnite,
+            StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, windSpriteRenderer, PuIgnite,
                 () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(windSpriteRenderer, false, Values.Instance.windFadeOutDuration, null))));
         }
     }
@@ -754,11 +748,11 @@ public class BattleUI : MonoBehaviour
         }
         else
         {
-            StartCoroutine(AnimationManager.Instance.AlphaFadeOut(sp,  Values.Instance.fadeFlusherDuration, () =>
-            {
-                target.SetActive(false);
-                Reset?.Invoke();
-            }));
+            StartCoroutine(AnimationManager.Instance.AlphaFadeOut(sp, Values.Instance.fadeFlusherDuration, () =>
+           {
+               target.SetActive(false);
+               Reset?.Invoke();
+           }));
         }
     }
 
@@ -782,6 +776,7 @@ public class BattleUI : MonoBehaviour
     {
         //  turnIndicator.flipY = playerEnable;
     }
+
 
     internal void UpdateRankTextInfo(bool enable, int rank)
     {
@@ -835,12 +830,12 @@ public class BattleUI : MonoBehaviour
 
     internal void DisableClickBtnReplace()
     {
-        StartCoroutine(AnimationManager.Instance.Shake(btnReplaceRenderer.material));
+        StartCoroutine(AnimationManager.Instance.Shake(btnReplaceRenderer.material, Values.Instance.disableClickShakeDuration));
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
     }
     public void ClickCoinEffect(int index)
     {
-        StartCoroutine(AnimationManager.Instance.Shake(coinsSpriteRend[index].material));
+        StartCoroutine(AnimationManager.Instance.Shake(coinsSpriteRend[index].material, Values.Instance.disableClickShakeDuration));
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinHit, false);
     }
 
@@ -859,6 +854,18 @@ public class BattleUI : MonoBehaviour
         StartCoroutine(AnimationManager.Instance.FadeColorSwapBlend(bgSpriteRenderer, true, Values.Instance.bgMaxValueSwapColor, Values.Instance.bgPulseColorSwapDuration));
     }
 
+    [Button]
+    internal void InitNinjaAttackAnimation(bool isPlayer, string puElement)
+    {
+        if (isPlayer)
+        {
+            playerAvatarAnimator.Play("attack_" + puElement, 0, 0f);
+        }
+        else
+        {
+            enemyAvatarAnimator.Play("attack_" + puElement, 0, 0f);
+        }
+    }
     internal void ShowEmojiWheel(bool enable)
     {
         for (int i = 0; i < emojis.Length; i++)
@@ -870,36 +877,51 @@ public class BattleUI : MonoBehaviour
 
     internal IEnumerator DisplayEmoji(bool isPlayer, int id, Action coolDownEmoji)
     {
-        GameObject emojiGO;
+        EmojiToDisplay emojiGO;
         SpriteRenderer emojiRenderer;
         if (isPlayer)
         {
             emojiRenderer = emojiToDisplayRendererPlayer;
-            emojiGO = emojiToDisplayTransformPlayer;
-            emojiGO.transform.position = emojiStartPosPlayer.position;
+            emojiGO = emojiToDisplayPlayer;
+            //  emojiGO.transform.parent.position = emojiStartPosPlayer.position;
         }
         else
         {
             emojiRenderer = emojiToDisplayRendererEnemy;
-            emojiGO = emojiToDisplayTransformEnemy;
-            emojiGO.transform.position = emojiStartPosEnemy.position;
+            emojiGO = emojiToDisplayEnemy;
+            //emojiGO.transform.parent.position = emojiStartPosEnemy.position;
         }
-        Vector3 targetPos = new Vector3(0, 1.3f, 0f);
-        emojiRenderer.sprite = emojis[id].sprite;
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, true, Values.Instance.emojiDisplayFadeDuration, null));
-        StartCoroutine(AnimationManager.Instance.SmoothMove(emojiGO.transform, emojiGO.transform.position + targetPos, emojiGO.transform.localScale, Values.Instance.emojiStay, null, null, null,
-            () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, false, Values.Instance.emojiDisplayFadeDuration, null /*()=> emojiToDisplayTransform.position = startingPos*/))));
-        // yield return new WaitForSeconds(Values.Instance.emojiStay);
-        //   StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiToDisplayRenderer, false, Values.Instance.emojiDisplayFadeDuration, null));
-        yield return new WaitForSeconds(Values.Instance.emojiCoolDown - Values.Instance.emojiStay);
+        //  Vector3 targetPos = new Vector3(0, 1.3f, 0f);
+        // emojiRenderer.sprite = emojis[id].sprite;
+        emojiGO.PlayEmoji(id);
+        //ADD 4 if enemy
+        if (isPlayer)
+        {
+            yield return new WaitForSeconds(Values.Instance.emojiCoolDown);
+        }
         coolDownEmoji?.Invoke();
-
+        //StartCoroutine(AnimationManager.Instance.SmoothMove(emojiGO.transform.parent, emojiTargetPos.position, emojiGO.transform.localScale, Values.Instance.emojiStay, null, null, null, () => coolDownEmoji?.Invoke()));
+        /* StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, true, Values.Instance.emojiDisplayFadeDuration, null));
+         StartCoroutine(AnimationManager.Instance.SmoothMove(emojiGO.transform, emojiGO.transform.position + targetPos, emojiGO.transform.localScale, Values.Instance.emojiStay, null, null, null,
+             () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiRenderer, false, Values.Instance.emojiDisplayFadeDuration, () => emojiGO.PlayEmoji(-1) *//*()=> emojiToDisplayTransform.position = startingPos*//*))));
+    */     // yield return new WaitForSeconds(Values.Instance.emojiStay);
+           //   StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiToDisplayRenderer, false, Values.Instance.emojiDisplayFadeDuration, null));
+           // yield return new WaitForSeconds(Values.Instance.emojiStay);
+           //  yield return new WaitForSeconds(Values.Instance.emojiCoolDown - Values.Instance.emojiStay);
 
     }
 
-    internal IEnumerator InitSmoke(bool isPlayerActivate,bool delay, CardSlot parent, bool enable, Action Reset)
+    internal IEnumerator ShakeEmoji(int id, Action FadeEmojis)
     {
-        if (parent.smokeEnable)
+        StartCoroutine(AnimationManager.Instance.Shake(emojis[id].material, Values.Instance.disableClickShakeDurationForEmoji));
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
+        yield return new WaitForSeconds(1f);
+        FadeEmojis?.Invoke();
+    }
+
+    internal IEnumerator InitSmoke(bool isPlayerActivate, bool delay, CardSlot parent, bool enable, Action Reset)
+    {
+        if (parent.smokeEnable && enable)
         {
             ParticleSystem ps = GameObject.Find(parent.name + "S").GetComponent<ParticleSystem>();
             StartCoroutine(FadeOutParticleSystem(ps));
@@ -910,11 +932,12 @@ public class BattleUI : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
         ParticleSystem target;
-        
+
         if (isPlayerActivate)
         {
             target = showSmoke;
-        }else if (parent.name.Contains("B"))
+        }
+        else if (parent.name.Contains("B"))
         {
             target = hideSmokeBoard;
         }
@@ -944,6 +967,7 @@ public class BattleUI : MonoBehaviour
 
     private IEnumerator FadeOutParticleSystem(ParticleSystem ps)
     {
+        Debug.LogError("Burn " + ps.name);
         var main = ps.main;
         main.startLifetime = 0;
         main.simulationSpeed = 2.5f;

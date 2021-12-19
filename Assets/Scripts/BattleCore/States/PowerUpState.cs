@@ -17,6 +17,7 @@ public class PowerUpState : State
     private Vector2 posTarget2;
     private int puIndex;
     private int energyCost;
+    private string puElement;
     public PowerUpState(BattleSystem battleSystem, bool isPlayerActivate, int energyCost, string powerUpName, string cardTarget1, string cardTarget2, Vector2 posTarget1, Vector2 posTarget2, int puIndex) : base(battleSystem)
     {
         this.isPlayerActivate = isPlayerActivate;
@@ -27,6 +28,7 @@ public class PowerUpState : State
         this.posTarget2 = posTarget2;
         this.puIndex = puIndex;
         this.energyCost = energyCost;
+        this.puElement = powerUpName.Substring(0, 1);
     }
 
     public override IEnumerator Start()
@@ -42,6 +44,8 @@ public class PowerUpState : State
         }
         if (!isPlayerActivate)
         {
+            battleSystem.Interface.InitNinjaAttackAnimation(false, puElement);
+
             if (waitForAction) // DRAW_2_CARDS
             {
                 EnableZpoitionForCardsList(battleSystem.cardsDeckUi.enemyCardsUi, true);
@@ -53,7 +57,7 @@ public class PowerUpState : State
                 if (puIndex != -1)
                 {
                     yield return new WaitForSecondsRealtime(1f);
-                    if (powerUpName.Substring(0, 1).Equals("s"))
+                    if (puElement.Equals("s"))
                     {
                         IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
                     }
@@ -73,6 +77,7 @@ public class PowerUpState : State
             int cardsToSelect = PowerUpStruct.Instance.GetPowerUpCardsToSelect(powerUpName);
             if (cardsToSelect == 0 || cardTarget2.Length > 0)
             {// Shove IT somewhereElse
+                battleSystem.Interface.InitNinjaAttackAnimation(true, puElement);
                 if (puIndex != -1)
                 {
                     battleSystem.skillUsed = false;
@@ -85,7 +90,7 @@ public class PowerUpState : State
                     {
                         posTarget2 = new Vector2(0, 0);
                     }
-                    if (powerUpName.Substring(0, 1).Equals("s"))
+                    if (puElement.Equals("s"))
                     {
                         IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
                     }
@@ -262,13 +267,13 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.s1): // 24, //smoke_player
 
                 {
-                    battleSystem.SmokeCardPu(true,cardTarget2, isPlayerActivate, true, false);
+                    battleSystem.SmokeCardPu(true, cardTarget2, isPlayerActivate, true, false);
                     break;
                 }
             case nameof(PowerUpNamesEnum.s2): // 25, //smoke_board
 
                 {
-                    battleSystem.SmokeTurnRiver(isPlayerActivate);
+                    battleSystem.SmokeCardPu(true, Constants.BRiver5, isPlayerActivate, true, false);
                     break;
                 }
             case nameof(PowerUpNamesEnum.s3): //ghost_board
@@ -293,6 +298,11 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.s7): //board value down 2
                 {
                     battleSystem.ChangeValuePu(cardTarget2, -2);
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.sm4): //smoke turn river
+                {
+                    battleSystem.SmokeTurnRiver(isPlayerActivate);
                     break;
                 }
         }
@@ -320,7 +330,7 @@ public class PowerUpState : State
     }
     private void EnableSelectForCardsList(List<CardUi> cardsList, bool enable)
     {
-        string puElement = powerUpName.Substring(0, 1);
+        //  string puElement = powerUpName.Substring(0, 1);
         if (powerUpName.Equals("fm1"))
         {
             puElement = "x";
@@ -328,10 +338,10 @@ public class PowerUpState : State
         }
         foreach (CardUi card in cardsList)
         {
-            if (card.underSmoke && puElement.Equals("w") || card.underSmoke && puElement.Equals("f") || !card.underSmoke)
+           /* if (card.freeze && powerUpName.Equals("s1") || card.underSmoke && puElement.Equals("w") || card.underSmoke && puElement.Equals("f") || !card.underSmoke)
             {
-                card.SetSelection(enable, puElement);
-            }
+            }*/
+                card.SetSelection(enable, puElement,powerUpName);
         }
     }
 

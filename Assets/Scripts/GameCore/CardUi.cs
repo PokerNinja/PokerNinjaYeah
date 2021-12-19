@@ -105,7 +105,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             BattleSystem.Instance.TemproryUnclickable = true;
             --BattleSystem.Instance.cardsToSelectCounter;
             clickbleForPU = false;
-            SetSelection(false, "");
+            SetSelection(false, "", "");
             Vector2 posTarget = transform.position;
             if (gameObject.name.Contains("Deck"))
             {
@@ -122,7 +122,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
         else
         {
-            StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material));
+            StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material, Values.Instance.disableClickShakeDuration));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
     }
@@ -137,9 +137,34 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         return isFaceDown;
     }
 
-    public void SetSelection(bool selectionEnable, string puElement)
+    public void SetSelection(bool selectionEnable, string puElement, string puName)
     {
-        if (!freeze || freeze && puElement.Equals("f") || freeze && !selectionEnable)
+        bool okToSelect = true;
+        if (freeze)
+        {
+            if (puName.Equals("s1") || puElement.Equals("f") || !selectionEnable)
+            {
+                okToSelect = true;
+            }
+            else
+            {
+                okToSelect = false;
+            }
+        }
+        if (underSmoke)
+        {
+            if (puElement.Equals("w") || puElement.Equals("f") || !selectionEnable)
+            {
+                okToSelect = true;
+            }
+            else
+            {
+                okToSelect = false;
+            }
+        }
+
+
+        if (okToSelect)
         {
             //   if (BattleSystem.Instance.cardsToSelectCounter > 0)
             clickbleForPU = selectionEnable;
@@ -236,11 +261,12 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     {
 
         float dissolveDuration = Values.Instance.cardBurnDuration * 2;
-      //  float dissolveAmount = 0.12f;
+        //  float dissolveAmount = 0.12f;
         float dissolveAmount = -0.01f;
+        float shadowAlpha = 0.31f;
         if (fadeIn)
         {
-
+            shadowAlpha = 0f;
             dissolveAmount = 1f;
         }
         //  material.SetTextureScale("_FadeTex", new Vector2(offset, 0.07f));
@@ -250,12 +276,21 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             if (fadeIn)
             {
                 dissolveAmount -= Time.deltaTime / dissolveDuration;
+                if (shadowAlpha < 0.32f)
+                {
+                    shadowAlpha += Time.deltaTime / dissolveDuration;
+                }
             }
             else
             {
                 dissolveAmount += Time.deltaTime / dissolveDuration;
+                if (shadowAlpha > 0f)
+                {
+                    shadowAlpha -= Time.deltaTime / dissolveDuration;
+                }
             }
             spriteRenderer.material.SetFloat("_FadeAmount", dissolveAmount);
+            spriteRenderer.material.SetFloat("_ShadowAlpha", shadowAlpha);
             yield return new WaitForFixedUpdate();
             if (dissolveAmount >= 1 || dissolveAmount <= -0.01f)
             {
