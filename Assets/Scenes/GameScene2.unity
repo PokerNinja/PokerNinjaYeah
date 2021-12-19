@@ -13494,9 +13494,10 @@ MonoBehaviour:
   emojiStartPosPlayer: {fileID: 2037197158}
   emojiStartPosEnemy: {fileID: 1198150331}
   emojiTargetPos: {fileID: 1215868917}
-  hideSmokeBoard: {fileID: 334230851892204992, guid: 32fab0ca8d7f01a4c9d84ccd5e923f0e, type: 3}
-  hideSmokeHand: {fileID: 6127912843102501866, guid: e4239be2510c08e42b5468577b6fdb7c, type: 3}
-  showSmoke: {fileID: 1054394869782477731, guid: c67815df40cb7af48aa4fad103a61286, type: 3}
+  hideSmokeBoard: {fileID: 304705376185053906, guid: 364c78010eda2314aba1df4d0524f055, type: 3}
+  hideSmokeHand: {fileID: 7145367056806923326, guid: cbc05594af45a894f85d83a5c2337a35, type: 3}
+  showSmokeBoard: {fileID: 7429491088334592238, guid: 3cd41a1a7168fca4a8b86464d1288d4c, type: 3}
+  showSmokeHand: {fileID: 616153946092843979, guid: 3b4a150c84c7b2b408aef15878a11350, type: 3}
   turnBtn: {fileID: 333540117}
   turnBtnSpriteREnderer: {fileID: 333540119}
   currentRankText: {fileID: 172212462}
@@ -16651,7 +16652,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1422921162340596280, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
       propertyPath: shaderTypes
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3516995242653804757, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
       propertyPath: m_IsActive
