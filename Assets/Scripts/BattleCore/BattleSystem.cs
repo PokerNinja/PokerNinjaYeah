@@ -159,8 +159,8 @@ public class BattleSystem : StateMachine
                  "w1","w2","w3",
                     "f2","i3","f3",
                  "i1","f1","i2",
-                 "w1","w2","w3",
-                 "w2","w1"};
+                 "w1","sm4","s2",
+                 "w2","sm4"};
             currentGameInfo.turn = "1";
         }
         else
@@ -732,6 +732,10 @@ public class BattleSystem : StateMachine
         isEnemyFlusher = false;
         isPlayerStrighter = false;
         isEnemyStrighter = false;
+        playerHandIsFlusher = false;
+        playerHandIsStrighter = false;
+        enemyHandIsFlusher = false;
+        enemyHandIsStrighter = false;
         TemproryUnclickable = false;
         ui.tieTitle.SetActive(false);
         ui.EnableBgColor(false);
@@ -1220,6 +1224,10 @@ public class BattleSystem : StateMachine
 
     internal void SmokeCardPu(bool enable, string cardTarget2, bool isPlayerActivate, bool reset, bool delay)
     {
+        if(enable && cardsDeckUi.GetCardUiByName(cardTarget2) != null && cardsDeckUi.GetCardUiByName(cardTarget2).freeze)
+        {
+            FreezePlayingCard(cardTarget2, false, false);
+        }
         Action Reset = null;
         if (reset)
         {
@@ -1449,18 +1457,46 @@ public class BattleSystem : StateMachine
 
     internal void SwapTwoCards(string cardTarget1, string cardTarget2)
     {
+        bool noSmoke = true;
         if (cardsDeckUi.GetParentByPlace(cardTarget1).smokeEnable)
         {
             SmokeCardPu(false, cardTarget1, false, false, true);
-            // StartCoroutine(ui.InitSmoke(false, false, cardsDeckUi.GetParentByPlace(cardTarget1), false, null));
+            noSmoke = false;
         }
         if (cardsDeckUi.GetParentByPlace(cardTarget2).smokeEnable)
         {
             SmokeCardPu(false, cardTarget2, false, false, true);
-            //  StartCoroutine(ui.InitSmoke(false, false, cardsDeckUi.GetParentByPlace(cardTarget2), false, null));
+            noSmoke = false;
+        }
+        if (noSmoke)
+        {
+            DestroyRandomSmoke(cardTarget1, cardTarget2);
         }
         cardsDeckUi.SwapTwoCards(cardTarget1, cardTarget2, () => EnableDarkAndSorting(false));
     }
+
+    private void DestroyRandomSmoke(string cardTarget1, string cardTarget2)
+    {
+        List<CardSlot> underSmokeCards = new List<CardSlot>();
+        string tag1 = cardsDeckUi.CardPlaceToTag(cardTarget1);
+        string tag2 = cardsDeckUi.CardPlaceToTag(cardTarget2);
+        foreach (CardSlot cardSlot in cardsDeckUi.allCardSlots)
+        {
+            if (cardSlot.CompareTag(tag1) || cardSlot.CompareTag(tag2))
+            {
+                if (cardSlot.smokeEnable)
+                {
+                    underSmokeCards.Add(cardSlot);
+                }
+            }
+        }
+        if (underSmokeCards.Count > 0)
+        {
+            SmokeCardPu(false, underSmokeCards[UnityEngine.Random.Range(0, underSmokeCards.Count - 1)].childrenName, false, false, false);
+        }
+
+    }
+
     internal void SwapPlayersHands()
     {
         for (int i = 0; i < 4; i++)
@@ -1468,7 +1504,6 @@ public class BattleSystem : StateMachine
             if (cardsDeckUi.allCardSlots[i].smokeEnable)
             {
                 SmokeCardPu(false, cardsDeckUi.allCardSlots[i].childrenName, false, false, true);
-                // StartCoroutine(ui.InitSmoke(false, false, cardsDeckUi.allCardSlots[i], false, null));
             }
 
         }
@@ -1602,7 +1637,7 @@ public class BattleSystem : StateMachine
                     winningPlayersCards.Add(cardsDeckUi.ghostCardUi);
                 }
                 ui.VisionEffect(bestHand.getCards(), winningPlayersCards);
-                 handRank = bestHand.Rank;
+                handRank = bestHand.Rank;
                 if (playerHandIsFlusher)
                 {
                     handRank = 1599;
@@ -1631,7 +1666,7 @@ public class BattleSystem : StateMachine
     }
 
 
-  
+
 
     private bool AreBoardCardsFlipped()
     {

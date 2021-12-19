@@ -21,7 +21,7 @@ public class ObjectPooler : Singleton<ObjectPooler>
     public PowerUpUi puPrefab;
     private Queue<CardUi> cardPool = new Queue<CardUi>();
     private Queue<PowerUpUi> puPool = new Queue<PowerUpUi>();
-    private int cardPoolSize = 12;
+    private int cardPoolSize = 17; // Check it
     private int puPoolSize = 6;
 
     void Start()

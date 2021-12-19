@@ -77,7 +77,7 @@ public class PowerUpState : State
             int cardsToSelect = PowerUpStruct.Instance.GetPowerUpCardsToSelect(powerUpName);
             if (cardsToSelect == 0 || cardTarget2.Length > 0)
             {// Shove IT somewhereElse
-                battleSystem.Interface.InitNinjaAttackAnimation(true,puElement);
+                battleSystem.Interface.InitNinjaAttackAnimation(true, puElement);
                 if (puIndex != -1)
                 {
                     battleSystem.skillUsed = false;
@@ -267,13 +267,13 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.s1): // 24, //smoke_player
 
                 {
-                    battleSystem.SmokeCardPu(true,cardTarget2, isPlayerActivate, true, false);
+                    battleSystem.SmokeCardPu(true, cardTarget2, isPlayerActivate, true, false);
                     break;
                 }
             case nameof(PowerUpNamesEnum.s2): // 25, //smoke_board
 
                 {
-                    battleSystem.SmokeTurnRiver(isPlayerActivate);
+                    battleSystem.SmokeCardPu(true, Constants.BRiver5, isPlayerActivate, true, false);
                     break;
                 }
             case nameof(PowerUpNamesEnum.s3): //ghost_board
@@ -298,6 +298,11 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.s7): //board value down 2
                 {
                     battleSystem.ChangeValuePu(cardTarget2, -2);
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.sm4): //smoke turn river
+                {
+                    battleSystem.SmokeTurnRiver(isPlayerActivate);
                     break;
                 }
         }
@@ -325,7 +330,7 @@ public class PowerUpState : State
     }
     private void EnableSelectForCardsList(List<CardUi> cardsList, bool enable)
     {
-      //  string puElement = powerUpName.Substring(0, 1);
+        //  string puElement = powerUpName.Substring(0, 1);
         if (powerUpName.Equals("fm1"))
         {
             puElement = "x";
@@ -333,10 +338,10 @@ public class PowerUpState : State
         }
         foreach (CardUi card in cardsList)
         {
-            if (card.underSmoke && puElement.Equals("w") || card.underSmoke && puElement.Equals("f") || !card.underSmoke)
+           /* if (card.freeze && powerUpName.Equals("s1") || card.underSmoke && puElement.Equals("w") || card.underSmoke && puElement.Equals("f") || !card.underSmoke)
             {
-                card.SetSelection(enable, puElement);
-            }
+            }*/
+                card.SetSelection(enable, puElement,powerUpName);
         }
     }
 

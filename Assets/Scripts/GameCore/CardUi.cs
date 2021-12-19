@@ -105,7 +105,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             BattleSystem.Instance.TemproryUnclickable = true;
             --BattleSystem.Instance.cardsToSelectCounter;
             clickbleForPU = false;
-            SetSelection(false, "");
+            SetSelection(false, "", "");
             Vector2 posTarget = transform.position;
             if (gameObject.name.Contains("Deck"))
             {
@@ -137,9 +137,34 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         return isFaceDown;
     }
 
-    public void SetSelection(bool selectionEnable, string puElement)
+    public void SetSelection(bool selectionEnable, string puElement, string puName)
     {
-        if (!freeze || freeze && puElement.Equals("f") || freeze && !selectionEnable)
+        bool okToSelect = true;
+        if (freeze)
+        {
+            if (puName.Equals("s1") || puElement.Equals("f") || !selectionEnable)
+            {
+                okToSelect = true;
+            }
+            else
+            {
+                okToSelect = false;
+            }
+        }
+        if (underSmoke)
+        {
+            if (puElement.Equals("w") || puElement.Equals("f") || !selectionEnable)
+            {
+                okToSelect = true;
+            }
+            else
+            {
+                okToSelect = false;
+            }
+        }
+
+
+        if (okToSelect)
         {
             //   if (BattleSystem.Instance.cardsToSelectCounter > 0)
             clickbleForPU = selectionEnable;

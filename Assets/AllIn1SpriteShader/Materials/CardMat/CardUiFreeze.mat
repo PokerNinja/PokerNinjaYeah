@@ -9,9 +9,9 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: CardUiFreeze
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
-  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA FADE_ON GLOWLIGHT_ON OUTBASE_ON OUTDIST_ON
-    OUTTEX_ON RECTSIZE_ON SHAKEUV_ON _GLOWAFFECTLIGHT_ON _OUTLINEDISTORTTOGGLE_ON
-    _OUTLINETEXTOGGLE_ON
+  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA FADE_ON FLICKER_ON GLITCH_ON GLOWLIGHT_ON
+    GRADIENT_ON HSV_ON OUTBASE_ON OUTDIST_ON OUTTEX_ON RADIALGRADIENT_ON SHAKEUV_ON
+    _GLOWAFFECTLIGHT_ON _GRADISRADIAL_ON _OUTLINEDISTORTTOGGLE_ON _OUTLINETEXTOGGLE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -131,21 +131,21 @@ Material:
     - _FadeBurnTransition: 0.101
     - _FadeBurnWidth: 0.56
     - _FishEyeUvAmount: 0
-    - _FlickerAlpha: 0
-    - _FlickerFreq: 0.2
-    - _FlickerPercent: 0.05
+    - _FlickerAlpha: 0.131
+    - _FlickerFreq: 1.4
+    - _FlickerPercent: 0
     - _GhostBlend: 1
     - _GhostColorBoost: 0
     - _GhostTransparency: 0
-    - _GlitchAmount: 3
-    - _GlitchSize: 1
+    - _GlitchAmount: 0
+    - _GlitchSize: 0.95
     - _Glow: 100
     - _GlowAffectLight: 1
     - _GlowTexUsed: 0
     - _GradBlend: 0
-    - _GradBoostX: 1.2
+    - _GradBoostX: 0.56
     - _GradBoostY: 1.2
-    - _GradIsRadial: 0
+    - _GradIsRadial: 1
     - _GrassManualAnim: 1
     - _GrassManualToggle: 0
     - _GrassRadialBend: 2.89
@@ -164,8 +164,8 @@ Material:
     - _HologramStripesAmount: 0.1
     - _HologramStripesSpeed: 4.5
     - _HologramUnmodAmount: 0
-    - _HsvBright: 1
-    - _HsvSaturation: 1
+    - _HsvBright: 1.01
+    - _HsvSaturation: 1.15
     - _HsvShift: 0
     - _InnerOutlineAlpha: 1
     - _InnerOutlineGlow: 250
@@ -256,9 +256,9 @@ Material:
     - _ColorSwapRed: {r: 1, g: 1, b: 1, a: 1}
     - _FadeBurnColor: {r: 0, g: 0.26774764, b: 1, a: 1}
     - _GlowColor: {r: 0.9056604, g: 0, b: 0, a: 0.7294118}
-    - _GradBotLeftCol: {r: 0, g: 0, b: 1, a: 1}
+    - _GradBotLeftCol: {r: 0.5019608, g: 0.27450982, b: 0.57254905, a: 1}
     - _GradBotRightCol: {r: 0, g: 0, b: 1, a: 1}
-    - _GradTopLeftCol: {r: 1, g: 0, b: 0, a: 1}
+    - _GradTopLeftCol: {r: 0, g: 0, b: 0, a: 1}
     - _GradTopRightCol: {r: 1, g: 0, b: 0, a: 1}
     - _GreyscaleTintColor: {r: 1, g: 1, b: 1, a: 1}
     - _HitEffectColor: {r: 1, g: 1, b: 1, a: 1}

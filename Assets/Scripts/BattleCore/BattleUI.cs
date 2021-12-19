@@ -921,7 +921,6 @@ public class BattleUI : MonoBehaviour
 
     internal IEnumerator InitSmoke(bool isPlayerActivate, bool delay, CardSlot parent, bool enable, Action Reset)
     {
-        Debug.LogError("smokie " + enable + " " + parent.name);
         if (parent.smokeEnable && enable)
         {
             ParticleSystem ps = GameObject.Find(parent.name + "S").GetComponent<ParticleSystem>();

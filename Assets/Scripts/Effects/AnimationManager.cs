@@ -320,7 +320,7 @@ public class AnimationManager : Singleton<AnimationManager>
                 onFinishDissolve?.Invoke();
                 if (!freeze)
                 {
-                    targetObj.material = targetMaterial;
+                   // targetObj.material = targetMaterial;
                     targetObj.material.SetFloat("_FadeAmount", -0.1f);
                 }
                 break;
@@ -369,15 +369,15 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
-   public IEnumerator FollowArc(
-        Transform mover,
-        Vector2 start,
-        Vector2 end,
-        float radius, // Set this to negative if you want to flip the arc.
-        float duration,
-        Action BeginAction,
-        Action End1,
-        Action End2)
+    public IEnumerator FollowArc(
+         Transform mover,
+         Vector2 start,
+         Vector2 end,
+         float radius, // Set this to negative if you want to flip the arc.
+         float duration,
+         Action BeginAction,
+         Action End1,
+         Action End2)
     {
         BeginAction?.Invoke();
         Vector2 difference = end - start;
@@ -406,13 +406,13 @@ public class AnimationManager : Singleton<AnimationManager>
 
         float progress = 0f;
         bool EndMovement = false;
-        while(progress < 1f)
+        while (progress < 1f)
         {
             float angle = startAngle + progress * travel;
             mover.position = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * absRadius;
             progress += Time.deltaTime / duration;
             yield return null;
-            if ( progress >= 1f)
+            if (progress >= 1f)
             {
                 mover.position = end;
                 End1?.Invoke();
@@ -422,17 +422,17 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
-   
-    public IEnumerator ScaleAnimation(Transform selector,  Vector2 targetScale, float scaleDuration, Action EndAction)
+
+    public IEnumerator ScaleAnimation(Transform selector, Vector2 targetScale, float scaleDuration, Action EndAction)
     {
         float startTime = Time.time;
         float t;
-        while ( (Vector2)selector.localScale != targetScale)
+        while ((Vector2)selector.localScale != targetScale)
         {
             t = (Time.time - startTime) / scaleDuration;
             if (selector.localScale.x != targetScale.x)
             {
-                selector.localScale = new Vector3(Mathf.SmoothStep(selector.localScale.x, targetScale.x, t), Mathf.SmoothStep(selector.localScale.y, targetScale.y, t ), 1f);
+                selector.localScale = new Vector3(Mathf.SmoothStep(selector.localScale.x, targetScale.x, t), Mathf.SmoothStep(selector.localScale.y, targetScale.y, t), 1f);
             }
             yield return null;
             if ((Vector2)selector.localScale == targetScale)
@@ -444,7 +444,14 @@ public class AnimationManager : Singleton<AnimationManager>
         yield break;
     }
 
-     public IEnumerator SmoothMove(Transform selector, Vector3 targetPosition, Vector2 targetScale, float movementDuration, Action beginAction, Action endAction, Action Reset, Action CloseDrawer)
+    public void ScaleMultipleTime(float firstScale, float secondScale, Transform selector, Vector2 targetScale, float scaleDuration, Action EndAction)
+    {
+        StartCoroutine(ScaleAnimation(selector, targetScale * firstScale, scaleDuration/3,
+            () => StartCoroutine(ScaleAnimation(selector, targetScale * secondScale, scaleDuration/3,
+            () => StartCoroutine(ScaleAnimation(selector, targetScale, scaleDuration/3, EndAction))))));
+    }
+
+    public IEnumerator SmoothMove(Transform selector, Vector3 targetPosition, Vector2 targetScale, float movementDuration, Action beginAction, Action endAction, Action Reset, Action CloseDrawer)
     {
         beginAction?.Invoke();
         float startTime = Time.time;
@@ -948,7 +955,7 @@ public class AnimationManager : Singleton<AnimationManager>
                 stopZooming = true;
 
             }
-            if(!startFading && rotateAmount >= 6.2831f)
+            if (!startFading && rotateAmount >= 6.2831f)
             {
                 startFading = true;
                 FadeOut?.Invoke();

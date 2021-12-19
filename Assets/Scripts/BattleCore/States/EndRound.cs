@@ -51,20 +51,22 @@ public class EndRound : State
         Hand bestOpponentHand = battleSystem.cardsDeckUi.CalculateHand(true, false, battleSystem.isEnemyFlusher, battleSystem.isEnemyStrighter);
         if (battleSystem.enemyHandIsFlusher)
         {
-            bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestOpponentHand);
-        }else if (battleSystem.enemyHandIsStrighter)
+            bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(false, bestOpponentHand);
+        }
+        else if (battleSystem.enemyHandIsStrighter)
         {
-            bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(bestOpponentHand);
+            bestOpponentHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(false, bestOpponentHand);
         }
 
-        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(true,true, battleSystem.isPlayerFlusher, battleSystem.isPlayerStrighter);
+        Hand bestPlayerHand = battleSystem.cardsDeckUi.CalculateHand(true, true, battleSystem.isPlayerFlusher, battleSystem.isPlayerStrighter);
         if (battleSystem.playerHandIsFlusher)
         {
-            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(bestPlayerHand);
-        }else if (battleSystem.playerHandIsStrighter)
+            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToFlusher(true, bestPlayerHand);
+        }
+        else if (battleSystem.playerHandIsStrighter)
         {
             Debug.LogError("Effect Strighter");
-            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(bestPlayerHand);
+            bestPlayerHand = battleSystem.cardsDeckUi.ReplaceCardToStrighter(true, bestPlayerHand);
         }
         battleSystem.Interface.UpdateCardRank(bestPlayerHand.Rank);
         string winnerMsg = "";
@@ -72,7 +74,7 @@ public class EndRound : State
         // Make it better
         if (bestPlayerHand.Rank.CompareTo(bestOpponentHand.Rank) == 1)
         {
-           // SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Lose, true);
+            // SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Lose, true);
             if (battleSystem.DealDamage(true))
             {
                 //battleSystem.gameOver = false;
@@ -85,7 +87,14 @@ public class EndRound : State
                 startNewRound = true;
                 winnerMsg = battleSystem.enemy.id + " Wins With ";
             }
-            AnimateWinWithHand(bestOpponentHand.getCards(), false);
+            if (battleSystem.cardsDeckUi.enemyShadowCard.Equals("x"))
+            {
+                AnimateWinWithHand(bestOpponentHand.getCards(), false);
+            }
+            else
+            {
+                battleSystem.cardsDeckUi.CreateShadowCard(battleSystem.cardsDeckUi.enemyShadowCard, () => AnimateWinWithHand(bestOpponentHand.getCards(), false));
+            }
 
             winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestOpponentHand.Rank); ;
             //  winnerMsg += bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
@@ -93,7 +102,7 @@ public class EndRound : State
         // Player win
         else if (bestPlayerHand.Rank.CompareTo(bestOpponentHand.Rank) == -1)
         {
-           // SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Win, true);
+            // SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Win, true);
             if (battleSystem.DealDamage(false))
             {
                 startNewRound = false;
@@ -106,8 +115,14 @@ public class EndRound : State
 
                 winnerMsg = battleSystem.player.id + " Wins With ";
             }
-
-            AnimateWinWithHand(bestPlayerHand.getCards(), true);
+            if (battleSystem.cardsDeckUi.playerShadowCard.Equals("x"))
+            {
+                AnimateWinWithHand(bestPlayerHand.getCards(), true);
+            }
+            else
+            {
+                battleSystem.cardsDeckUi.CreateShadowCard(battleSystem.cardsDeckUi.playerShadowCard, () => AnimateWinWithHand(bestPlayerHand.getCards(), true));
+            }
             winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestPlayerHand.Rank);
             // winnerMsg += bestPlayerHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
         }
@@ -149,7 +164,7 @@ public class EndRound : State
         losingBoardCards.AddRange(boardCardsUi);
         playerCardsUi.AddRange(battleSystem.cardsDeckUi.GetListByTag("CardP"));
         EnemyCardsUi.AddRange(battleSystem.cardsDeckUi.GetListByTag("CardE"));
-        CardUi card1, card2 , cardGhost;
+        CardUi card1, card2, cardGhost;
         if (isPlayerWin)
         {
             card1 = playerCardsUi[0];
@@ -162,18 +177,24 @@ public class EndRound : State
         }
         string cardGhostStr = "x";
         string cardGhostOwener = "x";
-        if(battleSystem.cardsDeckUi.ghostCardUi!= null)
+        if (battleSystem.cardsDeckUi.shadowCardUi != null)
+        {
+            winningPlayersCards.Add(battleSystem.cardsDeckUi.shadowCardUi);
+        }
+        if (battleSystem.cardsDeckUi.ghostCardUi != null)
         {
             cardGhost = battleSystem.cardsDeckUi.ghostCardUi;
             cardGhostStr = cardGhost.cardDescription.ToString();
             cardGhostOwener = cardGhost.cardPlace.ToString();
-            if(cardGhostOwener.Contains("Player") && isPlayerWin)
+            if (cardGhostOwener.Contains("Player") && isPlayerWin)
             {
 
-            }else if (cardGhostOwener.Contains("Enemy") && !isPlayerWin)
+            }
+            else if (cardGhostOwener.Contains("Enemy") && !isPlayerWin)
             {
 
-            } else if (cardGhostOwener.Contains("B"))
+            }
+            else if (cardGhostOwener.Contains("B"))
             {
 
             }
@@ -210,6 +231,7 @@ public class EndRound : State
             {
                 winningPlayersCards.Add(battleSystem.cardsDeckUi.ghostCardUi);
             }
+
             for (int j = 0; j < 5; j++)
             {
                 if (boardCardsUi[j].cardDescription.ToString().Equals(winningCardDesc))

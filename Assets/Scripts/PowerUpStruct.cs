@@ -67,7 +67,7 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
     
      /*25*/
     public PuStructInfo smoke_board = new PuStructInfo
-        (PowerUpNamesEnum.s2.ToString(), "Smoke", "Smoke the turn and the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them", "", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.s2.ToString(), "Smoke", "Smoke the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them", "", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
     
      /*26*/
     public PuStructInfo ghost_board = new PuStructInfo
@@ -88,6 +88,9 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
      /*31*/
     public PuStructInfo board_value_down_2 = new PuStructInfo
         (PowerUpNamesEnum.s7.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
+     /*32*/
+    public PuStructInfo smoke_turn_river = new PuStructInfo
+        (PowerUpNamesEnum.sm4.ToString(), "Smoke", "Smoke the turn and the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them","", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
 
     /*9*/
     public PuStructInfo shuffle_board = new PuStructInfo
@@ -169,6 +172,8 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
                 return board_value_up_2;
             case nameof(PowerUpNamesEnum.s7):
                 return board_value_down_2;
+            case nameof(PowerUpNamesEnum.sm4):
+                return smoke_turn_river;
            
                 /*draw_all = 3,
                 shuffle_board = 9,
@@ -231,6 +236,7 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         s5 = 29, //player value down 2
         s6 = 30, //board value up 2
         s7 = 31, //board value down 2
+        sm4 = 32, //smoke turn river
     }
 
     #region // PuInfo

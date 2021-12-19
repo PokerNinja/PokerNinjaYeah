@@ -32,6 +32,10 @@ public class Values : Singleton<Values>
     public float windMoveDuration = 0.3f;
     public float windFadeOutDuration =1f;
     public float windRorationSpeed = 2f;
+    public float circularRadiusMove = 1f;
+    public float circularMoveDuration = 1f;
+    public float firstCircualScaleMultiplication = 0.75f;
+    public float secondCircualScaleMultiplication = 1.25f;
 
     public float winningCardProjectileMoveDuration = 1f;
 
