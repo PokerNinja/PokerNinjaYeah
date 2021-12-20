@@ -206,7 +206,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
 
 
-    public void FlipCard(bool reveal, Action onFinish)
+    public void FlipCard( bool reveal, Action onFinish)
     {
         isFaceDown = !reveal;
         flipInProgress = true;

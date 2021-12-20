@@ -282,7 +282,7 @@ public class SoundManager : Singleton<SoundManager>
         }
 
         int randomIndex = Random.Range(0, targetClipSound.Length);
-        
+        // Is above range takin?
 
         
         await PlayAsync(targetClipSound[randomIndex] , false);

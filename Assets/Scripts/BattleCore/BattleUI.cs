@@ -128,6 +128,15 @@ public class BattleUI : MonoBehaviour
     private int lastHandRank = 10;
     public GameObject psParent;
 
+    public Transform pusThemePlayer,pusThemeEnemy;
+    
+    public SpriteRenderer ninjaBgP, ninjaBgE;
+    public SpriteRenderer puBgP, puBgE;
+    public SpriteRenderer puFrameP, puFrameE;
+    public SpriteRenderer ninjaFrameP, ninjaFrameE;
+    private string[] ninjaThemeSprites = { "wood","green","dojo","space" };
+    private Color[] ninjaFrameColors;
+
     public void Initialize(PlayerInfo player, PlayerInfo enemy)
     {
         InitializePlayer(player);
@@ -209,6 +218,34 @@ public class BattleUI : MonoBehaviour
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash2, true);
 
     }
+
+    internal void SlidePuSlots()
+    {
+        Vector3 targetPos = new Vector3(0, 0, 90f);
+        StartCoroutine(AnimationManager.Instance.SmoothMove(pusThemePlayer, targetPos,new Vector2(1,1),Values.Instance.pusDrawerMoveDuration,null,null,null,null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(pusThemeEnemy, targetPos,new Vector2(1,1),Values.Instance.pusDrawerMoveDuration, null,null,null,null));
+    }
+
+    internal void LoadNinjaBG()
+    {
+        ninjaFrameColors = new Color[] { Values.Instance.woodFrameColor, Values.Instance.greenFrameColor, Values.Instance.dojoFrameColor, Values.Instance.spaceFrameColor };
+        int randomPlayerTheme = UnityEngine.Random.Range(0, ninjaThemeSprites.Length);
+        int randomEnemyTheme = UnityEngine.Random.Range(0, ninjaThemeSprites.Length);
+        LoadTheme(ninjaBgP, ninjaThemeSprites[randomPlayerTheme], "bg");
+        LoadTheme(ninjaBgE, ninjaThemeSprites[randomEnemyTheme], "bg");
+        LoadTheme(puBgP, ninjaThemeSprites[randomPlayerTheme], "card");
+        LoadTheme(puBgE, ninjaThemeSprites[randomEnemyTheme], "card");
+        LoadTheme(puFrameP, ninjaThemeSprites[randomPlayerTheme], "orn");
+        LoadTheme(puFrameE, ninjaThemeSprites[randomEnemyTheme], "orn");
+        ninjaFrameP.color = ninjaFrameColors[randomPlayerTheme];
+        ninjaFrameE.color = ninjaFrameColors[randomEnemyTheme];
+    }
+
+    private void LoadTheme(SpriteRenderer target, string randomTheme, string endPath)
+    {
+        target.sprite = Resources.Load("Sprites/Ninja/NinjaBg/"+ randomTheme+ endPath, typeof(Sprite)) as Sprite;
+    }
+
     public IEnumerator SlashEffect()
     {
         rightSlash.Play();
@@ -262,6 +299,7 @@ public class BattleUI : MonoBehaviour
     }
     internal void InitAvatars()
     {
+
         playerAvatarAnimator.Play("idle", 0, 0f);
         enemyAvatarAnimator.Play("idle", 0, 0.4f);
     }
@@ -580,6 +618,16 @@ public class BattleUI : MonoBehaviour
         // currentRankText.text = ConvertHandRankToTextDescription(handRank);
     }
 
+   /* [Button]
+    public void RankUp()
+    {
+        SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankUp);
+    }
+    [Button]
+    public void RankDown()
+    {
+        SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankDown);
+    }*/
     private void UpdateVisionColor(int currentHandRank)
     {
         Values.Instance.currentVisionColor = Values.Instance.visionColorsByRank[currentHandRank - 1];
@@ -955,10 +1003,11 @@ public class BattleUI : MonoBehaviour
         }
         if (enable)
         {
-            ParticleSystem ps = Instantiate(target, parent.transform.position, target.transform.rotation);
+            Vector3 posCurretion = new Vector3(0, -1f, 0f);
+            ParticleSystem ps = Instantiate(target, parent.transform.position , target.transform.rotation);
             ps.name = parent.name + "S";
             ps.transform.SetParent(psParent.transform, false);
-            ps.transform.position = parent.transform.position;
+            ps.transform.position = parent.transform.position + posCurretion;
             yield return new WaitForSeconds(1f);
             Reset?.Invoke();
         }

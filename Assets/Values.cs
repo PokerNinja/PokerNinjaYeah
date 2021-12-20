@@ -53,7 +53,16 @@ public class Values : Singleton<Values>
     public float coinFlipEndMoveDuration = 1f;
 
 
-    //[GUIColor(1, 1, 0)]
+    [Title("Ninja")]
+    [Title("Frames", bold: false)]
+    public Color woodFrameColor;
+    public Color greenFrameColor;
+    public Color dojoFrameColor;
+    public Color spaceFrameColor;
+
+
+
+    [GUIColor(1, 1, 0)]
     [Title("Animation")]
     [Title("General", bold: false)]
     public float objectMoveDuration = 2f;
@@ -85,6 +94,7 @@ public class Values : Singleton<Values>
     public float delayBetweenDealBoardCards = 0.18f;
 
     [Title("PowerUpUi", bold: false)]
+    public float pusDrawerMoveDuration = 2f;
     public float puPushNewSlotMoveDuration = 2f;
     public float puDrawMoveDuration = 2f;
     public float puDissolveDuration = 4f;

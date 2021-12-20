@@ -32,6 +32,7 @@ public class ObjectPooler : Singleton<ObjectPooler>
             CardUi obj = Instantiate(cardPrefab);
             obj.Activate(false);
             obj.transform.SetParent( gameObject.transform);
+            obj.name = "CardUi" + (i+1);
             cardPool.Enqueue(obj);
         }
         for (int i = 0; i < puPoolSize; i++)

@@ -118,7 +118,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     public void CreateShadowCard(string newCardDescription, Action AnimateWinningHand)
     {
-        AnimateDrawer(true,()=> ShadowCreatorUi(Card.StringToCard(newCardDescription), AnimateWinningHand));
+        AnimateDrawer(true, () => ShadowCreatorUi(Card.StringToCard(newCardDescription), AnimateWinningHand));
     }
 
     private void ReplaceUiCard(string oldCard, string newCard)
@@ -656,7 +656,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         shadowCardUi.Init(cardTag, newCard.ToString(CardToStringFormatEnum.ShortCardName), false, true, "shadow");
         shadowCardUi.LoadSprite(true);
         shadowCardUi.spriteRenderer.material = shadowMaterial;
-        StartCoroutine(AnimationManager.Instance.ScaleAnimation(shadowCardUi.transform, cardScale, Values.Instance.cardDrawMoveDuration, () => AnimateDrawer(false, () =>AnimateWinningHand?.Invoke())));
+        StartCoroutine(AnimationManager.Instance.ScaleAnimation(shadowCardUi.transform, cardScale, Values.Instance.cardDrawMoveDuration, () => AnimateDrawer(false, () => AnimateWinningHand?.Invoke())));
     }
 
     private void CardCreatorUi(Card newCard, bool isFaceDown, bool aboveDarkScreen, CardSlot cardParent, string cardPlace, Action disableDarkScreen, bool isCloseDrawer, int indexToInsert)
@@ -709,11 +709,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardObject.spriteRenderer.material = dissolveMaterial;
 
             StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
-        Values.Instance.cardDrawMoveDuration, null, () =>
-        {
-            DarkCardUnderSmoke?.Invoke();
-            cardObject.CardReveal(!isFaceDown);
-        }
+        Values.Instance.cardDrawMoveDuration, DarkCardUnderSmoke, () =>
+            cardObject.CardReveal( !isFaceDown)
            , disableDarkScreen, () =>
         {
             closeDrawer?.Invoke();
@@ -1017,6 +1014,15 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                     }
                 }
             }
+        }
+        return false;
+    }
+
+    internal bool IsPlayerHandUnderSmoke()
+    {
+        if (playerCardAParent.smokeEnable || playerCardBParent.smokeEnable)
+        {
+            return true;
         }
         return false;
     }
@@ -1361,6 +1367,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void EnableCardSmoke(bool enable, bool isPlayerActivate, CardUi targetCard)
     {
+        Debug.LogWarning("ZH");
         if (targetCard != null)
         {
 
@@ -1453,7 +1460,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         if (cardToSee.whosCards.Equals(Constants.CardsOwener.Enemy))
         {
-            cardToSee.FlipCard(cardToSee.GetisFaceDown(), () => cardToSee.ApplyEyeEffect(endAction, cardToSee.GetisFaceDown(), false));
+            cardToSee.FlipCard( cardToSee.GetisFaceDown(), () => cardToSee.ApplyEyeEffect(endAction, cardToSee.GetisFaceDown(), false));
 
         }
     }
@@ -1699,7 +1706,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
             if (tagFrom == Constants.EnemyCardsTag)
             {
-                cardToFlip.FlipCard(true, null);
+                cardToFlip.FlipCard( true, null);
             }
             else if (tagTo == Constants.EnemyCardsTag)
             {

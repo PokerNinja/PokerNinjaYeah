@@ -761,6 +761,8 @@ public class AnimationManager : Singleton<AnimationManager>
         while (selector.localScale != vectorTargetFinal)
         {
             t = (Time.time - startTime) / flipDuration;
+
+           
             if (!shrinking)
             {
                 if (selector.localScale == vectorTargetShrink)

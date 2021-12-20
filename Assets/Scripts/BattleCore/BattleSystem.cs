@@ -184,19 +184,18 @@ public class BattleSystem : StateMachine
         Interface.Initialize(player, enemy);
         startNewRound = true;
         // StartCoroutine(InitGameListeners());
-
+        ui.LoadNinjaBG();
         ui.InitAvatars();
         if (!TEST_MODE)
         {
-            Debug.LogError(currentGameInfo.playersIds[0].ToString());
-            Debug.LogError(player.id);
             StartCoroutine(ui.CoinFlipStartGame(currentGameInfo.playersIds[0].ToString().Equals(player.id)));
-
+            ui.SlidePuSlots();
             LocalTurnSystem.Instance.Inito(() => StartCoroutine(InitGameListeners()));
         }
         else
         {
             StartCoroutine(ui.CoinFlipStartGame(true));
+            ui.SlidePuSlots();
             if (firstDeck)
             {
                 firstDeck = false;
@@ -1084,7 +1083,6 @@ public class BattleSystem : StateMachine
 
     public void DisablePlayerPus()
     {
-
         foreach (PowerUpUi puUi in puDeckUi.GetPuList(true))
         {
             if (puUi != null)
@@ -1101,7 +1099,6 @@ public class BattleSystem : StateMachine
             }
         }
         skillBtn.EnablePu(false);
-
     }
     public void CheckIfPuAvailable(PowerUpUi puUi)
     {
@@ -1111,7 +1108,7 @@ public class BattleSystem : StateMachine
         }
         else
         {
-            if (puUi.puElement.Equals("i") || puUi.puElement.Equals("w") && !puUi.isMonster || puUi.puName.Equals("fm1"))
+            if (puUi.puElement.Equals("i") || (puUi.puElement.Equals("w") && !puUi.isMonster) || puUi.puName.Equals("fm1"))
             {
                 string[] cardsTag = PowerUpStruct.Instance.GetReleventTagCards(puUi.name, true);
                 int cardsLimit = 0;
@@ -1128,6 +1125,10 @@ public class BattleSystem : StateMachine
                 {
                     puUi.EnablePu(true);
                 }
+            }
+            else if (puUi.puName.Equals("im1") && cardsDeckUi.IsPlayerHandUnderSmoke())
+            {
+                puUi.EnablePu(false);
             }
             else
             {
@@ -1224,7 +1225,7 @@ public class BattleSystem : StateMachine
 
     internal void SmokeCardPu(bool enable, string cardTarget2, bool isPlayerActivate, bool reset, bool delay)
     {
-        if(enable && cardsDeckUi.GetCardUiByName(cardTarget2) != null && cardsDeckUi.GetCardUiByName(cardTarget2).freeze)
+        if (enable && cardsDeckUi.GetCardUiByName(cardTarget2) != null && cardsDeckUi.GetCardUiByName(cardTarget2).freeze)
         {
             FreezePlayingCard(cardTarget2, false, false);
         }
