@@ -219,6 +219,10 @@ namespace StandardPokerHandEvaluator
             return SuitEnum.Clubs;
         }
 
+        public static int StringValueToInt(string value)
+        {
+           return StringValueToEnum(value).GetHashCode();
+        }
         private static CardEnum StringValueToEnum(string value)
         {
             switch (value)

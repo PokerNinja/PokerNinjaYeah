@@ -3,6 +3,7 @@ using StandardPokerHandEvaluator;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -89,11 +90,11 @@ public class EndRound : State
             }
             if (battleSystem.cardsDeckUi.enemyShadowCard.Equals("x"))
             {
-                AnimateWinWithHand(bestOpponentHand.getCards(), false);
+                AnimateWinWithHand(bestOpponentHand, false);
             }
             else
             {
-                battleSystem.cardsDeckUi.CreateShadowCard(battleSystem.cardsDeckUi.enemyShadowCard, () => AnimateWinWithHand(bestOpponentHand.getCards(), false));
+                battleSystem.cardsDeckUi.CreateShadowCard(battleSystem.cardsDeckUi.enemyShadowCard, () => AnimateWinWithHand(bestOpponentHand, false));
             }
 
             winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestOpponentHand.Rank); ;
@@ -117,11 +118,11 @@ public class EndRound : State
             }
             if (battleSystem.cardsDeckUi.playerShadowCard.Equals("x"))
             {
-                AnimateWinWithHand(bestPlayerHand.getCards(), true);
+                AnimateWinWithHand(bestPlayerHand, true);
             }
             else
             {
-                battleSystem.cardsDeckUi.CreateShadowCard(battleSystem.cardsDeckUi.playerShadowCard, () => AnimateWinWithHand(bestPlayerHand.getCards(), true));
+                battleSystem.cardsDeckUi.CreateShadowCard(battleSystem.cardsDeckUi.playerShadowCard, () => AnimateWinWithHand(bestPlayerHand, true));
             }
             winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestPlayerHand.Rank);
             // winnerMsg += bestPlayerHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
@@ -151,9 +152,10 @@ public class EndRound : State
     }
 
 
-    private void AnimateWinWithHand(List<Card> winningCards, bool isPlayerWin)
+    private void AnimateWinWithHand(Hand winningHand, bool isPlayerWin)
     {
         //MAKE IT BETTER
+        List<Card> winningCards = winningHand.getCards();
         List<CardUi> winningPlayersCards = new List<CardUi>();
         List<CardUi> winningBoardCards = new List<CardUi>();
         List<CardUi> losingBoardCards = new List<CardUi>();
@@ -243,12 +245,88 @@ public class EndRound : State
         }
         losingBoardCards.RemoveAll(item => winningBoardCards.Contains(item));
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndRoundGong, true);
-        AnimationManager.Instance.AnimateWinningHandToBoard(winningPlayersCards, losingBoardCards,
+        /* AnimationManager.Instance.AnimateWinningHandToBoard(winningPlayersCards, losingBoardCards,
+             () =>
+             {
+                 battleSystem.EndRoundVisual(isPlayerWin);
+                 StartNewRoundAction(false);
+             }); */
+
+        winningPlayersCards = winningPlayersCards.Concat(winningBoardCards).ToList();
+        winningPlayersCards = RearangeWinningCards(winningPlayersCards, IsStrightOrFlush(winningHand.Rank));
+         AnimationManager.Instance.AnimateWinningHandToBoard2(winningPlayersCards,
+            ConvertRankToCardToGlow(battleSystem.Interface.ConvertHandRankToTextNumber(winningHand.Rank)),
+            losingBoardCards, battleSystem.cardsDeckUi.boardTransform,
             () =>
             {
                 battleSystem.EndRoundVisual(isPlayerWin);
-                StartNewRoundAction(false);
+                StartNewRoundAction(true);
             });
+    }
+
+    private int ConvertRankToCardToGlow(int rank)
+    {
+        switch (rank)
+        {
+            case 10:
+                return 1;
+            case 9:
+                return 2;
+            case 8:
+            case 3:
+                return 4;
+            case 7:
+                return 3;/*
+            case 6:
+            case 5:
+            case 4:
+            case 2:
+            case 1:
+                return 5;*/
+        }
+        return 5;
+    }
+
+    private bool IsStrightOrFlush(int rank)
+    {
+        return (rank <= 2467 && rank >= 1600) || rank <= 166;
+    }
+
+    private List<CardUi> RearangeWinningCards(List<CardUi> winningHand, bool isStrightOrFlush)
+    {
+        List<CardUi> aragnedCards = new List<CardUi>();
+
+        winningHand = winningHand.OrderByDescending(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
+        if (isStrightOrFlush)
+        {
+            return winningHand;
+        }
+        else
+        {
+            List<CardUi> repetitive = new List<CardUi>();
+            string lastRepeatValue = "";
+            for (int i = 4; i > 0; i--)
+            {
+                if (lastRepeatValue == winningHand[i].cardDescription[0].ToString())
+                {
+                    repetitive.Add(winningHand[i]);
+                    winningHand.RemoveAt(i);
+                }
+                else if (winningHand[i].cardDescription[0].ToString() == winningHand[i - 1].cardDescription[0].ToString())
+                {
+                    lastRepeatValue = winningHand[i].cardDescription[0].ToString();
+                    repetitive.Add(winningHand[i]);
+                    repetitive.Add(winningHand[i - 1]);
+                    winningHand.RemoveAt(i);
+                    winningHand.RemoveAt(i - 1);
+                    i--;
+                }
+            }
+            aragnedCards = aragnedCards.Concat(repetitive).ToList();
+            aragnedCards = aragnedCards.OrderByDescending(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
+        }
+        aragnedCards = aragnedCards.Concat(winningHand).ToList();
+        return aragnedCards;
     }
 
     private void StartNewRoundAction(bool delay)

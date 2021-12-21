@@ -84,3 +84,13 @@ UserSettings/EditorUserSettings.asset
 ProjectSettings/HDRPProjectSettings.asset
 Assets/Plugins/Android/FirebaseCrashlytics.androidlib/res/values/crashlytics_build_id.xml
 ProjectSettings/HDRPProjectSettings.asset
+Assets/Plugins/Android/com.google.firebase.firebase-analytics-unity-7.0.2.aar
+Assets/Plugins/Android/com.google.firebase.firebase-app-unity-7.0.2.aar
+Assets/Plugins/Android/com.google.firebase.firebase-auth-unity-7.0.2.aar
+Assets/Plugins/Android/com.google.firebase.firebase-common-19.3.1.aar
+Assets/Plugins/Android/com.google.firebase.firebase-crashlytics-unity-7.0.2.aar
+Assets/Plugins/Android/com.google.firebase.firebase-database-unity-7.0.2.aar
+Assets/Plugins/Android/com.google.firebase.firebase-firestore-unity-7.0.2.aar
+Assets/Plugins/Android/com.google.firebase.firebase-functions-unity-7.0.2.aar
+Assets/Plugins/Android/com.google.firebase.firebase-storage-unity-7.0.2.aar
+Assets/Plugins/Android/FirebaseCrashlytics.androidlib/res/values/crashlytics_build_id.xml

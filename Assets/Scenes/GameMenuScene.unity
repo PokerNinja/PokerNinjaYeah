@@ -966,7 +966,9 @@ MonoBehaviour:
   cardMark: {fileID: 0}
   cardSelection: {fileID: 0}
   freeze: 0
+  isGhost: 0
   whosCards: 4
+  underSmoke: 0
 --- !u!1 &761299302
 GameObject:
   m_ObjectHideFlags: 0

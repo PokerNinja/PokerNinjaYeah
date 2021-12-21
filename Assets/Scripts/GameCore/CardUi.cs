@@ -206,7 +206,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
 
 
-    public void FlipCard( bool reveal, Action onFinish)
+    public void FlipCard(bool reveal, Action onFinish)
     {
         isFaceDown = !reveal;
         flipInProgress = true;
@@ -385,12 +385,17 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
 
 
-    internal IEnumerator Dissolve(Material dissolveMaterial, float delayInSec, Action onFinishDissolve)
+    internal IEnumerator Dissolve(bool isFrozen, Material dissolveMaterial, float delayInSec, Action onFinishDissolve)
     {
-        spriteRenderer.material = dissolveMaterial;
+        //spriteRenderer.material = dissolveMaterial;
+        //TODO MAYBE NEED DISSOLVEMAT
         float dissolveAmount = -0.01f;
         yield return new WaitForSeconds(delayInSec);
-
+        if (isFrozen)
+        {
+            StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_FadeBurnWidth", dissolveAmount, spriteRenderer.material, 0,
+                () => spriteRenderer.material.SetFloat("_FadeBurnWidth", 0.56f)));
+        }
         while (dissolveAmount < 1)
         {
             dissolveAmount += Time.deltaTime;

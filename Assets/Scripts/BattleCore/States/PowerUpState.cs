@@ -210,26 +210,28 @@ public class PowerUpState : State
                     //MAKE IT LOOK BETTER WHOS FIRST MAYNBE FUCKED HERE
                     battleSystem.UpdateZPos(true, "All");
                     int boardCount = battleSystem.cardsDeckUi.boardCardsUi.Count;
-                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.PlayerCard2), 0.1f, false, true, false);
-                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard2), 0.4f, false, false, false);
-                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.PlayerCard1), 0.7f, false, false, false);
-                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard1), 1f, false, false, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[0], 1.3f, false, false, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[1], 1.6f, false, false, false);
+                    float addition = 0.2f;
+                    int index = 1;
+                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.PlayerCard2), index++ * addition, false, true, false);
+                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard2), index++ * addition, false, false, false);
+                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.PlayerCard1), index++ * addition, false, false, false);
+                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard1), index++ * addition, false, false, false);
+                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[0], index++ * addition, false, false, false);
+                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[1], index++ * addition, false, false, false);
                     if (boardCount == 3)
                     {
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], 1.9f, true, false, true);
+                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], index++ * addition, true, false, true);
                     }
                     else if (boardCount == 4)
                     {
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], 1.9f, false, false, false);
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[3], 2.1f, true, false, true);
+                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2],  index++ * addition, false, false, false);
+                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[3], index++ * addition, true, false, true);
                     }
                     else if (boardCount == 5)
                     {
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], 1.9f, false, false, false);
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[3], 2.1f, false, false, false);
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[4], 2.3f, true, false, true);
+                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2],  index++ * addition, false, false, false);
+                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[3],  index++ * addition, false, false, false);
+                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[4], index++ * addition, true, false, true);
                     }
 
                     break;
@@ -338,10 +340,10 @@ public class PowerUpState : State
         }
         foreach (CardUi card in cardsList)
         {
-           /* if (card.freeze && powerUpName.Equals("s1") || card.underSmoke && puElement.Equals("w") || card.underSmoke && puElement.Equals("f") || !card.underSmoke)
-            {
-            }*/
-                card.SetSelection(enable, puElement,powerUpName);
+            /* if (card.freeze && powerUpName.Equals("s1") || card.underSmoke && puElement.Equals("w") || card.underSmoke && puElement.Equals("f") || !card.underSmoke)
+             {
+             }*/
+            card.SetSelection(enable, puElement, powerUpName);
         }
     }
 

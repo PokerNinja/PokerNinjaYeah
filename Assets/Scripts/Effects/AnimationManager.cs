@@ -155,6 +155,7 @@ public class AnimationManager : Singleton<AnimationManager>
         float r = spriteRenderer.color.r;
         float g = spriteRenderer.color.g;
         float b = spriteRenderer.color.b;
+        float startingAlpha = spriteRenderer.color.a;
         float dissolveAmount = 1;
         float alphaTarget = 0;
         if (fadeIn)
@@ -162,29 +163,38 @@ public class AnimationManager : Singleton<AnimationManager>
             dissolveAmount = 0;
             alphaTarget = 1;
         }
-        spriteRenderer.color = new Color(r, g, b, dissolveAmount);
-        //FIXIT
-        while (dissolveAmount != alphaTarget)
+        if (startingAlpha == alphaTarget)
         {
-            yield return new WaitForFixedUpdate();
-            if (fadeIn)
-            {
-                dissolveAmount += Time.deltaTime / duration;
-            }
-            else
-            {
-                dissolveAmount -= Time.deltaTime / duration;
-            }
+            Debug.LogError("SAME VaLUE");
+            OnFinish?.Invoke();
+        }
+        else
+        {
 
-            spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
-            if (dissolveAmount >= 1 || dissolveAmount <= 0)
+            spriteRenderer.color = new Color(r, g, b, dissolveAmount);
+            //FIXIT
+            while (dissolveAmount != alphaTarget)
             {
-                // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
-                // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
+                yield return new WaitForFixedUpdate();
+                if (fadeIn)
+                {
+                    dissolveAmount += Time.deltaTime / duration;
+                }
+                else
+                {
+                    dissolveAmount -= Time.deltaTime / duration;
+                }
 
-                spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaTarget));
-                OnFinish?.Invoke();
-                break;
+                spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
+                if (dissolveAmount >= 1 || dissolveAmount <= 0)
+                {
+                    // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
+                    // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
+
+                    spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaTarget));
+                    OnFinish?.Invoke();
+                    break;
+                }
             }
         }
     }
@@ -320,7 +330,7 @@ public class AnimationManager : Singleton<AnimationManager>
                 onFinishDissolve?.Invoke();
                 if (!freeze)
                 {
-                   // targetObj.material = targetMaterial;
+                    // targetObj.material = targetMaterial;
                     targetObj.material.SetFloat("_FadeAmount", -0.1f);
                 }
                 break;
@@ -446,9 +456,9 @@ public class AnimationManager : Singleton<AnimationManager>
 
     public void ScaleMultipleTime(float firstScale, float secondScale, Transform selector, Vector2 targetScale, float scaleDuration, Action EndAction)
     {
-        StartCoroutine(ScaleAnimation(selector, targetScale * firstScale, scaleDuration/3,
-            () => StartCoroutine(ScaleAnimation(selector, targetScale * secondScale, scaleDuration/3,
-            () => StartCoroutine(ScaleAnimation(selector, targetScale, scaleDuration/3, EndAction))))));
+        StartCoroutine(ScaleAnimation(selector, targetScale * firstScale, scaleDuration / 3,
+            () => StartCoroutine(ScaleAnimation(selector, targetScale * secondScale, scaleDuration / 3,
+            () => StartCoroutine(ScaleAnimation(selector, targetScale, scaleDuration / 3, EndAction))))));
     }
 
     public IEnumerator SmoothMove(Transform selector, Vector3 targetPosition, Vector2 targetScale, float movementDuration, Action beginAction, Action endAction, Action Reset, Action CloseDrawer)
@@ -762,7 +772,7 @@ public class AnimationManager : Singleton<AnimationManager>
         {
             t = (Time.time - startTime) / flipDuration;
 
-           
+
             if (!shrinking)
             {
                 if (selector.localScale == vectorTargetShrink)
@@ -1055,7 +1065,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
     }
 
-    public void VisionEffect(List<CardUi> winningPlayersCards, bool enable)
+    public void VisionEffect(List<CardUi> winningPlayersCards, int cardToGlow, bool enable)
     {
         float alphaAmoint = 0f;
         float burnAmoint = 0.6f;
@@ -1067,8 +1077,11 @@ public class AnimationManager : Singleton<AnimationManager>
             burnAmoint = 0f;
             ghostColor = visionColor;
         }
-        foreach (CardUi cardUi in winningPlayersCards)
+        //foreach (CardUi cardUi in winningPlayersCards)
+        CardUi cardUi;
+        for (int i = 0; i < cardToGlow; i++)
         {
+            cardUi = winningPlayersCards[i];
             if (cardUi.freeze)
             {
                 cardUi.spriteRenderer.material.SetFloat("_FadeAmount", burnAmoint);
@@ -1102,6 +1115,25 @@ public class AnimationManager : Singleton<AnimationManager>
         {
             StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, null));
         }
+    }
+    public async void AnimateWinningHandToBoard2(List<CardUi> winningPlayerCards, int cardToGlow, List<CardUi> losingBoardCards, Transform[] boardTransform, Action UpdateValueEndRoutine)
+    {
+        Vector3 targetScale = new Vector3(0.75f, 0.75f, 0.75f);
+        foreach (CardUi card in losingBoardCards)
+        {
+            StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, null));
+        }
+        VisionEffect(winningPlayerCards, cardToGlow, true);
+        for (int i = 0; i < 5; i++)
+        {
+            await Task.Delay(150);
+            StartCoroutine(SmoothMove(winningPlayerCards[i].transform, boardTransform[i].position, targetScale, Values.Instance.winningCardsMoveDuration, null, null, null, null));
+            if (i == 4)
+            {
+                UpdateValueEndRoutine.Invoke();
+            }
+        }
+
     }
 
 

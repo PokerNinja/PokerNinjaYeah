@@ -16,13 +16,14 @@ public class EnemyTurn : State
     }
     public override IEnumerator Start()
     {
+        battleSystem.turnInitInProgress = true;
         battleSystem.Interface.EnableBgColor(false);
         battleSystem.Interface.EnablePlayerButtons(false);
         battleSystem.DealPu(false, () =>
          {
              battleSystem.Interface.SetTurnIndicator(false, true);
              battleSystem.NewTimerStarter(false);
-             battleSystem.Interface.WhosTurnAnimation(false, false, isFinalTurn);
+             battleSystem.Interface.WhosTurnAnimation(false, false, isFinalTurn, () => battleSystem.turnInitInProgress = false);
          }
         );
         yield break;

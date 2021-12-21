@@ -128,13 +128,13 @@ public class BattleUI : MonoBehaviour
     private int lastHandRank = 10;
     public GameObject psParent;
 
-    public Transform pusThemePlayer,pusThemeEnemy;
-    
+    public Transform pusThemePlayer, pusThemeEnemy;
+
     public SpriteRenderer ninjaBgP, ninjaBgE;
     public SpriteRenderer puBgP, puBgE;
     public SpriteRenderer puFrameP, puFrameE;
     public SpriteRenderer ninjaFrameP, ninjaFrameE;
-    private string[] ninjaThemeSprites = { "wood","green","dojo","space" };
+    private string[] ninjaThemeSprites = { "wood", "green", "dojo", "space" };
     private Color[] ninjaFrameColors;
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy)
@@ -222,8 +222,8 @@ public class BattleUI : MonoBehaviour
     internal void SlidePuSlots()
     {
         Vector3 targetPos = new Vector3(0, 0, 90f);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(pusThemePlayer, targetPos,new Vector2(1,1),Values.Instance.pusDrawerMoveDuration,null,null,null,null));
-        StartCoroutine(AnimationManager.Instance.SmoothMove(pusThemeEnemy, targetPos,new Vector2(1,1),Values.Instance.pusDrawerMoveDuration, null,null,null,null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(pusThemePlayer, targetPos, new Vector2(1, 1), Values.Instance.pusDrawerMoveDuration, null, null, null, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(pusThemeEnemy, targetPos, new Vector2(1, 1), Values.Instance.pusDrawerMoveDuration, null, null, null, null));
     }
 
     internal void LoadNinjaBG()
@@ -243,7 +243,7 @@ public class BattleUI : MonoBehaviour
 
     private void LoadTheme(SpriteRenderer target, string randomTheme, string endPath)
     {
-        target.sprite = Resources.Load("Sprites/Ninja/NinjaBg/"+ randomTheme+ endPath, typeof(Sprite)) as Sprite;
+        target.sprite = Resources.Load("Sprites/Ninja/NinjaBg/" + randomTheme + endPath, typeof(Sprite)) as Sprite;
     }
 
     public IEnumerator SlashEffect()
@@ -483,8 +483,11 @@ public class BattleUI : MonoBehaviour
                 }
             }
         }
-        AnimationManager.Instance.VisionEffect(cardsToGlow, true);
+        
+        AnimationManager.Instance.VisionEffect(cardsToGlow, 5,true);
     }
+
+    
 
     public void SetTurnIndicator(bool isPlayerTurn, bool enable)
     {
@@ -500,7 +503,7 @@ public class BattleUI : MonoBehaviour
         }
     }
 
-    public void WhosTurnAnimation(bool isPlayer, bool yourLastTurn, bool finalMove)
+    public void WhosTurnAnimation(bool isPlayer, bool yourLastTurn, bool finalMove, Action EndRoutine)
     {
 
         string targetTurnTextPath;
@@ -528,7 +531,7 @@ public class BattleUI : MonoBehaviour
              }));
 
          }*/
-        endAction = () => StartCoroutine(AnimationManager.Instance.SmoothMove(turnTextGO.transform, targetTurnSymbol.transform.position, targetTurnSymbol.transform.localScale, Values.Instance.turnTextMoveDuration, null, null, null, () =>
+        endAction = () => StartCoroutine(AnimationManager.Instance.SmoothMove(turnTextGO.transform, targetTurnSymbol.transform.position, targetTurnSymbol.transform.localScale, Values.Instance.turnTextMoveDuration, null, null, EndRoutine, () =>
                 turnTextGO.transform.localPosition = new Vector3(turnTextGO.transform.localPosition.x, turnTextGO.transform.localPosition.y, 19.5f)));
 
         StartCoroutine(AnimationManager.Instance.ScaleObject(false, 11f, Values.Instance.turnTextScaleDuration, turnTextGO.transform, enableBGPulse, endAction));
@@ -573,14 +576,14 @@ public class BattleUI : MonoBehaviour
             //AnimationManager.Instance.SetAlpha(enemyFrameTurn, 0f);
             StartCoroutine(AnimationManager.Instance.AlphaAnimation(playerLargeTurnIndicator, true, Values.Instance.turnIndicatorFadeDuration, () =>
              StartCoroutine(AnimationManager.Instance.AlphaAnimation(playerLargeTurnIndicator, false, Values.Instance.turnIndicatorFadeDuration, null))));
-           // StartCoroutine(AnimationManager.Instance.AlphaAnimation(playerLargeNotTurnIndicator, false, Values.Instance.turnIndicatorFadeDuration, OnFinish));
+            // StartCoroutine(AnimationManager.Instance.AlphaAnimation(playerLargeNotTurnIndicator, false, Values.Instance.turnIndicatorFadeDuration, OnFinish));
 
             StartCoroutine(AnimationManager.Instance.AlphaLoop(playerFrameTurn, Values.Instance.turnIndicatorFadeDuration, OnFinish));
         }
         else
         {
-           // AnimationManager.Instance.SetAlpha(playerFrameTurn, 0f);
-           // StartCoroutine(AnimationManager.Instance.AlphaAnimation(playerLargeNotTurnIndicator, true, Values.Instance.turnIndicatorFadeDuration, null));
+            // AnimationManager.Instance.SetAlpha(playerFrameTurn, 0f);
+            // StartCoroutine(AnimationManager.Instance.AlphaAnimation(playerLargeNotTurnIndicator, true, Values.Instance.turnIndicatorFadeDuration, null));
             StartCoroutine(AnimationManager.Instance.AlphaLoop(enemyFrameTurn, Values.Instance.turnIndicatorFadeDuration, OnFinish));
         }
     }
@@ -595,7 +598,7 @@ public class BattleUI : MonoBehaviour
     }
     internal void UpdateCardRank(int handRank)
     {
-        if(handRank == -1)
+        if (handRank == -1)
         {
             handRank = 7000;
         }
@@ -618,16 +621,16 @@ public class BattleUI : MonoBehaviour
         // currentRankText.text = ConvertHandRankToTextDescription(handRank);
     }
 
-   /* [Button]
-    public void RankUp()
-    {
-        SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankUp);
-    }
-    [Button]
-    public void RankDown()
-    {
-        SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankDown);
-    }*/
+    /* [Button]
+     public void RankUp()
+     {
+         SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankUp);
+     }
+     [Button]
+     public void RankDown()
+     {
+         SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankDown);
+     }*/
     private void UpdateVisionColor(int currentHandRank)
     {
         Values.Instance.currentVisionColor = Values.Instance.visionColorsByRank[currentHandRank - 1];
@@ -667,7 +670,7 @@ public class BattleUI : MonoBehaviour
 
 
 
-    private int ConvertHandRankToTextNumber(int handRank)
+    public int ConvertHandRankToTextNumber(int handRank)
     {
         switch (handRank)
         {
@@ -895,6 +898,8 @@ public class BattleUI : MonoBehaviour
         {
             value = 0;
         }
+        // Make IT more stable
+        BattleSystem.Instance.btnReplaceClickable = enable;
         StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, btnReplaceRenderer.material, value, () => BattleSystem.Instance.btnReplaceClickable = enable));
     }
 
@@ -1004,7 +1009,7 @@ public class BattleUI : MonoBehaviour
         if (enable)
         {
             Vector3 posCurretion = new Vector3(0, -1f, 0f);
-            ParticleSystem ps = Instantiate(target, parent.transform.position , target.transform.rotation);
+            ParticleSystem ps = Instantiate(target, parent.transform.position, target.transform.rotation);
             ps.name = parent.name + "S";
             ps.transform.SetParent(psParent.transform, false);
             ps.transform.position = parent.transform.position + posCurretion;

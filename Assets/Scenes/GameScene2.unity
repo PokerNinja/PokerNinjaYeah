@@ -8307,6 +8307,7 @@ MonoBehaviour:
   sameCardsSelection: 0
   selectMode: 0
   playerPuInProcess: 0
+  ReplaceInProgress: 0
   endRoutineFinished: 0
   gameOver: 0
   startNewRound: 0
@@ -8322,21 +8323,22 @@ MonoBehaviour:
   enemyHandIsFlusher: 0
   enemyHandIsStrighter: 0
   visionUnavailable: 0
+  turnInitInProgress: 0
   energyCounter: 0
   replaceMode: 0
   endTurnInProcess: 0
   playersHand:
-  - Ks
-  - 8s
+  - As
+  - 6c
   enemysHand:
-  - Js
+  - Jd
   - As
   board:
-  - Ts
-  - 6s
-  - Td
+  - 8s
+  - Qd
+  - 6d
   - 4s
-  - Ad
+  - Ks
 --- !u!4 &924643557
 Transform:
   m_ObjectHideFlags: 0
@@ -16030,21 +16032,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1943470051078712891, guid: 67af4617b9110da4ab556420b1d6d2a8, type: 3}
   m_PrefabInstance: {fileID: 1732509030}
   m_PrefabAsset: {fileID: 0}
---- !u!111 &1732509033
-Animation:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1732509032}
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 97079657b3f781a4ea10b0151e481331, type: 2}
-  m_Animations: []
-  m_WrapMode: 0
-  m_PlayAutomatically: 0
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!212 &1732509034 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 1943470051078712889, guid: 67af4617b9110da4ab556420b1d6d2a8, type: 3}
@@ -16440,6 +16427,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1220153803}
     m_Modifications:
     - target: {fileID: -7068494672590517942, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7068494672590517942, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.x
       value: 2.136
       objectReference: {fileID: 0}
@@ -16549,7 +16540,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1422921162340596280, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1422921162340596280, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
       propertyPath: shaderTypes
@@ -16571,6 +16562,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: ed93eae6e8a8fdc40b6aae995e7d0a1b, type: 3}
+    - target: {fileID: 6742415106900719839, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6742415106900719839, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
       propertyPath: m_SortingOrder
       value: 0
@@ -16595,7 +16590,10 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1165370969, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
+    - {fileID: 6742415106900719839, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
+    - {fileID: 1422921162340596280, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 10d8b0ed31236b3409370b96b97dd861, type: 3}
 --- !u!1 &1814027273
 GameObject:
@@ -20447,9 +20445,10 @@ MonoBehaviour:
   playerShadowCard: 
   enemyShadowCard: 
   burnMaterial: {fileID: 2100000, guid: b7f697db8211edc4f90696f5c03c0370, type: 2}
-  dissolveMaterial: {fileID: 2100000, guid: dd9d00014dff10a429878936e451eb33, type: 2}
+  dissolveMaterial: {fileID: 2100000, guid: 242cb404a0105d44a9ca1b6a7900bf78, type: 2}
   ghostMaterial: {fileID: 2100000, guid: 56819362ee8949f4f858a91e178ef075, type: 2}
   shadowMaterial: {fileID: 2100000, guid: d79cc9da5d33af54abb2686314d78e2e, type: 2}
+  boardTransform: []
   highestSuitForFlusher: 0
 --- !u!212 &1064032605134543353
 SpriteRenderer:

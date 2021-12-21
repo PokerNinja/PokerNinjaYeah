@@ -53,7 +53,7 @@ public class PlayerTurn : State
                 battleSystem.NewTimerStarter(true);
             }
             battleSystem.ActivatePlayerButtons(true, true);
-            battleSystem.Interface.WhosTurnAnimation(true, yourLastTurn, finalTurn);
+            battleSystem.Interface.WhosTurnAnimation(true, yourLastTurn, finalTurn,null);
             battleSystem.ChargeEnergyCounter(energyChargeCount);
             battleSystem.Interface.SetTurnIndicator(true, true);
 

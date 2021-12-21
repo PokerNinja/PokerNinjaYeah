@@ -4,10 +4,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
@@ -56,6 +54,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     public Material dissolveMaterial;
     public Material ghostMaterial;
     public Material shadowMaterial;
+    public Transform[] boardTransform;
     private PokerHandRankingTable poker;
 
     #region Settings
@@ -80,6 +79,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         cardVectorGhostBoard = new Vector3(0.6f, 0.6f, 0.6f);
         poker = new PokerHandRankingTable();
         allCardSlots = new CardSlot[] { playerCardAParent, playerCardBParent, enemyCardAParent, enemyCardBParent, flopAParent, flopBParent, flopCParent, turnParent, riverParent };
+        boardTransform = new Transform[] {  flopAParent.transform, flopBParent.transform, flopCParent.transform, turnParent.transform, riverParent.transform};
     }
 
     private Card cardToSave;
@@ -449,6 +449,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardToReset.freeze = false;
             cardToReset.spriteRenderer.material.SetColor("_FadeBurnColor", Color.yellow);
         }
+
+        cardToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
         cardToReset.transform.position = cardTransform.position;
         cardToReset.transform.localScale = cardTransform.localScale;
         cardToReset.transform.SetParent(objectPooler.transform);
@@ -1018,6 +1020,15 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return false;
     }
 
+    internal bool IsOneCardFromHandsFreeze()
+    {
+        if(playerCardsUi[0].freeze || playerCardsUi[1].freeze ||enemyCardsUi[1].freeze || enemyCardsUi[1].freeze)
+        {
+            return true;
+        }
+        return false;
+    }
+
     internal bool IsPlayerHandUnderSmoke()
     {
         if (playerCardAParent.smokeEnable || playerCardBParent.smokeEnable)
@@ -1498,7 +1509,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         else
         {
-            StartCoroutine(cardToDestroy.Dissolve(dissolveMaterial, 0f, () =>
+            StartCoroutine(cardToDestroy.Dissolve(false,dissolveMaterial, 0f, () =>
                      RestAfterDestroy(cardToDestroy, OnEnd)));
         }
     }
@@ -1792,7 +1803,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 cardToDestroy.cardMark.SetActive(false);
             }
-            StartCoroutine(cardToDestroy.Dissolve(dissolveMaterial, 0, () => ResetCardUI(cardToDestroy)));
+            StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => ResetCardUI(cardToDestroy)));
         }
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve, true);
         DealHands();
