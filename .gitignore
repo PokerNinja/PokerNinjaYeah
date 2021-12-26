@@ -94,3 +94,8 @@ Assets/Plugins/Android/com.google.firebase.firebase-firestore-unity-7.0.2.aar
 Assets/Plugins/Android/com.google.firebase.firebase-functions-unity-7.0.2.aar
 Assets/Plugins/Android/com.google.firebase.firebase-storage-unity-7.0.2.aar
 Assets/Plugins/Android/FirebaseCrashlytics.androidlib/res/values/crashlytics_build_id.xml
+Assets/StreamingAssets/google-services-desktop.json.meta
+ProjectSettings/HDRPProjectSettings.asset
+Assets/Resources/Sprites/PU/Materials/Windy.mat.meta
+Assets/Resources/Sprites/PU/Materials/Windy.mat
+Assets/Resources/Sprites/PU/Materials.meta
