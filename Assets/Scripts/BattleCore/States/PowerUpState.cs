@@ -250,7 +250,6 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.im1): //block_player_2_cards = im1
                 {
-
                     battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard1), true, false);
                     battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2), true, true);
                     break;

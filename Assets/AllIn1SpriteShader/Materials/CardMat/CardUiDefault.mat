@@ -11,8 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
   m_ShaderKeywords: COLORRAMPOUTLINE_ON ETC1_EXTERNAL_ALPHA FADE_ON FLICKER_ON GLITCH_ON
     GRADIENT2COL_ON GRADIENTCOLORRAMP_ON GRADIENT_ON HSV_ON OUTBASE_ON OUTDIST_ON
-    OUTTEX_ON OVERLAYMULT_ON RADIALGRADIENT_ON SHAKEUV_ON _COLORRAMPOUTLINE_ON _GRADISRADIAL_ON
-    _OUTLINEDISTORTTOGGLE_ON _OUTLINETEXTOGGLE_ON
+    OUTTEX_ON OVERLAYMULT_ON RADIALGRADIENT_ON SHADOW_ON SHAKEUV_ON SHINE_ON _COLORRAMPOUTLINE_ON
+    _GRADISRADIAL_ON _OUTLINEDISTORTTOGGLE_ON _OUTLINETEXTOGGLE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -200,16 +200,16 @@ Material:
     - _RotateUvAmount: 0
     - _RoundWaveSpeed: 2
     - _RoundWaveStrength: 0.11
-    - _ShadowAlpha: 0.307
-    - _ShadowX: -0.151
-    - _ShadowY: -0.208
+    - _ShadowAlpha: 0
+    - _ShadowX: -0.094
+    - _ShadowY: 0.046
     - _ShakeUvSpeed: 0
     - _ShakeUvX: 3
     - _ShakeUvY: 3.5
-    - _ShineGlow: 1
-    - _ShineLocation: 1
-    - _ShineRotate: 0
-    - _ShineWidth: 0.1
+    - _ShineGlow: 0
+    - _ShineLocation: 0
+    - _ShineRotate: 1.88
+    - _ShineWidth: 0.211
     - _TextureScrollXSpeed: -2.4
     - _TextureScrollYSpeed: 0
     - _TwistUvAmount: 0.24

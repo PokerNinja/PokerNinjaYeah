@@ -9,6 +9,7 @@ public class Values : Singleton<Values>
     [GUIColor(0.3f, 0.8f, 0.8f)]
     [Title("Settings")]
     public bool TEST_MODE = false;
+    public bool TUTORIAL_MODE = false;
     public bool flusherOn = false;
     public bool strighterOn = false;
     public float turnTimerDuration = 40f;
@@ -16,12 +17,14 @@ public class Values : Singleton<Values>
     public float musicVolume = 0.6f;
     public float lowPitchRange = 0.95f;
     public float highPitchRange = 1.05f;
-    public float delayBeforeStartNewRound =2f;
+    public float delayBeforeStartNewRound = 2f;
     public float delayBeforeStartFirstRound = 1f;
     public int delayTimerStart = 3;
     public int skillUseLimit = 1;
     public GamePhase resetSkillEvery = GamePhase.Round;
     public int energyCostForDraw = 1;
+    public float tutoObjsFadeDuration = 0.7f;
+
     // public int replaceUseLimit = 1;
     //    public GamePhase resetReplaceEvery = GamePhase.Turn;
 
@@ -30,12 +33,11 @@ public class Values : Singleton<Values>
     public float puProjectileMoveDuration = 2f;
     public float puProjectileFadeOutDuration = 0.4f;
     public float windMoveDuration = 0.3f;
-    public float windFadeOutDuration =1f;
+    public float windFadeOutDuration = 1f;
     public float windRorationSpeed = 2f;
     public float circularRadiusMove = 1f;
     public float circularMoveDuration = 1f;
-    public float firstCircualScaleMultiplication = 0.75f;
-    public float secondCircualScaleMultiplication = 1.25f;
+    public float circualScaleMultiplication = 1.25f;
 
     public float winningCardProjectileMoveDuration = 1f;
 
@@ -69,21 +71,21 @@ public class Values : Singleton<Values>
     public float pulseDuration = 1f;
     public float rankInfoMoveDuration = 1f;
     public float darkScreenAlphaDuration = 0.4f;
-    public float shineDuration =0.3f;
+    public float shineDuration = 0.3f;
     public int coinShineEvery = 3;
     public float infoDialogFadeOutDuration = 0.2f;
     public float showDialogMoveDuration = 0.5f;
 
     [Title("Emojis", bold: false)]
     public float holdTimeForEmojiSelector = 0.25f;
-    public float emojiMenuFadeDuration =0.5f;
-    public float emojiDisplayFadeDuration =0.15f;
-    public float emojiStay =3f;
+    public float emojiMenuFadeDuration = 0.5f;
+    public float emojiDisplayFadeDuration = 0.15f;
+    public float emojiStay = 3f;
     public float emojiCoolDown = 5f;
 
     [Title("CardUi", bold: false)]
-    public Color cardSelectionColor ;
-    public float FreezeDuration =3f ;
+    public Color cardSelectionColor;
+    public float FreezeDuration = 3f;
     public float cardDrawMoveDuration = 2f;
     public float cardSwapMoveDuration = 2f;
     public float markOnCardScaleAlphaDuration = 3f;
@@ -99,7 +101,7 @@ public class Values : Singleton<Values>
     public float puDrawMoveDuration = 2f;
     public float puDissolveDuration = 4f;
     public float enrgyDissolveDuration = 1.2f;
-    public float puChangeColorDisableDuration =1f;
+    public float puChangeColorDisableDuration = 1f;
     public int puShineEvery = 3;
     public float floatingShakeAnimationSpeed = 0.5f;
     public float floatingShakeAnimationX = 0.55f;
@@ -114,7 +116,8 @@ public class Values : Singleton<Values>
     public float turnIndicatorFadeDuration = 1.2f;
 
     [Title("End", bold: false)]
-    public float winningCardsMoveDuration =4f;
+    public int delayBetweenCardWinArrangeInMilli = 50;
+    public float winningCardsMoveDuration = 1f;
     public float LoseLifeDuration = 1f;
     public float bgPulseColorSwapDuration = 1f;
     public float bgMaxValueSwapColor = 0.67f;

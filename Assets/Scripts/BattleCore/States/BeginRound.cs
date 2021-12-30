@@ -7,22 +7,27 @@ public class BeginRound : State
 {
     private bool isPlayerTurn;
     private float delayForStart;
-    public BeginRound(BattleSystem battleSystem , bool isPlayerTurn, bool isFirstRound) : base(battleSystem)
+    private int startingTurnCounter = 6;
+    public BeginRound(BattleSystem battleSystem, bool isPlayerTurn, bool isFirstRound) : base(battleSystem)
     {
         this.isPlayerTurn = isPlayerTurn;
         delayForStart = Values.Instance.delayBeforeStartNewRound;
         if (isFirstRound)
         {
-        delayForStart = Values.Instance.delayBeforeStartFirstRound;
+            delayForStart = Values.Instance.delayBeforeStartFirstRound;
+        }
+        if (battleSystem.TUTORIAL_MODE)
+        {
+            startingTurnCounter = 5;
         }
     }
 
     public override IEnumerator Start()
     {
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.StartRound,true);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.StartRound, true);
         battleSystem.InitDecks();
         yield return new WaitForSeconds(delayForStart);
-        battleSystem.ResetRoundSettings(()=> StartTurn());
+        battleSystem.ResetRoundSettings(() => StartTurn());
 
     }
 
@@ -44,11 +49,11 @@ public class BeginRound : State
         battleSystem.UpdateHandRank(false);
         if (isPlayerTurn)
         {
-            battleSystem.SetState(new PlayerTurn(battleSystem,6));
+            battleSystem.SetState(new PlayerTurn(battleSystem, startingTurnCounter));
         }
         else
         {
-            battleSystem.SetState(new EnemyTurn(battleSystem,6)); // create new one
+            battleSystem.SetState(new EnemyTurn(battleSystem, startingTurnCounter)); // create new one
         }
     }
 }
