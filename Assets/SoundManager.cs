@@ -54,6 +54,8 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip coinHit;
     public AudioClip coinLose;
     public AudioClip armagedon;
+    public AudioClip coinFlipStart;
+    public AudioClip energyCharge;
 
 
 
@@ -122,7 +124,9 @@ public class SoundManager : Singleton<SoundManager>
         }
         currentSource.pitch = pitch;
         currentSource.Play();
-        soundPool.Enqueue(currentSource);
+        soundPool.Enqueue(currentSource);/*
+        await Task.Delay((int)currentSource.clip.length);
+        currentSource.enabled = false;*/
     }
     /* public async Task StopSound(AudioClip clip)
      {
@@ -450,6 +454,16 @@ public class SoundManager : Singleton<SoundManager>
                     soundToPlay = coinLose;
                     break;
                 }
+            case SoundName.CoinFlipStart:
+                {
+                    soundToPlay = coinFlipStart;
+                    break;
+                }
+            case SoundName.EnergyCharge:
+                {
+                    soundToPlay = energyCharge;
+                    break;
+                }
         }
 
         await PlayAsync(soundToPlay, normalPitch);
@@ -496,5 +510,7 @@ public class SoundManager : Singleton<SoundManager>
         RankUp,
         RankDown,
         CoinLose,
+        CoinFlipStart,
+        EnergyCharge,
     }
 }

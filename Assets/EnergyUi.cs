@@ -24,7 +24,8 @@ public class EnergyUi : MonoBehaviour
     {
         UpdateDistortionInterval(available);
         StartCoroutine(AnimationManager.Instance.FadeEnergy(
-            ()=>StartCoroutine(AnimationManager.Instance.PulseSize(true,transform,1.5f,Values.Instance.pulseDuration,false,null)),
+            ()=>StartCoroutine(AnimationManager.Instance.PulseSize(true,transform,1.5f,Values.Instance.pulseDuration,false, 
+            () => SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EnergyCharge, true))),
             index * 0.2f, spriteRenderer.material, available,Values.Instance.enrgyDissolveDuration, null));
     }
 

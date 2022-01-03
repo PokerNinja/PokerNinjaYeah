@@ -167,7 +167,17 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         if (okToSelect)
         {
             //   if (BattleSystem.Instance.cardsToSelectCounter > 0)
-            clickbleForPU = selectionEnable;
+            if (Values.Instance.TUTORIAL_MODE)
+            {
+                if (cardPlace.Equals(Constants.PlayerCard1) || cardPlace.Equals(Constants.EnemyCard1) || cardPlace.Equals(Constants.BFlop2))
+                {
+                    clickbleForPU = selectionEnable;
+                }
+            }
+            else
+            {
+                clickbleForPU = selectionEnable;
+            }
             cardSelection.SetActive(selectionEnable);
             if (selectionEnable)
             {
