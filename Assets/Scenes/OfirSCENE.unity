@@ -4327,7 +4327,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 2.68
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -4812,7 +4812,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
-    maxNumParticles: 22
+    maxNumParticles: 21
     size3D: 0
     rotation3D: 0
     gravityModifier:
@@ -5696,11 +5696,11 @@ ParticleSystem:
     flipU: 0
     flipV: 0
   VelocityModule:
-    enabled: 0
+    enabled: 1
     x:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: -0.73
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -5753,7 +5753,7 @@ ParticleSystem:
     y:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0
+      scalar: -4.69
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -6230,7 +6230,7 @@ ParticleSystem:
     speedModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 2.09
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -8958,7 +8958,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 529157795}
   m_LocalRotation: {x: -0, y: -0, z: 0.994983, w: 0.100043826}
-  m_LocalPosition: {x: 2.17, y: 10.93, z: 0}
+  m_LocalPosition: {x: 1.5, y: 13.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
