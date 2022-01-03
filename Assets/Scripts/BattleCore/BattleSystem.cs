@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 
 using StandardPokerHandEvaluator;
 using Sirenix.OdinInspector;
+using System.Threading.Tasks;
 
 public class BattleSystem : StateMachine
 {
@@ -18,7 +19,8 @@ public class BattleSystem : StateMachine
 
     private bool TEST_MODE;
     public bool TUTORIAL_MODE;
-    public bool continueTutorial;
+    public bool continueTutorial = false;
+    private bool toOpen = true;
     [SerializeField] public bool END_TURN_AFTER_PU;
 
 
@@ -168,7 +170,7 @@ public class BattleSystem : StateMachine
             currentGameInfo.EnemyId = "Alex";
             currentGameInfo.cardDeck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
                 "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
-                "Ac", "Ah","9s",board[4],board[3], board[2],board[1],board[0],enemysHand[1], playersHand[1],enemysHand[0],playersHand[0]};
+                "8c", "3h","9s",board[4],board[3], board[2],board[1],board[0],enemysHand[1], playersHand[1],enemysHand[0],playersHand[0]};
             currentGameInfo.puDeck = new String[] {"f2","i3","f3","f2","i3","f3",
                  "i1","f1","i2",
                  "w1","w2","w3","f2","i3","w1","w2","w3","f2","i3","f3",
@@ -176,8 +178,8 @@ public class BattleSystem : StateMachine
                  "w1","w2","w3",
                     "f2","i3","f3",
                  "i1","f1","w3",
-                 "i3","f1","fm1",
-                "f1", "i3"};
+                 "f2","f3","f2",
+                "i3", "i3"};
             currentGameInfo.turn = "6";
             currentTurn = 5;
         }
@@ -215,7 +217,13 @@ public class BattleSystem : StateMachine
         }
         else
         {
-            StartCoroutine(ui.CoinFlipStartGame(TUTORIAL_MODE, () =>
+            ui.SlidePuSlots();
+            if (firstDeck)
+            {
+                firstDeck = false;
+                SetState(new BeginRound(this, TUTORIAL_MODE, true));
+            }
+           /* StartCoroutine(ui.CoinFlipStartGame(TUTORIAL_MODE, () =>
              {
                  ui.SlidePuSlots();
                  if (firstDeck)
@@ -223,7 +231,7 @@ public class BattleSystem : StateMachine
                      firstDeck = false;
                      SetState(new BeginRound(this, TUTORIAL_MODE, true));
                  }
-             }));
+             }));*/
 
         }
     }
@@ -464,6 +472,7 @@ public class BattleSystem : StateMachine
 
     private IEnumerator CheckIfEnemyPuRunningAndStartPlayerTurn()
     {
+        Debug.LogError("et " + enemyPuIsRunning + " " + turnInitInProgress);
         if (!enemyPuIsRunning && !turnInitInProgress)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
@@ -473,11 +482,11 @@ public class BattleSystem : StateMachine
         {
             while (enemyPuIsRunning || turnInitInProgress)
             {
-                yield return new WaitForSeconds(0.6f);
                 if (!enemyPuIsRunning && !turnInitInProgress)
                 {
                     StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
                 }
+                yield return new WaitForSeconds(0.6f);
             }
         }
 
@@ -510,7 +519,7 @@ public class BattleSystem : StateMachine
         }
         else
         {
-            StartCoroutine(FakePlayerEndTurn());
+            StartCoroutine(FakePlayerEndTurnCoro());
             FocusOnObjectWithText(false, 1, 8, false);
         }
     }
@@ -739,7 +748,7 @@ public class BattleSystem : StateMachine
             case 4:
                 //  puDeckUi.playerPusUi[0].EnablePu(true);
                 StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_GradBlend", Values.Instance.puChangeColorDisableDuration, puDeckUi.playerPusUi[0].spriteRenderer.material, 0, null));
-                break; 
+                break;
             case 5:
                 puDeckUi.playerPusUi[0].isClickable = true;
                 break;
@@ -750,7 +759,7 @@ public class BattleSystem : StateMachine
                 puDeckUi.playerPusUi[1].EnablePu(true);
                 break;
             case 8:
-               ui.EnableEndTurnBtn(true);
+                ui.EnableEndTurnBtn(true);
                 break;
 
         }
@@ -758,10 +767,22 @@ public class BattleSystem : StateMachine
 
     public void FakeEnemyEndTurn()
     {
-        StartCoroutine(StartPlayerTurn(true, () => TurnEvents(--currentTurn)));
+        StartCoroutine(StartPlayerTurn(true, () =>
+        {
+            
+            TurnEvents(--currentTurn);
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnBtnSpriteREnderer, true, Values.Instance.turnBtnAlphaDuration, null));
+        }));
     }
-    private IEnumerator FakePlayerEndTurn()
+
+    public void FakePlayerEndTurn()
     {
+        StartCoroutine(FakePlayerEndTurnCoro());
+    }
+    private IEnumerator FakePlayerEndTurnCoro()
+    {
+        ui.energyLeft[0].spriteRenderer.sortingOrder = 0;
+        ui.EnableEndTurnBtn(false);
         ResetTimers();
         StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
         ui.SetTurnIndicator(false, false);
@@ -778,13 +799,17 @@ public class BattleSystem : StateMachine
         }
     }
 
-    public void FakeEnemyPuUse(int puIndex, string cardPlace1, string cardPlace2, bool endTurn)
+    public async void FakeEnemyPuUse(int puIndex, string cardPlace1, string cardPlace2, bool endTurn)
     {
+        Debug.LogWarning("FAking it");
         PowerUpInfo puInfo = new PowerUpInfo("Alex", puDeckUi.GetPuFromList(false, puIndex).puName, cardPlace2, cardPlace1, puIndex, 12345);
         EnemyPuUse(puInfo);
         if (endTurn)
         {
-            StartCoroutine(StartPlayerTurn(true, () => TurnEvents(--currentTurn)));
+            await Task.Delay(4500);
+            enemyPuIsRunning = false;
+            Debug.LogWarning("EndingIT");
+            FakeEnemyEndTurn();
         }
     }
 
@@ -944,10 +969,18 @@ public class BattleSystem : StateMachine
             this.newEnergyCost = energyCost;
 
             SetState(new PowerUpState(this, true, energyCost, newPowerUpName, "", "", new Vector2(0, 0), new Vector2(0, 0), newPuSlotIndexUse));
-            if (TUTORIAL_MODE && newPowerUpName.Equals("i3"))
+            if (TUTORIAL_MODE)
             {
-                FocusOnObjectWithText(true, 0, 6, false);
+                if (newPowerUpName.Equals("i3"))
+                {
+                    FocusOnObjectWithText(true, 0, 6, false);
+                }
+                if (newPowerUpName.Equals("sflip"))
+                {
+                    FocusOnObjectWithText(true, 0, Constants.TutorialObjectEnum.cardToFlipFreeze.GetHashCode(), false);
+                }
             }
+
         }
         else if (energyCounter - energyCost < 0)
         {
@@ -1031,15 +1064,26 @@ public class BattleSystem : StateMachine
             }
             ResetValuesAfterCardSelection(Constants.AllCardsTag);
             yield return new WaitForSeconds(0.5f);
-            SetState(new PowerUpState(this, true, newEnergyCost, newPowerUpName, firstCardTargetPU, cardPlace, firstPosTargetPU, position, newPuSlotIndexUse));
+            if (TUTORIAL_MODE && cardPlace.Equals(Constants.EnemyCard2) && newPowerUpName.Equals("sflip"))
+            {
+                FocusOnObjectWithText(true, 0, 13, false);
+            }
+            else
+            {
+                SetState(new PowerUpState(this, true, newEnergyCost, newPowerUpName, firstCardTargetPU, cardPlace, firstPosTargetPU, position, newPuSlotIndexUse));
+            }
 
             if (TUTORIAL_MODE)
             {
                 // ui.EnableEndTurnBtn(true);
                 if (newPowerUpName.Equals("sflip"))
                 {
-                    yield return new WaitForSeconds(2f);
-                    StartCoroutine(ui.DisplayEmoji(false, 0, null));
+                    if (Constants.EnemyCard1.Equals(cardPlace))
+                    {
+                        FocusOnObjectWithText(true, 1, 14, true);
+                        yield return new WaitForSeconds(2f);
+                        StartCoroutine(ui.DisplayEmoji(false, 0, null));
+                    }
                 }
                 else if (newPowerUpName.Equals("i3"))
                 {
@@ -1428,6 +1472,10 @@ public class BattleSystem : StateMachine
             bool isFlip = IsEnemyCard(cardPlace);
             StartCoroutine(ReplaceSelectedCard(cardPlace, isFlip, delay, ResetEnable, firstCard, lastCard));
         }
+        if(TUTORIAL_MODE && cardPlace.Equals(Constants.BFlop3))
+        {
+            StartCoroutine(FocusOnObjectWithDelasy(3, true, 0,18,false));
+        }
     }
 
     private bool IsEnemyCard(string cardPlace)
@@ -1701,6 +1749,10 @@ public class BattleSystem : StateMachine
     {
         if (btnReplaceClickable && energyCounter > 0 && !disable && puDeckUi.GetPuListCount(true) < 2)
         {
+            if (TUTORIAL_MODE)
+            {
+                FocusOnObjectWithText(false, 1, 14, false);
+            }
             btnReplaceClickable = false;
             UpdateReplacePuInDb(-1);
             ReduceEnergy(Values.Instance.energyCostForDraw);
@@ -1708,7 +1760,14 @@ public class BattleSystem : StateMachine
             DisablePlayerPus();
             DealPu(true, () =>
             {
-                StartCoroutine(AutoEndTurn());
+                if (!TUTORIAL_MODE)
+                {
+                    StartCoroutine(AutoEndTurn());
+                }
+                else
+                {
+                    FocusOnObjectWithText(true, 1, 16, true);
+                }
             });
         }
         else if (btnReplaceClickable || endTurn || disable)
@@ -1764,6 +1823,15 @@ public class BattleSystem : StateMachine
 
     public void SlideRankingImg()
     {
+        if (TUTORIAL_MODE && currentTurn == 4 && toOpen)
+        {
+            FocusOnObjectWithText(false, 1, 9, false);
+            toOpen = false;
+        }
+        else if (TUTORIAL_MODE && currentTurn == 4 && !toOpen)
+        {
+            continueTutorial = true;
+        }
         ui.SlideRankingImg();
     }
 
@@ -1807,11 +1875,15 @@ public class BattleSystem : StateMachine
     {
         if (!AreBoardCardsFlipped()/* && !selectMode*/)
         {
-            AnimationManager.Instance.VisionEffect(cardsDeckUi.GetBoardAndPlayerHandList(), 5, false);
+            AnimationManager.Instance.VisionEffect(cardsDeckUi.GetBoardAndPlayerHandList(), cardsDeckUi.GetBoardAndPlayerHandList().Count, false);
         }
         SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.Vision, false);
         ui.UpdateRankTextInfo(false, 0);
-
+        if (TUTORIAL_MODE && currentTurn == 4)
+        {
+            BattleSystem.Instance.tutorialUi.btnTutorial.interactable = true;
+            AnimationManager.Instance.AlphaFade(true, tutorialUi.btnTutorialSprite, 1f, null/* ()=>infoDialog.gameObject.SetActive(false)*/);
+        }
     }
 
 
@@ -1917,6 +1989,10 @@ public class BattleSystem : StateMachine
             emojiCooledDown = false;
             StartCoroutine(ui.DisplayEmoji(true, id, () => emojiCooledDown = true));
             UpdateEmojiDB(id);
+            if (TUTORIAL_MODE)
+            {
+                FocusOnObjectWithText(false, 1, 18, false);
+            }
         }
         else if (id == -1)
         {
@@ -1954,6 +2030,11 @@ public class BattleSystem : StateMachine
 
     internal void FocusOnObjectWithText(bool enable, int maskShape, int objectNumber, bool endByBtn)
     {
+        SetState(new TutorialSystem(this, enable, maskShape, objectNumber, endByBtn));
+    }
+    internal IEnumerator FocusOnObjectWithDelasy(int delay, bool enable, int maskShape, int objectNumber, bool endByBtn)
+    {
+        yield return new WaitForSeconds(delay);
         SetState(new TutorialSystem(this, enable, maskShape, objectNumber, endByBtn));
     }
 

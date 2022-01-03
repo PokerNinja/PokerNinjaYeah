@@ -10,14 +10,22 @@ public class TutorialEnemy : State
         this.turnCounter = turnCounter;
         /*var task = InitAction(turnCounter);
         task.Wait();*/
-     //   InitFocusTutorial();
+        InitFocusTutorial();
     }
 
     private async void InitFocusTutorial()
     {
-        await Task.Delay(1200);
-       /* battleSystem.FocusOnObjectWithText(true,false, Constants.TutorialObjectEnum.startGame.GetHashCode(), true);
-        CheckIfReadyToCountinue();*/
+        await Task.Delay(1400);
+        /* battleSystem.FocusOnObjectWithText(true,false, Constants.TutorialObjectEnum.startGame.GetHashCode(), true);
+         CheckIfReadyToCountinue();*/
+        switch (turnCounter)
+        {
+            case 4:
+                battleSystem.tutorialUi.MoveCardsMaskPlayer(true, null);
+                battleSystem.FocusOnObjectWithText(true, 0, Constants.TutorialObjectEnum.vision.GetHashCode(), false);
+                break;
+        }
+        CheckIfReadyToCountinue();
     }
     private async void CheckIfReadyToCountinue()
     {
@@ -27,23 +35,25 @@ public class TutorialEnemy : State
         }
         else
         {
-            await Task.Delay(200);
+            await Task.Delay(400);
             CheckIfReadyToCountinue();
         }
     }
-    private  void InitAction(int turnCounter)
+    private async void InitAction(int turnCounter)
     {
-       
-            switch (turnCounter)
+        await Task.Delay(800);
+        switch (turnCounter)
             {
                 case 6:
                     battleSystem.FakeEnemyEndTurn();
                     break;
                 case 4:
-                    battleSystem.FakeEnemyPuUse(0, Constants.EnemyCard2, "", true);
+                battleSystem.continueTutorial = false;
+                battleSystem.FakeEnemyPuUse(0, Constants.EnemyCard2,"", true);
                     break;
                 case 2:
-                    battleSystem.FakeEnemyPuUse(0, Constants.EnemyCard2, "", true);
+                //battleSystem.continueTutorial = false;
+                battleSystem.FakeEnemyPuUse(0, Constants.BFlop2, Constants.BFlop3, false);
                     break;
             
         }

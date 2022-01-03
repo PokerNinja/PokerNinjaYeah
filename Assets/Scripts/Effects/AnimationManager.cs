@@ -519,14 +519,14 @@ public class AnimationManager : Singleton<AnimationManager>
             () => StartCoroutine(ScaleAnimation(selector, targetScale, scaleDuration / 2, EndAction))));
     }
 
-    public IEnumerator SmoothMove(Transform selector, Vector3 targetPosition, Vector2 targetScale, float movementDuration, Action beginAction, Action endAction, Action Reset, Action CloseDrawer)
+    public IEnumerator SmoothMove(Transform selector, Vector3 targetPosition, Vector3 targetScale, float movementDuration, Action beginAction, Action endAction, Action Reset, Action CloseDrawer)
     {
         beginAction?.Invoke();
         float startTime = Time.time;
         float t;
         bool endLoop = false;
         float speed = 1.5f;
-        while (selector.position != targetPosition || (Vector2)selector.localScale != targetScale)
+        while (selector.position != targetPosition || selector.localScale != targetScale)
         {
             t = (Time.time - startTime) / movementDuration;
             selector.position = new Vector3(Mathf.SmoothStep(selector.position.x, targetPosition.x, t * speed), Mathf.SmoothStep(selector.position.y, targetPosition.y, t * speed), targetPosition.z);
@@ -534,8 +534,8 @@ public class AnimationManager : Singleton<AnimationManager>
             {
                 selector.localScale = new Vector3(Mathf.SmoothStep(selector.localScale.x, targetScale.x, t * speed), Mathf.SmoothStep(selector.localScale.y, targetScale.y, t * speed), 1f);
             }
-            yield return new WaitForFixedUpdate();
-            if (!endLoop && selector.position == targetPosition && (Vector2)selector.localScale == targetScale)
+            yield return null;
+            if (!endLoop && selector.position == targetPosition /*&&selector.localScale == targetScale*/)
             {
                 endLoop = true;
                 endAction?.Invoke();
@@ -900,7 +900,7 @@ public class AnimationManager : Singleton<AnimationManager>
         yield break;
     }
 
-    public IEnumerator ScaleObject(float scaleTarget, float scaleDuration, Transform selector, Action RedBgEnable, Action onEnd)
+    public IEnumerator ScaleObjectRatio(float scaleTarget, float scaleDuration, Transform selector, Action RedBgEnable, Action onEnd)
     {
         float startTime = Time.time;
         float t;
@@ -921,6 +921,25 @@ public class AnimationManager : Singleton<AnimationManager>
                 break;
             }
             yield return new WaitForFixedUpdate();
+        }
+    }
+    public IEnumerator ScaleObjectWithTarget(Vector3 vectorTarget, float scaleDuration, Transform selector, Action RedBgEnable, Action onEnd)
+    {
+        float startTime = Time.time;
+        float t;
+        bool endActivate = true;
+        while (selector.localScale != vectorTarget)
+        {
+            t = (Time.time - startTime) / scaleDuration;
+            selector.localScale = new Vector3(Mathf.SmoothStep(0, vectorTarget.x, t), Mathf.SmoothStep(0, vectorTarget.y, t), vectorTarget.z);
+            yield return new WaitForFixedUpdate();
+            if (endActivate && selector.localScale== vectorTarget)
+            {
+                endActivate = false;
+                RedBgEnable?.Invoke();
+                onEnd?.Invoke();
+                break;
+            }
         }
     }
 
@@ -1112,6 +1131,9 @@ public class AnimationManager : Singleton<AnimationManager>
 
     public void VisionEffect(List<CardUi> winningPlayersCards, int cardToGlow, bool enable)
     {
+        Debug.LogWarning("enableCG" + enable);
+        Debug.LogWarning("cardsG" + cardToGlow);
+        Debug.LogWarning("cardsLast" + winningPlayersCards.Count);
         float alphaAmoint = 0f;
         float burnAmoint = 0.6f;
         Color visionColor = Values.Instance.currentVisionColor;
@@ -1273,9 +1295,11 @@ public class AnimationManager : Singleton<AnimationManager>
     {
         pulse?.Invoke();
         yield return new WaitForSeconds(delay);
+
         float dissolveAmount = -0.1f;
         if (fadeIn)
         {
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EnergyCharge, true);
             dissolveAmount = 1f;
         }
         while (dissolveAmount >= -0.1f && dissolveAmount <= 1f)

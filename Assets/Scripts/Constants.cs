@@ -59,7 +59,24 @@ public class Constants : Singleton<Constants>
         puCost = 4,
         pu2 = 5,
         endTurn = 8,
+        vision = 9,
+        rankMenu = 10,
+        flipSkill = 11,
+        cardToFlipFreeze = 12,
+        cardToFlip = 13,
+        eyeSymbol = 14,
+        drawPu = 15,
+        lastEnergyLefy = 16,
+        lastTurnPu = 17,
+        emojiSelector = 18,
+        lastTurnEnergy = 19,
+        pu3 = 20,
+        pu3select = 21,
+        cardToSelectWind = 22,
+        rankUp = 23,
+        end = 24,
 
+        board = 30,
 
     }
     /*  public const string BoardCardSlutFlop1 = "BFlop1";

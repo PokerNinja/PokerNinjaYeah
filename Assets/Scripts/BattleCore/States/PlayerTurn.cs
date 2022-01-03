@@ -59,6 +59,12 @@ public class PlayerTurn : State
                 if (turnCounter == 5)
                 {
                     tutorialAction = () => battleSystem.FocusOnObjectWithText( true, 0, Constants.TutorialObjectEnum.startGame.GetHashCode(), true);
+                }else if (turnCounter == 3)
+                {
+                    tutorialAction = () => battleSystem.FocusOnObjectWithText( true, 1, Constants.TutorialObjectEnum.flipSkill.GetHashCode(), false);
+                }else if(turnCounter == 1)
+                {
+                    tutorialAction = () => battleSystem.FocusOnObjectWithText(true, 1, Constants.TutorialObjectEnum.lastTurnEnergy.GetHashCode(), true);
                 }
             }
             else
@@ -67,7 +73,7 @@ public class PlayerTurn : State
                 battleSystem.ActivatePlayerButtons(true, true);
             }
             battleSystem.Interface.WhosTurnAnimation(true, yourLastTurn, finalTurn, tutorialAction);
-            if (battleSystem.TUTORIAL_MODE && turnCounter == 5)
+            if (battleSystem.TUTORIAL_MODE && (turnCounter == 5 || turnCounter == 1))
             { }
             else
             {

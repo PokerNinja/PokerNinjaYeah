@@ -13,6 +13,8 @@ using UnityEngine.UI;
 public class BattleUI : MonoBehaviour
 {
 
+    public bool updateTutorial = true;
+
     [SerializeField] public CoinFlipScript coinFlipTurn;
     [SerializeField] public TextMeshProUGUI playerNameText;
     [SerializeField] public TextMeshProUGUI enemyNameText;
@@ -104,9 +106,6 @@ public class BattleUI : MonoBehaviour
     public SpriteRenderer emojiToDisplayRendererEnemy;
     public EmojiToDisplay emojiToDisplayPlayer;
     public EmojiToDisplay emojiToDisplayEnemy;
-    public Transform emojiStartPosPlayer;
-    public Transform emojiStartPosEnemy;
-    public Transform emojiTargetPos;
 
     public ParticleSystem hideSmokeBoard;
     public ParticleSystem hideSmokeHand;
@@ -145,7 +144,7 @@ public class BattleUI : MonoBehaviour
     public SpriteRenderer coinsFocus;
     public SpriteRenderer energyCostTuto;
 
-    public void Initialize( PlayerInfo player, PlayerInfo enemy)
+    public void Initialize(PlayerInfo player, PlayerInfo enemy)
     {
         InitializePlayer(player);
         InitializeEnemy(enemy);
@@ -230,8 +229,8 @@ public class BattleUI : MonoBehaviour
     internal void SlidePuSlots()
     {
         Vector3 targetPos = new Vector3(0, 0, 90f);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(pusThemePlayer, targetPos, new Vector2(1, 1), Values.Instance.pusDrawerMoveDuration, null, null, null, null));
-        StartCoroutine(AnimationManager.Instance.SmoothMove(pusThemeEnemy, targetPos, new Vector2(1, 1), Values.Instance.pusDrawerMoveDuration, null, null, null, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(pusThemePlayer, targetPos, new Vector3(1, 1, 1), Values.Instance.pusDrawerMoveDuration, null, null, null, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(pusThemeEnemy, targetPos, new Vector3(1, 1, 1), Values.Instance.pusDrawerMoveDuration, null, null, null, null));
     }
 
     internal void LoadNinjaBG()
@@ -299,13 +298,13 @@ public class BattleUI : MonoBehaviour
         Vector3 targetPosition = new Vector3(0, yPosition, 0);
         coinFlipTurn.SetDirection(isPlayerStart);
         coinFlipTurn.FlipCoinAnimation();
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinFlipStart,true);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinFlipStart, true);
         /* StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, new Vector3(0,0,0), coinFlipTurn.transform.localScale, Values.Instance.coinFlipEndMoveDuration, null, null, 
              () => coinFlipTurn.SetDirection(isPlayerStart), () => coinFlipTurn.FlipCoinAnimation()));*/
         yield return new WaitForSeconds(3);
         EndAction?.Invoke();
         //Todo dont stop
-        StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, targetPosition, new Vector2(0.1f, 0.1f), Values.Instance.coinFlipEndMoveDuration, null, () => coinFlipTurn.gameObject.SetActive(false), null, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, targetPosition, new Vector3(1, 1, 1), Values.Instance.coinFlipEndMoveDuration, null, () => coinFlipTurn.gameObject.SetActive(false), null, null));
     }
     internal void InitAvatars()
     {
@@ -361,7 +360,7 @@ public class BattleUI : MonoBehaviour
             hitSpriteRen.color = new Color(hitSpriteRen.color.r, hitSpriteRen.color.g, hitSpriteRen.color.b, 1f);
             // StartCoroutine(AnimationManager.HitEffect(hitSpriteRen, () => hitGO.SetActive(false)));
 
-            StartCoroutine(AnimationManager.Instance.ScaleObject(10f, Values.Instance.hitTextScaleDuration, hitGO.transform, null, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(hitSpriteRen, false, Values.Instance.hitTextFDuration, null))));
+            StartCoroutine(AnimationManager.Instance.ScaleObjectRatio(10f, Values.Instance.hitTextScaleDuration, hitGO.transform, null, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(hitSpriteRen, false, Values.Instance.hitTextFDuration, null))));
 
 
         }
@@ -389,11 +388,15 @@ public class BattleUI : MonoBehaviour
             {
                 InitDialog(puDisplayName, PowerUpStruct.Instance.GetPuInfoByName(puName), isBtnOn);
             }
-            if (BattleSystem.Instance.TUTORIAL_MODE && puName.Equals("i3"))
+            if (BattleSystem.Instance.TUTORIAL_MODE /*&& puName.Equals("i3")*/)
             {
-                BattleSystem.Instance.puDeckUi.playerPusUi[0].spriteRenderer.sortingOrder = 1;
-                btnTutorial.transform.gameObject.SetActive(true);
-                OnEnd += () => AnimationManager.Instance.AlphaFade(true, btnTutorial, 1f, null/* ()=>infoDialog.gameObject.SetActive(false)*/);
+                if (updateTutorial)
+                {
+                    updateTutorial = false;
+                    BattleSystem.Instance.puDeckUi.playerPusUi[0].spriteRenderer.sortingOrder = 1;
+                    BattleSystem.Instance.tutorialUi.btnTutorial.interactable = true;
+                    OnEnd += () => AnimationManager.Instance.AlphaFade(true, btnTutorial, 1f, null/* ()=>infoDialog.gameObject.SetActive(false)*/);
+                }
             }
             StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialog, OnEnd));
             //StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialogTransform, OnEnd));
@@ -456,11 +459,14 @@ public class BattleUI : MonoBehaviour
 
     public void EnableDarkScreen(bool isPlayerActivateSelectMode, bool enable, Action ResetSortingOrder)
     {
-        darkScreenRenderer.GetComponent<BoxCollider2D>().enabled = enable;
-        AnimationManager.Instance.FadeBurnDarkScreen(darkScreenRenderer.material, enable, Values.Instance.darkScreenAlphaDuration, ResetSortingOrder);
-        if (isPlayerActivateSelectMode && !enable)
+        if (!BattleSystem.Instance.TUTORIAL_MODE)
         {
-            FadeCancelSelectModeScreen(false);
+            darkScreenRenderer.GetComponent<BoxCollider2D>().enabled = enable;
+            AnimationManager.Instance.FadeBurnDarkScreen(darkScreenRenderer.material, enable, Values.Instance.darkScreenAlphaDuration, ResetSortingOrder);
+            if (isPlayerActivateSelectMode && !enable)
+            {
+                FadeCancelSelectModeScreen(false);
+            }
         }
     }
 
@@ -484,8 +490,6 @@ public class BattleUI : MonoBehaviour
 
     public void VisionEffect(List<Card> winningCards, List<CardUi> winningPlayersCards)
     {
-
-
         List<CardUi> cardsToGlow = new List<CardUi>();
         string winningCardDesc;
         for (int i = 0; i < 5; i++)
@@ -526,36 +530,43 @@ public class BattleUI : MonoBehaviour
 
     public void WhosTurnAnimation(bool isPlayer, bool yourLastTurn, bool finalMove, Action EndRoutine)
     {
-
-        string targetTurnTextPath;
-        Action endAction = null;
-        Action enableBGPulse = null;
-        turnTextGO.transform.localScale = new Vector2(0.1f, 0.1f);
-        turnTextGO.transform.position = new Vector2(0f, 0f);
-        turnTextGO.SetActive(true);
-        targetTurnTextPath = GetTurnTextPath(isPlayer, yourLastTurn, finalMove);
-        SpriteRenderer spriteRenderer = turnTextGO.GetComponent<SpriteRenderer>();
-        AnimationManager.Instance.SetAlpha(spriteRenderer, 1f);
-        spriteRenderer.sprite = Resources.Load(targetTurnTextPath, typeof(Sprite)) as Sprite;
-
-
-        if (finalMove || yourLastTurn)
+        if (BattleSystem.Instance.TUTORIAL_MODE)
         {
-            enableBGPulse = () => EnableBgColor(true);
+            EndRoutine?.Invoke();
         }
-        /* else
-         {
-             alphaAction = () => StartCoroutine(AnimationManager.AlphaAnimation(spriteRenderer, false, 1f, () =>
+        else
+        {
+
+            string targetTurnTextPath;
+            Action endAction = null;
+            Action enableBGPulse = null;
+            turnTextGO.transform.localScale = new Vector2(0.1f, 0.1f);
+            turnTextGO.transform.position = new Vector2(0f, 0f);
+            turnTextGO.SetActive(true);
+            targetTurnTextPath = GetTurnTextPath(isPlayer, yourLastTurn, finalMove);
+            SpriteRenderer spriteRenderer = turnTextGO.GetComponent<SpriteRenderer>();
+            AnimationManager.Instance.SetAlpha(spriteRenderer, 1f);
+            spriteRenderer.sprite = Resources.Load(targetTurnTextPath, typeof(Sprite)) as Sprite;
+
+
+            if (finalMove || yourLastTurn)
+            {
+                enableBGPulse = () => EnableBgColor(true);
+            }
+            /* else
              {
-                 turnTextGO.SetActive(false);
-                 AnimationManager.SetAlpha(spriteRenderer, 1f);
-             }));
+                 alphaAction = () => StartCoroutine(AnimationManager.AlphaAnimation(spriteRenderer, false, 1f, () =>
+                 {
+                     turnTextGO.SetActive(false);
+                     AnimationManager.SetAlpha(spriteRenderer, 1f);
+                 }));
 
-         }*/
-        endAction = () => StartCoroutine(AnimationManager.Instance.SmoothMove(turnTextGO.transform, targetTurnSymbol.transform.position, targetTurnSymbol.transform.localScale, Values.Instance.turnTextMoveDuration, null, null, EndRoutine, () =>
-                turnTextGO.transform.localPosition = new Vector3(turnTextGO.transform.localPosition.x, turnTextGO.transform.localPosition.y, 19.5f)));
+             }*/
+            endAction = () => StartCoroutine(AnimationManager.Instance.SmoothMove(turnTextGO.transform, targetTurnSymbol.transform.position, targetTurnSymbol.transform.localScale, Values.Instance.turnTextMoveDuration, null, null, EndRoutine, () =>
+                    turnTextGO.transform.localPosition = new Vector3(turnTextGO.transform.localPosition.x, turnTextGO.transform.localPosition.y, 19.5f)));
 
-        StartCoroutine(AnimationManager.Instance.ScaleObject(11f, Values.Instance.turnTextScaleDuration, turnTextGO.transform, enableBGPulse, endAction));
+            StartCoroutine(AnimationManager.Instance.ScaleObjectRatio(11f, Values.Instance.turnTextScaleDuration, turnTextGO.transform, enableBGPulse, endAction));
+        }
     }
 
     public void EnableBgColor(bool enable)
@@ -771,7 +782,7 @@ public class BattleUI : MonoBehaviour
 
     private IEnumerator ShootProjectile(bool delay, Vector2 startingPos, GameObject projectile, Vector2 posTarget, Action EndAction)
     {
-       // yield return new WaitForFixedUpdate();
+        // yield return new WaitForFixedUpdate();
         yield return null;
 
         projectile.transform.position = startingPos;
@@ -1055,151 +1066,151 @@ public class BattleUI : MonoBehaviour
 
 
 
-   /* internal void FocusOnObjectWithText(bool enable, bool isRectMask, int objectNumber, bool endByBtn)
-    {
-        SpriteRenderer spriteTarget;
-        spriteTarget = GetSpriteTargetForTutorial(objectNumber);
-        GameObject mask = tutorialMaskRing;
-        if (isRectMask)
-        {
-            mask = tutorialMaskRect;
-        }
-        if (enable)
-        {
-            lastObjectToFocus = objectNumber;
-            BattleSystem.Instance.continueTutorial = false;
+    /* internal void FocusOnObjectWithText(bool enable, bool isRectMask, int objectNumber, bool endByBtn)
+     {
+         SpriteRenderer spriteTarget;
+         spriteTarget = GetSpriteTargetForTutorial(objectNumber);
+         GameObject mask = tutorialMaskRing;
+         if (isRectMask)
+         {
+             mask = tutorialMaskRect;
+         }
+         if (enable)
+         {
+             lastObjectToFocus = objectNumber;
+             BattleSystem.Instance.continueTutorial = false;
 
-            TutorialObjectsVisible(true, objectNumber == Constants.TutorialObjectEnum.puCost.GetHashCode(), isRectMask, endByBtn);
+             TutorialObjectsVisible(true, objectNumber == Constants.TutorialObjectEnum.puCost.GetHashCode(), isRectMask, endByBtn);
 
-            if (!endByBtn)
-            {
-                // spriteTarget.sortingOrder = 10;
-            }
+             if (!endByBtn)
+             {
+                 // spriteTarget.sortingOrder = 10;
+             }
 
-            mask.transform.position = spriteTarget.transform.position;
+             mask.transform.position = spriteTarget.transform.position;
 
-            mask.transform.localScale = new Vector2(0.01f, 0.01f);
-            tutorialText.text = Constants.tutoInfo[objectNumber];
-            AnimateTutoObjects(true, isRectMask, endByBtn, objectNumber == 4, null);
-        }
-        else
-        {
-            if (objectNumber == Constants.TutorialObjectEnum.pu.GetHashCode())
-            {
-                tutorialMaskRect.SetActive(false);
-                FocusOnObjectWithText(true, false, Constants.TutorialObjectEnum.puCost.GetHashCode(), true);
-            }
-            else
-            {
-                AnimateTutoObjects(false, isRectMask, endByBtn, false, () =>
-                  {
-                      TutorialObjectsVisible(false, false, isRectMask, false);
-                      if (!endByBtn)
-                      {
-                          spriteTarget.sortingOrder = 0;
-                      }
-                      BattleSystem.Instance.continueTutorial = true;
+             mask.transform.localScale = new Vector2(0.01f, 0.01f);
+             tutorialText.text = Constants.tutoInfo[objectNumber];
+             AnimateTutoObjects(true, isRectMask, endByBtn, objectNumber == 4, null);
+         }
+         else
+         {
+             if (objectNumber == Constants.TutorialObjectEnum.pu.GetHashCode())
+             {
+                 tutorialMaskRect.SetActive(false);
+                 FocusOnObjectWithText(true, false, Constants.TutorialObjectEnum.puCost.GetHashCode(), true);
+             }
+             else
+             {
+                 AnimateTutoObjects(false, isRectMask, endByBtn, false, () =>
+                   {
+                       TutorialObjectsVisible(false, false, isRectMask, false);
+                       if (!endByBtn)
+                       {
+                           spriteTarget.sortingOrder = 0;
+                       }
+                       BattleSystem.Instance.continueTutorial = true;
 
-                      switch (objectNumber)
-                      {
-                          case 1:
-                              FocusOnObjectWithText(true, false, Constants.TutorialObjectEnum.energy.GetHashCode(), true);
-                              break;
-                          case 2:
-                              FocusOnObjectWithText(true, true, Constants.TutorialObjectEnum.pu.GetHashCode(), false);
-                              break;
+                       switch (objectNumber)
+                       {
+                           case 1:
+                               FocusOnObjectWithText(true, false, Constants.TutorialObjectEnum.energy.GetHashCode(), true);
+                               break;
+                           case 2:
+                               FocusOnObjectWithText(true, true, Constants.TutorialObjectEnum.pu.GetHashCode(), false);
+                               break;
 
-                      }
-                  });
-            }
-        }
-    }
+                       }
+                   });
+             }
+         }
+     }
 
-    private void AnimateTutoObjects(bool toVisible, bool isRectMask, bool endByBtn, bool jusjAddBtn, Action EndAction)
-    {
-        GameObject mask = tutorialMaskRing;
-        float targetMaskScaleLarge = 200f;
-        float targetMaskScaleSmall = 0.01f;
-        if (isRectMask)
-        {
-            mask = tutorialMaskRect;
-            targetMaskScaleLarge = 30f;
-            targetMaskScaleSmall = 0.033333f;
-        }
-        float duration = Values.Instance.tutoObjsFadeDuration;
-        Action scaleMask = () => StartCoroutine(AnimationManager.Instance.ScaleObject(targetMaskScaleLarge, duration, mask.transform, null, null));
+     private void AnimateTutoObjects(bool toVisible, bool isRectMask, bool endByBtn, bool jusjAddBtn, Action EndAction)
+     {
+         GameObject mask = tutorialMaskRing;
+         float targetMaskScaleLarge = 200f;
+         float targetMaskScaleSmall = 0.01f;
+         if (isRectMask)
+         {
+             mask = tutorialMaskRect;
+             targetMaskScaleLarge = 30f;
+             targetMaskScaleSmall = 0.033333f;
+         }
+         float duration = Values.Instance.tutoObjsFadeDuration;
+         Action scaleMask = () => StartCoroutine(AnimationManager.Instance.ScaleObject(targetMaskScaleLarge, duration, mask.transform, null, null));
 
 
-        Action FadeAllObjects = () => AnimationManager.Instance.FadeBurnDarkScreen(darkScreenRenderer.material, toVisible, duration,() => scaleMask?.Invoke());
-        FadeAllObjects += () => AnimationManager.Instance.AlphaFade(toVisible, tutorialBgText, duration, null);
-        FadeAllObjects += () => StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(tutorialText, toVisible, duration, null));
-        if (endByBtn || (!toVisible && btnTutorial.color.a == 1))
-        {
-            FadeAllObjects += () => AnimationManager.Instance.AlphaFade(toVisible, btnTutorial, duration, EndAction);
-        }
+         Action FadeAllObjects = () => AnimationManager.Instance.FadeBurnDarkScreen(darkScreenRenderer.material, toVisible, duration,() => scaleMask?.Invoke());
+         FadeAllObjects += () => AnimationManager.Instance.AlphaFade(toVisible, tutorialBgText, duration, null);
+         FadeAllObjects += () => StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(tutorialText, toVisible, duration, null));
+         if (endByBtn || (!toVisible && btnTutorial.color.a == 1))
+         {
+             FadeAllObjects += () => AnimationManager.Instance.AlphaFade(toVisible, btnTutorial, duration, EndAction);
+         }
 
-        if (toVisible)
-        {
-            if (!jusjAddBtn)
-            {
-                FadeAllObjects.Invoke();
-            }
-            else
-            {
-                mask.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-                StartCoroutine(AnimationManager.Instance.ScaleObject(0.033333f, duration, tutorialMaskRect.transform, null, scaleMask));
-            }
-        }
-        else
-        {
-            scaleMask = null;
-            StartCoroutine(AnimationManager.Instance.ScaleObject(targetMaskScaleSmall, duration, mask.transform, null, FadeAllObjects));
-        }
+         if (toVisible)
+         {
+             if (!jusjAddBtn)
+             {
+                 FadeAllObjects.Invoke();
+             }
+             else
+             {
+                 mask.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+                 StartCoroutine(AnimationManager.Instance.ScaleObject(0.033333f, duration, tutorialMaskRect.transform, null, scaleMask));
+             }
+         }
+         else
+         {
+             scaleMask = null;
+             StartCoroutine(AnimationManager.Instance.ScaleObject(targetMaskScaleSmall, duration, mask.transform, null, FadeAllObjects));
+         }
 
-    }
+     }
 
-    private void TutorialObjectsVisible(bool enable, bool isPuCost, bool isRectMask, bool endByBtn)
-    {
-        if (!isPuCost)
-        {
-            tutorialText.enabled = enable;
-            tutorialText.gameObject.SetActive(enable);
-            tutorialBgText.transform.gameObject.SetActive(enable);
+     private void TutorialObjectsVisible(bool enable, bool isPuCost, bool isRectMask, bool endByBtn)
+     {
+         if (!isPuCost)
+         {
+             tutorialText.enabled = enable;
+             tutorialText.gameObject.SetActive(enable);
+             tutorialBgText.transform.gameObject.SetActive(enable);
 
-        }
-        if (isRectMask)
-        {
-            tutorialMaskRect.SetActive(enable);
-        }
-        else
-        {
-            tutorialMaskRing.SetActive(enable);
-        }
-        btnTutorial.transform.gameObject.SetActive(endByBtn);
-    }
+         }
+         if (isRectMask)
+         {
+             tutorialMaskRect.SetActive(enable);
+         }
+         else
+         {
+             tutorialMaskRing.SetActive(enable);
+         }
+         btnTutorial.transform.gameObject.SetActive(endByBtn);
+     }
 
-    private SpriteRenderer GetSpriteTargetForTutorial(int objectNumber)
-    {
-        switch (objectNumber)
-        {
-            case 0:
-                return turnBtn.GetComponent<SpriteRenderer>();
-            case 1:
-                return coinsFocus;
-            case 2:
-                return energyLeft[1].spriteRenderer;
-            case 3:
-                return BattleSystem.Instance.puDeckUi.playerPusUi[0].spriteRenderer;
-            case 4:
-                return energyCostTuto;
-        }
-        return null;
-    }
-*/
- /*   public void ContinueWithTutorial()
-    {
-        FocusOnObjectWithText(false, false, lastObjectToFocus, false);
-    }*/
+     private SpriteRenderer GetSpriteTargetForTutorial(int objectNumber)
+     {
+         switch (objectNumber)
+         {
+             case 0:
+                 return turnBtn.GetComponent<SpriteRenderer>();
+             case 1:
+                 return coinsFocus;
+             case 2:
+                 return energyLeft[1].spriteRenderer;
+             case 3:
+                 return BattleSystem.Instance.puDeckUi.playerPusUi[0].spriteRenderer;
+             case 4:
+                 return energyCostTuto;
+         }
+         return null;
+     }
+ */
+    /*   public void ContinueWithTutorial()
+       {
+           FocusOnObjectWithText(false, false, lastObjectToFocus, false);
+       }*/
     private IEnumerator FadeOutParticleSystem(ParticleSystem ps)
     {
         Debug.LogError("Burn " + ps.name);
