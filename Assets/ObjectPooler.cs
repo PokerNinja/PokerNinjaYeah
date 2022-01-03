@@ -21,7 +21,7 @@ public class ObjectPooler : Singleton<ObjectPooler>
     public PowerUpUi puPrefab;
     private Queue<CardUi> cardPool = new Queue<CardUi>();
     private Queue<PowerUpUi> puPool = new Queue<PowerUpUi>();
-    private int cardPoolSize = 17; // Check it
+    private int cardPoolSize = 13; // Check it
     private int puPoolSize = 6;
 
     void Start()
@@ -32,6 +32,7 @@ public class ObjectPooler : Singleton<ObjectPooler>
             CardUi obj = Instantiate(cardPrefab);
             obj.Activate(false);
             obj.transform.SetParent( gameObject.transform);
+            obj.name = "CardUi" + (i+1);
             cardPool.Enqueue(obj);
         }
         for (int i = 0; i < puPoolSize; i++)

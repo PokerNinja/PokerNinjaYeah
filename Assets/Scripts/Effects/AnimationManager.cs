@@ -18,7 +18,6 @@ public class AnimationManager : Singleton<AnimationManager>
         float shineDuration = Values.Instance.shineDuration;
         float shineLocation = 1f;
         yield return new WaitForSeconds(delayBefore);
-
         material.SetFloat("_ShineGlow", 1.5f);
 
         while (shineLocation > 0)
@@ -33,6 +32,27 @@ public class AnimationManager : Singleton<AnimationManager>
                 {
                     yield return new WaitForSeconds(delayForNextShine);
                 }
+                OnFinnish?.Invoke();
+                break;
+            }
+        }
+    }
+    public IEnumerator ShineCard(Material material, Action OnFinnish)
+    {
+        float shineDuration = Values.Instance.shineDuration;
+        float shineLocation = 0f;
+
+        material.SetColor("_ShineColor", Values.Instance.currentVisionColor);
+        material.SetFloat("_ShineGlow", 1.5f);
+
+        while (shineLocation < 1)
+        {
+            shineLocation += Time.deltaTime / shineDuration;
+            material.SetFloat("_ShineLocation", shineLocation);
+            yield return new WaitForFixedUpdate();
+            if (shineLocation >= 1)
+            {
+                material.SetFloat("_ShineGlow", 0f);
                 OnFinnish?.Invoke();
                 break;
             }
@@ -82,9 +102,18 @@ public class AnimationManager : Singleton<AnimationManager>
     }
 
 
-    public void FadeBurnDarkScreen(Material darkScreenMaterial, bool enable, Action ResetSortingOrder)
+    public void FadeBurnDarkScreen(Material darkScreenMaterial, bool enable, float duration, Action ResetSortingOrder)
     {
-        StartCoroutine(FadeDarkScreen(darkScreenMaterial, enable, Values.Instance.darkScreenAlphaDuration, ResetSortingOrder));
+        float currentAmount = darkScreenMaterial.GetFloat("_FadeAmount");
+        if ((currentAmount == -0.1f && enable) || (currentAmount == 1f && !enable))
+        {
+            Debug.LogWarning("Already in DS");
+            ResetSortingOrder?.Invoke();
+        }
+        else
+        {
+            StartCoroutine(FadeDarkScreen(darkScreenMaterial, enable, duration, ResetSortingOrder));
+        }
     }
 
 
@@ -155,6 +184,7 @@ public class AnimationManager : Singleton<AnimationManager>
         float r = spriteRenderer.color.r;
         float g = spriteRenderer.color.g;
         float b = spriteRenderer.color.b;
+        float startingAlpha = spriteRenderer.color.a;
         float dissolveAmount = 1;
         float alphaTarget = 0;
         if (fadeIn)
@@ -162,33 +192,69 @@ public class AnimationManager : Singleton<AnimationManager>
             dissolveAmount = 0;
             alphaTarget = 1;
         }
-        spriteRenderer.color = new Color(r, g, b, dissolveAmount);
-        //FIXIT
-        while (dissolveAmount != alphaTarget)
+        if (startingAlpha == alphaTarget)
         {
-            yield return new WaitForFixedUpdate();
-            if (fadeIn)
-            {
-                dissolveAmount += Time.deltaTime / duration;
-            }
-            else
-            {
-                dissolveAmount -= Time.deltaTime / duration;
-            }
+            Debug.LogError("SAME VaLUE");
+            OnFinish?.Invoke();
+        }
+        else
+        {
 
-            spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
-            if (dissolveAmount >= 1 || dissolveAmount <= 0)
+            spriteRenderer.color = new Color(r, g, b, dissolveAmount);
+            //FIXIT
+            while (dissolveAmount != alphaTarget)
             {
-                // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
-                // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
+                //yield return new WaitForFixedUpdate();
+                yield return null;
+                if (fadeIn)
+                {
+                    dissolveAmount += Time.deltaTime / duration;
+                }
+                else
+                {
+                    dissolveAmount -= Time.deltaTime / duration;
+                }
 
-                spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaTarget));
-                OnFinish?.Invoke();
-                break;
+                spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
+                if (dissolveAmount >= 1 || dissolveAmount <= 0)
+                {
+                    // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
+                    // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
+
+                    spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaTarget));
+                    OnFinish?.Invoke();
+                    break;
+                }
             }
         }
     }
-    public IEnumerator AlphaFadeIn(SpriteRenderer spriteRenderer, float duration, Action OnFinish)
+
+    public void AlphaFade(bool fadeIn, SpriteRenderer spriteRenderer, float duration, Action OnFinish)
+    {
+        if (fadeIn)
+        {
+            if (spriteRenderer.color.a == 0)
+            {
+                StartCoroutine(AlphaFadeIn(spriteRenderer, duration, OnFinish));
+            }
+            else
+            {
+                OnFinish?.Invoke();
+            }
+        }
+        else
+        {
+            if (spriteRenderer.color.a > 0)
+            {
+                StartCoroutine(AlphaFadeOut(spriteRenderer, duration, OnFinish));
+            }
+            else
+            {
+                OnFinish?.Invoke();
+            }
+        }
+    }
+    private IEnumerator AlphaFadeIn(SpriteRenderer spriteRenderer, float duration, Action OnFinish)
     {
         float r = spriteRenderer.color.r;
         float g = spriteRenderer.color.g;
@@ -199,7 +265,8 @@ public class AnimationManager : Singleton<AnimationManager>
         spriteRenderer.color = new Color(r, g, b, 0f);
         while (dissolveAmount < alphaTarget)
         {
-            yield return new WaitForFixedUpdate();
+            //yield return new WaitForFixedUpdate();
+            yield return null;
 
             dissolveAmount += Time.deltaTime / duration;
 
@@ -215,7 +282,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
     }
 
-    public IEnumerator AlphaFadeOut(SpriteRenderer spriteRenderer, float duration, Action OnFinish)
+    private IEnumerator AlphaFadeOut(SpriteRenderer spriteRenderer, float duration, Action OnFinish)
     {
         float r = spriteRenderer.color.r;
         float g = spriteRenderer.color.g;
@@ -226,7 +293,8 @@ public class AnimationManager : Singleton<AnimationManager>
         spriteRenderer.color = new Color(r, g, b, 1f);
         while (dissolveAmount > alphaTarget)
         {
-            yield return new WaitForFixedUpdate();
+            // yield return new WaitForFixedUpdate();
+            yield return null;
 
             dissolveAmount -= Time.deltaTime / duration;
 
@@ -253,32 +321,33 @@ public class AnimationManager : Singleton<AnimationManager>
             dissolveAmount = 0;
             alphaTarget = 1;
         }
-
-
-        while (txtMesh.color.a != alphaTarget)
+        if (txtMesh.color.a != alphaTarget)
         {
+            while (dissolveAmount != alphaTarget)
+            {
 
-            yield return new WaitForFixedUpdate();
-            if (fadeIn)
-            {
-                dissolveAmount += Time.deltaTime / duration;
-            }
-            else
-            {
-                dissolveAmount -= Time.deltaTime / duration;
-            }
+                yield return new WaitForFixedUpdate();
+                if (fadeIn)
+                {
+                    dissolveAmount += Time.deltaTime / duration;
+                }
+                else
+                {
+                    dissolveAmount -= Time.deltaTime / duration;
+                }
 
-            txtMesh.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
-            if (txtMesh.color.a == alphaTarget)
-            {
-                OnFinish?.Invoke();
-                break;
+                txtMesh.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
+                if ((dissolveAmount >= alphaTarget && fadeIn) || (dissolveAmount <= alphaTarget && !fadeIn))
+                {
+                    txtMesh.color = new Color(r, g, b, alphaTarget);
+                    OnFinish?.Invoke();
+                    break;
+                }
             }
         }
-
-        if (txtMesh.color.a == alphaTarget)
+        else
         {
-            OnFinish?.Invoke();
+             OnFinish?.Invoke();
         }
     }
 
@@ -320,7 +389,7 @@ public class AnimationManager : Singleton<AnimationManager>
                 onFinishDissolve?.Invoke();
                 if (!freeze)
                 {
-                   // targetObj.material = targetMaterial;
+                    // targetObj.material = targetMaterial;
                     targetObj.material.SetFloat("_FadeAmount", -0.1f);
                 }
                 break;
@@ -444,11 +513,10 @@ public class AnimationManager : Singleton<AnimationManager>
         yield break;
     }
 
-    public void ScaleMultipleTime(float firstScale, float secondScale, Transform selector, Vector2 targetScale, float scaleDuration, Action EndAction)
+    public void ScaleMultipleTime(float firstScale, Transform selector, Vector2 targetScale, float scaleDuration, Action EndAction)
     {
-        StartCoroutine(ScaleAnimation(selector, targetScale * firstScale, scaleDuration/3,
-            () => StartCoroutine(ScaleAnimation(selector, targetScale * secondScale, scaleDuration/3,
-            () => StartCoroutine(ScaleAnimation(selector, targetScale, scaleDuration/3, EndAction))))));
+        StartCoroutine(ScaleAnimation(selector, targetScale * firstScale, scaleDuration / 2,
+            () => StartCoroutine(ScaleAnimation(selector, targetScale, scaleDuration / 2, EndAction))));
     }
 
     public IEnumerator SmoothMove(Transform selector, Vector3 targetPosition, Vector2 targetScale, float movementDuration, Action beginAction, Action endAction, Action Reset, Action CloseDrawer)
@@ -761,6 +829,8 @@ public class AnimationManager : Singleton<AnimationManager>
         while (selector.localScale != vectorTargetFinal)
         {
             t = (Time.time - startTime) / flipDuration;
+
+
             if (!shrinking)
             {
                 if (selector.localScale == vectorTargetShrink)
@@ -830,7 +900,7 @@ public class AnimationManager : Singleton<AnimationManager>
         yield break;
     }
 
-    public IEnumerator ScaleObject(bool scaleDown, float scaleTarget, float scaleDuration, Transform selector, Action RedBgEnable, Action onEnd)
+    public IEnumerator ScaleObject(float scaleTarget, float scaleDuration, Transform selector, Action RedBgEnable, Action onEnd)
     {
         float startTime = Time.time;
         float t;
@@ -840,21 +910,8 @@ public class AnimationManager : Singleton<AnimationManager>
         while (selector.localScale.x != vectorTarget.x)
         {
             t = (Time.time - startTime) / scaleDuration;
-            if (scaleDown)
-            {
-                selector.localScale = new Vector3(Mathf.SmoothStep(vectorTarget.x, selector.localScale.x, t), Mathf.SmoothStep(vectorTarget.y, selector.localScale.y, t), vectorTarget.z);
-            }
-            else
-            {
-                selector.localScale = new Vector3(Mathf.SmoothStep(selector.localScale.x, vectorTarget.x, t), Mathf.SmoothStep(selector.localScale.y, vectorTarget.y, t), vectorTarget.z);
-                /* if (activate && selector.localScale.x > vectorTarget.x/2)
-                 {
+            selector.localScale = new Vector3(Mathf.SmoothStep(selector.localScale.x, vectorTarget.x, t), Mathf.SmoothStep(selector.localScale.y, vectorTarget.y, t), vectorTarget.z);
 
-                     activate = false;
-                     AlphaAnimation?.Invoke();
-                 }*/
-
-            }
             yield return new WaitForFixedUpdate();
             if (endActivate && selector.localScale.x == vectorTarget.x)
             {
@@ -967,9 +1024,9 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
-    public void SetAlpha(SpriteRenderer windSpriteRenderer, float alpha)
+    public void SetAlpha(SpriteRenderer targetSprite, float alpha)
     {
-        windSpriteRenderer.color = new Color(windSpriteRenderer.material.color.r, windSpriteRenderer.material.color.g, windSpriteRenderer.material.color.b, alpha);
+        targetSprite.color = new Color(targetSprite.material.color.r, targetSprite.material.color.g, targetSprite.material.color.b, alpha);
     }
 
     public IEnumerator ScaleAndFadeEye(Transform selector, bool disableImage, Action ImateReplace, Action disableDarkScreen)
@@ -1053,7 +1110,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
     }
 
-    public void VisionEffect(List<CardUi> winningPlayersCards, bool enable)
+    public void VisionEffect(List<CardUi> winningPlayersCards, int cardToGlow, bool enable)
     {
         float alphaAmoint = 0f;
         float burnAmoint = 0.6f;
@@ -1065,8 +1122,11 @@ public class AnimationManager : Singleton<AnimationManager>
             burnAmoint = 0f;
             ghostColor = visionColor;
         }
-        foreach (CardUi cardUi in winningPlayersCards)
+        //foreach (CardUi cardUi in winningPlayersCards)
+        CardUi cardUi;
+        for (int i = 0; i < cardToGlow; i++)
         {
+            cardUi = winningPlayersCards[i];
             if (cardUi.freeze)
             {
                 cardUi.spriteRenderer.material.SetFloat("_FadeAmount", burnAmoint);
@@ -1101,9 +1161,36 @@ public class AnimationManager : Singleton<AnimationManager>
             StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, null));
         }
     }
+    public void AnimateWinningHandToBoard2(List<CardUi> winningPlayerCards, int cardToGlow, List<CardUi> losingBoardCards, Transform[] boardTransform, Action UpdateValueEndRoutine)
+    {
+        Vector3 targetScale = new Vector3(0.75f, 0.75f, 0.75f);
+        Action EndAction = null;
+        foreach (CardUi card in losingBoardCards)
+        {
+            StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, null));
+        }
+        VisionEffect(winningPlayerCards, cardToGlow, true);
+        for (int i = 0; i < 5; i++)
+        {
+            //await Task.Delay(Values.Instance.delayBetweenCardWinArrangeInMilli);
+            if (i == 4)
+            {
+                EndAction += UpdateValueEndRoutine;
+                EndAction += () => ShineWinningCards(winningPlayerCards, cardToGlow);
+                Debug.LogError("Shinning" + cardToGlow);
+            }
+            StartCoroutine(SmoothMove(winningPlayerCards[i].transform, boardTransform[i].position, targetScale, Values.Instance.winningCardsMoveDuration, null, null, null, EndAction));
+        }
 
+    }
 
-
+    private void ShineWinningCards(List<CardUi> winningPlayerCards, int cardsToGlow)
+    {
+        for (int i = 0; i < cardsToGlow; i++)
+        {
+            StartCoroutine(ShineCard(winningPlayerCards[i].spriteRenderer.material, null));
+        }
+    }
 
     public IEnumerator FadeDarkScreen(Material targetObj, bool fadeIn, float duration, Action onFinishDissolve3)
     {
@@ -1111,13 +1198,15 @@ public class AnimationManager : Singleton<AnimationManager>
         //  float tiling = UnityEngine.Random.Range(0.07f, 0.15f);
         // targetObj.SetTextureScale("_FadeTex", new Vector2(tiling, tiling));
         // targetObj.SetTextureOffset("_FadeTex", new Vector2(tiling, tiling));
-        float dissolveAmount = -0.1f;
+        float maxTarget = 1f;
+        float minTarget = -0.1f;
+        float dissolveAmount = minTarget;
 
         if (fadeIn)
         {
-            dissolveAmount = 1f;
+            dissolveAmount = maxTarget;
         }
-        while (dissolveAmount >= -0.1f && dissolveAmount <= 1f)
+        while (dissolveAmount >= minTarget && dissolveAmount <= maxTarget)
         {
             if (fadeIn)
             {
@@ -1129,9 +1218,14 @@ public class AnimationManager : Singleton<AnimationManager>
             }
             targetObj.SetFloat("_FadeAmount", dissolveAmount);
             yield return new WaitForFixedUpdate();
-            if (dissolveAmount < -0.1f || dissolveAmount > 1f)
+            if (dissolveAmount < minTarget || dissolveAmount > maxTarget)
             {
-
+                dissolveAmount = maxTarget;
+                if (fadeIn)
+                {
+                    dissolveAmount = minTarget;
+                }
+                targetObj.SetFloat("_FadeAmount", dissolveAmount);
                 yield return new WaitForSeconds(0.1f);
                 onFinishDissolve3?.Invoke();
                 break;

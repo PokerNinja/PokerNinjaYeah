@@ -4,10 +4,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
@@ -56,6 +54,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     public Material dissolveMaterial;
     public Material ghostMaterial;
     public Material shadowMaterial;
+    public Transform[] boardTransform;
     private PokerHandRankingTable poker;
 
     #region Settings
@@ -80,6 +79,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         cardVectorGhostBoard = new Vector3(0.6f, 0.6f, 0.6f);
         poker = new PokerHandRankingTable();
         allCardSlots = new CardSlot[] { playerCardAParent, playerCardBParent, enemyCardAParent, enemyCardBParent, flopAParent, flopBParent, flopCParent, turnParent, riverParent };
+        boardTransform = new Transform[] {  flopAParent.transform, flopBParent.transform, flopCParent.transform, turnParent.transform, riverParent.transform};
     }
 
     private Card cardToSave;
@@ -118,7 +118,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     public void CreateShadowCard(string newCardDescription, Action AnimateWinningHand)
     {
-        AnimateDrawer(true,()=> ShadowCreatorUi(Card.StringToCard(newCardDescription), AnimateWinningHand));
+        AnimateDrawer(true, () => ShadowCreatorUi(Card.StringToCard(newCardDescription), AnimateWinningHand));
     }
 
     private void ReplaceUiCard(string oldCard, string newCard)
@@ -449,6 +449,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardToReset.freeze = false;
             cardToReset.spriteRenderer.material.SetColor("_FadeBurnColor", Color.yellow);
         }
+
+        cardToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
         cardToReset.transform.position = cardTransform.position;
         cardToReset.transform.localScale = cardTransform.localScale;
         cardToReset.transform.SetParent(objectPooler.transform);
@@ -656,7 +658,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         shadowCardUi.Init(cardTag, newCard.ToString(CardToStringFormatEnum.ShortCardName), false, true, "shadow");
         shadowCardUi.LoadSprite(true);
         shadowCardUi.spriteRenderer.material = shadowMaterial;
-        StartCoroutine(AnimationManager.Instance.ScaleAnimation(shadowCardUi.transform, cardScale, Values.Instance.cardDrawMoveDuration, () => AnimateDrawer(false, () =>AnimateWinningHand?.Invoke())));
+        StartCoroutine(AnimationManager.Instance.ScaleAnimation(shadowCardUi.transform, cardScale, Values.Instance.cardDrawMoveDuration, () => AnimateDrawer(false, () => AnimateWinningHand?.Invoke())));
     }
 
     private void CardCreatorUi(Card newCard, bool isFaceDown, bool aboveDarkScreen, CardSlot cardParent, string cardPlace, Action disableDarkScreen, bool isCloseDrawer, int indexToInsert)
@@ -709,11 +711,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardObject.spriteRenderer.material = dissolveMaterial;
 
             StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
-        Values.Instance.cardDrawMoveDuration, null, () =>
-        {
-            DarkCardUnderSmoke?.Invoke();
-            cardObject.CardReveal(!isFaceDown);
-        }
+        Values.Instance.cardDrawMoveDuration, DarkCardUnderSmoke, () =>
+            cardObject.CardReveal( !isFaceDown)
            , disableDarkScreen, () =>
         {
             closeDrawer?.Invoke();
@@ -1017,6 +1016,24 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                     }
                 }
             }
+        }
+        return false;
+    }
+
+    internal bool IsOneCardFromHandsFreeze()
+    {
+        if(playerCardsUi[0].freeze || playerCardsUi[1].freeze ||enemyCardsUi[1].freeze || enemyCardsUi[1].freeze)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    internal bool IsPlayerHandUnderSmoke()
+    {
+        if (playerCardAParent.smokeEnable || playerCardBParent.smokeEnable)
+        {
+            return true;
         }
         return false;
     }
@@ -1361,6 +1378,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void EnableCardSmoke(bool enable, bool isPlayerActivate, CardUi targetCard)
     {
+        Debug.LogWarning("ZH");
         if (targetCard != null)
         {
 
@@ -1453,7 +1471,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         if (cardToSee.whosCards.Equals(Constants.CardsOwener.Enemy))
         {
-            cardToSee.FlipCard(cardToSee.GetisFaceDown(), () => cardToSee.ApplyEyeEffect(endAction, cardToSee.GetisFaceDown(), false));
+            cardToSee.FlipCard( cardToSee.GetisFaceDown(), () => cardToSee.ApplyEyeEffect(endAction, cardToSee.GetisFaceDown(), false));
 
         }
     }
@@ -1491,7 +1509,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         else
         {
-            StartCoroutine(cardToDestroy.Dissolve(dissolveMaterial, 0f, () =>
+            StartCoroutine(cardToDestroy.Dissolve(false,dissolveMaterial, 0f, () =>
                      RestAfterDestroy(cardToDestroy, OnEnd)));
         }
     }
@@ -1593,6 +1611,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
         CardUi cardSwap1 = GetCardUiByName(cardPlace1);
         CardUi cardSwap2 = GetCardUiByName(cardPlace2);
+       // cardSwap1.spriteRenderer.material.SetFloat("_ShadowAlpha", 0.8f);
+       // cardSwap2.spriteRenderer.material.SetFloat("_ShadowAlpha", 0.8f);
         if (cardSwap1.underSmoke)
         {
             EnableCardSmoke(false, false, cardSwap1);
@@ -1609,10 +1629,10 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         SwitchCardsInfo(cardSwap1, cardSwap2);
 
         StartCoroutine(AnimationManager.Instance.FollowArc(cardSwap1.transform, cardSwap1.transform.position, cardSwap2.transform.position, Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
-        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.firstCircualScaleMultiplication, Values.Instance.secondCircualScaleMultiplication, cardSwap1.transform, cardSwap2.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2))), null, null));
+        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardSwap1.transform, cardSwap2.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2))),  null/*() => cardSwap1.spriteRenderer.material.SetFloat("_ShadowAlpha", 0f)*/, null));
 
         StartCoroutine(AnimationManager.Instance.FollowArc(cardSwap2.transform, cardSwap2.transform.position, cardSwap1.transform.position, Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
-        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.secondCircualScaleMultiplication, Values.Instance.firstCircualScaleMultiplication, cardSwap2.transform, cardSwap1.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1))), null, DisableDarkScreen));
+        AnimationManager.Instance.ScaleMultipleTime( Values.Instance.circualScaleMultiplication, cardSwap2.transform, cardSwap1.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1))), null/*() => cardSwap2.spriteRenderer.material.SetFloat("_ShadowAlpha", 0f)*/, DisableDarkScreen));
 
 
         Card tempCard1 = Card.StringToCard(cardSwap1.cardDescription);
@@ -1699,7 +1719,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
             if (tagFrom == Constants.EnemyCardsTag)
             {
-                cardToFlip.FlipCard(true, null);
+                cardToFlip.FlipCard( true, null);
             }
             else if (tagTo == Constants.EnemyCardsTag)
             {
@@ -1785,7 +1805,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 cardToDestroy.cardMark.SetActive(false);
             }
-            StartCoroutine(cardToDestroy.Dissolve(dissolveMaterial, 0, () => ResetCardUI(cardToDestroy)));
+            StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => ResetCardUI(cardToDestroy)));
         }
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve, true);
         DealHands();

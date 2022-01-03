@@ -1,52 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!28 &-6970118215333085623
-Texture2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: _ColorRampTexGradientTex{"mode":0,"colorKeys":[{"color":{"r":0.0,"g":0.0,"b":0.0,"a":1.0},"time":0.0},{"color":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"time":1.0}],"alphaKeys":[{"alpha":1.0,"time":0.0},{"alpha":1.0,"time":1.0}]}
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 2
-  m_Width: 64
-  m_Height: 1
-  m_CompleteImageSize: 256
-  m_MipsStripped: 0
-  m_TextureFormat: 4
-  m_MipCount: 1
-  m_IsReadable: 1
-  m_IsPreProcessed: 0
-  m_IgnoreMasterTextureLimit: 0
-  m_StreamingMipmaps: 0
-  m_StreamingMipmapsPriority: 0
-  m_VTOnly: 0
-  m_AlphaIsTransparency: 0
-  m_ImageCount: 1
-  m_TextureDimension: 2
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_LightmapFormat: 0
-  m_ColorSpace: 0
-  m_PlatformBlob: 
-  image data: 256
-  _typelessdata: 000000ff040404ff080808ff0c0c0cff101010ff141414ff181818ff1c1c1cff202020ff242424ff282828ff2d2d2dff313131ff353535ff393939ff3d3d3dff414141ff454545ff494949ff4d4d4dff515151ff555555ff595959ff5d5d5dff616161ff656565ff696969ff6d6d6dff717171ff757575ff797979ff7d7d7dff828282ff868686ff8a8a8aff8e8e8eff929292ff969696ff9a9a9aff9e9e9effa2a2a2ffa6a6a6ffaaaaaaffaeaeaeffb2b2b2ffb6b6b6ffbababaffbebebeffc2c2c2ffc6c6c6ffcacacaffcececeffd2d2d2ffd7d7d7ffdbdbdbffdfdfdfffe3e3e3ffe7e7e7ffebebebffefefeffff3f3f3fff7f7f7fffbfbfbffffffffff
-  m_StreamData:
-    serializedVersion: 2
-    offset: 0
-    size: 0
-    path: 
 --- !u!21 &2100000
 Material:
   serializedVersion: 6
@@ -54,11 +7,12 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CardUiDissolve
+  m_Name: CardUiDefault
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
   m_ShaderKeywords: COLORRAMPOUTLINE_ON ETC1_EXTERNAL_ALPHA FADE_ON FLICKER_ON GLITCH_ON
-    GRADIENT_ON HSV_ON OUTBASE_ON OUTDIST_ON OUTTEX_ON RADIALGRADIENT_ON SHAKEUV_ON
-    _COLORRAMPOUTLINE_ON _GRADISRADIAL_ON _OUTLINEDISTORTTOGGLE_ON _OUTLINETEXTOGGLE_ON
+    GRADIENT2COL_ON GRADIENTCOLORRAMP_ON GRADIENT_ON HSV_ON OUTBASE_ON OUTDIST_ON
+    OUTTEX_ON OVERLAYMULT_ON RADIALGRADIENT_ON SHADOW_ON SHAKEUV_ON SHINE_ON _COLORRAMPOUTLINE_ON
+    _GRADISRADIAL_ON _OUTLINEDISTORTTOGGLE_ON _OUTLINETEXTOGGLE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -69,11 +23,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _ColorRampTex:
-        m_Texture: {fileID: 2800000, guid: 279657edc397ece4b8029c727adf6ddc, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6fc6eee88963e63429ed61892dadd042, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ColorRampTexGradient:
-        m_Texture: {fileID: -6970118215333085623}
+        m_Texture: {fileID: -7766777452268937819, guid: d30835922f3a7fb43b4588b77896022f, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ColorSwapTex:
@@ -109,8 +63,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OverlayTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: f96aebb9bcd1e3b44bafbb23b1bdac88, type: 3}
+        m_Scale: {x: 0.92, y: 0.5}
         m_Offset: {x: 0, y: 0}
     - _ShineMask:
         m_Texture: {fileID: 0}
@@ -144,21 +98,21 @@ Material:
     - _BurnAmount: 0
     - _BurnScale: 7
     - _ChromAberrAlpha: 0
-    - _ChromAberrAmount: 1
+    - _ChromAberrAmount: 0.185
     - _ClipUvDown: 0
     - _ClipUvLeft: 0
     - _ClipUvRight: 0
     - _ClipUvUp: 0
-    - _ColorChangeLuminosity: 0.67
-    - _ColorChangeTolerance: 0.61
+    - _ColorChangeLuminosity: 1
+    - _ColorChangeTolerance: 0.878
     - _ColorChangeTolerance2: 0.25
     - _ColorChangeTolerance3: 0.25
-    - _ColorRampBlend: 1
-    - _ColorRampLuminosity: -0.44
+    - _ColorRampBlend: 0.448
+    - _ColorRampLuminosity: -1
     - _ColorRampOutline: 1
     - _ColorSwapBlend: 1
     - _ColorSwapBlueLuminosity: 0.5
-    - _ColorSwapGreenLuminosity: 0.5
+    - _ColorSwapGreenLuminosity: -0.38
     - _ColorSwapRedLuminosity: 1
     - _Contrast: 1
     - _DistortAmount: 0.5
@@ -172,16 +126,16 @@ Material:
     - _FlickerAlpha: 0.131
     - _FlickerFreq: 1.4
     - _FlickerPercent: 0
-    - _GhostBlend: 1
+    - _GhostBlend: 0.764
     - _GhostColorBoost: 0
-    - _GhostTransparency: 0
+    - _GhostTransparency: 0.117
     - _GlitchAmount: 0
     - _GlitchSize: 0.95
     - _Glow: 100
     - _GlowTexUsed: 0
     - _GradBlend: 0
     - _GradBoostX: 0.56
-    - _GradBoostY: 1.2
+    - _GradBoostY: 0.53
     - _GradIsRadial: 1
     - _GrassManualAnim: 1
     - _GrassManualToggle: 0
@@ -191,14 +145,14 @@ Material:
     - _GreyscaleBlend: 1
     - _GreyscaleLuminosity: -1
     - _GreyscaleOutline: 0
-    - _HandDrawnAmount: 12.09
-    - _HandDrawnSpeed: 5.09
-    - _HitEffectBlend: 0.499
-    - _HitEffectGlow: 1
+    - _HandDrawnAmount: 10.4
+    - _HandDrawnSpeed: 8.4
+    - _HitEffectBlend: 0
+    - _HitEffectGlow: 17.5
     - _HologramBlend: 1
     - _HologramMaxAlpha: 0
     - _HologramMinAlpha: 1
-    - _HologramStripesAmount: 1
+    - _HologramStripesAmount: 0.453
     - _HologramStripesSpeed: -15.6
     - _HologramUnmodAmount: 0
     - _HsvBright: 1.01
@@ -206,7 +160,7 @@ Material:
     - _HsvShift: 0
     - _InnerOutlineAlpha: 1
     - _InnerOutlineGlow: 250
-    - _InnerOutlineThickness: 1.8
+    - _InnerOutlineThickness: 2.98
     - _MaxXUV: 1
     - _MaxYUV: 1
     - _MinXUV: 0
@@ -234,8 +188,8 @@ Material:
     - _OutlineTexXSpeed: 10
     - _OutlineTexYSpeed: 0
     - _OutlineWidth: 0.055
-    - _OverlayBlend: 1
-    - _OverlayGlow: 1
+    - _OverlayBlend: 0
+    - _OverlayGlow: 23.9
     - _PinchUvAmount: 0
     - _PixelateSize: 336
     - _PosterizeGamma: 0.75
@@ -246,23 +200,23 @@ Material:
     - _RotateUvAmount: 0
     - _RoundWaveSpeed: 2
     - _RoundWaveStrength: 0.11
-    - _ShadowAlpha: 0.307
-    - _ShadowX: -0.151
-    - _ShadowY: -0.208
+    - _ShadowAlpha: 0
+    - _ShadowX: -0.094
+    - _ShadowY: 0.046
     - _ShakeUvSpeed: 0
     - _ShakeUvX: 3
     - _ShakeUvY: 3.5
-    - _ShineGlow: 1
-    - _ShineLocation: 1
-    - _ShineRotate: 0
-    - _ShineWidth: 0.1
+    - _ShineGlow: 0
+    - _ShineLocation: 0
+    - _ShineRotate: 1.88
+    - _ShineWidth: 0.211
     - _TextureScrollXSpeed: -2.4
     - _TextureScrollYSpeed: 0
     - _TwistUvAmount: 0.24
     - _TwistUvPosX: 0.5
     - _TwistUvPosY: 0.5
     - _TwistUvRadius: 0.75
-    - _WaveAmount: 2
+    - _WaveAmount: 15.1
     - _WaveSpeed: 0
     - _WaveStrength: 4.8
     - _WaveX: 0.502
@@ -275,7 +229,7 @@ Material:
     - _AlphaOutlineColor: {r: 1, g: 0, b: 0, a: 1}
     - _BlineCOLOR: {r: 3.688605, g: 0.6372983, b: 0.05793621, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorChangeNewCol: {r: 0.7826463, g: 0.8396226, b: 0.6693218, a: 1}
+    - _ColorChangeNewCol: {r: 0.4800171, g: 0.13011748, b: 0.6415094, a: 1}
     - _ColorChangeNewCol2: {r: 1, g: 1, b: 0, a: 1}
     - _ColorChangeNewCol3: {r: 1, g: 1, b: 0, a: 1}
     - _ColorChangeTarget: {r: 1, g: 1, b: 1, a: 1}
@@ -284,18 +238,18 @@ Material:
     - _ColorSwapBlue: {r: 1, g: 1, b: 1, a: 1}
     - _ColorSwapGreen: {r: 1, g: 1, b: 1, a: 1}
     - _ColorSwapRed: {r: 0.061638594, g: 0.7924528, b: 0, a: 1}
-    - _FadeBurnColor: {r: 0.039848804, g: 0, b: 1, a: 1}
+    - _FadeBurnColor: {r: 0.039215688, g: 0, b: 1, a: 1}
     - _GlowColor: {r: 0.9056604, g: 0, b: 0, a: 0.7294118}
     - _GradBotLeftCol: {r: 0.5019608, g: 0.27450982, b: 0.57254905, a: 1}
     - _GradBotRightCol: {r: 0, g: 0, b: 1, a: 1}
     - _GradTopLeftCol: {r: 0, g: 0, b: 0, a: 1}
     - _GradTopRightCol: {r: 1, g: 0, b: 0, a: 1}
     - _GreyscaleTintColor: {r: 1, g: 1, b: 1, a: 1}
-    - _HitEffectColor: {r: 1, g: 1, b: 1, a: 1}
+    - _HitEffectColor: {r: 0.76315784, g: 0, b: 1, a: 1}
     - _HologramStripeColor: {r: 0, g: 0, b: 0, a: 1}
-    - _InnerOutlineColor: {r: 1, g: 0, b: 0, a: 1}
+    - _InnerOutlineColor: {r: 0.76315784, g: 0, b: 1, a: 1}
     - _OutlineColor: {r: 1, g: 0.8926476, b: 0, a: 1}
-    - _OverlayColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OverlayColor: {r: 0.76315784, g: 0, b: 1, a: 1}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 1}
     - _ShineColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

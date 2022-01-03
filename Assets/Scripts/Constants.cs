@@ -11,9 +11,9 @@ public class Constants : Singleton<Constants>
     public const string DeckCardsTag = "CardD";
     public const string AllCardsTag = "All";
     public const string PoolCardTag = "Pool";
-    public enum CardsOwener { Player, Enemy, Board, Deck, Pool,}
+    public enum CardsOwener { Player, Enemy, Board, Deck, Pool, }
 
-public const string PlayerCard1 = "PlayerCard1";
+    public const string PlayerCard1 = "PlayerCard1";
     public const string PlayerCard2 = "PlayerCard2";
     public const string EnemyCard1 = "EnemyCard1";
     public const string EnemyCard2 = "EnemyCard2";
@@ -32,7 +32,9 @@ public const string PlayerCard1 = "PlayerCard1";
     public static readonly string[] ghostCardsNames = { PlayerGhost, EnemyGhost, BoardGhost };
     public static string ReplacePuInfo = "Choose one PowerUp and replace it with a new one.";
 
-    public  string ConvertCardPlaceForEnemy(string cardPlace)
+
+
+    public string ConvertCardPlaceForEnemy(string cardPlace)
     {
         switch (cardPlace)
         {
@@ -46,6 +48,19 @@ public const string PlayerCard1 = "PlayerCard1";
                 return PlayerCard2;
         }
         return cardPlace;
+    }
+
+    public enum TutorialObjectEnum
+    {
+        startGame = 0,
+        coins = 1,
+        energy = 2,
+        pu = 3,
+        puCost = 4,
+        pu2 = 5,
+        endTurn = 8,
+
+
     }
     /*  public const string BoardCardSlutFlop1 = "BFlop1";
       public const string BoardCardSlutFlop2 = "CardB";

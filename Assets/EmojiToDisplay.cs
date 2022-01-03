@@ -12,7 +12,8 @@ public class EmojiToDisplay : MonoBehaviour
 
     public void PlayEmoji(int id)
     {
-        animator.SetInteger("emojiId",id);
+        animator.Play("emoji_" + id, 0, 0f);
+        //animator.SetInteger("emojiId",id);
     }
 
 
