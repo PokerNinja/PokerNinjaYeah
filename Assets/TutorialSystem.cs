@@ -5,17 +5,8 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
-public class TutorialSystem : State
+public class TutorialSystem : StateTuto
 {
-    /*public GameObject tutorialMaskRing;
-    public GameObject tutorialMaskRect;
-    public SpriteRenderer darkScreenRenderer;
-    public SpriteRenderer btnTutorial;
-    public SpriteRenderer tutorialBgText;
-    public TextMeshProUGUI tutorialText;
-    public int lastObjectToFocus;
-    public SpriteRenderer coinsFocus;
-    public SpriteRenderer energyCostTuto;*/
 
 
     private TutorialUi ui;
@@ -43,7 +34,7 @@ public class TutorialSystem : State
     public const string tuto12 = "Choose a card to flip";
     public const string tuto13 = "It’s Frozen. Choose the other card";
     public const string tuto14 = "A card with this symbol means its revealed";
-    public const string tuto15 = "With the cost of 1 energy you can draw another ninja card";
+    public const string tuto15 = "With the cost of 1 energy you can draw another Ninja card";
     public const string tuto16 = "Got no energy left! The turn will pass automatically";
     public const string tuto17 = "When you finish your turn with 2 Ninja cards, the one from the left will be destroyd before you next turn.";
     /// <summary>
@@ -54,16 +45,16 @@ public class TutorialSystem : State
     /// /////////////////// Player Last Turn
     /// </summary>
     public const string tuto19 = "In the final turn of the round, you get only 1 energy";
-    public const string tuto20 = "Hold to read";
-    public const string tuto21 = "Use the card to swap the enemy’s card.";
-    public const string tuto22 = " Choose his '7' card and from the board - other than '7'.";
+    public const string tuto20 = "\nHold to read     ";
+    public const string tuto21 = "Use the Ninja card to swap\nthe enemy’s card\nwith 1 from the board.";
+    public const string tuto22 = "Choose the '7' from the\nopponent's hand.And\nfrom the board - other than '7'.";
     public const string tuto23 = "You just UP’d your rank!";
     public const string tuto24 = "GOOD LUCK!";
     public static readonly string[] tutoInfo = { tuto0, tuto1, tuto2, tuto3, tuto4, tuto5, tuto6, tuto7, tuto8,
         tuto9,tuto10, tuto11, tuto12, tuto13, tuto14, tuto15, tuto16, tuto17, tuto18,tuto19,tuto20,tuto21,tuto22,tuto23,tuto24,
     "","","","","",tuto30};
 
-    public TutorialSystem(BattleSystem battleSystem, bool enableFocus, int maskShape, int objectNumber, bool endByBtn) : base(battleSystem)
+    public TutorialSystem(BattleSystemTuto battleSystem, bool enableFocus, int maskShape, int objectNumber, bool endByBtn) : base(battleSystem)
     {
         ui = battleSystem.tutorialUi;
         Action EndFocus = null;
@@ -73,13 +64,13 @@ public class TutorialSystem : State
                 battleSystem.ActivatePlayerButtons(false, false);
                 break;
             case 2: //energy
-                EndFocus = () => BattleSystem.Instance.ChargeEnergyCounter(2);
+                EndFocus = () => battleSystem.ChargeEnergyCounter(2);
                 break;
             case 3: //puInfo
-                EndFocus = () => BattleSystem.Instance.ActivateButtonForTutorial(4);
+                EndFocus = () => battleSystem.ActivateButtonForTutorial(4);
                 break;
             case 5: // 
-                EndFocus = () => BattleSystem.Instance.ActivateButtonForTutorial(5);
+                EndFocus = () => battleSystem.ActivateButtonForTutorial(5);
                 // ui.ScaleDownMask(2);
                 break;
             case 6: // 
@@ -90,26 +81,28 @@ public class TutorialSystem : State
                 GetSpriteTargetForTutorial(6).sortingOrder = 1;
                 break;
             case 8: // End First Turn
-               // ui.ScaleDownMask(2);
                 ui.MoveCardsMaskPlayer(false, null);
-                
-                EndFocus = () => BattleSystem.Instance.ActivateButtonForTutorial(8);
+
+                EndFocus = () => battleSystem.ActivateButtonForTutorial(8);
                 EndFocus += () => ui.ScaleMaskForEndFirstTurn();
+                break;
+            case 9:
+                // GetSpriteTargetForTutorial(8).sortingOrder = 1;
                 break;
             case 11: //flip skill
                 ui.tutorialText.transform.position = new Vector3(-0.843f, -0.4f, 10f);
                 //  ui.tutorialText.transform.position = new Vector3(-0.843f,2.45f,-80f);
                 battleSystem.cardsDeckUi.enemyCardsUi[1].freeze = false;
-                EndFocus = () => BattleSystem.Instance.ActivateButtonForTutorial(3);
+                EndFocus = () => battleSystem.ActivateButtonForTutorial(3);
                 break;
             case 12: //flip skill chooose 
-                ui.MoveCardsMaskEnemy(true, null);
+                ui.MoveCardsMaskEnemy(true, false, null);
                 battleSystem.puDeckUi.playerSkillUi.spriteRenderer.sortingOrder = 1;
                 battleSystem.cardsDeckUi.enemyCardsUi[1].spriteRenderer.sortingOrder = 35;
                 battleSystem.cardsDeckUi.enemyCardsUi[0].spriteRenderer.sortingOrder = 1;
                 break;
             case 13: //flip skill frozen pick
-               BattleSystem.Instance.StartCoroutine(AnimationManager.Instance.Shake(battleSystem.cardsDeckUi.enemyCardsUi[1].spriteRenderer.material, Values.Instance.disableClickShakeDuration));
+                BattleSystemTuto.Instance.StartCoroutine(AnimationManager.Instance.Shake(battleSystem.cardsDeckUi.enemyCardsUi[1].spriteRenderer.material, Values.Instance.disableClickShakeDuration));
                 ui.ScaleDownMask(1);
                 battleSystem.cardsDeckUi.enemyCardsUi[1].freeze = true;
                 battleSystem.cardsDeckUi.enemyCardsUi[1].spriteRenderer.sortingOrder = 1;
@@ -117,22 +110,25 @@ public class TutorialSystem : State
                 battleSystem.cardsDeckUi.enemyCardsUi[0].SetSelection(true, "f", "f");
                 battleSystem.cardsDeckUi.enemyCardsUi[0].cardMark.GetComponent<SpriteRenderer>().sortingOrder = 36;
                 battleSystem.cardsDeckUi.enemyCardsUi[0].clickbleForPU = true;
-                battleSystem.cardsToSelectCounter = 1;
+                Constants.cardsToSelectCounter = 1;
                 break;
             case 14: //flip skill choose normal
-                ui.MoveCardsMaskEnemy(false, null);
+                ui.MoveCardsMaskEnemy(false, false, null);
                 battleSystem.cardsDeckUi.enemyCardsUi[0].spriteRenderer.sortingOrder = 1;
                 break;
             case 15: //noEnergyLeft
+                EndFocus = () => battleSystem.ActivateButtonForTutorial(15);
+                EndFocus += () => ui.ScaleMaskForDrawAndCards();
                 break;
             case 16:// auto end
+                ui.ScaleDownMask(2);
                 battleSystem.Interface.btnReplaceRenderer.sortingOrder = 1;
                 break;
             case 17:// auto end
                 if (!enableFocus)
                 {
                     battleSystem.continueTutorial = true;
-                    EndFocus = () => BattleSystem.Instance.FakePlayerEndTurn();
+                    EndFocus = () => battleSystem.FakePlayerEndTurn();
                 }
                 break;
             case 18:
@@ -148,24 +144,59 @@ public class TutorialSystem : State
                 }
                 break;
             case 19:
-                EndFocus = () => BattleSystem.Instance.ChargeEnergyCounter(1);
+                EndFocus = () => battleSystem.ChargeEnergyCounter(1);
                 break;
             case 20:
-                EndFocus = () => BattleSystem.Instance.ActivateButtonForTutorial(4);
+                ui.tutorialText.transform.position = new Vector3(0.68f, -3.81f, 10f);
+                ui.ScaleDownMask(1);
+                EndFocus = () => battleSystem.ActivateButtonForTutorial(4);
                 break;
             case 21:
-                EndFocus = () => BattleSystem.Instance.ActivateButtonForTutorial(5);
+                EndFocus = () => ui.MoveCardsMaskEnemy(true, true, () => battleSystem.ActivateButtonForTutorial(5));
                 break;
-
+            case 22:
+                UpdateClickableCards(enableFocus);
+                if (!enableFocus)
+                {
+                    ui.MoveCardsMaskEnemy(false, true, null);
+                }
+                break;
+            case 23:
+                EndFocus = () => battleSystem.Interface.UpdateCardRank(2072);
+                break;
+            case 24:
+                EndFocus = () => battleSystem.EndRoundExternal();
+                break;
         }
         FocusOnObjectWithText(enableFocus, maskShape, objectNumber, endByBtn, EndFocus);
+    }
+
+    private void UpdateClickableCards(bool enable)
+    {
+        int sortingOrder = 1;
+        if (enable)
+        {
+            sortingOrder = 34;
+        }
+        foreach (CardUi card in battleSystem.cardsDeckUi.boardCardsUi)
+        {
+            if (!card.cardPlace.Equals(Constants.BFlop1))
+            {
+                card.spriteRenderer.sortingOrder = sortingOrder;
+            }
+        }
+        battleSystem.cardsDeckUi.enemyCardsUi[0].spriteRenderer.sortingOrder = sortingOrder;
     }
 
     internal void FocusOnObjectWithText(bool enable, int maskShape, int objectNumber, bool endByBtn, Action EndAction)
     {
         Debug.LogWarning("Focus " + objectNumber);
         SpriteRenderer spriteTarget;
-        ui.btnTutorial.interactable = endByBtn;
+        ui.btnTutorial.interactable = false;
+        if (enable && endByBtn)
+        {
+            EndAction += () => BtnContinueEnable();
+        }
         spriteTarget = GetSpriteTargetForTutorial(objectNumber);
         GameObject mask = null;
         if (enable)
@@ -177,9 +208,9 @@ public class TutorialSystem : State
             }
             if (!endByBtn)
             {
-                if(spriteTarget != null)
+                if (spriteTarget != null)
                 {
-                EndAction += () => spriteTarget.sortingOrder = 34;
+                    EndAction += () => spriteTarget.sortingOrder = 40;
                 }
             }
             ui.tutorialText.text = tutoInfo[objectNumber];
@@ -200,6 +231,12 @@ public class TutorialSystem : State
            });
 
         }
+    }
+
+    private async void BtnContinueEnable()
+    {
+        await Task.Delay(1500);
+        ui.btnTutorial.interactable = true;
     }
 
     private GameObject InitMask(int maskShape, Vector3 position)
@@ -240,9 +277,9 @@ public class TutorialSystem : State
             {
                 targetMaskScale = targetMaskScaleLarge;
             }
-            scaleMask = () => BattleSystem.Instance.StartCoroutine(AnimationManager.Instance.ScaleObjectRatio(targetMaskScale, duration, mask.transform, null, null));
+            scaleMask = () => BattleSystemTuto.Instance.StartCoroutine(AnimationManager.Instance.ScaleObjectRatio(targetMaskScale, duration, mask.transform, null, null));
         }
-        fadeFont = () => BattleSystem.Instance.StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(ui.tutorialText, toVisible, duration, null));
+        fadeFont = () => BattleSystemTuto.Instance.StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(ui.tutorialText, toVisible, duration, null));
         fadeBtn = () => AnimationManager.Instance.AlphaFade(endByBtn, ui.btnTutorialSprite, duration, null);
         fadeDarkScreen = () => AnimationManager.Instance.FadeBurnDarkScreen(ui.darkScreenRenderer.material, toVisible, duration / 2, null);
 
@@ -257,7 +294,7 @@ public class TutorialSystem : State
             fadeBtn?.Invoke();
             scaleMask?.Invoke();
             fadeDarkScreen += EndAction;
-            BattleSystem.Instance.StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(ui.tutorialText, toVisible, duration / 2, fadeDarkScreen));
+            BattleSystemTuto.Instance.StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(ui.tutorialText, toVisible, duration / 2, fadeDarkScreen));
         }
 
     }
@@ -304,6 +341,8 @@ public class TutorialSystem : State
                 return battleSystem.puDeckUi.playerPusUi[1].spriteRenderer;
             case 18:
                 return battleSystem.Interface.emojiSelector;
+            case 23:
+                return ui.handRankNumber;
         }
         return null;
     }

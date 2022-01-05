@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 
-public class TutorialEnemy : State
+public class TutorialEnemy : StateTuto
 {
     private int turnCounter;
 
-    public TutorialEnemy(BattleSystem battleSystem, int turnCounter) : base(battleSystem)
+    public TutorialEnemy(BattleSystemTuto battleSystem, int turnCounter) : base(battleSystem)
     {
         this.battleSystem = battleSystem;
         this.turnCounter = turnCounter;
@@ -15,7 +15,7 @@ public class TutorialEnemy : State
 
     private async void InitFocusTutorial()
     {
-        await Task.Delay(1400);
+        await Task.Delay(350);
         /* battleSystem.FocusOnObjectWithText(true,false, Constants.TutorialObjectEnum.startGame.GetHashCode(), true);
          CheckIfReadyToCountinue();*/
         switch (turnCounter)
@@ -54,7 +54,7 @@ public class TutorialEnemy : State
                 case 2:
                 //battleSystem.continueTutorial = false;
                 battleSystem.FakeEnemyPuUse(0, Constants.BFlop2, Constants.BFlop3, false);
-                    break;
+                break;
             
         }
     }

@@ -23,7 +23,12 @@ public class TutorialUi : MonoBehaviour
     public SpriteRenderer handRankMenu;
     public SpriteRenderer eyeRenderer;
     public Transform maskPositionForEmojis;
+    public SpriteRenderer handRankNumber;
 
+    public SpriteRenderer maskRingSprite, maskRecSprite, maskCardsSprite;
+
+
+    
     public async void ContinueWithTutorial()
     {
         bool enable = false;
@@ -34,6 +39,7 @@ public class TutorialUi : MonoBehaviour
         switch (lastObjectToFocus)
         {
             case 0://after Start
+                SetMasKBlink();
                 enable = true;
                 objectToFocus = Constants.TutorialObjectEnum.coins.GetHashCode();
                 maskShape = 1;
@@ -46,9 +52,9 @@ public class TutorialUi : MonoBehaviour
                 endByBtn = true;
                 break;
             case 2:// after energy
-                BattleSystem.Instance.DealPu(true, () =>
+                BattleSystemTuto.Instance.DealPu(true, () =>
                 {
-                    BattleSystem.Instance.FocusOnObjectWithText(true, 2, Constants.TutorialObjectEnum.pu.GetHashCode(), false);
+                    BattleSystemTuto.Instance.FocusOnObjectWithText(true, 2, Constants.TutorialObjectEnum.pu.GetHashCode(), false);
                 });
                 enable = false;
                 objectToFocus = Constants.TutorialObjectEnum.startGame.GetHashCode();
@@ -69,7 +75,7 @@ public class TutorialUi : MonoBehaviour
                 objectToFocus = Constants.TutorialObjectEnum.board.GetHashCode();
                 maskShape = 0;
                 endByBtn = true;
-                MoveCardsMaskPlayer(true,null);
+                MoveCardsMaskPlayer(true, null);
                 break;
             case 30:// after puCost
                 enable = true;
@@ -77,25 +83,24 @@ public class TutorialUi : MonoBehaviour
                 maskShape = 2;
                 endByBtn = false;
                 break;
-            case 7:// after puCost
-                MoveCardsMaskPlayer(false,null);
-               // await Task.Delay(1500);
+            case 7:// 
+                MoveCardsMaskPlayer(false, null);
                 enable = true;
                 objectToFocus = Constants.TutorialObjectEnum.endTurn.GetHashCode();
                 maskShape = 0;
                 endByBtn = false;
                 break;
-            case 9:// after puCost
-                MoveCardsMaskPlayer(false,null);
-               // await Task.Delay(1500);
+            case 9:// 
+                MoveCardsMaskPlayer(false, null);
+                // await Task.Delay(1500);
                 enable = true;
                 objectToFocus = Constants.TutorialObjectEnum.rankMenu.GetHashCode();
                 maskShape = 1;
                 endByBtn = false;
                 break;
             case 14:// after flip symbol
-                // await Task.Delay(1500);
-                  tutorialText.transform.position = new Vector3(-0.843f,2.45f,10f);
+                    // await Task.Delay(1500);
+                tutorialText.transform.position = new Vector3(-0.843f, 2.45f, 10f);
                 enable = true;
                 objectToFocus = Constants.TutorialObjectEnum.drawPu.GetHashCode();
                 maskShape = 1;
@@ -103,7 +108,7 @@ public class TutorialUi : MonoBehaviour
                 break;
             case 16:// after draw
                 ScaleDownMask(1);
-                await Task.Delay(1500); 
+                await Task.Delay(1500);
                 enable = true;
                 objectToFocus = Constants.TutorialObjectEnum.lastTurnPu.GetHashCode();
                 maskShape = 2;
@@ -127,17 +132,30 @@ public class TutorialUi : MonoBehaviour
                 maskShape = 2;
                 endByBtn = false;
                 break;
+            case 23:
+                enable = false;
+                objectToFocus = Constants.TutorialObjectEnum.end.GetHashCode();
+                maskShape = 1;
+                endByBtn = false;
+                break;
 
         }
 
-        BattleSystem.Instance.FocusOnObjectWithText(enable, maskShape, objectToFocus, endByBtn);
+        BattleSystemTuto.Instance.FocusOnObjectWithText(enable, maskShape, objectToFocus, endByBtn);
     }
 
-    public void MoveCardsMaskPlayer(bool up , Action OnEndMove)
+    private void SetMasKBlink()
+    {
+        StartCoroutine(AnimationManager.Instance.AlphaLoopNoStop(maskRingSprite, Values.Instance.tutoMaskFadeLoopDuration,null));
+        StartCoroutine(AnimationManager.Instance.AlphaLoopNoStop(maskRecSprite, Values.Instance.tutoMaskFadeLoopDuration, null));
+        StartCoroutine(AnimationManager.Instance.AlphaLoopNoStop(maskCardsSprite, Values.Instance.tutoMaskFadeLoopDuration, null));
+    }
+
+    public void MoveCardsMaskPlayer(bool up, Action OnEndMove)
     {
         Vector3 targetPos = new Vector3(0, -11f, 10);
         tutorialMaskCards.transform.localScale = new Vector2(1.37f, 0.98f);
-        Action DeactivateMask = ()=>tutorialMaskCards.SetActive(false);
+        Action DeactivateMask = () => tutorialMaskCards.SetActive(false);
         if (up)
         {
             tutorialMaskCards.transform.position = new Vector3(0, -11.3f, 10);
@@ -145,32 +163,45 @@ public class TutorialUi : MonoBehaviour
             targetPos = new Vector3(0, -3.71f, 10);
             DeactivateMask = null;
         }
-            StartCoroutine(AnimationManager.Instance.SmoothMove(tutorialMaskCards.transform,
-                targetPos,tutorialMaskCards.transform.localScale, Values.Instance.tutoObjsFadeDuration,null,null, DeactivateMask, OnEndMove));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(tutorialMaskCards.transform,
+            targetPos, tutorialMaskCards.transform.localScale, Values.Instance.tutoObjsFadeDuration, null, null, DeactivateMask, OnEndMove));
     }
-    public void MoveCardsMaskEnemy(bool up , Action OnEndMove)
+
+    public void MoveCardsMaskEnemy(bool up, bool withBoard, Action OnEndMove)
     {
         Vector3 targetPos = new Vector3(0, 11f, 10);
-        tutorialMaskCards.transform.localScale = new Vector2(0.77f, 0.81f);
-        Action DeactivateMask = ()=>tutorialMaskCards.SetActive(false);
+        Vector3 scale = new Vector2(0.77f, 0.81f);
+        if (withBoard)
+        {
+            scale = new Vector2(1.37f, 0.98f);
+        }
+        tutorialMaskCards.transform.localScale = scale;
+        Action DeactivateMask = () => tutorialMaskCards.SetActive(false);
         if (up)
         {
             tutorialMaskCards.transform.position = new Vector3(0, 11.17f, 10);
             tutorialMaskCards.SetActive(true);
-            targetPos = new Vector3(0, 6.34f, 10);
+            if (withBoard)
+            {
+                targetPos = new Vector3(0, 4.28f, 10);
+            }
+            else
+            {
+                targetPos = new Vector3(0, 6.34f, 10);
+            }
             DeactivateMask = null;
         }
-            StartCoroutine(AnimationManager.Instance.SmoothMove(tutorialMaskCards.transform,
-                targetPos,tutorialMaskCards.transform.localScale, Values.Instance.tutoObjsFadeDuration,null,null, DeactivateMask, OnEndMove));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(tutorialMaskCards.transform,
+            targetPos, tutorialMaskCards.transform.localScale, Values.Instance.tutoObjsFadeDuration, null, null, DeactivateMask, OnEndMove));
     }
 
     public void ScaleDownMask(int maskShape)
     {
         GameObject mask = tutorialMaskRing;
-        float targetMaskScale= 0.001f;
-        if(maskShape == 2)
+        float targetMaskScale = 0.001f;
+        if (maskShape == 2)
         {
-            targetMaskScale= 0.0033333f;
+            targetMaskScale = 0.0033333f;
             mask = tutorialMaskRect;
         }
         StartCoroutine(AnimationManager.Instance.ScaleObjectRatio(targetMaskScale, Values.Instance.tutoObjsFadeDuration, mask.transform, null, null));
@@ -181,11 +212,16 @@ public class TutorialUi : MonoBehaviour
         tutorialMaskRing.transform.position = maskPositionForEmojis.position;
         StartCoroutine(AnimationManager.Instance.ScaleObjectRatio(2500f, Values.Instance.tutoObjsFadeDuration, tutorialMaskRing.transform, null, null));
     }
-    [Button]
+
     public void ScaleMaskForEndFirstTurn()
     {
-        tutorialMaskRect.transform.position = new Vector3(-7.29f, -0.38f, 10f);
-        StartCoroutine(AnimationManager.Instance.ScaleObjectWithTarget(new Vector3(0.4491432f, 0.2902843f, 1f), Values.Instance.tutoObjsFadeDuration, tutorialMaskRect.transform, null, null));
+        tutorialMaskRect.transform.position = new Vector3(-7.25f, -0.29f, 10f);
+        StartCoroutine(AnimationManager.Instance.ScaleObjectWithTarget(new Vector3(0.45f, 0.265f, 1f), Values.Instance.tutoObjsFadeDuration, tutorialMaskRect.transform, null, null));
+    }
+    public void ScaleMaskForDrawAndCards()
+    {
+        tutorialMaskRect.transform.position = new Vector3(-6.36f, -3.6f, 10f);
+        StartCoroutine(AnimationManager.Instance.ScaleObjectWithTarget(new Vector3(0.7f, 0.5f, 1f), Values.Instance.tutoObjsFadeDuration, tutorialMaskRect.transform, null, null));
     }
 
     private void Start()

@@ -37,16 +37,15 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public UnityEvent onClick = new UnityEvent();
     public UnityEvent onLongPress = new UnityEvent();
 
-
     #region Settings
 
     private void Start()
     {
-
         if (isSkill && isPlayer)
         {
             LoopShine(true);
         }
+     
     }
 
     public void Activate(bool enable)
@@ -85,10 +84,17 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnClick()
     {
-        // TODO move this to battleSystem
-        // BattleSystem battleSystem = GameObject.Find("BattleSystem").GetComponent<BattleSystem>();
-        //Maybe Better One
-        if (BattleSystem.Instance.infoShow)
+
+        if (Constants.TUTORIAL_MODE)
+        {
+            BattleSystemTuto.Instance.OnPuClick(this);
+        }
+        else
+        {
+            BattleSystem.Instance.OnPuClick(this);
+        }
+
+        /*if (BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.HideDialog();
         }
@@ -117,12 +123,11 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material, Values.Instance.disableClickShakeDuration));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick,false);
-        }
+        }*/
     }
     public void OnPointerUp(PointerEventData eventData)
     {
-    /*    Debug.LogError("count " + eventData.clickCount);
-        Debug.LogError("time " + eventData.clickTime);*/
+   
         CancelInvoke("OnLongPress");
         if (isPlayer || isSkill)
         {
@@ -130,7 +135,11 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             {
                 onClick.Invoke();
             }
-            else if (BattleSystem.Instance.infoShow)
+            else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
+            {
+                BattleSystemTuto.Instance.HideDialog();
+            }
+            else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
             {
                 BattleSystem.Instance.HideDialog();
             }
@@ -163,10 +172,12 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OND()
     {
-
-        if (!BattleSystem.Instance.infoShow)
+        if(!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.ShowPuInfo(transform.position, puIndex==1, puName, puDisplayName);
+        }else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
+        {
+            BattleSystemTuto.Instance.ShowPuInfo(transform.position, puIndex==1, puName, puDisplayName);
         }
     }
 

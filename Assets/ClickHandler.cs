@@ -72,11 +72,22 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         // TODO move this to battleSystem
         // BattleSystem battleSystem = GameObject.Find("BattleSystem").GetComponent<BattleSystem>();
         //Maybe Better One
-        if (BattleSystem.Instance.infoShow)
+        if (!Constants.TUTORIAL_MODE)
         {
-            BattleSystem.Instance.HideDialog();
+            if (BattleSystem.Instance.infoShow)
+            {
+                BattleSystem.Instance.HideDialog();
+            }
+            BattleSystem.Instance.EnableReplaceDialog(false, false);
         }
-        BattleSystem.Instance.EnableReplaceDialog(false,false);
+        else
+        {
+            if (BattleSystemTuto.Instance.infoShow)
+            {
+                BattleSystemTuto.Instance.HideDialog();
+            }
+            BattleSystemTuto.Instance.EnableReplaceDialog(false, false);
+        }
     }
     public void OnPointerUp(PointerEventData eventData)
     {
@@ -89,9 +100,13 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         {
             onClick.Invoke();
         }
-        else if (BattleSystem.Instance.infoShow)
+        else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.HideDialog();
+        }
+        else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
+        {
+            BattleSystemTuto.Instance.HideDialog();
         }
 
     }
@@ -103,8 +118,8 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        
-       LoadSpriteBtn(true);
+
+        LoadSpriteBtn(true);
         held = false;
         Invoke("OnLongPress", holdTime);
         Debug.LogError("DDown");
@@ -113,23 +128,27 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     private void LoadSpriteBtn(bool press)
     {
         animator.SetBool("enable", !press);
-       /* string imgName;
-        if (press)
-        {
-            imgName = "draw_press";
-        }
-        else
-        {
-            imgName = "draw1";
-        }
-        spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + imgName, typeof(Sprite)) as Sprite;*/
+        /* string imgName;
+         if (press)
+         {
+             imgName = "draw_press";
+         }
+         else
+         {
+             imgName = "draw1";
+         }
+         spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + imgName, typeof(Sprite)) as Sprite;*/
     }
 
     public void OND()
     {
-        if (!BattleSystem.Instance.infoShow)
+        if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position,false, "replace", Constants.ReplacePuInfo);
+            BattleSystem.Instance.ShowPuInfo(transform.position, false, "replace", Constants.ReplacePuInfo);
+        }
+        else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
+        {
+            BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, "replace", Constants.ReplacePuInfo);
         }
     }
 

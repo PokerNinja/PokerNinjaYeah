@@ -100,10 +100,10 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     private IEnumerator OnClickHandler()
     {
         yield return new WaitForSeconds(0.1f);
-        if (!BattleSystem.Instance.TemproryUnclickable && clickbleForPU && !flipInProgress && BattleSystem.Instance.cardsToSelectCounter > 0)
+        if (!Constants.TemproryUnclickable && clickbleForPU && !flipInProgress && Constants.cardsToSelectCounter > 0)
         {
-            BattleSystem.Instance.TemproryUnclickable = true;
-            --BattleSystem.Instance.cardsToSelectCounter;
+            Constants.TemproryUnclickable = true;
+            --Constants.cardsToSelectCounter;
             clickbleForPU = false;
             SetSelection(false, "", "");
             Vector2 posTarget = transform.position;
@@ -114,8 +114,15 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             //SHOULD BE WITH INTERFACE LISTENR
             StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform, 1.2f, 0.135f, true, () =>
             {
-                BattleSystem.Instance.TemproryUnclickable = false;
+                Constants.TemproryUnclickable = false;
+                if (Constants.TUTORIAL_MODE)
+                {
+                StartCoroutine(BattleSystemTuto.Instance.OnCardsSelectedForPU(cardPlace, transform.position));
+                }
+                else
+                {
                 StartCoroutine(BattleSystem.Instance.OnCardsSelectedForPU(cardPlace, transform.position));
+                }
 
             }));
         }

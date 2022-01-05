@@ -53,6 +53,7 @@ public class Values : Singleton<Values>
     public float durationGlitchBeforeChange = 2f;
     public float durationGlitchAfterChange = 2f;
     public float coinFlipEndMoveDuration = 1f;
+    public float tutoMaskFadeLoopDuration = 0.75f;
 
 
     [Title("Ninja")]

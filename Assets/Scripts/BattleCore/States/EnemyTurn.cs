@@ -26,14 +26,15 @@ public class EnemyTurn : State
          {
              battleSystem.Interface.SetTurnIndicator(false, true);
              battleSystem.Interface.WhosTurnAnimation(false, false, isFinalTurn, () => battleSystem.turnInitInProgress = false);
-             if (battleSystem.TUTORIAL_MODE)
+             /*if (battleSystem.TUTORIAL_MODE)
              {
                  battleSystem.SetState(new TutorialEnemy(battleSystem, turnCounter));
              }
              else
              {
                  battleSystem.NewTimerStarter(false);
-             }
+             }*/
+                 battleSystem.NewTimerStarter(false);
          }
         );
         yield break;

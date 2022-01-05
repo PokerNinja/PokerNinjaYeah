@@ -58,6 +58,11 @@ public class GameMenuHandler : MonoBehaviour
         }
     }
 
+
+    public void StartTutorial()
+    {
+        SceneManager.LoadScene("TutorialScene");
+    }
     [Button]
     private void GetGameLogByNicnName(string nickname)
     {

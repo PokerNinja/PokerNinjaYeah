@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 
 public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
-    
+
     //[Tooltip("How long must pointer be down on this object to trigger a long press")]
     private float holdTime;
     private bool drag = false;
@@ -20,6 +20,8 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
     public BoxCollider2D boxCollider;
     private Vector2 largeBox, smallBox;
     private Vector2 largeOffset, smallOffset;
+
+    private bool TutorialMode = false;
     //private bool held = false;
     //public UnityEvent onClick = new UnityEvent();
 
@@ -32,6 +34,7 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
         largeBox = new Vector2(1.6f, 2.5f);
         smallOffset = new Vector2(0f, 0f);
         largeOffset = new Vector2(0.1004553f, -0.7235291f);
+        TutorialMode = Constants.TUTORIAL_MODE;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -48,7 +51,14 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
         transform.position = startingPosition.position;
         boxCollider.size = largeBox;
         boxCollider.offset = largeOffset;
-        BattleSystem.Instance.EmojiSelected(currentEmojiId);
+        if (!TutorialMode)
+        {
+            BattleSystem.Instance.EmojiSelected(currentEmojiId);
+        }
+        else
+        {
+            BattleSystemTuto.Instance.EmojiSelected(currentEmojiId);
+        }
 
         CancelInvoke("OnLongPress");
         //if (!held)
@@ -95,7 +105,7 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
     {
         if (drag)
         {
-        currentEmojiId = ConvertNameToId(collision.name);
+            currentEmojiId = ConvertNameToId(collision.name);
         }
     }
 

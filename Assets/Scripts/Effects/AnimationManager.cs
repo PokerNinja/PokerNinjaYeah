@@ -762,6 +762,40 @@ public class AnimationManager : Singleton<AnimationManager>
             }
         }
     }
+    internal IEnumerator AlphaLoopNoStop(SpriteRenderer spriteTarget, float duration, Action onFinish)
+    {
+        /*alphaLoopEnable = false;
+        yield return new WaitForFixedUpdate();*/
+        float r = spriteTarget.color.r;
+        float g = spriteTarget.color.g;
+        float b = spriteTarget.color.b;
+        float alphaAmount = 0;
+        bool fadeIn = true;
+        
+        while (true)
+        {
+            if (fadeIn)
+            {
+                alphaAmount += Time.deltaTime / duration;
+            }
+            else
+            {
+                alphaAmount -= Time.deltaTime / duration;
+            }
+            if (alphaAmount >= 1)
+            {
+                fadeIn = false;
+                alphaAmount = 1;
+            }
+            else if (alphaAmount <= 0)
+            {
+                fadeIn = true;
+                alphaAmount = 0;
+            }
+            yield return null;
+            spriteTarget.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaAmount));
+        }
+    }
     public IEnumerator SpinRotateValue(SpriteRenderer projectileSpriteRen, Action EndAction)
     {
         float startTime = Time.time;

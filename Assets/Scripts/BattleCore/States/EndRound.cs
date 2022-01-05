@@ -289,7 +289,7 @@ public class EndRound : State
 
     private bool IsStrightOrFlush(int rank)
     {
-        return (rank <= 2467 && rank >= 1600) || rank <= 166;
+        return (rank <= 1609 && rank >= 323) || rank <= 166;
     }
 
     private List<CardUi> RearangeWinningCards(List<CardUi> winningHand, bool isStrightOrFlush)
