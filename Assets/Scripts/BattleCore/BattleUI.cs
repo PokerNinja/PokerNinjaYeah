@@ -388,16 +388,6 @@ public class BattleUI : MonoBehaviour
             {
                 InitDialog(puDisplayName, PowerUpStruct.Instance.GetPuInfoByName(puName), isBtnOn);
             }
-            if (BattleSystem.Instance.TUTORIAL_MODE /*&& puName.Equals("i3")*/)
-            {
-                if (updateTutorial)
-                {
-                    updateTutorial = false;
-                    BattleSystem.Instance.puDeckUi.playerPusUi[0].spriteRenderer.sortingOrder = 1;
-                    BattleSystem.Instance.tutorialUi.btnTutorial.interactable = true;
-                    OnEnd += () => AnimationManager.Instance.AlphaFade(true, btnTutorial, 1f, null/* ()=>infoDialog.gameObject.SetActive(false)*/);
-                }
-            }
             StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialog, OnEnd));
             //StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialogTransform, OnEnd));
             StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, true, Values.Instance.showDialogMoveDuration, null));
@@ -459,14 +449,12 @@ public class BattleUI : MonoBehaviour
 
     public void EnableDarkScreen(bool isPlayerActivateSelectMode, bool enable, Action ResetSortingOrder)
     {
-        if (!BattleSystem.Instance.TUTORIAL_MODE)
+        darkScreenRenderer.GetComponent<BoxCollider2D>().enabled = enable;
+        // BUG FM2 ResetSortingOrder
+        AnimationManager.Instance.FadeBurnDarkScreen(darkScreenRenderer.material, enable, Values.Instance.darkScreenAlphaDuration, ResetSortingOrder);
+        if (isPlayerActivateSelectMode && !enable)
         {
-            darkScreenRenderer.GetComponent<BoxCollider2D>().enabled = enable;
-            AnimationManager.Instance.FadeBurnDarkScreen(darkScreenRenderer.material, enable, Values.Instance.darkScreenAlphaDuration, ResetSortingOrder);
-            if (isPlayerActivateSelectMode && !enable)
-            {
-                FadeCancelSelectModeScreen(false);
-            }
+            FadeCancelSelectModeScreen(false);
         }
     }
 
@@ -530,43 +518,35 @@ public class BattleUI : MonoBehaviour
 
     public void WhosTurnAnimation(bool isPlayer, bool yourLastTurn, bool finalMove, Action EndRoutine)
     {
-        if (BattleSystem.Instance.TUTORIAL_MODE)
+        string targetTurnTextPath;
+        Action endAction = null;
+        Action enableBGPulse = null;
+        turnTextGO.transform.localScale = new Vector2(0.1f, 0.1f);
+        turnTextGO.transform.position = new Vector2(0f, 0f);
+        turnTextGO.SetActive(true);
+        targetTurnTextPath = GetTurnTextPath(isPlayer, yourLastTurn, finalMove);
+        SpriteRenderer spriteRenderer = turnTextGO.GetComponent<SpriteRenderer>();
+        AnimationManager.Instance.SetAlpha(spriteRenderer, 1f);
+        spriteRenderer.sprite = Resources.Load(targetTurnTextPath, typeof(Sprite)) as Sprite;
+
+        if (finalMove || yourLastTurn)
         {
-            EndRoutine?.Invoke();
+            enableBGPulse = () => EnableBgColor(true);
         }
-        else
-        {
-
-            string targetTurnTextPath;
-            Action endAction = null;
-            Action enableBGPulse = null;
-            turnTextGO.transform.localScale = new Vector2(0.1f, 0.1f);
-            turnTextGO.transform.position = new Vector2(0f, 0f);
-            turnTextGO.SetActive(true);
-            targetTurnTextPath = GetTurnTextPath(isPlayer, yourLastTurn, finalMove);
-            SpriteRenderer spriteRenderer = turnTextGO.GetComponent<SpriteRenderer>();
-            AnimationManager.Instance.SetAlpha(spriteRenderer, 1f);
-            spriteRenderer.sprite = Resources.Load(targetTurnTextPath, typeof(Sprite)) as Sprite;
-
-
-            if (finalMove || yourLastTurn)
-            {
-                enableBGPulse = () => EnableBgColor(true);
-            }
-            /* else
+        /* else
+         {
+             alphaAction = () => StartCoroutine(AnimationManager.AlphaAnimation(spriteRenderer, false, 1f, () =>
              {
-                 alphaAction = () => StartCoroutine(AnimationManager.AlphaAnimation(spriteRenderer, false, 1f, () =>
-                 {
-                     turnTextGO.SetActive(false);
-                     AnimationManager.SetAlpha(spriteRenderer, 1f);
-                 }));
+                 turnTextGO.SetActive(false);
+                 AnimationManager.SetAlpha(spriteRenderer, 1f);
+             }));
 
-             }*/
-            endAction = () => StartCoroutine(AnimationManager.Instance.SmoothMove(turnTextGO.transform, targetTurnSymbol.transform.position, targetTurnSymbol.transform.localScale, Values.Instance.turnTextMoveDuration, null, null, EndRoutine, () =>
-                    turnTextGO.transform.localPosition = new Vector3(turnTextGO.transform.localPosition.x, turnTextGO.transform.localPosition.y, 19.5f)));
+         }*/
+        endAction = () => StartCoroutine(AnimationManager.Instance.SmoothMove(turnTextGO.transform, targetTurnSymbol.transform.position, targetTurnSymbol.transform.localScale, Values.Instance.turnTextMoveDuration, null, null, EndRoutine, () =>
+                turnTextGO.transform.localPosition = new Vector3(turnTextGO.transform.localPosition.x, turnTextGO.transform.localPosition.y, 19.5f)));
 
-            StartCoroutine(AnimationManager.Instance.ScaleObjectRatio(11f, Values.Instance.turnTextScaleDuration, turnTextGO.transform, enableBGPulse, endAction));
-        }
+        StartCoroutine(AnimationManager.Instance.ScaleObjectRatio(11f, Values.Instance.turnTextScaleDuration, turnTextGO.transform, enableBGPulse, endAction));
+
     }
 
     public void EnableBgColor(bool enable)

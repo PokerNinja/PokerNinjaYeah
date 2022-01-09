@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 {
-
+    public CardUi cardPrefab;
     [SerializeField] public Transform cardTransform;
     private List<Card> EnemyHand;
     private List<Card> playerHand;
@@ -400,7 +400,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     }
     public CardUi GetCardUiByName(string cardTarget2)
     {
-        List<CardUi> allCardsUi = playerCardsUi.Concat(enemyCardsUi).Concat(boardCardsUi).ToList();
+        List<CardUi> allCardsUi = playerCardsUi.Concat(enemyCardsUi).Concat(boardCardsUi).Concat(extraDeckCardsUi).ToList();
         for (int i = 0; i < allCardsUi.Count; i++)
         {
             if (allCardsUi[i].cardPlace.Equals(cardTarget2))
@@ -440,7 +440,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         ResetCardUI(cardToDestroy);
         OnEnd?.Invoke();
     }
-
     private void ResetCardUI(CardUi cardToReset)
     {
         cardToReset.name = "CardUII";
@@ -667,6 +666,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Vector3 cardScale;
         string cardTag = "Card" + cardPlace.Substring(0, 1);
         CardUi cardObject = objectPooler.SpwanCardFromPool(cardTag);
+        //CardUi cardObject = Instantiate(cardPrefab);
         cardScale = cardHandVector;
         cardObject.transform.SetParent(cardParent.transform);
         if (cardParent.name.Contains("B") || indexToInsert == -10)
@@ -684,7 +684,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         cardObject.name = cardPlace;
         cardObject.transform.position = new Vector3(cardTransform.position.x, cardTransform.position.y, 1); ;
         cardObject.transform.localScale = cardTransform.localScale;
-        cardObject.Init(cardTag, newCard.ToString(CardToStringFormatEnum.ShortCardName), isFaceDown, aboveDarkScreen, cardPlace);
+         cardObject.Init(cardTag, newCard.ToString(CardToStringFormatEnum.ShortCardName), isFaceDown, aboveDarkScreen, cardPlace);
         if (cardParent.smokeEnable)
         {
             DarkCardUnderSmoke = () => EnableCardSmoke(true, cardParent.smokeActivateByPlayer, cardObject);
@@ -708,8 +708,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         else
         {
-            cardObject.spriteRenderer.material = dissolveMaterial;
 
+            //cardObject.spriteRenderer.material = dissolveMaterial;
             StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
         Values.Instance.cardDrawMoveDuration, DarkCardUnderSmoke, () =>
             cardObject.CardReveal(!isFaceDown)
@@ -721,6 +721,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
 
     }
+
+
 
     private void AddCardToList(string cardTag, CardUi cardObject, int indexToInsert)
     {
@@ -828,7 +830,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             if (!Constants.TUTORIAL_MODE)
             {
-            BattleSystem.Instance.visionUnavailable = false;
+                BattleSystem.Instance.visionUnavailable = false;
             }
         }
         if (totalCards.Count == 5)
@@ -1493,7 +1495,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     private void DestroyWithDelay(string cardPlace, Action OnEnd)
     {
-        CardUi cardToDestroy = GameObject.Find(cardPlace).GetComponent<CardUi>();
+        CardUi cardToDestroy = GetCardUiByName(cardPlace);
         RemoveFromList(GetListByTag(cardToDestroy.tag), cardToDestroy);
         //boardCardsUi.Remove(cardToDestroy); //TODO why this
         if (cardToDestroy == null)
@@ -1514,7 +1516,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 changeOffset = false;
             }
             StartCoroutine(cardToDestroy.FadeBurnOut(targetMaterial, changeOffset, () =>
-          RestAfterDestroy(cardToDestroy, OnEnd)));
+        //  Destroy(cardToDestroy)));
+            RestAfterDestroy(cardToDestroy, OnEnd)));
         }
         else
         {
@@ -1524,11 +1527,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     }
 
 
-
-
     internal void DrawAndReplaceCard(string cardPlace, bool isFlip, Action disableDarkScreen, bool isFirstCard, bool isLastCard)
     {
-
+        Debug.LogWarning("HiDraw " + cardPlace);
         Card newCard = deck.Pop();
         UpdateCardsList(cardPlace, newCard, true);
         int indexToInsert = ConvertCardPlaceToIndex(cardPlace);
@@ -1699,8 +1700,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     {
         Debug.LogError("card" + cardFromDeck);
         Debug.LogError("card" + playerCard);
-        CardUi cardFromDeckUI = GameObject.Find(cardFromDeck).GetComponent<CardUi>();
-        CardUi playerCardUI = GameObject.Find(playerCard).GetComponent<CardUi>();
+        CardUi cardFromDeckUI = GetCardUiByName(cardFromDeck);//    GameObject.Find(cardFromDeck).GetComponent<CardUi>();
+        CardUi playerCardUI = GetCardUiByName(playerCard);
         /*int sortingOrder1 = cardFromDeckUI.GetComponent<Renderer>().sortingOrder;
         int sortingOrder2 = playerCardUI.GetComponent<Renderer>().sortingOrder;*/
 

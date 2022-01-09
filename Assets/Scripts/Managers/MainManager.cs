@@ -1,7 +1,4 @@
 ﻿using Managers;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MainManager : MonoBehaviour
@@ -30,7 +27,7 @@ public class MainManager : MonoBehaviour
             Destroy(this);
         }
     }
-
+  
     private void Start()
     {
         matchmakingManager = GetComponent<MatchMakingManager>();

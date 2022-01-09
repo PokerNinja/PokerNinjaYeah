@@ -107,6 +107,7 @@ public class SoundManager : Singleton<SoundManager>
             AudioSource obj = Instantiate(audioPrefab, gameObject.transform);
             obj.name = "AS:" + i;
             soundPool.Enqueue(obj);
+            obj.gameObject.SetActive(false);
         }
     }
 
@@ -115,7 +116,12 @@ public class SoundManager : Singleton<SoundManager>
     public async Task PlayAsync(AudioClip clip,bool normalPitch)
     {
         float pitch = 1f;
-        AudioSource currentSource = await GetAvailableAudioSource();
+        AudioSource currentSource = await GetAvailableAudioSource();/*
+        if(currentSource == null)
+        {
+            currentSource = Instantiate(audioPrefab, gameObject.transform);
+        }*/
+        //currentSource.gameObject.SetActive(true);
         currentSource.clip = clip;
         currentSource.volume = Values.Instance.sfxVolume;
         if (!normalPitch)
@@ -124,17 +130,24 @@ public class SoundManager : Singleton<SoundManager>
         }
         currentSource.pitch = pitch;
         currentSource.Play();
-        soundPool.Enqueue(currentSource);/*
-        await Task.Delay((int)currentSource.clip.length);
-        currentSource.enabled = false;*/
+        soundPool.Enqueue(currentSource);
+        StartCoroutine(DisableAudioSource(currentSource, currentSource.clip.length));
+        // AudioSource.PlayClipAtPoint(clip,centerPosition);
     }
-    /* public async Task StopSound(AudioClip clip)
-     {
-         AudioSource currentSource = await GetPlayingSound();
 
-         currentSource.clip = clip;
-         currentSource.Stop();
-     }*/
+    private IEnumerator DisableAudioSource(AudioSource currentSource, float length)
+    {
+        yield return new WaitForSeconds(length );
+        currentSource.gameObject.SetActive(false);
+    }
+
+    /* public async Task StopSound(AudioClip clip)
+{
+    AudioSource currentSource = await GetPlayingSound();
+
+    currentSource.clip = clip;
+    currentSource.Stop();
+}*/
 
     /* private AudioSource GetPlayingSound()
      {
@@ -159,18 +172,20 @@ public class SoundManager : Singleton<SoundManager>
             for (int i = 0; i < soundPool.Count; i++)
             {
                 AudioSource currentSource = soundPool.Dequeue();
-                if (!currentSource.isPlaying)
+                if ( !currentSource.isPlaying)
                 {
+                    currentSource.gameObject.SetActive(true);
                     return currentSource;
                 }
                 else
                 {
-                    Debug.LogError("oh no sound");
+                    
+                    Debug.LogWarning("oh no sound");
                 }
                 await Task.Yield();
-
             }
         }
+       // AudioSource obj = Instantiate(audioPrefab, gameObject.transform);
         return null;
     }
 

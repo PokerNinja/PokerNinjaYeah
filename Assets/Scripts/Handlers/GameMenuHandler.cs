@@ -6,7 +6,8 @@ using static DataBaseAPI;
 using System.Text.RegularExpressions;
 using System;
 using Sirenix.OdinInspector;
-
+using System.Collections.Generic;
+using Firebase.Database;
 public class GameMenuHandler : MonoBehaviour
 {
     public TMP_InputField playerName;
@@ -14,6 +15,7 @@ public class GameMenuHandler : MonoBehaviour
     public TextMeshProUGUI appVersion;
     public GameObject wrongTypeText;
     public GameObject tutorialImage;
+    public GameObject updateCanvas;
 
     [GUIColor(0.3f, 0.8f, 0.8f)]
     public bool TEST_MODE;
@@ -37,6 +39,61 @@ public class GameMenuHandler : MonoBehaviour
             //ChangeMyName(Random.Range(1, 45).ToString());
             StartMultiplayer();
         }
+
+        ListenForUpdate( targetVersion=> { 
+            if (Application.version.ToString().Equals(targetVersion))
+            {
+            Debug.LogError("You are updated");
+            }
+            else {
+                ShowUpdateDialog();
+            }
+        }, Debug.Log);
+    }
+
+    private void ShowUpdateDialog()
+    {
+        updateCanvas.SetActive(true);
+    }
+    public void SendUserToUpdate()
+    {
+        Application.OpenURL("market://details?id=com.DefaultCompany.SpeedWeedGrinder");
+    }
+
+    private void OnGUI()
+    {
+        if (Input.GetKeyUp("escape"))
+        {
+            //LoadMenuScene(false);
+        }
+    }
+
+    private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> versionListener;
+
+    public void ListenForUpdate( Action<string> callback,
+        Action<AggregateException> fallback)
+    {
+        // Should update when return to main?
+        versionListener =
+            DatabaseAPI.ListenForValueChanged("version", args =>
+            {
+                if (!args.Snapshot.Exists) return;
+
+                string version = args.Snapshot.GetRawJsonValue() as
+                            string;
+                callback(version);
+               // Constants.updated = currentVersion.Equals(version);
+                Debug.LogWarning("target " + version);
+            },
+            fallback);
+    }
+
+    [Button]
+    public static void yalla()
+    {
+
+        DatabaseAPI.CheckIfVersionUpdated(Application.version.ToString(),
+          () => Debug.Log("Version Updated"), () => Debug.LogError("Update is required"));
     }
 
     public void StartMultiplayer()

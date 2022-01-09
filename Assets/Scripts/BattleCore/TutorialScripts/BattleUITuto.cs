@@ -130,7 +130,7 @@ public class BattleUITuto : MonoBehaviour
 
     public SpriteRenderer btnTutorial;
     public GameObject winBtn;
-
+    public SpriteRenderer pokerTutoSpriteRenderer;
     public void Initialize(string player, string enemy)
     {
         InitializePlayer(player);
@@ -917,5 +917,10 @@ public class BattleUITuto : MonoBehaviour
         Destroy(ps.gameObject);
     }
 
+    internal void LoadNextPokerTutoImage(int imageNumber)
+    {
+        pokerTutoSpriteRenderer.sprite = Resources.Load("Sprites/Tuto/poker_tuto_" + imageNumber, typeof(Sprite)) as Sprite;
+
+    }
 }
 

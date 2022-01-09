@@ -195,7 +195,21 @@ namespace Managers
                             },
                            fallback);
         }
+        public void ListenForUpdate(Action callback,
+       Action<AggregateException> fallback)
+        {
+            currentEmojiListener =
+                DatabaseAPI.ListenForValueChanged("version", args =>
+                {
+                    if (!args.Snapshot.Exists) return;
 
+                    string version = args.Snapshot.GetRawJsonValue() as
+                            string;
+                    callback();
+                    Debug.LogWarning("ty " + version);
+                },
+                fallback);
+        }
         public void StopListeningForAllPlayersReady() => DatabaseAPI.StopListeningForChildAdded(readyListener);
         public void StopListeningForAllPlayersReadyInGame() => DatabaseAPI.StopListeningForChildChanged(readyListenerInGame);
 

@@ -43,19 +43,21 @@ public class TutorialEnemy : StateTuto
     {
         await Task.Delay(800);
         switch (turnCounter)
-            {
-                case 6:
-                    battleSystem.FakeEnemyEndTurn();
-                    break;
-                case 4:
+        {
+            case 6:
+                battleSystem.FakeEnemyEndTurn();
+                break;
+            case 4:
                 battleSystem.continueTutorial = false;
-                battleSystem.FakeEnemyPuUse(0, Constants.EnemyCard2,"", true);
-                    break;
-                case 2:
+                battleSystem.FakeEnemyPuUse(0, Constants.EnemyCard2, "", true);
+                break;
+            case 2:
                 //battleSystem.continueTutorial = false;
                 battleSystem.FakeEnemyPuUse(0, Constants.BFlop2, Constants.BFlop3, false);
+                await Task.Delay(800);
+                battleSystem.FakeEnemyEmoji(1);
                 break;
-            
+
         }
     }
 

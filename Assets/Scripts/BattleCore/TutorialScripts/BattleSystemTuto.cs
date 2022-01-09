@@ -88,13 +88,34 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     public event Action onGameStarted;
 
     private string[] cardDeck, puDeck;
+    private int pokerTutoPhase;
+    public GameObject pokerTutorial;
+    public GameObject dialogInfo;
 
-    
     private void Start()
     {
+        pokerTutoPhase = 1;
         playerLifeLeft = 2;
         enemyLifeLeft = 2;
         Constants.TUTORIAL_MODE = true;
+        if (!Constants.TUTORIAL_POKER)
+        {
+            StartPokerTutorial();
+        }
+        else
+        {
+            StartNinjaTuto();
+        }
+
+    }
+
+    private void StartPokerTutorial()
+    {
+        pokerTutorial.SetActive(true);
+    }
+
+    private void StartNinjaTuto()
+    {
         cardDeck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
                 "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
                 "8c", "3h","9s",board[4],board[3], board[2],board[1],board[0],enemysHand[1], playersHand[1],enemysHand[0],playersHand[0]};
@@ -118,7 +139,6 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
             firstDeck = false;
             StartCoroutine(StarRound());
         }
-        DetectTheBack();
     }
 
     private IEnumerator StarRound()
@@ -141,6 +161,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
 
 
     bool yourLastTurn, finalTurn;
+
     public void PlayerTurnTuto(int turnCounter)
     {
         yourLastTurn = false;
@@ -205,6 +226,8 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
 
     public void LoadMenuScene(bool playAgain)
     {
+        Constants.TUTORIAL_MODE = false;
+        Constants.TUTORIAL_POKER= false;
         //SoundManager.Instance.StopMusic();
         SceneManager.LoadScene("GameMenuScene");
         Destroy(GameObject.Find("AnimationManager"));
@@ -246,9 +269,9 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         {
             int handRank = 7000;
             Hand bestHand = cardsDeckUi.CalculateHand(false, true, false, false);
-          
-                handRank = bestHand.Rank;
-            
+
+            handRank = bestHand.Rank;
+
             ui.UpdateCardRank(handRank);
         }
         else
@@ -478,9 +501,12 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
             Debug.LogWarning("EndingIT");
             FakeEnemyEndTurn();
         }
-        StartCoroutine(ui.DisplayEmoji(false, 1, null));
     }
 
+    public void FakeEnemyEmoji(int index)
+    {
+        StartCoroutine(ui.DisplayEmoji(false, index, null));
+    }
 
 
 
@@ -677,7 +703,8 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     }
     public void HideDialog()
     {
-        ui.ShowPuInfoDialog(new Vector2(0, 0), false, " ", " ", false, false, () => {
+        ui.ShowPuInfoDialog(new Vector2(0, 0), false, " ", " ", false, false, () =>
+        {
             infoShow = false;
             ui.dialogContentUi.color = new Color(1, 1, 1, 0);
         });
@@ -732,7 +759,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
 
 
 
- 
+
 
     public void DisablePlayerPus()
     {
@@ -877,7 +904,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         }
     }
 
-   
+
 
 
     public void SetCardsSelectionAndDisplayInfo(int cardsToSelectCounter, string newPuName)
@@ -890,7 +917,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         {
             ui.InitLargeText(true, PowerUpStruct.Instance.GetPuInfoByName(newPuName));
         }
-       Constants.cardsToSelectCounter = cardsToSelectCounter;
+        Constants.cardsToSelectCounter = cardsToSelectCounter;
     }
 
     internal void FreezePlayingCard(string cardTarget, bool isToFreeze, bool reset)
@@ -950,7 +977,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     internal void DealPu(bool isPlayer, Action OnEnd)
     {
 
-        if ( firstDealTuto)
+        if (firstDealTuto)
         {
             firstDealTuto = false;
             OnEnd.Invoke();
@@ -1170,7 +1197,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
             if (enable && !endTurnInProcess)
             {
                 ui.EnablePlayerButtons(true);
-              
+
             }
             else if (!enable)
             {
@@ -1326,7 +1353,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     }
 
 
-  
+
     private void AnimateWinWithHand(Hand winningHand, bool isPlayerWin)
     {
         //MAKE IT BETTER
@@ -1508,17 +1535,33 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         ui.playerNameText.text = eventData.button.ToString();
         ui.enemyNameText.text = eventData.GetHashCode().ToString();
     }
-    private async void DetectTheBack()
+    public void NextPokerTutorial()
     {
-        while (true)
+        if (pokerTutoPhase == 3)
         {
-            await Task.Delay(500);
-            if (Input.GetKeyUp("escape"))
-            {
-                // Quit application
-            //    Application.Quit();
-            }
+            pokerTutorial.SetActive(false);
+            StartNinjaTuto();
+        }
+        else
+        {
+            ui.LoadNextPokerTutoImage(++pokerTutoPhase);
+        }
+
+    }
+
+    public void ShowExitDialog(bool enable)
+    {
+        dialogInfo.SetActive(enable);
+    }
+
+    private void OnGUI()
+    {
+        if (Input.GetKeyUp("escape"))
+        {
+            ShowExitDialog(true);
         }
     }
+
+
 }
 

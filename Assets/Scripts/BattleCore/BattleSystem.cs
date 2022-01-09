@@ -15,11 +15,8 @@ using System.Threading.Tasks;
 public class BattleSystem : StateMachine
 {
     public static BattleSystem Instance { get; private set; }
-    public TutorialUi tutorialUi;
 
     private bool TEST_MODE;
-    public bool TUTORIAL_MODE;
-    public bool continueTutorial = false;
     private bool toOpen = true;
     [SerializeField] public bool END_TURN_AFTER_PU;
 
@@ -99,7 +96,7 @@ public class BattleSystem : StateMachine
     private bool timedOut;
     private bool emojisWheelDisplay;
 
-    
+
 
     private bool emojiCooledDown = true;
     private readonly long TURN_COUNTER_INIT = 6;
@@ -116,7 +113,7 @@ public class BattleSystem : StateMachine
 
     public bool visionUnavailable = false;
     public bool turnInitInProgress = false;
-    private bool firstDealTuto = true;
+    public GameObject canvasExitDialog;
 
     [SerializeField]
     public bool isRoundReady
@@ -154,14 +151,9 @@ public class BattleSystem : StateMachine
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
-        TUTORIAL_MODE = Values.Instance.TUTORIAL_MODE;
 
-        if (TEST_MODE || TUTORIAL_MODE)
+        if (TEST_MODE)
         {
-            if (TUTORIAL_MODE)
-            {
-                tutorialUi = GameObject.Find("TutorialUi").GetComponent<TutorialUi>();
-            }
             manualPuDeck = true;
             currentGameInfo = new GameInfo();
             currentGameInfo.gameId = "zxc";
@@ -180,16 +172,12 @@ public class BattleSystem : StateMachine
                     "f2","i3","f3",
                  "i1","f1","w3",
                  "f2","f2","f2",
-                "f2", "f2"};
+                "f2", "fm2"};
             currentGameInfo.turn = "6";
             currentTurn = 5;
         }
         else
         {
-            if (!TUTORIAL_MODE)
-            {
-                Destroy(GameObject.Find("Tutorial"));
-            }
             gameManager = MainManager.Instance.gameManager;
             currentGameInfo = gameManager.currentGameInfo; // Current Gameinfo or battleSettings??
 
@@ -211,7 +199,7 @@ public class BattleSystem : StateMachine
         // StartCoroutine(InitGameListeners());
         ui.LoadNinjaBG();
         ui.InitAvatars();
-        if (!TEST_MODE && !TUTORIAL_MODE)
+        if (!TEST_MODE)
         {
             StartCoroutine(ui.CoinFlipStartGame(currentGameInfo.playersIds[0].ToString().Equals(player.id), () => ui.SlidePuSlots()));
             LocalTurnSystem.Instance.Inito(() => StartCoroutine(InitGameListeners()));
@@ -253,49 +241,41 @@ public class BattleSystem : StateMachine
 
     public void DisableSelectMode(bool endTurn)
     {
-        if (!TUTORIAL_MODE)
+
+        if (selectMode && !Constants.TemproryUnclickable)
         {
+            Constants.TemproryUnclickable = true;
+            selectMode = false;
+            sameCardsSelection = false;
+            isPlayerActivatePu = false;
+            ui.EnableVisionClick(true);
+            resetAllCardsSelectionWhenCardClicked = false;
+            ui.InitLargeText(false, "");
+            firstCardTargetPU = "";
+            firstPosTargetPU = new Vector2(0, 0);
+            ui.EnableDarkScreen(true, false, () =>
+             {
 
-            if (selectMode && !Constants.TemproryUnclickable)
-            {
-                Constants.TemproryUnclickable = true;
-                selectMode = false;
-                sameCardsSelection = false;
-                isPlayerActivatePu = false;
-                ui.EnableVisionClick(true);
-                resetAllCardsSelectionWhenCardClicked = false;
-                ui.InitLargeText(false, "");
-                firstCardTargetPU = "";
-                firstPosTargetPU = new Vector2(0, 0);
-                ui.EnableDarkScreen(true, false, () =>
-                 {
-
-                     StartCoroutine(ResetSortingOrder(false));
-                     puDeckUi.EnablePusZ(true, false);
-                     cardsDeckUi.DisableCardsSelection(Constants.AllCardsTag);
-                     ActivatePlayerButtons(!endTurn, false);
-                     Constants.TemproryUnclickable = false;
-                 });
-            }
-            if (replaceMode && !Constants.TemproryUnclickable)
-            {
-                Debug.LogError("Disabling");
-                EnableReplaceDialog(true, endTurn);
-            }
-            if (!endTurn && emojisWheelDisplay)
-            {
-                ShowEmojiWheel(false);
-            }
+                 StartCoroutine(ResetSortingOrder(false));
+                 puDeckUi.EnablePusZ(true, false);
+                 cardsDeckUi.DisableCardsSelection(Constants.AllCardsTag);
+                 ActivatePlayerButtons(!endTurn, false);
+                 Constants.TemproryUnclickable = false;
+             });
+        }
+        if (replaceMode && !Constants.TemproryUnclickable)
+        {
+            Debug.LogError("Disabling");
+            EnableReplaceDialog(true, endTurn);
+        }
+        if (!endTurn && emojisWheelDisplay)
+        {
+            ShowEmojiWheel(false);
         }
     }
     public void LoadMenuScene(bool playAgain)
     {
-        if (TEST_MODE)
-        {
-            SceneManager.LoadScene("GameScene2");
-        }
-        else
-        {
+      
             //SoundManager.Instance.StopMusic();
             SaveAutoPlayAgain(playAgain);
             SceneManager.LoadScene("GameMenuScene");
@@ -304,7 +284,7 @@ public class BattleSystem : StateMachine
             Destroy(GameObject.Find("LocalTurnSystem"));
             Destroy(GameObject.Find("SoundManager"));
             Destroy(GameObject.Find("BattleSystem"));
-        }
+        
     }
 
     public void PlayMusic(bool enable)
@@ -325,7 +305,7 @@ public class BattleSystem : StateMachine
     private IEnumerator InitGameListeners()
     {
         yield return new WaitForSeconds(1f);
-        if (!TEST_MODE && !TUTORIAL_MODE)
+        if (!TEST_MODE)
         {
             BindTurnCounter();
             BindRoundCounter();
@@ -392,7 +372,6 @@ public class BattleSystem : StateMachine
     [Button]
     public void UpdateHandRank(bool reset)
     {
-        Debug.LogError("hereIm");
         if (!AreBoardCardsFlipped() && !reset)
         {
             int handRank = 7000;
@@ -496,28 +475,21 @@ public class BattleSystem : StateMachine
 
     public void EndTurn()
     {
-        if (!TUTORIAL_MODE && !TEST_MODE)
+        if (!endTurnInProcess)
         {
-
-            if (!endTurnInProcess)
+            endTurnInProcess = true;
+            DisableSelectMode(true);
+            ui.EnableBgColor(false);
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
+            DisablePlayerPus();
+            ui.SetTurnIndicator(false, false);
+            ResetTimers();
+            if (!TEST_MODE)
             {
-                endTurnInProcess = true;
-                DisableSelectMode(true);
-                ui.EnableBgColor(false);
-                StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
-                DisablePlayerPus();
-                ui.SetTurnIndicator(false, false);
-                ResetTimers();
                 gameManager.AddGameActionLog(GameManager.ActionEnum.EndTurn, "end of turn: " + currentTurn, () => { }, Debug.Log);
-                SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
                 LocalTurnSystem.Instance.PassTurn();
             }
-        }
-        else
-        {
-            ui.turnBtnSpriteREnderer.sortingOrder = 1;
-            StartCoroutine(FakePlayerEndTurnCoro());
-            FocusOnObjectWithText(false, 2, 0, false);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
         }
     }
 
@@ -539,7 +511,7 @@ public class BattleSystem : StateMachine
         /*TemproryUnclickable = true;
         yield return new WaitForSeconds(2f);
         TemproryUnclickable = false;
-*/
+    */
         if (IsPlayerTurn())
         {
             yield return new WaitForSeconds(0.5f);
@@ -738,63 +710,17 @@ public class BattleSystem : StateMachine
         ;
     }
 
-    internal void ActivateButtonForTutorial(int turnCounter)
-    {
-        switch (turnCounter)
-        {
-            case 4:
-                //  puDeckUi.playerPusUi[0].EnablePu(true);
-                StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_GradBlend", Values.Instance.puChangeColorDisableDuration, puDeckUi.playerPusUi[0].spriteRenderer.material, 0, null));
-                break;
-            case 5:
-                puDeckUi.playerPusUi[0].isClickable = true;
-                break;
-            case 3:
-                skillBtn.EnablePu(true);
-                break;
-            case 1:
-                puDeckUi.playerPusUi[1].EnablePu(true);
-                break;
-            case 8:
-                ui.EnableEndTurnBtn(true);
-                break;
-
-        }
-    }
 
     public void FakeEnemyEndTurn()
     {
         StartCoroutine(StartPlayerTurn(true, () =>
         {
-            
+
             TurnEvents(--currentTurn);
             StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnBtnSpriteREnderer, true, Values.Instance.turnBtnAlphaDuration, null));
         }));
     }
 
-    public void FakePlayerEndTurn()
-    {
-        StartCoroutine(FakePlayerEndTurnCoro());
-    }
-    private IEnumerator FakePlayerEndTurnCoro()
-    {
-        ui.energyLeft[0].spriteRenderer.sortingOrder = 0;
-        ui.EnableEndTurnBtn(false);
-        ResetTimers();
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
-        ui.SetTurnIndicator(false, false);
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
-        TurnEvents(--currentTurn);
-        yield return new WaitForSeconds(3f);
-        if (currentTurn > 1)
-        {
-            SetState(new EnemyTurn(this, currentTurn));
-        }
-        else
-        {
-            SetState(new EndRound(this, false, false));
-        }
-    }
 
     public async void FakeEnemyPuUse(int puIndex, string cardPlace1, string cardPlace2, bool endTurn)
     {
@@ -881,7 +807,7 @@ public class BattleSystem : StateMachine
         if (firstRound)
         {
             currentRound = 1;
-            if (!TEST_MODE && !TUTORIAL_MODE)
+            if (!TEST_MODE)
             {
                 LocalTurnSystem.Instance.RoundCounter.Value = 1;
             }
@@ -966,21 +892,6 @@ public class BattleSystem : StateMachine
             this.newEnergyCost = energyCost;
 
             SetState(new PowerUpState(this, true, energyCost, newPowerUpName, "", "", new Vector2(0, 0), new Vector2(0, 0), newPuSlotIndexUse));
-            if (TUTORIAL_MODE)
-            {
-                if (newPowerUpName.Equals("i3"))
-                {
-                    FocusOnObjectWithText(true, 0, 6, false);
-                }
-                if (newPowerUpName.Equals("sflip"))
-                {
-                    FocusOnObjectWithText(true, 0, Constants.TutorialObjectEnum.cardToFlipFreeze.GetHashCode(), false);
-                }
-                if (newPowerUpName.Equals("w3"))
-                {
-                    FocusOnObjectWithText(true, 0, 22, false);
-                }
-            }
 
         }
         else if (energyCounter - energyCost < 0)
@@ -1000,7 +911,7 @@ public class BattleSystem : StateMachine
 
     public bool IsPlayerTurn()
     {
-        if (!TEST_MODE && !TUTORIAL_MODE)
+        if (!TEST_MODE)
         {
             return LocalTurnSystem.Instance.IsPlayerTurn();
         }
@@ -1064,42 +975,10 @@ public class BattleSystem : StateMachine
                 fm1Activated = true;
             }
 
-            if (TUTORIAL_MODE)
-            {
-                // ui.EnableEndTurnBtn(true);
-                if (newPowerUpName.Equals("sflip"))
-                {
-                    if (Constants.EnemyCard1.Equals(cardPlace))
-                    {
-                        FocusOnObjectWithText(true, 1, 14, true);
-                        yield return new WaitForSeconds(2f);
-                        StartCoroutine(ui.DisplayEmoji(false, 0, null));
-                    }
-                }
-                else if (newPowerUpName.Equals("i3"))
-                {
-                    FocusOnObjectWithText(true, 0, 7, true);
-                }
-                else if (newPowerUpName.Equals("w3"))
-                {
-                    FocusOnObjectWithText(false, 2, 22, false);
-                    StartCoroutine(FocusOnObjectWithDelasy(4, true, 1, 23, true));
-                }
-            }
 
             ResetValuesAfterCardSelection(Constants.AllCardsTag);
             yield return new WaitForSeconds(0.5f);
-            if (TUTORIAL_MODE && cardPlace.Equals(Constants.EnemyCard2) && newPowerUpName.Equals("sflip"))
-            {
-                FocusOnObjectWithText(true, 0, 13, false);
-            }
-            else
-            {
-                SetState(new PowerUpState(this, true, newEnergyCost, newPowerUpName, firstCardTargetPU, cardPlace, firstPosTargetPU, position, newPuSlotIndexUse));
-            }
-
-          
-
+            SetState(new PowerUpState(this, true, newEnergyCost, newPowerUpName, firstCardTargetPU, cardPlace, firstPosTargetPU, position, newPuSlotIndexUse));
             firstPosTargetPU = new Vector2(0, 0);
             firstCardTargetPU = "empty";
         }
@@ -1149,7 +1028,7 @@ public class BattleSystem : StateMachine
         PowerUpUi pu = puDeckUi.GetPu(isPlayer, puIndex);
         puDeckUi.RemovePuFromList(isPlayer, puIndex);
         puDeckUi.ResetPuUI(pu, null);
-        if (isPlayer && !TUTORIAL_MODE)
+        if (isPlayer)
         {
             StartCoroutine(AutoEndTurn());
         }
@@ -1172,7 +1051,7 @@ public class BattleSystem : StateMachine
         {
             cardTarget = firstCardTargetPUstring;
         }
-        if (!TEST_MODE && !TUTORIAL_MODE)
+        if (!TEST_MODE)
             gameManager.SetNewPowerupUseDB(new PowerUpInfo(player.id, newPowerUpName, Constants.Instance.ConvertCardPlaceForEnemy(cardTarget), Constants.Instance.ConvertCardPlaceForEnemy(secondCardTargetPU), puIndex, CreateTimeStamp()), () =>
         {
             gameManager.AddGameActionLog(GameManager.ActionEnum.PuUse, "name: " + newPowerUpName + " c1: " + cardTarget + " c2: " + secondCardTargetPU, () => { }, Debug.Log);
@@ -1182,7 +1061,7 @@ public class BattleSystem : StateMachine
 
     public void UpdateReplacePuInDb(int puIndex)
     {
-        if (!TEST_MODE && !TUTORIAL_MODE)
+        if (!TEST_MODE)
             gameManager.SetNewPowerupUseDB(new PowerUpInfo(player.id, "replace", "empty", "empty", puIndex, CreateTimeStamp()), () =>
             {
                 gameManager.AddGameActionLog(GameManager.ActionEnum.ReplacePu, "index: " + puIndex, () => { }, Debug.Log);
@@ -1241,17 +1120,14 @@ public class BattleSystem : StateMachine
 
     public void ActivatePlayerPus()
     {
-        if (!TUTORIAL_MODE)
+        foreach (PowerUpUi puUi in puDeckUi.GetPuList(true))
         {
-            foreach (PowerUpUi puUi in puDeckUi.GetPuList(true))
+            if (puUi != null)
             {
-                if (puUi != null)
-                {
-                    CheckIfPuAvailable(puUi);
-                }
+                CheckIfPuAvailable(puUi);
             }
-            CheckIfPuAvailable(skillBtn);
         }
+        CheckIfPuAvailable(skillBtn);
     }
 
     public void DisablePlayerPus()
@@ -1480,10 +1356,38 @@ public class BattleSystem : StateMachine
         {
             bool isFlip = IsEnemyCard(cardPlace);
             StartCoroutine(ReplaceSelectedCard(cardPlace, isFlip, delay, ResetEnable, firstCard, lastCard));
+            // ReplaceSelectedCard2(cardPlace, isFlip, delay, ResetEnable, firstCard, lastCard);
         }
-        if(TUTORIAL_MODE && cardPlace.Equals(Constants.BFlop3))
+    }
+    public async void DestroyAndDrawCard2(string cardPlace, int delay, bool ResetEnable, bool firstCard, bool lastCard)
+    {
+        /*if (currentTurn < 3 && cardPlace.Contains("River"))
         {
-            StartCoroutine(FocusOnObjectWithDelasy(3, true, 0,18,false));
+            Debug.LogError("card not excist");
+
+        }
+        else if ((currentTurn < 3 && cardPlace.Contains("Turn")))
+        {
+            Debug.LogError("card not excist");
+        }
+        else
+        {
+            if (currentTurn < 3 && cardPlace.Contains("Flop3"))
+            {
+                ResetEnable = true;
+            }
+        }*/
+        await Task.Delay(delay);
+        if (puDeckUi.IsCardFreeze(cardPlace))
+        {
+            FreezePlayingCard(cardPlace, false, ResetEnable);
+        }
+        else
+        {
+            bool isFlip = IsEnemyCard(cardPlace);
+            float ddelay = delay / 1000;
+            //   StartCoroutine(ReplaceSelectedCard(cardPlace, isFlip, ddelay, ResetEnable, firstCard, lastCard));
+            ReplaceSelectedCard2(cardPlace, false, delay, ResetEnable, firstCard, lastCard);
         }
     }
 
@@ -1498,9 +1402,26 @@ public class BattleSystem : StateMachine
         {
             SmokeCardPu(false, cardPlace, false, false, false);
         }
-        yield return new WaitForSecondsRealtime(delay);
+        yield return new WaitForSeconds(delay);
         cardsDeckUi.DestroyCardObject(cardPlace, null);
-        yield return new WaitForSeconds(delay + 0.4f);
+        yield return new WaitForSeconds(0.4f);
+        Action resetAction = null;
+        if (ResetEnable)
+        {
+            resetAction = () => EnableDarkAndSorting(false);
+        }
+        cardsDeckUi.DrawAndReplaceCard(cardPlace, isFlip, resetAction, isFirstCard, isLastCard);
+    }
+    public async void ReplaceSelectedCard2(string cardPlace, bool isFlip, int delay, bool ResetEnable, bool isFirstCard, bool isLastCard)
+    {
+        if (cardsDeckUi.GetParentByPlace(cardPlace).smokeEnable)
+        {
+            SmokeCardPu(false, cardPlace, false, false, false);
+        }
+
+        await Task.Delay(500);
+        cardsDeckUi.DestroyCardObject(cardPlace, null);
+        await Task.Delay(500);
         Action resetAction = null;
         if (ResetEnable)
         {
@@ -1511,19 +1432,14 @@ public class BattleSystem : StateMachine
 
     private void EnableDarkAndSorting(bool enable)
     {
-        if (TUTORIAL_MODE && newPowerUpName.Equals("i3"))
-        { }
-        else
+        if (!enable)
         {
-            if (!enable)
-            {
-                ui.EnableVisionClick(true);
-                newPowerUpName = "x";
-                fm1Activated = false;
-                //selectCardsMode = true;
-            }
-            ui.EnableDarkScreen(isPlayerActivatePu, enable, () => StartCoroutine(ResetSortingOrder(enable)));
+            ui.EnableVisionClick(true);
+            newPowerUpName = "x";
+            fm1Activated = false;
+            //selectCardsMode = true;
         }
+        ui.EnableDarkScreen(isPlayerActivatePu, enable, () => StartCoroutine(ResetSortingOrder(enable)));
     }
 
     public void UpdateZPos(bool aboveDarkScreen, string tag)
@@ -1534,17 +1450,21 @@ public class BattleSystem : StateMachine
         }
     }
 
+
+
     private IEnumerator ResetSortingOrder(bool enable)
     {
-        UpdateHandRank(false);
+
+        // UpdateHandRank(false);
+        //THIS ABOVE CAUSE PROB
         // yield return new WaitForFixedUpdate();
-        yield return null;
         if (!enable)
         {
             enemyPuIsRunning = false;
             playerPuInProcess = false;
             foreach (CardUi card in cardsDeckUi.GetListByTag("All"))
             {
+                yield return new WaitForEndOfFrame();
                 card.EnableSelecetPositionZ(false);
             }
         }
@@ -1699,17 +1619,7 @@ public class BattleSystem : StateMachine
     }
     internal void DealPu(bool isPlayer, Action OnEnd)
     {
-
-        if (TUTORIAL_MODE && firstDealTuto)
-        {
-            firstDealTuto = false;
-            OnEnd.Invoke();
-        }
-        else
-        {
-            StartCoroutine(DealPuCourotine(isPlayer, OnEnd));
-        }
-
+        StartCoroutine(DealPuCourotine(isPlayer, OnEnd));
     }
     internal IEnumerator DealPuCourotine(bool isPlayer, Action OnEnd)
     {
@@ -1758,10 +1668,6 @@ public class BattleSystem : StateMachine
     {
         if (btnReplaceClickable && energyCounter > 0 && !disable && puDeckUi.GetPuListCount(true) < 2)
         {
-            /*if (TUTORIAL_MODE)
-            {
-                FocusOnObjectWithText(false, 1, 14, false);
-            }*/
             btnReplaceClickable = false;
             UpdateReplacePuInDb(-1);
             ReduceEnergy(Values.Instance.energyCostForDraw);
@@ -1769,14 +1675,7 @@ public class BattleSystem : StateMachine
             DisablePlayerPus();
             DealPu(true, () =>
             {
-                if (!TUTORIAL_MODE)
-                {
-                    StartCoroutine(AutoEndTurn());
-                }
-                else
-                {
-                    FocusOnObjectWithText(true, 1, 16, true);
-                }
+                StartCoroutine(AutoEndTurn());
             });
         }
         else if (btnReplaceClickable || endTurn || disable)
@@ -1832,15 +1731,6 @@ public class BattleSystem : StateMachine
 
     public void SlideRankingImg()
     {
-        if (TUTORIAL_MODE && currentTurn == 4 && toOpen)
-        {
-            FocusOnObjectWithText(false, 1, 9, false);
-            toOpen = false;
-        }
-        else if (TUTORIAL_MODE && currentTurn == 4 && !toOpen)
-        {
-            continueTutorial = true;
-        }
         ui.SlideRankingImg();
     }
 
@@ -1888,11 +1778,6 @@ public class BattleSystem : StateMachine
         }
         SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.Vision, false);
         ui.UpdateRankTextInfo(false, 0);
-        if (TUTORIAL_MODE && currentTurn == 4)
-        {
-            tutorialUi.btnTutorial.interactable = true;
-            AnimationManager.Instance.AlphaFade(true, tutorialUi.btnTutorialSprite, 1f, null/* ()=>infoDialog.gameObject.SetActive(false)*/);
-        }
     }
 
 
@@ -1998,10 +1883,6 @@ public class BattleSystem : StateMachine
             emojiCooledDown = false;
             StartCoroutine(ui.DisplayEmoji(true, id, () => emojiCooledDown = true));
             UpdateEmojiDB(id);
-            if (TUTORIAL_MODE)
-            {
-                FocusOnObjectWithText(false, 1, 18, false);
-            }
         }
         else if (id == -1)
         {
@@ -2021,7 +1902,7 @@ public class BattleSystem : StateMachine
 
     private void UpdateEmojiDB(int emojiId)
     {
-        if (!TEST_MODE && !TUTORIAL_MODE)
+        if (!TEST_MODE)
         {
 
             gameManager.UpdateEmojiDB(new EmojiInfo(currentGameInfo.localPlayerId, emojiId, CreateTimeStamp()), () =>
@@ -2037,15 +1918,7 @@ public class BattleSystem : StateMachine
         ui.WinParticleEffect();
     }
 
-    internal void FocusOnObjectWithText(bool enable, int maskShape, int objectNumber, bool endByBtn)
-    {
-/*        SetState(new TutorialSystem(this, enable, maskShape, objectNumber, endByBtn));
-*/    }
-    internal IEnumerator FocusOnObjectWithDelasy(int delay, bool enable, int maskShape, int objectNumber, bool endByBtn)
-    {
-        yield return new WaitForSeconds(delay);
-        /*SetState(new TutorialSystem(this, enable, maskShape, objectNumber, endByBtn));*/
-    }
+
 
     /* [Button]
      internal void SmokeCheck(bool enable)
@@ -2096,12 +1969,26 @@ public class BattleSystem : StateMachine
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
     }
+
+    private void OnGUI()
+    {
+        if (Input.GetKeyUp("escape"))
+        {
+            EnableExitDialog(true);
+        }
+    }
+
+    public void EnableExitDialog(bool enable)
+    {
+        canvasExitDialog.SetActive(enable);
+        ui.EnableDarkScreen(false, enable, null);
+    }
     /* internal void FreezePu(string puTarget, bool isToFreeze)
-     {
-         PowerUpUi cardToFreeze = GameObject.Find(puTarget).GetComponent<PowerUpUi>();
-         cardToFreeze.freeze = isToFreeze;
-         ui.FreezeObject(cardToFreeze.spriteRenderer, isToFreeze, () => EnableDarkAndSorting(false));
-     }*/
+{
+    PowerUpUi cardToFreeze = GameObject.Find(puTarget).GetComponent<PowerUpUi>();
+    cardToFreeze.freeze = isToFreeze;
+    ui.FreezeObject(cardToFreeze.spriteRenderer, isToFreeze, () => EnableDarkAndSorting(false));
+}*/
     /*    private string[] Get2RandomDigitsForBoardCards()
         {
             int boardCound = cardsDeckUi.boardCards.Count;

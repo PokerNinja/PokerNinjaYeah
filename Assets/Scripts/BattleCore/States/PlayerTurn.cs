@@ -14,7 +14,6 @@ public class PlayerTurn : State
     {
         yourLastTurn = false;
         finalTurn = false;
-        Debug.LogError("Notice turn counter " + turnCounter);
         this.turnCounter = turnCounter;
         energyChargeCount = 2;
         if (turnCounter == 2)
@@ -47,38 +46,13 @@ public class PlayerTurn : State
         {
             battleSystem.skillUseLeft = Values.Instance.skillUseLimit;
         }
-
         battleSystem.DealPu(true, () =>
         {
-
             Action tutorialAction = null;
-            if (battleSystem.TUTORIAL_MODE)
-            {
-               // battleSystem.ActivateButtonForTutorial(turnCounter);
-                //tutorialAction = () => battleSystem.FocusOnObjectWithText(true, false, Constants.TutorialObjectEnum.coins.GetHashCode(), true);
-                if (turnCounter == 5)
-                {
-                    tutorialAction = () => battleSystem.FocusOnObjectWithText( true, 0, Constants.TutorialObjectEnum.startGame.GetHashCode(), true);
-                }else if (turnCounter == 3)
-                {
-                    tutorialAction = () => battleSystem.FocusOnObjectWithText( true, 1, Constants.TutorialObjectEnum.flipSkill.GetHashCode(), false);
-                }else if(turnCounter == 1)
-                {
-                    tutorialAction = () => battleSystem.FocusOnObjectWithText(true, 1, Constants.TutorialObjectEnum.lastTurnEnergy.GetHashCode(), true);
-                }
-            }
-            else
-            {
-                battleSystem.NewTimerStarter(true);
-                battleSystem.ActivatePlayerButtons(true, true);
-            }
+            battleSystem.NewTimerStarter(true);
+            battleSystem.ActivatePlayerButtons(true, true);
             battleSystem.Interface.WhosTurnAnimation(true, yourLastTurn, finalTurn, tutorialAction);
-            if (battleSystem.TUTORIAL_MODE && (turnCounter == 5 || turnCounter == 1))
-            { }
-            else
-            {
-                battleSystem.ChargeEnergyCounter(energyChargeCount);
-            }
+            battleSystem.ChargeEnergyCounter(energyChargeCount);
             battleSystem.Interface.SetTurnIndicator(true, true);
 
         }

@@ -16,10 +16,6 @@ public class BeginRound : State
         {
             delayForStart = Values.Instance.delayBeforeStartFirstRound;
         }
-        if (battleSystem.TUTORIAL_MODE)
-        {
-            startingTurnCounter = 5;
-        }
     }
 
     public override IEnumerator Start()

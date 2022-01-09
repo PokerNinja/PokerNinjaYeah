@@ -28,7 +28,7 @@ public class DataBaseAPI : MonoBehaviour
 
                      foreach (DataSnapshot players in ds.Child("gameInfo").Child("playersIds").Children)
                      {
-                        // Debug.LogWarning("123: " + dsds.Value);
+                         // Debug.LogWarning("123: " + dsds.Value);
 
                          if (players.Value.ToString().Contains(valueToSearch))
                          {
@@ -38,9 +38,6 @@ public class DataBaseAPI : MonoBehaviour
                              }
                          }
                      }
-
-
-
                      /*    if (ds.Child("winner").Exists)
                          {
 
@@ -48,10 +45,30 @@ public class DataBaseAPI : MonoBehaviour
                          }*/
                  }
              }
-
             , Debug.Log);
 
+        }
 
+
+        
+
+        public static void CheckIfVersionUpdated(string currentVersion, Action callback, Action fallback)
+        {
+            string targetVersion = "";
+            GetJSON("version", snapshot =>
+              {
+                  targetVersion = snapshot.GetRawJsonValue().ToString();
+                  Debug.LogWarning("current " + currentVersion);
+                  if (targetVersion.Equals(currentVersion))
+                  {
+                      callback?.Invoke();
+                  }
+                  else
+                  {
+                      fallback?.Invoke();
+                  }
+              }
+                , Debug.Log);
         }
 
         public static void PostJSON(string path, string json, Action callback, Action<AggregateException> fallback, bool debug = false)
@@ -110,7 +127,7 @@ public class DataBaseAPI : MonoBehaviour
                     return;
                 }
 
-               // Debug.Log("JSON posted successfully");
+                // Debug.Log("JSON posted successfully");
                 callback();
             });
         }
@@ -137,7 +154,7 @@ public class DataBaseAPI : MonoBehaviour
                     return;
                 }
 
-               // Debug.Log("JSON posted successfully");
+                // Debug.Log("JSON posted successfully");
                 callback();
             });
         }

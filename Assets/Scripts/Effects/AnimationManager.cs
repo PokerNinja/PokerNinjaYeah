@@ -534,7 +534,7 @@ public class AnimationManager : Singleton<AnimationManager>
             {
                 selector.localScale = new Vector3(Mathf.SmoothStep(selector.localScale.x, targetScale.x, t * speed), Mathf.SmoothStep(selector.localScale.y, targetScale.y, t * speed), 1f);
             }
-            yield return null;
+            yield return new WaitForEndOfFrame();
             if (!endLoop && selector.position == targetPosition /*&&selector.localScale == targetScale*/)
             {
                 endLoop = true;

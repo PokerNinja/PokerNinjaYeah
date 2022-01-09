@@ -105,7 +105,11 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
     {
         if (drag)
         {
+            if (!collision.name.Equals("BtnRanking"))
+            {
+            Debug.LogError("myname" + collision.name);
             currentEmojiId = ConvertNameToId(collision.name);
+            }
         }
     }
 

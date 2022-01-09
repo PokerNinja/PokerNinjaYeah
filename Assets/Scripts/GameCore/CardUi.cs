@@ -259,13 +259,17 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             float offsetX = UnityEngine.Random.Range(-1.18f, -0.73f);
             spriteRenderer.material.SetTextureOffset("_FadeTex", new Vector2(offsetX, -0.14f));
         }
-        //  material.SetTextureScale("_FadeTex", new Vector2(offset, 0.07f));
+
+        //TODO this is problam
         SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.BurnCard);
+
+        //  material.SetTextureScale("_FadeTex", new Vector2(offset, 0.07f));
+
         while (dissolveAmount < 1)
         {
+            yield return new WaitForFixedUpdate();
             dissolveAmount += Time.deltaTime / dissolveDuration;
             spriteRenderer.material.SetFloat("_FadeAmount", dissolveAmount);
-            yield return new WaitForFixedUpdate();
             if (dissolveAmount >= 1)
             {
                 Activate(false);

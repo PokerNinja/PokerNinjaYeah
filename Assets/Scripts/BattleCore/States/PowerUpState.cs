@@ -156,8 +156,8 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.f2): // draw_board
                 {
-                    battleSystem.DestroyAndDrawCard(cardTarget2, 0.100f, false, true, false);
-                    battleSystem.DestroyAndDrawCard(cardTarget1, 0.400f, true, false, true);
+                    battleSystem.DestroyAndDrawCard(cardTarget2, Values.Instance.test1, false, true, false);
+                    battleSystem.DestroyAndDrawCard(cardTarget1, Values.Instance.test2, true, false, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.w2)://swap_player_board = w2
@@ -210,7 +210,7 @@ public class PowerUpState : State
                     //MAKE IT LOOK BETTER WHOS FIRST MAYNBE FUCKED HERE
                     battleSystem.UpdateZPos(true, "All");
                     int boardCount = battleSystem.cardsDeckUi.boardCardsUi.Count;
-                    float addition = 0.2f;
+                    float addition =0.25f;
                     int index = 1;
                     battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.PlayerCard2), index++ * addition, false, true, false);
                     battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard2), index++ * addition, false, false, false);
@@ -224,13 +224,13 @@ public class PowerUpState : State
                     }
                     else if (boardCount == 4)
                     {
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2],  index++ * addition, false, false, false);
+                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], index++ * addition, false, false, false);
                         battleSystem.DestroyAndDrawCard(Constants.BoardCards[3], index++ * addition, true, false, true);
                     }
                     else if (boardCount == 5)
                     {
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2],  index++ * addition, false, false, false);
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[3],  index++ * addition, false, false, false);
+                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], index++ * addition, false, false, false);
+                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[3], index++ * addition, false, false, false);
                         battleSystem.DestroyAndDrawCard(Constants.BoardCards[4], index++ * addition, true, false, true);
                     }
 
@@ -309,6 +309,24 @@ public class PowerUpState : State
         }
 
     }
+
+    /*private IEnumerator PlayASync()
+    {
+        int addition = 300;
+        int index = 1;
+        yield return new WaitForSeconds(0.3f);
+        battleSystem.DestroyAndDrawCard2(ConvertFixedCardPlace(Constants.PlayerCard2), index++ * addition, false, true, false);
+        yield return new WaitForSeconds(0.3f);
+        battleSystem.DestroyAndDrawCard2(ConvertFixedCardPlace(Constants.EnemyCard2), index++ * addition, false, false, false);
+        yield return new WaitForSeconds(0.3f);
+        battleSystem.DestroyAndDrawCard2(ConvertFixedCardPlace(Constants.PlayerCard1), index++ * addition, false, false, false);
+        yield return new WaitForSeconds(0.3f);
+        battleSystem.DestroyAndDrawCard2(ConvertFixedCardPlace(Constants.EnemyCard1), index++ * addition, false, false, false);
+        yield return new WaitForSeconds(0.3f);
+        battleSystem.DestroyAndDrawCard2(Constants.BoardCards[0], index++ * addition, false, false, false);
+        yield return new WaitForSeconds(0.3f);
+        battleSystem.DestroyAndDrawCard2(Constants.BoardCards[1], index++ * addition, false, false, false);
+    }*/
 
     private string ConvertFixedCardPlace(string targetToConvert)
     {

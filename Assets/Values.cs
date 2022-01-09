@@ -135,7 +135,9 @@ public class Values : Singleton<Values>
 
 
 
-
+    public float test1 = 0f;
+    public float test2 = 0.5f;
+    public float test3 = 0f;
     public enum GamePhase
     {
         Turn,
