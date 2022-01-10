@@ -151,7 +151,7 @@ public class BattleSystem : StateMachine
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
-
+        //LoadSoundSettings();
         if (TEST_MODE)
         {
             manualPuDeck = true;
@@ -219,6 +219,18 @@ public class BattleSystem : StateMachine
         }
     }
 
+  /*  private void LoadSoundSettings()
+    {
+        SoundManager.Instance.MAX_VOL_MUSIC = LoadPrefs(Constants.Instance.volumeSoundKey);
+        ui.musicSlider.value = SoundManager.Instance.MAX_VOL_MUSIC;
+    }*/
+
+    public void UpdateMusicVolume()
+    {
+        float newVolume = ui.musicSlider.value;
+        SoundManager.Instance.ChangeMusicVolume(newVolume);
+        SavePrefs(Constants.Instance.volumeSoundKey, newVolume);
+    }
 
     public void Awake()
     {
@@ -1983,6 +1995,26 @@ public class BattleSystem : StateMachine
         canvasExitDialog.SetActive(enable);
         ui.EnableDarkScreen(false, enable, null);
     }
+
+     
+    
+    public void SavePrefs(string key, float value)
+    {
+        PlayerPrefs.SetFloat(key, value);
+    }
+
+    private float LoadPrefs(string key)
+    {
+        if (PlayerPrefs.HasKey(key))
+        {
+        return PlayerPrefs.GetFloat(key);
+        }
+        else
+        {
+            return 1f;
+        }
+    }
+
     /* internal void FreezePu(string puTarget, bool isToFreeze)
 {
     PowerUpUi cardToFreeze = GameObject.Find(puTarget).GetComponent<PowerUpUi>();

@@ -94,3 +94,4 @@ Assets/Plugins/Android/com.google.firebase.firebase-firestore-unity-7.0.2.aar
 Assets/Plugins/Android/com.google.firebase.firebase-functions-unity-7.0.2.aar
 Assets/Plugins/Android/com.google.firebase.firebase-storage-unity-7.0.2.aar
 Assets/Plugins/Android/FirebaseCrashlytics.androidlib/res/values/crashlytics_build_id.xml
+ProjectSettings/HDRPProjectSettings.asset

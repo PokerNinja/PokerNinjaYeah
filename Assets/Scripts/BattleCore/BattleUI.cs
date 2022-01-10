@@ -15,6 +15,7 @@ public class BattleUI : MonoBehaviour
 
     public bool updateTutorial = true;
 
+    //[SerializeField] public Slider musicSlider;
     [SerializeField] public CoinFlipScript coinFlipTurn;
     [SerializeField] public TextMeshProUGUI playerNameText;
     [SerializeField] public TextMeshProUGUI enemyNameText;
@@ -1201,6 +1202,7 @@ public class BattleUI : MonoBehaviour
         Destroy(ps.gameObject);
     }
 
+    //public void EnbaleMusic
 
     /* internal void SlidingWinnerEyes(bool isPlayerWin)
     {

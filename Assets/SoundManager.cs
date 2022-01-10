@@ -72,7 +72,6 @@ public class SoundManager : Singleton<SoundManager>
         LowPitchRange = Values.Instance.lowPitchRange;
         HighPitchRange = Values.Instance.highPitchRange;
         InitPool();
-
     }
 
     public void PlayMusic()
@@ -210,6 +209,11 @@ public class SoundManager : Singleton<SoundManager>
             constantsSounds[audioSourceIndex].Stop();
         }
 
+    }
+  
+    public void ChangeMusicVolume(float value)
+    {
+        constantsSounds[0].volume = value;
     }
 
     public  IEnumerator FadeIn(AudioSource audioSource, float FadeTime)

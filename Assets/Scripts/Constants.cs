@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class Constants : Singleton<Constants>
 {
+
+    public readonly string volumeSoundKey = "music_key";
     public const string PlayerCardsTag = "CardP";
     public const string EnemyCardsTag = "CardE";
     public const string BoardCardsTag = "CardB";
