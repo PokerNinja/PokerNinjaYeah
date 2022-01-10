@@ -645,6 +645,27 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return playerHandWithBoard;
     }
 
+    internal List<string> GetAvailbeCards()
+    {
+        List<string> allCardsNames = new List<string>();
+        allCardsNames.Add(Constants.PlayerCard1);
+        allCardsNames.Add(Constants.PlayerCard2);
+        allCardsNames.Add(Constants.EnemyCard1);
+        allCardsNames.Add(Constants.EnemyCard2);
+        allCardsNames.Add(Constants.BFlop1);
+        allCardsNames.Add(Constants.BFlop2);
+        allCardsNames.Add(Constants.BFlop3);
+        if (boardCardsUi.Count == 4)
+        {
+            allCardsNames.Add(Constants.BTurn4);
+        }
+        else if (boardCardsUi.Count == 5)
+        {
+            allCardsNames.Add(Constants.BRiver5);
+        }
+        return allCardsNames;
+    }
+
     private void ShadowCreatorUi(Card newCard, Action AnimateWinningHand)
     {
         Vector3 cardScale;
@@ -684,7 +705,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         cardObject.name = cardPlace;
         cardObject.transform.position = new Vector3(cardTransform.position.x, cardTransform.position.y, 1); ;
         cardObject.transform.localScale = cardTransform.localScale;
-         cardObject.Init(cardTag, newCard.ToString(CardToStringFormatEnum.ShortCardName), isFaceDown, aboveDarkScreen, cardPlace);
+        cardObject.Init(cardTag, newCard.ToString(CardToStringFormatEnum.ShortCardName), isFaceDown, aboveDarkScreen, cardPlace);
         if (cardParent.smokeEnable)
         {
             DarkCardUnderSmoke = () => EnableCardSmoke(true, cardParent.smokeActivateByPlayer, cardObject);
@@ -1516,7 +1537,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 changeOffset = false;
             }
             StartCoroutine(cardToDestroy.FadeBurnOut(targetMaterial, changeOffset, () =>
-        //  Destroy(cardToDestroy)));
+            //  Destroy(cardToDestroy)));
             RestAfterDestroy(cardToDestroy, OnEnd)));
         }
         else

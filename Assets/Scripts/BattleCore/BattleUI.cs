@@ -56,7 +56,8 @@ public class BattleUI : MonoBehaviour
     [SerializeField] public GameObject largeFireProjectile1;
     [SerializeField] public GameObject iceProjectile1;
     [SerializeField] public GameObject iceProjectile2;
-    [SerializeField] public SpriteRenderer windSpriteRenderer;
+    //[SerializeField] public SpriteRenderer windSpriteRenderer;
+    [SerializeField] public GameObject windEffect;
 
     [SerializeField] public GameObject gameOverPanel;
 
@@ -112,6 +113,7 @@ public class BattleUI : MonoBehaviour
     public ParticleSystem hideSmokeHand;
     public ParticleSystem showSmokeBoard;
     public ParticleSystem showSmokeHand;
+    public ParticleSystem icenado;
 
     [SerializeField] private GameObject turnBtn;
     [SerializeField] public SpriteRenderer turnBtnSpriteREnderer;
@@ -754,8 +756,7 @@ public class BattleUI : MonoBehaviour
         }
         else
         {
-            StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, windSpriteRenderer, PuIgnite,
-                () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(windSpriteRenderer, false, Values.Instance.windFadeOutDuration, null))));
+            StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, windEffect, PuIgnite, null));
         }
     }
 
@@ -1200,6 +1201,16 @@ public class BattleUI : MonoBehaviour
         main.simulationSpeed = 2.5f;
         yield return new WaitForSeconds(3f);
         Destroy(ps.gameObject);
+    }
+
+    internal IEnumerator StartIcenado()
+    {
+        icenado.Play();
+        yield return new WaitForSeconds(3f);
+        var main = icenado.main;
+        main.startLifetime = 0;
+        yield return new WaitForSeconds(2f);
+        icenado.Stop();
     }
 
     //public void EnbaleMusic

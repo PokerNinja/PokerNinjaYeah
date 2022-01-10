@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 using StandardPokerHandEvaluator;
 using Sirenix.OdinInspector;
 using System.Threading.Tasks;
+using System.Linq;
 
 public class BattleSystem : StateMachine
 {
@@ -171,8 +172,8 @@ public class BattleSystem : StateMachine
                  "w1","w2","w3",
                     "f2","i3","f3",
                  "i1","f1","w3",
-                 "f2","f2","f2",
-                "f2", "fm2"};
+                 "f2","f2","w3",
+                "wm2", "im2"};
             currentGameInfo.turn = "6";
             currentTurn = 5;
         }
@@ -219,18 +220,18 @@ public class BattleSystem : StateMachine
         }
     }
 
-  /*  private void LoadSoundSettings()
-    {
-        SoundManager.Instance.MAX_VOL_MUSIC = LoadPrefs(Constants.Instance.volumeSoundKey);
-        ui.musicSlider.value = SoundManager.Instance.MAX_VOL_MUSIC;
-    }*/
+    /*  private void LoadSoundSettings()
+      {
+          SoundManager.Instance.MAX_VOL_MUSIC = LoadPrefs(Constants.Instance.volumeSoundKey);
+          ui.musicSlider.value = SoundManager.Instance.MAX_VOL_MUSIC;
+      }*/
 
-    public void UpdateMusicVolume()
-    {
-        float newVolume = ui.musicSlider.value;
-        SoundManager.Instance.ChangeMusicVolume(newVolume);
-        SavePrefs(Constants.Instance.volumeSoundKey, newVolume);
-    }
+    /*  public void UpdateMusicVolume()
+      {
+          float newVolume = ui.musicSlider.value;
+          SoundManager.Instance.ChangeMusicVolume(newVolume);
+          SavePrefs(Constants.Instance.volumeSoundKey, newVolume);
+      }*/
 
     public void Awake()
     {
@@ -287,16 +288,16 @@ public class BattleSystem : StateMachine
     }
     public void LoadMenuScene(bool playAgain)
     {
-      
-            //SoundManager.Instance.StopMusic();
-            SaveAutoPlayAgain(playAgain);
-            SceneManager.LoadScene("GameMenuScene");
-            Destroy(GameObject.Find("AnimationManager"));
-            Destroy(GameObject.Find("ObjectPooler"));
-            Destroy(GameObject.Find("LocalTurnSystem"));
-            Destroy(GameObject.Find("SoundManager"));
-            Destroy(GameObject.Find("BattleSystem"));
-        
+
+        //SoundManager.Instance.StopMusic();
+        SaveAutoPlayAgain(playAgain);
+        SceneManager.LoadScene("GameMenuScene");
+        Destroy(GameObject.Find("AnimationManager"));
+        Destroy(GameObject.Find("ObjectPooler"));
+        Destroy(GameObject.Find("LocalTurnSystem"));
+        Destroy(GameObject.Find("SoundManager"));
+        Destroy(GameObject.Find("BattleSystem"));
+
     }
 
     public void PlayMusic(bool enable)
@@ -505,7 +506,20 @@ public class BattleSystem : StateMachine
         }
     }
 
+    internal List<string> GetRandomAvailableCardsNames()
+    {
+        List<string> cardsNames = cardsDeckUi.GetAvailbeCards();
+        var rnd = new System.Random();
+        List<string> shuffledcards = cardsNames.OrderBy(a => Guid.NewGuid()).ToList();
+        return shuffledcards;
 
+    }
+
+
+    internal int GenerateRandom(int v1, int v2)
+    {
+        return UnityEngine.Random.Range(v1, v2);
+    }
 
     public void OnEndTurnButton()
     {
@@ -1667,8 +1681,15 @@ public class BattleSystem : StateMachine
                 inlargeProjectile = true;
                 break;
         }
-
-        ui.InitProjectile(puDeckUi.GetPuPosition(isPlayerActivate, puIndex), inlargeProjectile, powerUpName, posTarget1, posTarget2, IgnitePowerUp);
+        if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.im2)))
+        {
+            StartCoroutine(ui.StartIcenado());
+            IgnitePowerUp.Invoke();
+        }
+        else
+        {
+            ui.InitProjectile(puDeckUi.GetPuPosition(isPlayerActivate, puIndex), inlargeProjectile, powerUpName, posTarget1, posTarget2, IgnitePowerUp);
+        }
     }
 
     #endregion
@@ -1996,8 +2017,8 @@ public class BattleSystem : StateMachine
         ui.EnableDarkScreen(false, enable, null);
     }
 
-     
-    
+
+
     public void SavePrefs(string key, float value)
     {
         PlayerPrefs.SetFloat(key, value);
@@ -2007,7 +2028,7 @@ public class BattleSystem : StateMachine
     {
         if (PlayerPrefs.HasKey(key))
         {
-        return PlayerPrefs.GetFloat(key);
+            return PlayerPrefs.GetFloat(key);
         }
         else
         {

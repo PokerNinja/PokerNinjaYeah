@@ -91,6 +91,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     private int pokerTutoPhase;
     public GameObject pokerTutorial;
     public GameObject dialogInfo;
+    public GameObject tutoDialog;
 
     private void Start()
     {
@@ -98,24 +99,18 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         playerLifeLeft = 2;
         enemyLifeLeft = 2;
         Constants.TUTORIAL_MODE = true;
-        if (!Constants.TUTORIAL_POKER)
-        {
-            StartPokerTutorial();
-        }
-        else
-        {
-            StartNinjaTuto();
-        }
-
     }
 
-    private void StartPokerTutorial()
+
+    public void StartPokerTutorial()
     {
+        tutoDialog.SetActive(false);
         pokerTutorial.SetActive(true);
     }
 
-    private void StartNinjaTuto()
+    public void StartNinjaTuto()
     {
+        tutoDialog.SetActive(false);
         cardDeck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
                 "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
                 "8c", "3h","9s",board[4],board[3], board[2],board[1],board[0],enemysHand[1], playersHand[1],enemysHand[0],playersHand[0]};
@@ -130,10 +125,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
                 "i3", "i3"};
         currentTurn = 5;
         Interface.Initialize("Ninja", "Alex");
-        ui.LoadNinjaBG();
         ui.InitAvatars();
-
-        ui.SlidePuSlots();
         if (firstDeck)
         {
             firstDeck = false;
@@ -145,7 +137,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     {
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.StartRound, true);
         InitDecks();
-        yield return new WaitForSeconds(Values.Instance.delayBeforeStartNewRound);
+        yield return new WaitForSeconds(0.5f);
         ResetRoundSettings(() => StartTurn());
     }
 
@@ -227,7 +219,6 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     public void LoadMenuScene(bool playAgain)
     {
         Constants.TUTORIAL_MODE = false;
-        Constants.TUTORIAL_POKER= false;
         //SoundManager.Instance.StopMusic();
         SceneManager.LoadScene("GameMenuScene");
         Destroy(GameObject.Find("AnimationManager"));
@@ -516,18 +507,19 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     #region Settings
     public void ResetRoundSettings(Action FinishCallbac)
     {
-        Constants.TemproryUnclickable = false;
-        ui.tieTitle.SetActive(false);
-        ui.EnableBgColor(false);
+        /* Constants.TemproryUnclickable = false;
+         ui.tieTitle.SetActive(false);
+         ui.EnableBgColor(false);
 
-        ui.ResetTurnPanels();
-        // currentTurn = 1;
-        if (firstRound)
-        {
-            firstRound = false;////
-        }
+         ui.ResetTurnPanels();
+         // currentTurn = 1;
+         if (firstRound)
+         {
+             firstRound = false;////
+         }*/
         UpdateHandRank(true);
-        cardsDeckUi.DeleteAllCards(() => DealHands(FinishCallbac));
+        //  cardsDeckUi.DeleteAllCards(() => DealHands(FinishCallbac));
+        DealHands(FinishCallbac);
     }
 
 
@@ -1316,9 +1308,15 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
 
         RevealEnemyCards();
         RevealBoardCards();
+        foreach (CardUi card in cardsDeckUi.boardCardsUi)
+        {
+            card.cardMark.SetActive(false);
+        }
         yield return new WaitForSeconds(1.5f);
 
         DisplayWinner(WinnerCalculator());
+        yield return new WaitForSeconds(5f);
+        ui.winBtn.SetActive(true);
     }
 
 
@@ -1347,7 +1345,6 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
             }
             winnerMsg += Interface.ConvertHandRankToTextDescription(bestPlayerHand.Rank);
             AnimateWinWithHand(bestPlayerHand, true);
-            ui.winBtn.SetActive(true);
         }
         return winnerMsg;
     }
@@ -1537,7 +1534,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     }
     public void NextPokerTutorial()
     {
-        if (pokerTutoPhase == 3)
+        if (pokerTutoPhase == 4)
         {
             pokerTutorial.SetActive(false);
             StartNinjaTuto();
@@ -1546,7 +1543,15 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         {
             ui.LoadNextPokerTutoImage(++pokerTutoPhase);
         }
+    }
 
+    public void ShowHandRanking()
+    {
+        if (pokerTutoPhase == 4)
+        {
+            ui.LoadNextPokerTutoImage(3);
+            pokerTutoPhase = 3;
+        }
     }
 
     public void ShowExitDialog(bool enable)

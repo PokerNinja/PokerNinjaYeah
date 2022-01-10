@@ -24,7 +24,6 @@ public class BattleUITuto : MonoBehaviour
 
 
 
-    [SerializeField] public TextMeshProUGUI textWinLabel;
     [SerializeField] public int winnerPanelInterval;
 
 
@@ -54,7 +53,8 @@ public class BattleUITuto : MonoBehaviour
     [SerializeField] public GameObject largeFireProjectile1;
     [SerializeField] public GameObject iceProjectile1;
     [SerializeField] public GameObject iceProjectile2;
-    [SerializeField] public SpriteRenderer windSpriteRenderer;
+
+    [SerializeField] public GameObject windEffect;
 
     [SerializeField] public GameObject gameOverPanel;
 
@@ -97,7 +97,6 @@ public class BattleUITuto : MonoBehaviour
     //Buttons
 
     public Material freezeMaterial;
-    public TextMeshProUGUI dialogTitleUi;
     public TextMeshProUGUI dialogContentUi;
     public SpriteRenderer[] emojis;
     public SpriteRenderer emojiSelector;
@@ -300,7 +299,7 @@ public class BattleUITuto : MonoBehaviour
     public IEnumerator ShowWinner(string winnerMsg)
     {
         yield return new WaitForSeconds(winnerPanelInterval);
-        textWinLabel.text = winnerMsg;
+       // textWinLabel.text = winnerMsg;
         winLabel.SetActive(true);
     }
 
@@ -708,8 +707,7 @@ public class BattleUITuto : MonoBehaviour
         }
         else
         {
-            StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, windSpriteRenderer, PuIgnite,
-                () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(windSpriteRenderer, false, Values.Instance.windFadeOutDuration, null))));
+            StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, windEffect, PuIgnite, null));
         }
     }
 

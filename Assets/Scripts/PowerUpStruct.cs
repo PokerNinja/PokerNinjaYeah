@@ -91,6 +91,12 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
      /*32*/
     public PuStructInfo smoke_turn_river = new PuStructInfo
         (PowerUpNamesEnum.sm4.ToString(), "Smoke", "Smoke the turn and the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them","", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
+     /*33*/
+    public PuStructInfo iceagedon = new PuStructInfo
+        (PowerUpNamesEnum.im2.ToString(), "Iceagedon", "Freeze random cards","", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
+     /*34*/
+    public PuStructInfo tornado = new PuStructInfo
+        (PowerUpNamesEnum.wm2.ToString(), "Tornado", "Swap random cards","", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
 
     /*9*/
     public PuStructInfo shuffle_board = new PuStructInfo
@@ -174,6 +180,10 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
                 return board_value_down_2;
             case nameof(PowerUpNamesEnum.sm4):
                 return smoke_turn_river;
+            case nameof(PowerUpNamesEnum.im2):
+                return iceagedon;
+            case nameof(PowerUpNamesEnum.wm2):
+                return tornado;
            
                 /*draw_all = 3,
                 shuffle_board = 9,
@@ -237,6 +247,8 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         s6 = 30, //board value up 2
         s7 = 31, //board value down 2
         sm4 = 32, //smoke turn river
+        im2 = 33, //smoke turn river
+        wm2 = 34, //smoke turn river
     }
 
     #region // PuInfo

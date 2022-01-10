@@ -210,7 +210,7 @@ public class PowerUpState : State
                     //MAKE IT LOOK BETTER WHOS FIRST MAYNBE FUCKED HERE
                     battleSystem.UpdateZPos(true, "All");
                     int boardCount = battleSystem.cardsDeckUi.boardCardsUi.Count;
-                    float addition =0.25f;
+                    float addition = 0.25f;
                     int index = 1;
                     battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.PlayerCard2), index++ * addition, false, true, false);
                     battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard2), index++ * addition, false, false, false);
@@ -306,8 +306,33 @@ public class PowerUpState : State
                     battleSystem.SmokeTurnRiver(isPlayerActivate);
                     break;
                 }
+            case nameof(PowerUpNamesEnum.im2): //smoke turn river
+                {
+                    FreezeRandomCards();
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.wm2): //smoke turn river
+                {
+                    // battleSystem.SmokeTurnRiver(isPlayerActivate);
+                    break;
+                }
         }
 
+    }
+
+    private void FreezeRandomCards()
+    {
+        List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
+        int randomAmount = battleSystem.GenerateRandom(4, 6);
+        bool isLast = false;
+        for (int i = 0; i < randomAmount; i++)
+        {
+            if (i == randomAmount - 1)
+            {
+                isLast = true;
+            }
+            battleSystem.FreezePlayingCard(ConvertFixedCardPlace(cardsNames[i]), true, isLast);
+        }
     }
 
     /*private IEnumerator PlayASync()

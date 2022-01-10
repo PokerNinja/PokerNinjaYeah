@@ -1015,66 +1015,69 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
-    public IEnumerator AnimateWind(string puName, SpriteRenderer windSpriteRenderer, Action PuIgnite, Action FadeOut)
+    public IEnumerator AnimateWind(string puName, GameObject wind, Action PuIgnite, Action FadeOut)
     {
-        float zoomTarget = 0.1f;
+        float newScale = 1f;
         float newYcenter = 0;
         if (puName.Equals("w2"))
         {
-            zoomTarget = 2.5f;
-            newYcenter = -2f;
+            newScale = 0.5f;
+            newYcenter = -2.5f;
         }
         else if (puName.Equals("w3"))
         {
-            zoomTarget = 2.5f;
-            newYcenter = 2f;
+            newScale = 0.5f;
+            newYcenter = 2.5f;
         }
 
-        Vector3 windCenterPosition = new Vector3(0, newYcenter, 6);
-        windSpriteRenderer.transform.parent.position = windCenterPosition;
+        wind.SetActive(true);
+        wind.transform.parent.transform.position = new Vector3(0, newYcenter, 6);
+        wind.transform.parent.transform.localScale = new Vector3(newScale, newScale, newScale);
         SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.WindSound);
+        PuIgnite?.Invoke();
+        yield return new WaitForSeconds(3f);
+        wind.SetActive(false);
+        /* bool activatePu = true;
         float windMoveDuration = Values.Instance.windMoveDuration;
+         bool stopZooming = false;
+         bool startFading = false;
+         float zoomAmount = 5f;
+         float rotateAmount = 0;
+         float rotationSpeed = Values.Instance.windRorationSpeed;
+         SetAlpha(windSpriteRenderer, 1f);
+         windSpriteRenderer.material.SetFloat("_ZoomUvAmount", zoomAmount);
+         windSpriteRenderer.material.SetFloat("_RotateUvAmount", rotateAmount);
+         while (zoomAmount > 0)
+         {
+             if (!stopZooming)
+             {
+                 zoomAmount -= Time.deltaTime / windMoveDuration;
+             }
+             rotateAmount += Time.deltaTime / windMoveDuration * rotationSpeed;
+             windSpriteRenderer.material.SetFloat("_ZoomUvAmount", zoomAmount);
+             windSpriteRenderer.material.SetFloat("_RotateUvAmount", rotateAmount);
+             yield return new WaitForFixedUpdate();
+             if (activatePu && zoomAmount < 4)
+             {
+                 activatePu = false;
+                 PuIgnite?.Invoke();
 
-        bool activatePu = true;
-        bool stopZooming = false;
-        bool startFading = false;
-        float zoomAmount = 5f;
-        float rotateAmount = 0;
-        float rotationSpeed = Values.Instance.windRorationSpeed;
-        SetAlpha(windSpriteRenderer, 1f);
-        windSpriteRenderer.material.SetFloat("_ZoomUvAmount", zoomAmount);
-        windSpriteRenderer.material.SetFloat("_RotateUvAmount", rotateAmount);
-        while (zoomAmount > 0)
-        {
-            if (!stopZooming)
-            {
-                zoomAmount -= Time.deltaTime / windMoveDuration;
-            }
-            rotateAmount += Time.deltaTime / windMoveDuration * rotationSpeed;
-            windSpriteRenderer.material.SetFloat("_ZoomUvAmount", zoomAmount);
-            windSpriteRenderer.material.SetFloat("_RotateUvAmount", rotateAmount);
-            yield return new WaitForFixedUpdate();
-            if (activatePu && zoomAmount < 4)
-            {
-                activatePu = false;
-                PuIgnite?.Invoke();
+             }
+             if (!stopZooming && zoomAmount <= zoomTarget)
+             {
+                 stopZooming = true;
 
-            }
-            if (!stopZooming && zoomAmount <= zoomTarget)
-            {
-                stopZooming = true;
-
-            }
-            if (!startFading && rotateAmount >= 6.2831f)
-            {
-                startFading = true;
-                FadeOut?.Invoke();
-            }
-            if (6.2831f >= 10)
-            {
-                break;
-            }
-        }
+             }
+             if (!startFading && rotateAmount >= 6.2831f)
+             {
+                 startFading = true;
+                 FadeOut?.Invoke();
+             }
+             if (6.2831f >= 10)
+             {
+                 break;
+             }
+         }*/
     }
 
     public void SetAlpha(SpriteRenderer targetSprite, float alpha)
