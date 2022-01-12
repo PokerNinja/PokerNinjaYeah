@@ -213,7 +213,7 @@ public class TutorialSystem : StateTuto
                     EndAction += () => spriteTarget.sortingOrder = 40;
                 }
             }
-            ui.tutorialText.text = tutoInfo[objectNumber];
+            ui.tutorialText.text = ValuesText.tutoInfo[objectNumber];
             AnimateTutoObjects(true, maskShape, endByBtn, EndAction);
         }
         else

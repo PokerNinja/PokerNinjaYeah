@@ -172,8 +172,8 @@ public class BattleSystem : StateMachine
                  "w1","w2","w3",
                     "f2","i3","f3",
                  "i1","f1","w3",
-                 "f2","f2","w3",
-                "wm2", "im2"};
+                 "f2","f2","wm2",
+                "fm2", "im2"};
             currentGameInfo.turn = "6";
             currentTurn = 5;
         }
@@ -339,9 +339,11 @@ public class BattleSystem : StateMachine
     }
 
     [Button]
-    public void SoundCheck()
+    public void SoundCheck(int emojiId)
     {
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndRoundGong, true);
+        //SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndRoundGong, true);
+        StartCoroutine(ui.DisplayEmoji(false, emojiId, null));
+
     }
 
     public IEnumerator StartNewRound()
@@ -1589,7 +1591,7 @@ public class BattleSystem : StateMachine
     }
 
 
-    internal void SwapTwoCards(string cardTarget1, string cardTarget2)
+    internal void SwapTwoCards(string cardTarget1, string cardTarget2, bool reset)
     {
         bool noSmoke = true;
         if (cardsDeckUi.GetParentByPlace(cardTarget1).smokeEnable)
@@ -1606,7 +1608,12 @@ public class BattleSystem : StateMachine
         {
             DestroyRandomSmoke(cardTarget1, cardTarget2);
         }
-        cardsDeckUi.SwapTwoCards(cardTarget1, cardTarget2, () => EnableDarkAndSorting(false));
+        Action ActionReset = null;
+        if (reset)
+        {
+            ActionReset = ()=>EnableDarkAndSorting(false);
+        }
+        cardsDeckUi.SwapTwoCards(cardTarget1, cardTarget2, ActionReset);
     }
 
     private void DestroyRandomSmoke(string cardTarget1, string cardTarget2)
@@ -1662,10 +1669,20 @@ public class BattleSystem : StateMachine
 
     internal void InitProjectile(bool isPlayerActivate, int puIndex, string powerUpName, Vector2 posTarget1, Vector2 posTarget2, Action IgnitePowerUp)
     {
-        bool inlargeProjectile = false;
-        switch (powerUpName)
+        if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.im2)))
         {
-            case nameof(PowerUpStruct.PowerUpNamesEnum.im1):
+            StartCoroutine(ui.StartIcenado());
+            IgnitePowerUp.Invoke();
+        }
+        else if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.fm2)))
+        {
+            StartCoroutine(ui.StartArmageddon());
+            IgnitePowerUp.Invoke();
+        }
+        else
+        {
+            if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.im1)))
+            {
                 if (isPlayerActivate)
                 {
                     posTarget1 = cardsDeckUi.playerCardsUi[0].transform.position;
@@ -1676,19 +1693,8 @@ public class BattleSystem : StateMachine
                     posTarget1 = cardsDeckUi.enemyCardsUi[0].transform.position;
                     posTarget2 = cardsDeckUi.enemyCardsUi[1].transform.position;
                 }
-                break;
-            case nameof(PowerUpStruct.PowerUpNamesEnum.fm2):
-                inlargeProjectile = true;
-                break;
-        }
-        if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.im2)))
-        {
-            StartCoroutine(ui.StartIcenado());
-            IgnitePowerUp.Invoke();
-        }
-        else
-        {
-            ui.InitProjectile(puDeckUi.GetPuPosition(isPlayerActivate, puIndex), inlargeProjectile, powerUpName, posTarget1, posTarget2, IgnitePowerUp);
+            }
+            ui.InitProjectile(puDeckUi.GetPuPosition(isPlayerActivate, puIndex), powerUpName, posTarget1, posTarget2, IgnitePowerUp);
         }
     }
 
@@ -1713,6 +1719,7 @@ public class BattleSystem : StateMachine
         }
         else if (btnReplaceClickable || endTurn || disable)
         {
+            Constants.TemproryUnclickable = true;
             Debug.LogError("1");
             if (/*replaceMode ||*/ IsPlayerTurn() && energyCounter > 0)
             {
@@ -1724,7 +1731,7 @@ public class BattleSystem : StateMachine
                     if (replaceMode)
                     {
                         puDeckUi.EnablePusSlotZ(true, true);
-                        ui.EnableDarkScreen(isPlayerActivatePu, true, null);
+                        ui.EnableDarkScreen(isPlayerActivatePu, true, () => Constants.TemproryUnclickable = false);
                     }
                     else
                     {
@@ -1976,7 +1983,7 @@ public class BattleSystem : StateMachine
         {
             HideDialog();
         }
-        else if (powerUpUi.isPlayer && !powerUpUi.freeze && powerUpUi.isClickable)
+        else if (!Constants.TemproryUnclickable && powerUpUi.isPlayer && !powerUpUi.freeze && powerUpUi.isClickable)
         {
             powerUpUi.isClickable = false;
             powerUpUi.aboutToDestroy = true;

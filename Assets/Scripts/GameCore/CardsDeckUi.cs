@@ -1635,11 +1635,40 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         targetMaterial.SetFloat("_FlickerPercent", flickerAmount);
     }
 
-    internal void SwapTwoCards(string cardPlace1, string cardPlace2, Action DisableDarkScreen)
+    internal void SwapTwoCards(string cardToSwap, string cardTarget, Action DisableDarkScreen)
     {
+        Debug.LogError("war");
+        CardUi cardUiToSwap = GetCardUiByName(cardToSwap);
+        CardUi cardUiTarget = GetCardUiByName(cardTarget);
+       
+        SwapCardUiList(cardUiToSwap, cardUiTarget);
+        bool card1WasFaceDown = cardUiToSwap.GetisFaceDown();
+        bool card2WasFaceDown = cardUiTarget.GetisFaceDown(); // NOT IMPLENMANETD
+        Transform tempTransform1 = cardUiToSwap.transform;
+        Transform tempTransform2 = cardUiTarget.transform;
+        SwitchCardsInfo(cardUiToSwap, cardUiTarget);
 
+        StartCoroutine(AnimationManager.Instance.FollowArc(cardUiToSwap.transform, cardUiToSwap.transform.position, cardUiTarget.transform.position, 
+            Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
+        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiToSwap.transform, cardUiTarget.transform.localScale,
+        Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiToSwap,
+        !cardUiToSwap.cardMark.activeSelf, CardPlaceToTag(cardToSwap), CardPlaceToTag(cardTarget))), null, null));
+
+        StartCoroutine(AnimationManager.Instance.FollowArc(cardUiTarget.transform, cardUiTarget.transform.position, cardUiToSwap.transform.position, 
+            Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
+        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiTarget.transform, cardUiToSwap.transform.localScale,
+        Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiTarget, 
+        !cardUiTarget.cardMark.activeSelf, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, DisableDarkScreen));
+
+
+        Card tempCard1 = Card.StringToCard(cardUiToSwap.cardDescription);
+        Card tempCard2 = Card.StringToCard(cardUiTarget.cardDescription);
+        UpdateCardsList(cardToSwap, tempCard2, true);
+        UpdateCardsList(cardTarget, tempCard1, true);
+    }
+   /* internal void SwapTwoCards(string cardPlace1, string cardPlace2, Action DisableDarkScreen)
+    {
         //COPy WASTE
-
         CardUi cardSwap1 = GetCardUiByName(cardPlace1);
         CardUi cardSwap2 = GetCardUiByName(cardPlace2);
         // cardSwap1.spriteRenderer.material.SetFloat("_ShadowAlpha", 0.8f);
@@ -1660,18 +1689,17 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         SwitchCardsInfo(cardSwap1, cardSwap2);
 
         StartCoroutine(AnimationManager.Instance.FollowArc(cardSwap1.transform, cardSwap1.transform.position, cardSwap2.transform.position, Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
-        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardSwap1.transform, cardSwap2.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2))), null/*() => cardSwap1.spriteRenderer.material.SetFloat("_ShadowAlpha", 0f)*/, null));
+        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardSwap1.transform, cardSwap2.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2))), null*//*() => cardSwap1.spriteRenderer.material.SetFloat("_ShadowAlpha", 0f)*//*, null));
 
         StartCoroutine(AnimationManager.Instance.FollowArc(cardSwap2.transform, cardSwap2.transform.position, cardSwap1.transform.position, Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
-        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardSwap2.transform, cardSwap1.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1))), null/*() => cardSwap2.spriteRenderer.material.SetFloat("_ShadowAlpha", 0f)*/, DisableDarkScreen));
+        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardSwap2.transform, cardSwap1.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1))), null*//*() => cardSwap2.spriteRenderer.material.SetFloat("_ShadowAlpha", 0f)*//*, DisableDarkScreen));
 
 
         Card tempCard1 = Card.StringToCard(cardSwap1.cardDescription);
         Card tempCard2 = Card.StringToCard(cardSwap2.cardDescription);
         UpdateCardsList(cardPlace1, tempCard2, true);
         UpdateCardsList(cardPlace2, tempCard1, true);
-
-    }
+    }*/
 
     /* private Vector3 GetMiddlePosForWind(string cardPlace1, string cardPlace2)
      {

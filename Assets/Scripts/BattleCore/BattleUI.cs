@@ -57,7 +57,7 @@ public class BattleUI : MonoBehaviour
     [SerializeField] public GameObject iceProjectile1;
     [SerializeField] public GameObject iceProjectile2;
     //[SerializeField] public SpriteRenderer windSpriteRenderer;
-    [SerializeField] public GameObject windEffect;
+    [SerializeField] public GameObject windEffect, windEffect2;
 
     [SerializeField] public GameObject gameOverPanel;
 
@@ -113,7 +113,8 @@ public class BattleUI : MonoBehaviour
     public ParticleSystem hideSmokeHand;
     public ParticleSystem showSmokeBoard;
     public ParticleSystem showSmokeHand;
-    public ParticleSystem icenado;
+    public ParticleSystem icenadoPS;
+    public ParticleSystem armageddonPS;
 
     [SerializeField] private GameObject turnBtn;
     [SerializeField] public SpriteRenderer turnBtnSpriteREnderer;
@@ -138,14 +139,6 @@ public class BattleUI : MonoBehaviour
     private string[] ninjaThemeSprites = { "wood", "green", "dojo", "space" };
     private Color[] ninjaFrameColors;
 
-    public GameObject tutorialMaskRing;
-    public GameObject tutorialMaskRect;
-    public SpriteRenderer btnTutorial;
-    public SpriteRenderer tutorialBgText;
-    public TextMeshProUGUI tutorialText;
-    public int lastObjectToFocus;
-    public SpriteRenderer coinsFocus;
-    public SpriteRenderer energyCostTuto;
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy)
     {
@@ -714,7 +707,7 @@ public class BattleUI : MonoBehaviour
         }
         return 10;
     }
-    internal void InitProjectile(Vector2 startingPos, bool inlargeProjectile, string powerUpName, Vector2 posTarget1, Vector2 posTarget2, Action PuIgnite)
+    internal void InitProjectile(Vector2 startingPos, string powerUpName, Vector2 posTarget1, Vector2 posTarget2, Action PuIgnite)
     {
         GameObject projectile1 = null;
         GameObject projectile2 = null;
@@ -724,12 +717,12 @@ public class BattleUI : MonoBehaviour
             case "f":
                 SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.FireProjectile, false);
                 projectile1 = fireProjectile1;
-                projectile2 = fireProjectile2;
+                projectile2 = fireProjectile2;/*
                 if (inlargeProjectile)
                 {
                     projectile1 = largeFireProjectile1;
                     // StartCoroutine(AnimationManager.ScaleObject(true, 2f, projectile1.transform, () => projectile1.transform.localScale = new Vector3(1f, 1f, 1f)));
-                }
+                }*/
                 break;
             case "i":
                 SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.IceProjectile, false);
@@ -756,7 +749,15 @@ public class BattleUI : MonoBehaviour
         }
         else
         {
-            StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, windEffect, PuIgnite, null));
+            if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.wm2)))
+            {
+                 StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,false, windEffect, PuIgnite));
+                 StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,true, windEffect2, PuIgnite));
+            }
+            else
+            {
+                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,false, windEffect, PuIgnite));
+            }
         }
     }
 
@@ -1205,12 +1206,24 @@ public class BattleUI : MonoBehaviour
 
     internal IEnumerator StartIcenado()
     {
-        icenado.Play();
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Iceagedon, true);
+        icenadoPS.Play();
         yield return new WaitForSeconds(3f);
-        var main = icenado.main;
+        var main = icenadoPS.main;
         main.startLifetime = 0;
         yield return new WaitForSeconds(2f);
-        icenado.Stop();
+        icenadoPS.Stop();
+    }
+    internal IEnumerator StartArmageddon()
+    {
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Armagedon, true);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Armagedon2, true);
+        armageddonPS.Play();
+        yield return new WaitForSeconds(3f);
+        var main = armageddonPS.main;
+        main.startLifetime = 0;
+        yield return new WaitForSeconds(2f);
+        armageddonPS.Stop();
     }
 
     //public void EnbaleMusic

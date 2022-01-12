@@ -50,6 +50,8 @@ public class TutorialEnemy : StateTuto
             case 4:
                 battleSystem.continueTutorial = false;
                 battleSystem.FakeEnemyPuUse(0, Constants.EnemyCard2, "", true);
+                await Task.Delay(800);
+                battleSystem.FakeEnemyEmoji(1);
                 break;
             case 2:
                 //battleSystem.continueTutorial = false;

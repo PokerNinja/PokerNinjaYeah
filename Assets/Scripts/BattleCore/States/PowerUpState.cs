@@ -167,7 +167,7 @@ public class PowerUpState : State
 
                     battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[0]);
                     battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[1]);
-                    battleSystem.SwapTwoCards(cardTarget1, cardTarget2);
+                    battleSystem.SwapTwoCards(cardTarget1, cardTarget2, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.wm1): //swap_hands = wm1
@@ -206,34 +206,7 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.fm2):  //armagedon = fm2
                 {
-                    SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Armagedon, true);
-                    //MAKE IT LOOK BETTER WHOS FIRST MAYNBE FUCKED HERE
-                    battleSystem.UpdateZPos(true, "All");
-                    int boardCount = battleSystem.cardsDeckUi.boardCardsUi.Count;
-                    float addition = 0.25f;
-                    int index = 1;
-                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.PlayerCard2), index++ * addition, false, true, false);
-                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard2), index++ * addition, false, false, false);
-                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.PlayerCard1), index++ * addition, false, false, false);
-                    battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(Constants.EnemyCard1), index++ * addition, false, false, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[0], index++ * addition, false, false, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[1], index++ * addition, false, false, false);
-                    if (boardCount == 3)
-                    {
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], index++ * addition, true, false, true);
-                    }
-                    else if (boardCount == 4)
-                    {
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], index++ * addition, false, false, false);
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[3], index++ * addition, true, false, true);
-                    }
-                    else if (boardCount == 5)
-                    {
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], index++ * addition, false, false, false);
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[3], index++ * addition, false, false, false);
-                        battleSystem.DestroyAndDrawCard(Constants.BoardCards[4], index++ * addition, true, false, true);
-                    }
-
+                    BurnRandomCards();
                     break;
                 }
             case nameof(PowerUpNamesEnum.i1): //block_enemy_card = i1
@@ -313,14 +286,46 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.wm2): //smoke turn river
                 {
-                    // battleSystem.SmokeTurnRiver(isPlayerActivate);
+                    battleSystem.SwapTwoCards(Constants.BFlop3, Constants.EnemyCard2, true);
+                   // SwapRandomCards();
                     break;
                 }
         }
 
     }
 
-    private void FreezeRandomCards()
+    private  void SwapRandomCards()
+    {
+        List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
+        bool isLast = false;
+        
+           /* await Task.Delay(1500);
+            battleSystem.SwapTwoCards(Constants.PlayerCard1, Constants.BFlop2, false);
+            await Task.Delay(1500);
+            battleSystem.SwapTwoCards(Constants.EnemyCard2, Constants.BFlop1, false);*/
+            battleSystem.SwapTwoCards(Constants.EnemyCard1, Constants.BFlop3, true);
+    }
+
+
+    private async void BurnRandomCards()
+    {
+       // battleSystem.UpdateZPos(true, "All");
+        await Task.Delay(300);
+        List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
+        int randomAmount = battleSystem.GenerateRandom(5, 7);
+        bool isLast = false;
+        for (int i = 0; i < randomAmount; i++)
+        {
+            if (i == randomAmount - 1)
+            {
+                isLast = true;
+            }
+            await Task.Delay(battleSystem.GenerateRandom(400, 700));
+            battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(cardsNames[i]), 0.1f, isLast, false, isLast);
+        }
+    }
+
+    private async void FreezeRandomCards()
     {
         List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
         int randomAmount = battleSystem.GenerateRandom(4, 6);
@@ -331,6 +336,7 @@ public class PowerUpState : State
             {
                 isLast = true;
             }
+            await Task.Delay(battleSystem.GenerateRandom(400, 800));
             battleSystem.FreezePlayingCard(ConvertFixedCardPlace(cardsNames[i]), true, isLast);
         }
     }

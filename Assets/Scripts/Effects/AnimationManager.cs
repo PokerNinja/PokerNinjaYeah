@@ -347,7 +347,7 @@ public class AnimationManager : Singleton<AnimationManager>
         }
         else
         {
-             OnFinish?.Invoke();
+            OnFinish?.Invoke();
         }
     }
 
@@ -438,6 +438,58 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
+    public async void FollowArc2(
+         Transform mover,
+         Vector2 start,
+         Vector2 end,
+         float radius, // Set this to negative if you want to flip the arc.
+         float duration,
+         Action BeginAction,
+         Action End1,
+         Action End2)
+    {
+        BeginAction?.Invoke();
+        Vector2 difference = end - start;
+        float span = difference.magnitude;
+
+        // Override the radius if it's too small to bridge the points.
+        float absRadius = Mathf.Abs(radius);
+        if (span > 2f * absRadius)
+        {
+            radius = absRadius = span / 2f;
+        }
+
+        Vector2 perpendicular = new Vector2(difference.y, -difference.x) / span;
+        perpendicular *= Mathf.Sign(radius) * Mathf.Sqrt(radius * radius - span * span / 4f);
+
+        Vector2 center = start + difference / 2f + perpendicular;
+
+        Vector2 toStart = start - center;
+        float startAngle = Mathf.Atan2(toStart.y, toStart.x);
+
+        Vector2 toEnd = end - center;
+        float endAngle = Mathf.Atan2(toEnd.y, toEnd.x);
+
+        // Choose the smaller of two angles separating the start & end
+        float travel = (endAngle - startAngle + 5f * Mathf.PI) % (2f * Mathf.PI) - Mathf.PI;
+
+        float progress = 0f;
+        bool EndMovement = false;
+        while (progress < 1f)
+        {
+            float angle = startAngle + progress * travel;
+            mover.position = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * absRadius;
+            progress += Time.deltaTime / duration;
+            await Task.Yield();
+            if (progress >= 1f)
+            {
+                mover.position = end;
+                End1?.Invoke();
+                End2?.Invoke();
+                break;
+            }
+        }
+    }
     public IEnumerator FollowArc(
          Transform mover,
          Vector2 start,
@@ -771,7 +823,7 @@ public class AnimationManager : Singleton<AnimationManager>
         float b = spriteTarget.color.b;
         float alphaAmount = 0;
         bool fadeIn = true;
-        
+
         while (true)
         {
             if (fadeIn)
@@ -967,7 +1019,7 @@ public class AnimationManager : Singleton<AnimationManager>
             t = (Time.time - startTime) / scaleDuration;
             selector.localScale = new Vector3(Mathf.SmoothStep(0, vectorTarget.x, t), Mathf.SmoothStep(0, vectorTarget.y, t), vectorTarget.z);
             yield return new WaitForFixedUpdate();
-            if (endActivate && selector.localScale== vectorTarget)
+            if (endActivate && selector.localScale == vectorTarget)
             {
                 endActivate = false;
                 RedBgEnable?.Invoke();
@@ -1015,7 +1067,7 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
-    public IEnumerator AnimateWind(string puName, GameObject wind, Action PuIgnite, Action FadeOut)
+    public IEnumerator AnimateWind(string puName, bool extraWind, GameObject wind, Action PuIgnite)
     {
         float newScale = 1f;
         float newYcenter = 0;
@@ -1030,10 +1082,17 @@ public class AnimationManager : Singleton<AnimationManager>
             newYcenter = 2.5f;
         }
 
+        if (!puName.Equals("wm2"))
+        {
+            SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.WindSound);
+        }else if (extraWind)
+        {
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Tornado,true);
+            yield return new WaitForSeconds(0.3f);
+        }
         wind.SetActive(true);
         wind.transform.parent.transform.position = new Vector3(0, newYcenter, 6);
         wind.transform.parent.transform.localScale = new Vector3(newScale, newScale, newScale);
-        SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.WindSound);
         PuIgnite?.Invoke();
         yield return new WaitForSeconds(3f);
         wind.SetActive(false);

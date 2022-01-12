@@ -493,9 +493,10 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
             FakeEnemyEndTurn();
         }
     }
-
+    [Button]
     public void FakeEnemyEmoji(int index)
     {
+        Debug.LogError("ind" + index);
         StartCoroutine(ui.DisplayEmoji(false, index, null));
     }
 

@@ -56,6 +56,9 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip armagedon;
     public AudioClip coinFlipStart;
     public AudioClip energyCharge;
+    public AudioClip tornado;
+    public AudioClip iceagedon;
+    public AudioClip armageddon2;
 
 
 
@@ -112,7 +115,7 @@ public class SoundManager : Singleton<SoundManager>
 
 
     // Play a single clip through the sound effects source.
-    public async Task PlayAsync(AudioClip clip,bool normalPitch)
+    private async Task PlayAsync(AudioClip clip,bool normalPitch)
     {
         float pitch = 1f;
         AudioSource currentSource = await GetAvailableAudioSource();/*
@@ -483,6 +486,21 @@ public class SoundManager : Singleton<SoundManager>
                     soundToPlay = energyCharge;
                     break;
                 }
+            case SoundName.Tornado:
+                {
+                    soundToPlay = tornado;
+                    break;
+                }
+            case SoundName.Iceagedon:
+                {
+                    soundToPlay = iceagedon;
+                    break;
+                }
+            case SoundName.Armagedon2:
+                {
+                    soundToPlay = armageddon2;
+                    break;
+                }
         }
 
         await PlayAsync(soundToPlay, normalPitch);
@@ -502,7 +520,6 @@ public class SoundManager : Singleton<SoundManager>
         Slash1,
         Slash2,
         PuUse,
-        PuArmagedon,
         PuFreeze,
         PuHeal,
         PuSee,
@@ -531,5 +548,8 @@ public class SoundManager : Singleton<SoundManager>
         CoinLose,
         CoinFlipStart,
         EnergyCharge,
+        Tornado,
+        Iceagedon,
+        Armagedon2,
     }
 }

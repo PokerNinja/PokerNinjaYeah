@@ -1,4 +1,5 @@
 
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class EmojiToDisplay : MonoBehaviour
@@ -12,10 +13,9 @@ public class EmojiToDisplay : MonoBehaviour
 
     public void PlayEmoji(int id)
     {
-        animator.Play("emoji_" + id, 0, 0f);
+       animator.Play("emoji_" + id, 0, 0f);
         //animator.SetInteger("emojiId",id);
     }
-
 
     private void EnalbeAnimator(bool enable)
     {
