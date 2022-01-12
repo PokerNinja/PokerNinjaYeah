@@ -8142,6 +8142,7 @@ MonoBehaviour:
   energyCharge: {fileID: 8300000, guid: e1bb4bf923ec8ec47833cc09ac4a7f16, type: 3}
   tornado: {fileID: 0}
   iceagedon: {fileID: 0}
+  armageddon2: {fileID: 0}
   LowPitchRange: 0.95
   HighPitchRange: 1.05
 --- !u!4 &813767122
