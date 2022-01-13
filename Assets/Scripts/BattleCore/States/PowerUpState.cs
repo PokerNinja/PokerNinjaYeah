@@ -315,11 +315,11 @@ public class PowerUpState : State
         List<string> cardsNames = new List<string>(listOfCards.Split(','));
         int i = 0;
         await Task.Delay(150);
-        battleSystem.SwapTwoCards(cardsNames[i++], cardsNames[i++], false);
+        battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), false);
         await Task.Delay(320);
-        battleSystem.SwapTwoCards(cardsNames[i++], cardsNames[i++], false);
+        battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), false);
         await Task.Delay(210);
-        battleSystem.SwapTwoCards(cardsNames[i++], cardsNames[i++], true);
+        battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), true);
     }
 
 

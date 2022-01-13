@@ -1067,7 +1067,7 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
-    public IEnumerator AnimateWind(string puName, bool extraWind, GameObject wind, Action PuIgnite)
+    public IEnumerator AnimateWind(string puName, bool isPlayerActivate, bool extraWind, GameObject wind, Action PuIgnite)
     {
         float newScale = 1f;
         float newYcenter = 0;
@@ -1081,7 +1081,10 @@ public class AnimationManager : Singleton<AnimationManager>
             newScale = 0.5f;
             newYcenter = 2.5f;
         }
-
+        if (!isPlayerActivate)
+        {
+            newYcenter *= -1; 
+        }
         if (!puName.Equals("wm2"))
         {
             SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.WindSound);
@@ -1336,8 +1339,9 @@ public class AnimationManager : Singleton<AnimationManager>
             }
             targetObj.SetFloat("_FadeAmount", dissolveAmount);
             yield return new WaitForFixedUpdate();
-            if (dissolveAmount < minTarget || dissolveAmount > maxTarget)
+            if (dissolveAmount <= minTarget || dissolveAmount >= maxTarget)
             {
+                Debug.Log("Faded DS");
                 dissolveAmount = maxTarget;
                 if (fadeIn)
                 {
@@ -1375,7 +1379,7 @@ public class AnimationManager : Singleton<AnimationManager>
             }
             targetObj.SetFloat("_FadeAmount", dissolveAmount);
             yield return new WaitForFixedUpdate();
-            if (dissolveAmount < -0.1f || dissolveAmount > 1f)
+            if (dissolveAmount < -0.1f || dissolveAmount >= 1f)
             {
                 onFinishDissolve?.Invoke();
                 yield return new WaitForSeconds(0.1f);

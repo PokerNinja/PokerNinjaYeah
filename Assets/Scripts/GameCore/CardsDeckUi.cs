@@ -1303,7 +1303,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             return new Vector2(0, 0);
         }
-        else if(cardPlace.Length == 1 || cardPlace.Length > 10)
+        else if (cardPlace.Length == 1 || cardPlace.Length > 20)
         {
             return new Vector2(0, 0);
         }
@@ -1643,7 +1643,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Debug.LogError("swaping");
         CardUi cardUiToSwap = GetCardUiByName(cardToSwap);
         CardUi cardUiTarget = GetCardUiByName(cardTarget);
-       
+
         SwapCardUiList(cardUiToSwap, cardUiTarget);
         bool card1WasFaceDown = cardUiToSwap.GetisFaceDown();
         bool card2WasFaceDown = cardUiTarget.GetisFaceDown(); // NOT IMPLENMANETD
@@ -1651,16 +1651,16 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Transform tempTransform2 = cardUiTarget.transform;
         SwitchCardsInfo(cardUiToSwap, cardUiTarget);
 
-        StartCoroutine(AnimationManager.Instance.FollowArc(cardUiToSwap.transform, cardUiToSwap.transform.position, cardUiTarget.transform.position, 
+        StartCoroutine(AnimationManager.Instance.FollowArc(cardUiToSwap.transform, cardUiToSwap.transform.position, cardUiTarget.transform.position,
             Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
         AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiToSwap.transform, cardUiTarget.transform.localScale,
         Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiToSwap,
         !cardUiToSwap.cardMark.activeSelf, CardPlaceToTag(cardToSwap), CardPlaceToTag(cardTarget))), null, null));
 
-        StartCoroutine(AnimationManager.Instance.FollowArc(cardUiTarget.transform, cardUiTarget.transform.position, cardUiToSwap.transform.position, 
+        StartCoroutine(AnimationManager.Instance.FollowArc(cardUiTarget.transform, cardUiTarget.transform.position, cardUiToSwap.transform.position,
             Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
         AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiTarget.transform, cardUiToSwap.transform.localScale,
-        Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiTarget, 
+        Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiTarget,
         !cardUiTarget.cardMark.activeSelf, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, DisableDarkScreen));
 
 
@@ -1669,40 +1669,40 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         UpdateCardsList(cardToSwap, tempCard2, true);
         UpdateCardsList(cardTarget, tempCard1, true);
     }
-   /* internal void SwapTwoCards(string cardPlace1, string cardPlace2, Action DisableDarkScreen)
-    {
-        //COPy WASTE
-        CardUi cardSwap1 = GetCardUiByName(cardPlace1);
-        CardUi cardSwap2 = GetCardUiByName(cardPlace2);
-        // cardSwap1.spriteRenderer.material.SetFloat("_ShadowAlpha", 0.8f);
-        // cardSwap2.spriteRenderer.material.SetFloat("_ShadowAlpha", 0.8f);
-        if (cardSwap1.underSmoke)
-        {
-            EnableCardSmoke(false, false, cardSwap1);
-        }
-        if (cardSwap2.underSmoke)
-        {
-            EnableCardSmoke(false, false, cardSwap1);
-        }
-        SwapCardUiList(cardSwap1, cardSwap2);
-        bool card1WasFaceDown = cardSwap1.GetisFaceDown();
-        bool card2WasFaceDown = cardSwap2.GetisFaceDown(); // NOT IMPLENMANETD
-        Transform tempTransform1 = cardSwap1.transform;
-        Transform tempTransform2 = cardSwap2.transform;
-        SwitchCardsInfo(cardSwap1, cardSwap2);
+    /* internal void SwapTwoCards(string cardPlace1, string cardPlace2, Action DisableDarkScreen)
+     {
+         //COPy WASTE
+         CardUi cardSwap1 = GetCardUiByName(cardPlace1);
+         CardUi cardSwap2 = GetCardUiByName(cardPlace2);
+         // cardSwap1.spriteRenderer.material.SetFloat("_ShadowAlpha", 0.8f);
+         // cardSwap2.spriteRenderer.material.SetFloat("_ShadowAlpha", 0.8f);
+         if (cardSwap1.underSmoke)
+         {
+             EnableCardSmoke(false, false, cardSwap1);
+         }
+         if (cardSwap2.underSmoke)
+         {
+             EnableCardSmoke(false, false, cardSwap1);
+         }
+         SwapCardUiList(cardSwap1, cardSwap2);
+         bool card1WasFaceDown = cardSwap1.GetisFaceDown();
+         bool card2WasFaceDown = cardSwap2.GetisFaceDown(); // NOT IMPLENMANETD
+         Transform tempTransform1 = cardSwap1.transform;
+         Transform tempTransform2 = cardSwap2.transform;
+         SwitchCardsInfo(cardSwap1, cardSwap2);
 
-        StartCoroutine(AnimationManager.Instance.FollowArc(cardSwap1.transform, cardSwap1.transform.position, cardSwap2.transform.position, Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
-        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardSwap1.transform, cardSwap2.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2))), null*//*() => cardSwap1.spriteRenderer.material.SetFloat("_ShadowAlpha", 0f)*//*, null));
+         StartCoroutine(AnimationManager.Instance.FollowArc(cardSwap1.transform, cardSwap1.transform.position, cardSwap2.transform.position, Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
+         AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardSwap1.transform, cardSwap2.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap1, !cardSwap1.cardMark.activeSelf, CardPlaceToTag(cardPlace1), CardPlaceToTag(cardPlace2))), null*//*() => cardSwap1.spriteRenderer.material.SetFloat("_ShadowAlpha", 0f)*//*, null));
 
-        StartCoroutine(AnimationManager.Instance.FollowArc(cardSwap2.transform, cardSwap2.transform.position, cardSwap1.transform.position, Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
-        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardSwap2.transform, cardSwap1.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1))), null*//*() => cardSwap2.spriteRenderer.material.SetFloat("_ShadowAlpha", 0f)*//*, DisableDarkScreen));
+         StartCoroutine(AnimationManager.Instance.FollowArc(cardSwap2.transform, cardSwap2.transform.position, cardSwap1.transform.position, Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
+         AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardSwap2.transform, cardSwap1.transform.localScale, Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardSwap2, !cardSwap2.cardMark.activeSelf, CardPlaceToTag(cardPlace2), CardPlaceToTag(cardPlace1))), null*//*() => cardSwap2.spriteRenderer.material.SetFloat("_ShadowAlpha", 0f)*//*, DisableDarkScreen));
 
 
-        Card tempCard1 = Card.StringToCard(cardSwap1.cardDescription);
-        Card tempCard2 = Card.StringToCard(cardSwap2.cardDescription);
-        UpdateCardsList(cardPlace1, tempCard2, true);
-        UpdateCardsList(cardPlace2, tempCard1, true);
-    }*/
+         Card tempCard1 = Card.StringToCard(cardSwap1.cardDescription);
+         Card tempCard2 = Card.StringToCard(cardSwap2.cardDescription);
+         UpdateCardsList(cardPlace1, tempCard2, true);
+         UpdateCardsList(cardPlace2, tempCard1, true);
+     }*/
 
     /* private Vector3 GetMiddlePosForWind(string cardPlace1, string cardPlace2)
      {
@@ -1834,11 +1834,18 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     #endregion
 
 
-
-
+    bool isDrawerOpen = false;
+    public void CloseDrawer()
+    {
+        if (isDrawerOpen)
+        {
+            AnimateDrawer(false, null);
+        }
+    }
 
     private void AnimateDrawer(bool open, Action action)
     {
+        isDrawerOpen = open;
         float targetX;
         if (open)
         {

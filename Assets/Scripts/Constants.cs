@@ -7,6 +7,7 @@ public class Constants : Singleton<Constants>
 {
 
     public readonly string volumeSoundKey = "music_key";
+    public readonly string botEnergyKey = "bot_energy_key";
     public const string PlayerCardsTag = "CardP";
     public const string EnemyCardsTag = "CardE";
     public const string BoardCardsTag = "CardB";
@@ -35,6 +36,7 @@ public class Constants : Singleton<Constants>
     public static string ReplacePuInfo = "Choose one PowerUp and replace it with a new one.";
 
     public static bool TUTORIAL_MODE = false;
+    public static bool BOT_MODE = false;
     public static bool TemproryUnclickable = false;
     public static int cardsToSelectCounter = 0;
 

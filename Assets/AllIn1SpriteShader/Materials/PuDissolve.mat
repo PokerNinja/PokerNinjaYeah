@@ -128,7 +128,7 @@ Material:
     - _FadeAmount: -0.1
     - _FadeBurnGlow: 119
     - _FadeBurnTransition: 0.1
-    - _FadeBurnWidth: 0.11
+    - _FadeBurnWidth: 0.08
     - _FishEyeUvAmount: 0
     - _FlickerAlpha: 0
     - _FlickerFreq: 0.2

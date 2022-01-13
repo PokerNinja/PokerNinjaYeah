@@ -39,7 +39,7 @@ public class BattleUI : MonoBehaviour
     [SerializeField] public SpriteRenderer dialogSprite;
     [SerializeField] public Transform targetDialogTransform;
 
-    [SerializeField] public GameObject rankingImg;
+    [SerializeField] public GameObject rankImageParent;
     [SerializeField] public SpriteRenderer darkScreenRenderer;
     [SerializeField] public SpriteRenderer cancelDarkScreenRenderer;
     [SerializeField] public TextMeshProUGUI largeText;
@@ -53,7 +53,6 @@ public class BattleUI : MonoBehaviour
 
 
 
-    [SerializeField] public GameObject largeFireProjectile1;
     [SerializeField] public GameObject iceProjectile1;
     [SerializeField] public GameObject iceProjectile2;
     //[SerializeField] public SpriteRenderer windSpriteRenderer;
@@ -436,8 +435,8 @@ public class BattleUI : MonoBehaviour
         if (!sliding)
         {
             sliding = true;
-            StartCoroutine(AnimationManager.Instance.SmoothMoveRank(rankingImg.transform, Values.Instance.rankInfoMoveDuration, () => rankingImg.SetActive(false)/*rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_empty", typeof(Sprite)) as Sprite*/,
-                () => rankingImg.SetActive(true)/*rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_full", typeof(Sprite)) as Sprite*/, () => sliding = false));
+            StartCoroutine(AnimationManager.Instance.SmoothMoveRank(rankImageParent.transform, Values.Instance.rankInfoMoveDuration, () => rankImageParent.SetActive(false)/*rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_empty", typeof(Sprite)) as Sprite*/,
+                () => rankImageParent.SetActive(true)/*rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_full", typeof(Sprite)) as Sprite*/, () => sliding = false));
         }
 
     }
@@ -707,7 +706,7 @@ public class BattleUI : MonoBehaviour
         }
         return 10;
     }
-    internal void InitProjectile(Vector2 startingPos, string powerUpName, Vector2 posTarget1, Vector2 posTarget2, Action PuIgnite)
+    internal void InitProjectile(Vector2 startingPos, string powerUpName, bool isPlayerActivate, Vector2 posTarget1, Vector2 posTarget2, Action PuIgnite)
     {
         GameObject projectile1 = null;
         GameObject projectile2 = null;
@@ -751,12 +750,12 @@ public class BattleUI : MonoBehaviour
         {
             if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.wm2)))
             {
-                 StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,false, windEffect, null));
-                 StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,true, windEffect2, PuIgnite));
+                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, isPlayerActivate, false, windEffect, null));
+                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, isPlayerActivate, true, windEffect2, PuIgnite));
             }
             else
             {
-                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,false, windEffect, PuIgnite));
+                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, isPlayerActivate, false, windEffect, PuIgnite));
             }
         }
     }
@@ -1224,6 +1223,14 @@ public class BattleUI : MonoBehaviour
         main.startLifetime = 0;
         yield return new WaitForSeconds(2f);
         armageddonPS.Stop();
+    }
+
+    internal void SlideRankingImgIfOpen()
+    {
+        if (rankImageParent.activeSelf)
+        {
+            SlideRankingImg();
+        }
     }
 
     //public void EnbaleMusic
