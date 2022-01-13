@@ -35,6 +35,7 @@ public class PlayerTurn : State
 
     public override IEnumerator Start()
     {
+        Debug.LogError("startingMyTurn;");
         battleSystem.endTurnInProcess = false;
         battleSystem.skillUsed = false;
         battleSystem.newPowerUpName = "x";
@@ -48,6 +49,7 @@ public class PlayerTurn : State
         }
         battleSystem.DealPu(true, () =>
         {
+        Debug.LogError("AfterPlayerDeal;");
             Action tutorialAction = null;
             battleSystem.NewTimerStarter(true);
             battleSystem.ActivatePlayerButtons(true, true);

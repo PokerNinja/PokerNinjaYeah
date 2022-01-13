@@ -8,6 +8,7 @@ public class EnemyTurn : State
     private int turnCounter;
     public EnemyTurn(BattleSystem battleSystem, int turnCounter) : base(battleSystem)
     {
+
         isFinalTurn = false;
         this.turnCounter = turnCounter;
         if (turnCounter == 1)
@@ -24,6 +25,8 @@ public class EnemyTurn : State
         battleSystem.DisablePlayerPus();
         battleSystem.DealPu(false, () =>
          {
+             battleSystem.Interface.enemyNameText.text = "afterDeal";
+
              battleSystem.Interface.SetTurnIndicator(false, true);
              battleSystem.Interface.WhosTurnAnimation(false, false, isFinalTurn, () => battleSystem.turnInitInProgress = false);
              /*if (battleSystem.TUTORIAL_MODE)

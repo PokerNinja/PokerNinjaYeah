@@ -751,7 +751,7 @@ public class BattleUI : MonoBehaviour
         {
             if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.wm2)))
             {
-                 StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,false, windEffect, PuIgnite));
+                 StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,false, windEffect, null));
                  StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,true, windEffect2, PuIgnite));
             }
             else

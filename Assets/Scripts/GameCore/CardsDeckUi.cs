@@ -1303,10 +1303,13 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             return new Vector2(0, 0);
         }
+        else if(cardPlace.Length == 1 || cardPlace.Length > 10)
+        {
+            return new Vector2(0, 0);
+        }
         else
         {
             return GetCardUiByName(cardPlace).transform.position;
-
         }
     }
 
@@ -1637,7 +1640,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void SwapTwoCards(string cardToSwap, string cardTarget, Action DisableDarkScreen)
     {
-        Debug.LogError("war");
+        Debug.LogError("swaping");
         CardUi cardUiToSwap = GetCardUiByName(cardToSwap);
         CardUi cardUiTarget = GetCardUiByName(cardTarget);
        

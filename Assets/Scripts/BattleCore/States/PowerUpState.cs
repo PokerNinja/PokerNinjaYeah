@@ -96,6 +96,8 @@ public class PowerUpState : State
                     }
                     else
                     {
+                        cardTarget2 = GetListOfRandomCardsForMonster();
+                        cardTarget1 = GetRandomAmountForMonster();
                         battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
                     }
                 }
@@ -122,6 +124,30 @@ public class PowerUpState : State
         }
         yield break;
 
+    }
+
+    private string GetRandomAmountForMonster()
+    {
+        if (powerUpName.Equals("fm2"))
+        {
+            int randomAmount = battleSystem.GenerateRandom(5, 7);
+            return randomAmount.ToString();
+        }
+        else if (powerUpName.Equals("im2"))
+        {
+            int randomAmount = battleSystem.GenerateRandom(4, 6);
+            return randomAmount.ToString();
+        }
+        return cardTarget1;
+    }
+
+    private string GetListOfRandomCardsForMonster()
+    {
+        if (powerUpName.Equals("wm2") || powerUpName.Equals("im2") || powerUpName.Equals("fm2"))
+        {
+            return string.Join(",", battleSystem.GetRandomAvailableCardsNames());
+        }
+        return cardTarget2;
     }
 
     private void ActivateSelectMode(int cardsToSelect, string powerUpName)
@@ -182,16 +208,6 @@ public class PowerUpState : State
                     battleSystem.SwapAndDestroy(cardTarget1, cardTarget2);
                     break;
                 }
-            case nameof(PowerUpNamesEnum.shuffle_board): //shuffle_board
-                {
-                    battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[0]);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[0], 0.1f, false, true, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[1], 0.35f, false, false, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[2], 0.6f, false, false, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[3], 0.85f, false, false, false);
-                    battleSystem.DestroyAndDrawCard(Constants.BoardCards[4], 1.1f, true, false, true);
-                    break;
-                }
             case nameof(PowerUpNamesEnum.enemy_pu_freeze): //enemy_pu_freeze
                 {
                     battleSystem.FreezePlayingCard(cardTarget2, true, true);
@@ -206,7 +222,7 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.fm2):  //armagedon = fm2
                 {
-                    BurnRandomCards();
+                    BurnRandomCards(cardTarget2, cardTarget1);
                     break;
                 }
             case nameof(PowerUpNamesEnum.i1): //block_enemy_card = i1
@@ -281,39 +297,40 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.im2): //smoke turn river
                 {
-                    FreezeRandomCards();
+                    FreezeRandomCards(cardTarget2, cardTarget1);
                     break;
                 }
             case nameof(PowerUpNamesEnum.wm2): //smoke turn river
                 {
-                    battleSystem.SwapTwoCards(Constants.BFlop3, Constants.EnemyCard2, true);
-                   // SwapRandomCards();
+                    SwapRandomCards(cardTarget2);
                     break;
                 }
         }
 
     }
 
-    private  void SwapRandomCards()
+    private async void SwapRandomCards(string listOfCards )
     {
-        List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
-        bool isLast = false;
-        
-           /* await Task.Delay(1500);
-            battleSystem.SwapTwoCards(Constants.PlayerCard1, Constants.BFlop2, false);
-            await Task.Delay(1500);
-            battleSystem.SwapTwoCards(Constants.EnemyCard2, Constants.BFlop1, false);*/
-            battleSystem.SwapTwoCards(Constants.EnemyCard1, Constants.BFlop3, true);
+        //  List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
+        List<string> cardsNames = new List<string>(listOfCards.Split(','));
+        int i = 0;
+        await Task.Delay(150);
+        battleSystem.SwapTwoCards(cardsNames[i++], cardsNames[i++], false);
+        await Task.Delay(320);
+        battleSystem.SwapTwoCards(cardsNames[i++], cardsNames[i++], false);
+        await Task.Delay(210);
+        battleSystem.SwapTwoCards(cardsNames[i++], cardsNames[i++], true);
     }
 
 
-    private async void BurnRandomCards()
+    private async void BurnRandomCards(string listOfCards, string limit)
     {
-       // battleSystem.UpdateZPos(true, "All");
+        // battleSystem.UpdateZPos(true, "All");
         await Task.Delay(300);
-        List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
-        int randomAmount = battleSystem.GenerateRandom(5, 7);
+        List<string> cardsNames = new List<string>(listOfCards.Split(','));
+        int randomAmount = int.Parse(limit);
         bool isLast = false;
+        bool isFirst = true;
         for (int i = 0; i < randomAmount; i++)
         {
             if (i == randomAmount - 1)
@@ -321,14 +338,15 @@ public class PowerUpState : State
                 isLast = true;
             }
             await Task.Delay(battleSystem.GenerateRandom(400, 700));
-            battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(cardsNames[i]), 0.1f, isLast, false, isLast);
+            battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(cardsNames[i]), 0.1f, isLast, isFirst, isLast);
+            isFirst = false;
         }
     }
 
-    private async void FreezeRandomCards()
+    private async void FreezeRandomCards(string listOfCards, string limit)
     {
-        List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
-        int randomAmount = battleSystem.GenerateRandom(4, 6);
+        List<string> cardsNames = new List<string>(listOfCards.Split(','));
+        int randomAmount = int.Parse(limit);
         bool isLast = false;
         for (int i = 0; i < randomAmount; i++)
         {

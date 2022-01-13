@@ -56,7 +56,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void Init(string puName, int puIndex, string puDisplayName, string puElement, bool isPlayer)
     {
-        this.puName = puName;
+        this.puName = "fm2";
         this.puIndex = puIndex;
         this.puDisplayName = puDisplayName;
         this.isFaceDown = !isPlayer;

@@ -257,7 +257,6 @@ public class BattleSystem : StateMachine
 
         if (selectMode && !Constants.TemproryUnclickable)
         {
-            Constants.TemproryUnclickable = true;
             selectMode = false;
             sameCardsSelection = false;
             isPlayerActivatePu = false;
@@ -273,7 +272,6 @@ public class BattleSystem : StateMachine
                  puDeckUi.EnablePusZ(true, false);
                  cardsDeckUi.DisableCardsSelection(Constants.AllCardsTag);
                  ActivatePlayerButtons(!endTurn, false);
-                 Constants.TemproryUnclickable = false;
              });
         }
         if (replaceMode && !Constants.TemproryUnclickable)
@@ -465,6 +463,7 @@ public class BattleSystem : StateMachine
         Debug.LogError("et " + enemyPuIsRunning + " " + turnInitInProgress);
         if (!enemyPuIsRunning && !turnInitInProgress)
         {
+            Debug.LogError("et ABOUT");
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
             SetState(new PlayerTurn(this, currentTurn));
         }
@@ -472,11 +471,13 @@ public class BattleSystem : StateMachine
         {
             while (enemyPuIsRunning || turnInitInProgress)
             {
+                yield return new WaitForSeconds(0.6f);
+                Debug.LogError("e " + enemyPuIsRunning);
+                Debug.LogError("t " + turnInitInProgress);
                 if (!enemyPuIsRunning && !turnInitInProgress)
                 {
                     StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
                 }
-                yield return new WaitForSeconds(0.6f);
             }
         }
 
@@ -505,6 +506,10 @@ public class BattleSystem : StateMachine
                 LocalTurnSystem.Instance.PassTurn();
             }
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
+        }
+        else
+        {
+            Debug.LogError("endingProcees");
         }
     }
 
@@ -708,13 +713,17 @@ public class BattleSystem : StateMachine
 
         LocalTurnSystem.Instance.CurrentPlayerID.onValueChanged += s =>
         {
+            Debug.LogError("s" + s);
             if (s == LocalTurnSystem.Instance.PlayerID.Value)
             {
                 StartCoroutine(StartPlayerTurn(false, null));
+                ui.playerNameText.text = "Bind " + currentTurn;
+
             }
             else
             {
                 SetState(new EnemyTurn(this, currentTurn));
+                ui.enemyNameText.text = "Bind " + currentTurn;
             }
 
 
@@ -732,6 +741,7 @@ public class BattleSystem : StateMachine
         StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(),
             false, Values.Instance.textTurnFadeOutDuration, () =>
             {
+                ui.playerNameText.text = "start " + currentTurn;
                 EndAction?.Invoke();
                 StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
             }));
@@ -1512,6 +1522,7 @@ public class BattleSystem : StateMachine
 
         else if (timedOut || energyCounter == 0 /*|| energyCounter == 1 && puDeckUi.GetPuListCount(true) == 0 && !skillUsed*/)
         {
+            Debug.LogError("ending");
             timedOut = false;
             yield return new WaitForSeconds(1.5f);
             EndTurn();
@@ -1658,11 +1669,14 @@ public class BattleSystem : StateMachine
     {
         if (waitForDrawerAnimationToEnd)
         {
+            Debug.Log("HI123123YOU");
             yield return new WaitForSeconds(0.1f);
             StartCoroutine(DealPuCourotine(isPlayer, OnEnd));
         }
         else
         {
+            Debug.Log("DEaling");
+
             puDeckUi.DealRoutine(isPlayer, OnEnd);
         }
     }
@@ -1728,10 +1742,18 @@ public class BattleSystem : StateMachine
                 if (playerPus[0] != null || playerPus[1] != null)
                 {
                     replaceMode = !replaceMode;
+                    if (playerPus[0] != null)
+                    {
+                        playerPus[0].SetReplaceMode(replaceMode);
+                    }
+                    if (playerPus[1] != null)
+                    {
+                        playerPus[1].SetReplaceMode(replaceMode);
+                    }
                     if (replaceMode)
                     {
                         puDeckUi.EnablePusSlotZ(true, true);
-                        ui.EnableDarkScreen(isPlayerActivatePu, true, () => Constants.TemproryUnclickable = false);
+                        ui.EnableDarkScreen(isPlayerActivatePu, true, () => StartCoroutine(SetClickableWithDelay(3f)));
                     }
                     else
                     {
@@ -1741,14 +1763,7 @@ public class BattleSystem : StateMachine
                              ActivatePlayerButtons(!endTurn, false);
                          });
                     }
-                    if (playerPus[0] != null)
-                    {
-                        playerPus[0].SetReplaceMode(replaceMode);
-                    }
-                    if (playerPus[1] != null)
-                    {
-                        playerPus[1].SetReplaceMode(replaceMode);
-                    }
+                   
                 }
             }
             else
@@ -1767,8 +1782,13 @@ public class BattleSystem : StateMachine
         }
     }
 
+  
 
-
+    private IEnumerator SetClickableWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Constants.TemproryUnclickable = false;
+    }
     public void SlideRankingImg()
     {
         ui.SlideRankingImg();
@@ -1983,7 +2003,7 @@ public class BattleSystem : StateMachine
         {
             HideDialog();
         }
-        else if (!Constants.TemproryUnclickable && powerUpUi.isPlayer && !powerUpUi.freeze && powerUpUi.isClickable)
+        else if (!ReplaceInProgress  && !Constants.TemproryUnclickable && powerUpUi.isPlayer && !powerUpUi.freeze && powerUpUi.isClickable)
         {
             powerUpUi.isClickable = false;
             powerUpUi.aboutToDestroy = true;
@@ -1999,8 +2019,10 @@ public class BattleSystem : StateMachine
                 OnPowerUpPress(powerUpUi.puName, powerUpUi.puIndex, powerUpUi.energyCost);
             }
         }
-        else if (powerUpUi.isPlayer && powerUpUi.replaceMode)
+        else if (!ReplaceInProgress && powerUpUi.isPlayer && powerUpUi.replaceMode)
         {
+            Debug.LogError("unc " + Constants.TemproryUnclickable);
+            Debug.LogError("clica " + powerUpUi.isClickable);
             ReplacePu(true, powerUpUi.puIndex);
         }
         else if (powerUpUi.isPlayer || !powerUpUi.isPlayer)
