@@ -45,7 +45,7 @@ namespace Handlers
 
         private IEnumerator StartBotGame()
         {
-            yield return new WaitForSeconds(30f);
+            yield return new WaitForSeconds(10f);
             LeaveQueue();
             Constants.BOT_MODE = true;
             SceneManager.LoadScene("GameScene2");

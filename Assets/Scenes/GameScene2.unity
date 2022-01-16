@@ -8807,7 +8807,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e3ce115113eea42bbf042a3e756011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TEST_MODE: 1
+  TEST_MODE: 0
   TUTORIAL_MODE: 0
   flusherOn: 0
   strighterOn: 0
@@ -9402,6 +9402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f6abf03e6f263642b20d661eb3dddb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BOT_MODE: 0
   END_TURN_AFTER_PU: 0
   ui: {fileID: 1384007426}
   cardsDeckUi: {fileID: 1064032605134543352}
@@ -9438,6 +9439,7 @@ MonoBehaviour:
   visionUnavailable: 0
   turnInitInProgress: 0
   canvasExitDialog: {fileID: 573393518}
+  enemyBotSkillUsed: 0
   energyCounter: 0
   replaceMode: 0
   endTurnInProcess: 1
@@ -16144,7 +16146,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 13.07234, y: 10.799999}
+    oldSize: {x: 13.059999, y: 10.802558}
     newSize: {x: 12.54902, y: 10}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

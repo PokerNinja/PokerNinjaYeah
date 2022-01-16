@@ -102,6 +102,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         yield return new WaitForSeconds(0.1f);
         if (!Constants.TemproryUnclickable && clickbleForPU && !flipInProgress && Constants.cardsToSelectCounter > 0)
         {
+            Debug.LogWarning("onClickHand");
             Constants.TemproryUnclickable = true;
             --Constants.cardsToSelectCounter;
             clickbleForPU = false;

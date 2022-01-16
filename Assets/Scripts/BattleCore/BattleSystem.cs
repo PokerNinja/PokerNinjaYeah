@@ -147,15 +147,16 @@ public class BattleSystem : StateMachine
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
-        BOT_MODE = Constants.BOT_MODE;
-        if (TEST_MODE)
+        //BOT_MODE = Constants.BOT_MODE;
+        BOT_MODE = true;
+        if (TEST_MODE || BOT_MODE)
         {
             InitTestMode();
         }
         else
         {
             gameManager = MainManager.Instance.gameManager;
-            currentGameInfo = gameManager.currentGameInfo; 
+            currentGameInfo = gameManager.currentGameInfo;
         }
         player = new PlayerInfo();
         enemy = new PlayerInfo();
@@ -167,13 +168,14 @@ public class BattleSystem : StateMachine
         startNewRound = true;
         ui.LoadNinjaBG();
         ui.InitAvatars();
-        if (!TEST_MODE)
+        if (!TEST_MODE && !BOT_MODE)
         {
             StartCoroutine(ui.CoinFlipStartGame(currentGameInfo.playersIds[0].ToString().Equals(player.id), () => ui.SlidePuSlots()));
             LocalTurnSystem.Instance.Inito(() => StartCoroutine(InitGameListeners()));
         }
         else
         {
+            Constants.TemproryUnclickable = false;
             firstToPlayBotMode = GetRandomFirstTurn();
             StartCoroutine(ui.CoinFlipStartGame(firstToPlayBotMode, () =>
              {
@@ -200,7 +202,7 @@ public class BattleSystem : StateMachine
             Debug.Log(rng.Next(0, 2) > 0);
             return rng.Next(0, 2) > 0;
         }
-       
+
     }
 
     private void InitTestMode()
@@ -209,13 +211,38 @@ public class BattleSystem : StateMachine
         currentGameInfo = new GameInfo();
         currentGameInfo.gameId = "zxc";
         currentGameInfo.prize = 1000;
-        currentGameInfo.playersIds = new String[] { "1", "2" };
-        currentGameInfo.localPlayerId = "TEST";
+        string playerName = PlayerPrefs.GetString("player_name", "Ninja");
+        if (TEST_MODE)
+        {
+            playerName += "TEST";
+        }
+        currentGameInfo.playersIds = new String[] { playerName, "Alex" };
+        currentGameInfo.localPlayerId = playerName;
         currentGameInfo.EnemyId = "Alex";
-        currentGameInfo.cardDeck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
-                "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
-                "8c", "3h","9s",board[4],board[3], board[2],board[1],board[0],enemysHand[1], playersHand[1],enemysHand[0],playersHand[0]};
-        currentGameInfo.puDeck = new String[] {"f2","i3","f3","f2","i3","f3",
+        currentGameInfo.turn = "6";
+        currentTurn = 6;
+        currentGameInfo.cardDeck = CreateCardsDeck(BOT_MODE);
+
+        currentGameInfo.puDeck = CreatePuDeck(BOT_MODE);
+    }
+
+    private string[] CreatePuDeck(bool newDeck)
+    {
+        string[] deck;
+        if (newDeck)
+        {
+            deck = new string[]{
+              "f1","f2","f3","i1","i2","i3","w1","w2","w3",
+              "f1","f2","f3","i1","i2","i3","w1","w2","w3",
+              "f1","f2","f3","i1","i2","i3","w1","w2","w3",
+              "f1","f2","f3","i1","i2","i3","w1","w2","w3",
+              "f1","f2","f3","i1","i2","i3","w1","w2","w3",
+              "fm1","fm2","im1","im2","wm1","wm2"};
+            deck = ShuffleArray(deck);
+        }
+        else
+        {
+            deck = new String[] {"f2","i3","f3","f2","i3","f3",
                  "i1","f1","i2",
                  "w1","w2","w3","f2","i3","w1","w2","w3","f2","i3","f3",
                  "i1","f1","i2",
@@ -224,8 +251,35 @@ public class BattleSystem : StateMachine
                  "i1","f1","w3",
                  "f2","f2","wm2",
                 "fm2", "im2"};
-        currentGameInfo.turn = "6";
-        currentTurn = 5;
+        }
+        return deck;
+    }
+
+    private string[] CreateCardsDeck(bool newDeck)
+    {
+        string[] deck;
+        if (newDeck)
+        {
+            deck = new string[]{
+                "Ac", "2c", "3c", "4c", "5c", "6c", "7c", "8c", "9c", "Tc", "Jc", "Qc", "Kc",
+                       "Ad", "2d", "3d", "4d", "5d", "6d", "7d", "8d", "9d", "Td", "Jd", "Qd", "Kd",
+                       "As", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s", "Ts", "Js", "Qs", "Ks",
+                       "Ah", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Th", "Jh", "Qh", "Kh" };
+            deck = ShuffleArray(deck);
+        }
+        else
+        {
+            deck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
+                "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
+                "8c", "3h","9s",board[4],board[3], board[2],board[1],board[0],enemysHand[1], playersHand[1],enemysHand[0],playersHand[0]};
+        }
+        return deck;
+    }
+
+    private string[] ShuffleArray(string[] deck)
+    {
+        System.Random rnd = new System.Random();
+        return deck.OrderBy(x => rnd.Next()).ToArray();
     }
 
     /*  private void LoadSoundSettings()
@@ -325,7 +379,7 @@ public class BattleSystem : StateMachine
     private IEnumerator InitGameListeners()
     {
         yield return new WaitForSeconds(1f);
-        if (!TEST_MODE)
+        if (!TEST_MODE && !BOT_MODE)
         {
             BindTurnCounter();
             BindRoundCounter();
@@ -357,7 +411,18 @@ public class BattleSystem : StateMachine
     {
 
         yield return new WaitForSeconds(0.2f);
-        StartCoroutine(CheckIfNewRoundReadyAndStart());
+        if (!BOT_MODE)
+        {
+            StartCoroutine(CheckIfNewRoundReadyAndStart());
+        }
+        else
+        {
+            isRoundReady = true;
+            currentGameInfo.cardDeck = CreateCardsDeck(true);
+            ui.winLabel.SetActive(false);
+            firstToPlayBotMode = !firstToPlayBotMode;
+            SetState(new BeginRound(this, firstToPlayBotMode, false));
+        }
     }
 
     private IEnumerator CheckIfNewRoundReadyAndStart()
@@ -441,6 +506,7 @@ public class BattleSystem : StateMachine
                 break;
             case 1:
                 break;
+            case 0:
             case -1:
                 //  isRoundReady = false;
                 SetState(new EndRound(this, false, false));
@@ -509,10 +575,18 @@ public class BattleSystem : StateMachine
             DisablePlayerPus();
             ui.SetTurnIndicator(false, false);
             ResetTimers();
-            if (!TEST_MODE)
+            if (!TEST_MODE && !BOT_MODE)
             {
                 gameManager.AddGameActionLog(GameManager.ActionEnum.EndTurn, "end of turn: " + currentTurn, () => { }, Debug.Log);
                 LocalTurnSystem.Instance.PassTurn();
+            }
+            else
+            {
+                TurnEvents(--currentTurn);
+                if (currentTurn > 0)
+                {
+                    SetState(new EnemyTurn(this, currentTurn));
+                }
             }
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
         }
@@ -614,10 +688,7 @@ public class BattleSystem : StateMachine
     {
         cardsDeckUi = CardsDeckUi.Instance();
         cardsDeckUi.InitDeckFromServer(currentGameInfo.cardDeck);
-
         cardsDeckUi.isPlayerFirst = IsPlayerTurn();
-
-
         puDeckUi = PuDeckUi.Instance();
         if (firstDeck)
         {
@@ -760,19 +831,35 @@ public class BattleSystem : StateMachine
 
     public void FakeEnemyEndTurn()
     {
-        StartCoroutine(StartPlayerTurn(true, () =>
+        currentTurn--;
+        if (currentTurn > 0)
         {
-
-            TurnEvents(--currentTurn);
-            StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnBtnSpriteREnderer, true, Values.Instance.turnBtnAlphaDuration, null));
-        }));
+            StartCoroutine(StartPlayerTurn(true, () =>
+            {
+                TurnEvents(currentTurn);
+                StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnBtnSpriteREnderer, true, Values.Instance.turnBtnAlphaDuration, null));
+            }));
+        }
+        else
+        {
+            TurnEvents(currentTurn);
+        }
     }
 
 
     public async void FakeEnemyPuUse(int puIndex, string cardPlace1, string cardPlace2, bool endTurn)
     {
         Debug.LogWarning("FAking it");
-        PowerUpInfo puInfo = new PowerUpInfo("Alex", puDeckUi.GetPuFromList(false, puIndex).puName, cardPlace2, cardPlace1, puIndex, 12345);
+        string puName = "";
+        if(puIndex == -1)
+        {
+            puName = "sflip";
+        }
+        else
+        {
+            puName = puDeckUi.GetPuFromList(false, puIndex).puName;
+        }
+        PowerUpInfo puInfo = new PowerUpInfo("Alex", puName, cardPlace2, cardPlace1, puIndex, 12345);
         EnemyPuUse(puInfo);
         if (endTurn)
         {
@@ -854,7 +941,7 @@ public class BattleSystem : StateMachine
         if (firstRound)
         {
             currentRound = 1;
-            if (!TEST_MODE)
+            if (!TEST_MODE && !BOT_MODE)
             {
                 LocalTurnSystem.Instance.RoundCounter.Value = 1;
             }
@@ -958,11 +1045,11 @@ public class BattleSystem : StateMachine
 
     public bool IsPlayerTurn()
     {
-        if (!TEST_MODE)
+        if (!TEST_MODE && !BOT_MODE)
         {
             return LocalTurnSystem.Instance.IsPlayerTurn();
         }
-        return true;
+        return firstToPlayBotMode;
     }
 
     public void DissolvePuAfterUse(bool isPlayer, int index)
@@ -1098,7 +1185,7 @@ public class BattleSystem : StateMachine
         {
             cardTarget = firstCardTargetPUstring;
         }
-        if (!TEST_MODE)
+        if (!TEST_MODE && !BOT_MODE)
             gameManager.SetNewPowerupUseDB(new PowerUpInfo(player.id, newPowerUpName, Constants.Instance.ConvertCardPlaceForEnemy(cardTarget), Constants.Instance.ConvertCardPlaceForEnemy(secondCardTargetPU), puIndex, CreateTimeStamp()), () =>
         {
             gameManager.AddGameActionLog(GameManager.ActionEnum.PuUse, "name: " + newPowerUpName + " c1: " + cardTarget + " c2: " + secondCardTargetPU, () => { }, Debug.Log);
@@ -1682,8 +1769,8 @@ public class BattleSystem : StateMachine
     {
         if (waitForDrawerAnimationToEnd)
         {
-            Debug.Log("HI123123YOU");
-            yield return new WaitForSeconds(0.1f);
+            Debug.Log("BDealing");
+            yield return new WaitForSeconds(0.25f);
             StartCoroutine(DealPuCourotine(isPlayer, OnEnd));
         }
         else
@@ -2068,7 +2155,7 @@ public class BattleSystem : StateMachine
     {
         PlayerPrefs.SetFloat(key, value);
     }
-    
+
     public void SavePrefsInt(string key, int value)
     {
         PlayerPrefs.SetInt(key, value);
