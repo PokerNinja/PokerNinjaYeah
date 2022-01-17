@@ -20,8 +20,12 @@ public class BotEnemy : State
     private int playerRevealdCard;
     private string pu1 = "";
     private string pu2 = "";
+
+    private int pu1Odds = 0;
+    private int pu2Odds = 0;
     public BotEnemy(BattleSystem battleSystem, int turnCounter) : base(battleSystem)
     {
+        Debug.Log("BOTSTATER");
         this.battleSystem = battleSystem;
         this.turnCounter = turnCounter;
         if (turnCounter > 4)
@@ -36,8 +40,10 @@ public class BotEnemy : State
         InitBotTurn();
     }
 
-    private void InitBotTurn()
+    private async void InitBotTurn()
     {
+        await Task.Delay(1000);
+        battleSystem.finishPuDissolve = true;
         pu1 = "";
         pu2 = "";
         card1 = GetEnemyCard(0);
@@ -82,7 +88,7 @@ public class BotEnemy : State
 
     private void ChreageEnergy()
     {
-        if (turnCounter >= 1 && turnCounter <= 5)
+        if (turnCounter > 1)
         {
             energyLeft += 2;
         }
@@ -112,7 +118,7 @@ public class BotEnemy : State
             case 5:
                 battleSystem.enemyBotSkillUsed = false;
                 drawOdds = 2;
-                skillOdds = 3;
+                skillOdds = 4;
                 if (energyLeft == 1)
                 {
                     endTurnOdds = 2;
@@ -143,7 +149,7 @@ public class BotEnemy : State
         Debug.Log("turn " + turnCounter);
         if (energyLeft == 0)
         {
-            StartAutoEndWithDelay(3000, true);
+            StartAutoEndWithDelay(1200, true);
         }
         else
         {
@@ -155,11 +161,11 @@ public class BotEnemy : State
             List<int> options = puness.Concat(skillness).Concat(drawness).Concat(endness).ToList();
             BotRandomAct(options);
 
-            Debug.Log("i " + options.Count);
-            Debug.Log("puness " + puness.Count);
-            Debug.Log("skillness " + skillness.Count);
-            Debug.Log("drawness " + drawness.Count);
-            Debug.Log("endness " + endness.Count);
+            Debug.Log("total:" + options.Count);
+            Debug.Log("pu: " + puness.Count + " skill:" + skillness.Count + " draw:" + drawness.Count + " end:" + endness.Count);
+            Debug.Log("rank:" + currentRank);
+            Debug.Log("hand:" + card1 + "," + card2);
+            Debug.Log("energy:" + energyLeft);
         }
     }
 
@@ -167,24 +173,25 @@ public class BotEnemy : State
     {
         await Task.Delay(3000);
         int costOfAction = 0;
-        int delay = 5000;
+        int delay = 7000;
         if (options.Count > 0)
         {
-            int act = options[battleSystem.GenerateRandom(0, options.Count - 1)];
+            int act = options[battleSystem.GenerateRandom(0, options.Count)];
             switch (act)
             {
                 case (int)EnemyActions.EndTurn:
                     {
-                        battleSystem.FakeEnemyEndTurn();
+                        //battleSystem.FakeEnemyEndTurn();
+                        delay = 1000;
                         break;
                     }
                 case (int)EnemyActions.SkillUse:
                     {
                         battleSystem.enemyBotSkillUsed = true;
                         battleSystem.FakeEnemyPuUse(-1,
-                        battleSystem.cardsDeckUi.GetListByTag(Constants.PlayerCardsTag)[battleSystem.GenerateRandom(0, 1)].cardPlace, "", false);
+                        battleSystem.cardsDeckUi.GetListByTag(Constants.PlayerCardsTag)[battleSystem.GenerateRandom(0, 2)].cardPlace, "", false);
                         costOfAction = 2;
-                        delay -= 1500;
+                        delay -= 3000;
                         break;
                     }
                 case (int)EnemyActions.DrawPu:
@@ -209,7 +216,7 @@ public class BotEnemy : State
                 case (int)EnemyActions.PuRandomUse:
                     {
                         string[] pus = { pu1, pu2 };
-                        int index = battleSystem.GenerateRandom(0, 1);
+                        int index = battleSystem.GenerateRandom(0, 2);
                         BotPuUse(pus[index], index);
                         costOfAction = GetPuCost(pus[index]);
                         break;
@@ -230,93 +237,109 @@ public class BotEnemy : State
     {
         string cardTarget1 = "";
         string cardTarget2 = "";
-        string playerDuplicateOnBoard = GetDuplicateBoardCardWithPlayer(playerRevealdCard);
+        string playerDuplicateOnBoard = GetDuplicateBoardCardWithPlayer(playerRevealdCard, true);
         switch (puName)
         {
             case "f1":
-                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", true, false);
+                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", true, false, true);
                 break;
             case "f2":
                 if (playerRevealdCard > 0)
                 {
-                    cardTarget1 = GetDuplicateBoardCardWithPlayer(playerRevealdCard);
+                    cardTarget1 = GetDuplicateBoardCardWithPlayer(playerRevealdCard, true);
                 }
                 if (cardTarget1.Equals(""))
                 {
-                    cardTarget1 = GetCardOf(Constants.BoardCardsTag, "", true, false);
+                    cardTarget1 = GetCardOf(Constants.BoardCardsTag, "", true, false, true);
                 }
-                cardTarget2 = GetCardOf(Constants.BoardCardsTag, cardTarget1, true, false);
+                cardTarget2 = GetCardOf(Constants.BoardCardsTag, cardTarget1, true, false, true);
                 break;
             case "f3":
                 if (!playerDuplicateOnBoard.Equals(""))
                 {
-                    cardTarget1 = GetPlayerRevealedCard(true);
+                    cardTarget1 = GetPlayerRevealedCardAndIfFreeze(true, true);
                 }
                 else if (playerRevealdCard >= 13) // 13 == 7
                 {
-                    cardTarget1 = GetPlayerRevealedCard(true);
+                    cardTarget1 = GetPlayerRevealedCardAndIfFreeze(true, true);
                 }
                 else
                 {
-                    cardTarget1 = GetPlayerRevealedCard(false);
+                    cardTarget1 = GetPlayerRevealedCardAndIfFreeze(false, true);
                 }
                 break;
             case "i1":
                 if (playerDuplicateOnBoard.Equals("") && playerRevealdCard <= 13)
                 {
-                    cardTarget1 = GetPlayerRevealedCard(true);
+                    cardTarget1 = GetPlayerRevealedCardAndIfFreeze(true, false);
                 }
                 else
                 {
-                    cardTarget1 = GetPlayerRevealedCard(false);
+                    cardTarget1 = GetPlayerRevealedCardAndIfFreeze(false, false);
                 }
                 break;
             case "i2":
-                cardTarget1 = GetCardOf(Constants.BoardCardsTag, "", false, false);
-                cardTarget2 = GetCardOf(Constants.BoardCardsTag, cardTarget1, false, false);
+                cardTarget1 = GetCardOf(Constants.BoardCardsTag, "", false, true, false);
+                cardTarget2 = GetCardOf(Constants.BoardCardsTag, cardTarget1, false, true, false);
                 break;
             case "i3":
-                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", false, true);
+                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", false, true, false);
                 break;
             case "w1":
                 if (!playerDuplicateOnBoard.Equals("") || playerRevealdCard > 13)
                 {
-                    cardTarget1 = GetPlayerRevealedCard(true);
+                    cardTarget1 = GetPlayerRevealedCardAndIfFreeze(true, false);
                 }
                 else
                 {
-                    cardTarget1 = GetPlayerRevealedCard(false);
+                    cardTarget1 = GetPlayerRevealedCardAndIfFreeze(false, false);
                 }
-                cardTarget2 = GetCardOf(Constants.EnemyCardsTag, "", true, false);
+                cardTarget2 = GetCardOf(Constants.EnemyCardsTag, "", true, false, false);
                 break;
             case "w2":
-                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", true, false);
-                cardTarget2 = GetCardOf(Constants.BoardCardsTag, "", false, true);
+                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", true, false, false);
+                cardTarget2 = GetCardOf(Constants.BoardCardsTag, "", false, true, false);
                 break;
             case "w3":
                 if (!playerDuplicateOnBoard.Equals(""))
                 {
-                    cardTarget1 = GetPlayerRevealedCard(true);
+                    cardTarget1 = GetPlayerRevealedCardAndIfFreeze(true, false);
                 }
                 else if (playerRevealdCard >= 13) // 13 == 7
                 {
-                    cardTarget1 = GetPlayerRevealedCard(true);
+                    cardTarget1 = GetPlayerRevealedCardAndIfFreeze(true, false);
                 }
                 else
                 {
-                    cardTarget1 = GetPlayerRevealedCard(false);
+                    cardTarget1 = GetPlayerRevealedCardAndIfFreeze(false, false);
                 }
-                cardTarget2 = GetCardOf(Constants.BoardCardsTag, "", true, false);
+                cardTarget2 = GetCardOf(Constants.BoardCardsTag, "", true, false, false);
                 break;
             case "fm1":
-                cardTarget1 = GetCardOf(Constants.DeckCardsTag, "", false, true);
-                cardTarget2 = GetCardOf(Constants.EnemyCardsTag, "", true, false);
+                cardTarget1 = GetCardOf(Constants.DeckCardsTag, "", false, true, false);
+                cardTarget2 = GetCardOf(Constants.EnemyCardsTag, "", true, false, false);
                 break;
         }
         Debug.LogWarning("pu " + index + " c " + cardTarget1 + " , " + cardTarget2);
         battleSystem.FakeEnemyPuUse(index, cardTarget1, cardTarget2, false);
     }
 
+    private string GetPlayerRevealedCardAndIfFreeze(bool reveald, bool canTargetFreeze)
+    {
+        string cardPlace = GetPlayerRevealedCard(reveald);
+        if (!canTargetFreeze && battleSystem.cardsDeckUi.GetCardUiByName(cardPlace).freeze)
+        {
+            if (cardPlace.Equals(Constants.PlayerCard1))
+            {
+                return Constants.PlayerCard2;
+            }
+            else
+            {
+                return Constants.PlayerCard1;
+            }
+        }
+        return cardPlace;
+    }
     private string GetPlayerRevealedCard(bool revealed)
     {
         if (battleSystem.cardsDeckUi.playerCardsUi[0].cardMark.activeSelf)
@@ -341,18 +364,21 @@ public class BotEnemy : State
                 return Constants.PlayerCard1;
             }
         }
-        return battleSystem.cardsDeckUi.playerCardsUi[battleSystem.GenerateRandom(0, 1)].cardPlace;
+        return battleSystem.cardsDeckUi.playerCardsUi[battleSystem.GenerateRandom(0, 2)].cardPlace;
     }
 
-    private string GetDuplicateBoardCardWithPlayer(int playerRevealdCard)
+    private string GetDuplicateBoardCardWithPlayer(int playerRevealdCard, bool canTargetFreeze)
     {
         List<CardUi> boardsCards = new List<CardUi>(battleSystem.cardsDeckUi.GetListByTag(Constants.BoardCardsTag).ToArray());
 
         for (int i = 0; i < boardsCards.Count; i++)
         {
-            if (Card.StringValueToInt(boardsCards[i].cardDescription.Substring(0, 1)) == playerRevealdCard)
+            if (canTargetFreeze || !boardsCards[i].freeze)
             {
-                return boardsCards[i].cardPlace;
+                if (Card.StringValueToInt(boardsCards[i].cardDescription.Substring(0, 1)) == playerRevealdCard)
+                {
+                    return boardsCards[i].cardPlace;
+                }
             }
         }
         return "";
@@ -366,13 +392,19 @@ public class BotEnemy : State
         }
         else
         {       //Make it smarter
-            battleSystem.ReplacePu(false, 0);
+            int index = 0;
+            if (pu1Odds > pu2Odds && energyLeft > 1)
+            {
+                index = 1;
+            }
+            battleSystem.ReplacePu(false, index);
         }
 
     }
 
     private async void StartAutoEndWithDelay(int delay, bool autoEnd)
     {
+        Debug.LogError("AutoNotice " + delay);
         await Task.Delay(delay);
         if (autoEnd)
         {
@@ -380,13 +412,20 @@ public class BotEnemy : State
         }
         else
         {
+            while (!battleSystem.finishPuDissolve)
+            {
+                await Task.Delay(800);
+                Debug.Log("cycle");
+            }
             InitBotTurn();
+            Debug.Log("InitAgain");
         }
 
     }
 
-    private string GetCardOf(string cardsTag, string differentThan, bool lowest, bool isDuplicate)
+    private string GetCardOf(string cardsTag, string differentThan, bool lowest, bool isDuplicate, bool canTargetFreeze)
     {
+
         List<CardUi> cards = new List<CardUi>(battleSystem.cardsDeckUi.GetListByTag(cardsTag).ToArray());
         if (lowest)
         {
@@ -405,24 +444,30 @@ public class BotEnemy : State
         {
             for (int j = 0; j < boardCards.Count; j++)
             {
-                if (!cards[i].Equals(differentThan))
+                if (canTargetFreeze || !cards[i].freeze)
                 {
-                    Debug.Log("current " + cards[i].cardPlace);
-                    Debug.Log("differentThan " + differentThan);
-                    int boardCardRank = Card.StringValueToInt(boardCards[j].cardDescription.Substring(0, 1));
-                    int currentCardRank = Card.StringValueToInt(cards[i].cardDescription.Substring(0, 1));
-                    if (isDuplicate)
+
+                    if (!cards[i].cardPlace.Equals(differentThan))
                     {
-                        if (currentCardRank == boardCardRank)
+                        Debug.Log("current " + cards[i].cardPlace);
+                        Debug.Log("differentThan " + differentThan);
+                        int boardCardRank = Card.StringValueToInt(boardCards[j].cardDescription.Substring(0, 1));
+                        int currentCardRank = Card.StringValueToInt(cards[i].cardDescription.Substring(0, 1));
+                        if (isDuplicate)
                         {
-                            return cards[i].cardPlace;
+                            if (currentCardRank == boardCardRank)
+                            {
+                                Debug.Log("Chosen Duplicate " + cards[i].cardPlace);
+                                return cards[i].cardPlace;
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (currentCardRank != boardCardRank)
+                        else
                         {
-                            return cards[i].cardPlace;
+                            if (currentCardRank != boardCardRank)
+                            {
+                                Debug.Log("Chosen NOT duplicate " + cards[i].cardPlace);
+                                return cards[i].cardPlace;
+                            }
                         }
                     }
                 }
@@ -436,20 +481,21 @@ public class BotEnemy : State
         }
         else
         {
+            Debug.Log("ChoseFirst " + cards[0].cardPlace);
             return cards[0].cardPlace;
         }
     }
     private string GetRandomCardOf(string cardsTag)
     {
-        return battleSystem.cardsDeckUi.GetListByTag(cardsTag)[battleSystem.GenerateRandom(0, 1)].cardPlace;
+        return battleSystem.cardsDeckUi.GetListByTag(cardsTag)[battleSystem.GenerateRandom(0, 2)].cardPlace;
     }
 
     private bool ReduceEnergy(int energyToReduce)
     {
         energyLeft -= energyToReduce;
-        Debug.Log("energyToReduce" + energyLeft);
+        Debug.Log("energyLeft" + energyLeft);
         battleSystem.SavePrefsInt(Constants.Instance.botEnergyKey.ToString(), energyLeft);
-        return energyLeft == 0;
+        return energyLeft == 0 || energyToReduce == 0;
     }
 
     private List<int> CalcualteEndTurnProbability(int endTurnOdds)
@@ -472,8 +518,8 @@ public class BotEnemy : State
             pu2 = battleSystem.puDeckUi.GetPu(false, 1).puName;
             Debug.Log("pu2 " + pu2);
         }
-        int pu1Odds = CalculatePu(pu1);
-        int pu2Odds = CalculatePu(pu2);
+        pu1Odds = CalculatePu(pu1);
+        pu2Odds = CalculatePu(pu2);
         if (pu1Odds > pu2Odds)
         {
             return GenerateListProbability(EnemyActions.Pu1Use, pu1Odds);
@@ -489,6 +535,25 @@ public class BotEnemy : State
         return new List<int>();
     }
 
+    private bool AreBotCardsDuplicateOnBoard(bool bothCards)
+    {
+        if (card1 == card2)
+        {
+            return true;
+        }
+        if (bothCards)
+        {
+            if ((card1DuplicateBoard && card2DuplicateBoard))
+            {
+                return true;
+            }
+        }
+        else if (card1DuplicateBoard || card2DuplicateBoard)
+        {
+            return true;
+        }
+        return false;
+    }
     private int CalculatePu(string pu)
     {
         int odds = 0;
@@ -505,7 +570,7 @@ public class BotEnemy : State
                 switch (pu)
                 {
                     case "f1":
-                        if (currentRank >= 7 && EnemyGotCardLowerThan(7) && (!card1DuplicateBoard || !card2DuplicateBoard))
+                        if (currentRank >= 7 && EnemyGotCardLowerThan(7) && !AreBotCardsDuplicateOnBoard(false))
                         {
                             odds = 5;
                         }
@@ -515,11 +580,11 @@ public class BotEnemy : State
                         {
                             if (boardCardsUi.Count > 3)
                             {
-                                if (!card1DuplicateBoard || !card2DuplicateBoard)
+                                if (!AreBotCardsDuplicateOnBoard(false))
                                 {
                                     odds = 4;
                                 }
-                                else if (card1DuplicateBoard && card1DuplicateBoard)
+                                else if (AreBotCardsDuplicateOnBoard(true))
                                 {
                                     odds = 2;
                                 }
@@ -542,73 +607,100 @@ public class BotEnemy : State
                         break;
 
                     case "i1":
-                        if (!PlayerGotDuplicateCard())
+                        if (UnfrozenCardsAvailable(Constants.PlayerCardsTag, 1))
                         {
-                            if (playerRevealdCard < 7)
+                            if (!PlayerGotDuplicateCard())
                             {
-                                odds = 8;
-                            }
-                            else
-                            {
-                                odds = 3;
+                                if (playerRevealdCard > 0 && playerRevealdCard <= 7)
+                                {
+                                    odds = 8;
+                                }
+                                else
+                                {
+                                    odds = 3;
+                                }
                             }
                         }
                         break;
                     case "i2":
-                        if (card1DuplicateBoard && card2DuplicateBoard)
+                        if (UnfrozenCardsAvailable(Constants.BoardCardsTag, 2))
                         {
-                            odds = 10;
-                        }
-                        else if (card1DuplicateBoard || card2DuplicateBoard)
-                        {
-                            odds = 6;
+
+                            if (AreBotCardsDuplicateOnBoard(true))
+                            {
+                                odds = 10;
+                            }
+                            else if (AreBotCardsDuplicateOnBoard(false))
+                            {
+                                odds = 6;
+                            }
                         }
                         break;
                     case "i3":
-                        if (card1DuplicateBoard || card2DuplicateBoard)
+                        if (UnfrozenCardsAvailable(Constants.EnemyCardsTag, 1))
                         {
-                            odds = 8;
+
+                            if (AreBotCardsDuplicateOnBoard(false))
+                            {
+                                odds = 8;
+                            }
                         }
                         break;
                     case "w1":
-                        if (PlayerGotDuplicateCard() && (!card1DuplicateBoard || !card2DuplicateBoard))
+                        if (UnfrozenCardsAvailable(Constants.PlayerCardsTag, 1) && UnfrozenCardsAvailable(Constants.EnemyCardsTag, 1))
                         {
-                            odds = 8;
-                        }
-                        else if (!card1DuplicateBoard || !card2DuplicateBoard)
-                        {
-                            odds = 3;
+                            if (!AreBotCardsDuplicateOnBoard(false))
+                            {
+                                if (PlayerGotDuplicateCard())
+                                {
+                                    odds = 8;
+                                }
+                                else
+                                {
+                                    odds = 3;
+                                }
+                            }
                         }
                         break;
                     case "w2":
-                        if (PlayerGotDuplicateCard() && (!card1DuplicateBoard || !card2DuplicateBoard))
+                        if (UnfrozenCardsAvailable(Constants.BoardCardsTag, 1) && UnfrozenCardsAvailable(Constants.EnemyCardsTag, 1))
                         {
-                            odds = 8;
-                        }
-                        else if (!PlayerGotDuplicateCard())
-                        {
-                            if ((card1DuplicateBoard && !card2DuplicateBoard) || (!card1DuplicateBoard && card2DuplicateBoard))
-                                odds = 3;
+
+                            if (PlayerGotDuplicateCard() && !AreBotCardsDuplicateOnBoard(false))
+                            {
+                                odds = 8;
+                            }
+                            else if (!PlayerGotDuplicateCard())
+                            {
+                                if ((card1DuplicateBoard && !card2DuplicateBoard) || (!card1DuplicateBoard && card2DuplicateBoard))
+                                    odds = 3;
+                            }
                         }
                         break;
                     case "w3":
-                        if (PlayerGotDuplicateCard())
+                        if (UnfrozenCardsAvailable(Constants.PlayerCardsTag, 1) && UnfrozenCardsAvailable(Constants.BoardCardsTag, 1))
                         {
-                            odds = 10;
-                        }
-                        else if (playerRevealdCard > 7)
-                        {
-                            odds = 6;
-                        }
-                        else //other player card Not revealed
-                        {
-                            odds = 3;
+                            if (PlayerGotDuplicateCard())
+                            {
+                                odds = 10;
+                            }
+                            else if (playerRevealdCard > 7)
+                            {
+                                odds = 6;
+                            }
+                            else //other player card Not revealed
+                            {
+                                odds = 3;
+                            }
                         }
                         break;
                     case "fm1":
-                        if (currentRank >= 7 && (!card1DuplicateBoard || !card2DuplicateBoard))
+                        if (UnfrozenCardsAvailable(Constants.EnemyCardsTag, 1))
                         {
-                            odds = 7;
+                            if (currentRank >= 7 && !AreBotCardsDuplicateOnBoard(true))
+                            {
+                                odds = 7;
+                            }
                         }
                         break;
                     case "fm2":
@@ -625,6 +717,22 @@ public class BotEnemy : State
                                 odds = 8;
                             }
                         }
+                        if (pu.Contains("w"))
+                        {
+                            if (!UnfrozenCardsAvailable(Constants.PlayerCardsTag, 2) || !UnfrozenCardsAvailable(Constants.EnemyCardsTag, 2))
+                            {
+                                odds = 0;
+                            }
+                            if (pu.Equals("wm2"))
+                            {
+                                if (!UnfrozenCardsAvailable(Constants.BoardCardsTag, battleSystem.cardsDeckUi.boardCardsUi.Count))
+                                {
+                                    odds = 0;
+                                }
+                            }
+                        }
+
+
                         break;
                     case "im1":
                     case "im2":
@@ -639,11 +747,30 @@ public class BotEnemy : State
                 }
             }
         }
-         if (pu.Contains("i") && turnCounter <= 2)
+        if (pu.Contains("i") && turnCounter <= 2)
         {
             odds = 0;
         }
         return odds;
+    }
+
+    private bool UnfrozenCardsAvailable(string cardsTag, int unfrozenCardsTarget)
+    {
+        int frozenCardsCounter = 0;
+        int totalCards = 0;
+        foreach (CardUi card in battleSystem.cardsDeckUi.GetListByTag(cardsTag))
+        {
+            totalCards++;
+            if (card.freeze)
+            {
+                frozenCardsCounter++;
+            }
+        }
+        if (totalCards - frozenCardsCounter >= unfrozenCardsTarget)
+        {
+            return true;
+        }
+        return false;
     }
 
     private int GetPuCost(string pu)

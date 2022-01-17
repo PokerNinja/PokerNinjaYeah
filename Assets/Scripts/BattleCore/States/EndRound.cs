@@ -15,6 +15,7 @@ public class EndRound : State
 
     public EndRound(BattleSystem battleSystem, bool enemyStartsNextRound, bool isTimedOut) : base(battleSystem)
     {
+        Debug.Log("eniding ROund");
         this.isTimedOut = isTimedOut;
         this.enemyStartsNextRound = enemyStartsNextRound;
     }
@@ -294,7 +295,7 @@ public class EndRound : State
 
     private List<CardUi> RearangeWinningCards(List<CardUi> winningHand, bool isStrightOrFlush)
     {
-        List<CardUi> aragnedCards = new List<CardUi>();
+        List<CardUi> arangedCards = new List<CardUi>();
 
         winningHand = winningHand.OrderByDescending(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
         if (isStrightOrFlush)
@@ -322,11 +323,11 @@ public class EndRound : State
                     i--;
                 }
             }
-            aragnedCards = aragnedCards.Concat(repetitive).ToList();
-            aragnedCards = aragnedCards.OrderByDescending(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
+            arangedCards = arangedCards.Concat(repetitive).ToList();
+            arangedCards = arangedCards.OrderByDescending(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
         }
-        aragnedCards = aragnedCards.Concat(winningHand).ToList();
-        return aragnedCards;
+        arangedCards = arangedCards.Concat(winningHand).ToList();
+        return arangedCards;
     }
 
     private void StartNewRoundAction(bool delay)

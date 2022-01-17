@@ -142,13 +142,15 @@ public class BattleSystem : StateMachine
     public string[] enemysHand = { "Ac", "2d" };
     public string[] board = { "3s", "4h", "5s", "6d", "7d" };
     private bool firstToPlayBotMode;
+    public bool finishPuDissolve;
+    public bool isPlayerBotModeTurn;
 
     public event Action onGameStarted;
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
-        //BOT_MODE = Constants.BOT_MODE;
-        BOT_MODE = true;
+        Constants.BOT_MODE = true;
+        BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
         {
             InitTestMode();
@@ -199,7 +201,6 @@ public class BattleSystem : StateMachine
         else
         {
             System.Random rng = new System.Random();
-            Debug.Log(rng.Next(0, 2) > 0);
             return rng.Next(0, 2) > 0;
         }
 
@@ -316,7 +317,7 @@ public class BattleSystem : StateMachine
 
     public void DisableSelectMode(bool endTurn)
     {
-        Debug.Log("Start" + " " + Constants.TemproryUnclickable);
+        Debug.Log("Start" + " TU " + Constants.TemproryUnclickable);
 
         if (selectMode && !Constants.TemproryUnclickable)
         {
@@ -417,6 +418,8 @@ public class BattleSystem : StateMachine
         }
         else
         {
+            currentTurn = 6;
+            currentRound++;
             isRoundReady = true;
             currentGameInfo.cardDeck = CreateCardsDeck(true);
             ui.winLabel.SetActive(false);
@@ -526,10 +529,17 @@ public class BattleSystem : StateMachine
         {
             yield return new WaitForSeconds(3.5f);
         }
-        if (!deckGenerate && LocalTurnSystem.Instance.isPlayerFirstPlayer)
+        if (!TEST_MODE && !BOT_MODE)
         {
-            deckGenerate = true;
-            DeckGeneratorDB();
+            if (!deckGenerate && LocalTurnSystem.Instance.isPlayerFirstPlayer)
+            {
+                deckGenerate = true;
+                DeckGeneratorDB();
+            }
+        }
+        else
+        {
+            StartCoroutine(StartNewRound());
         }
     }
 
@@ -582,6 +592,7 @@ public class BattleSystem : StateMachine
             }
             else
             {
+                isPlayerBotModeTurn = false;
                 TurnEvents(--currentTurn);
                 if (currentTurn > 0)
                 {
@@ -608,7 +619,7 @@ public class BattleSystem : StateMachine
 
     internal int GenerateRandom(int v1, int v2)
     {
-        return UnityEngine.Random.Range(v1, v2);
+        return UnityEngine.Random.Range(v1, v2 );
     }
 
     public void OnEndTurnButton()
@@ -849,9 +860,10 @@ public class BattleSystem : StateMachine
 
     public async void FakeEnemyPuUse(int puIndex, string cardPlace1, string cardPlace2, bool endTurn)
     {
+        finishPuDissolve = false;
         Debug.LogWarning("FAking it");
         string puName = "";
-        if(puIndex == -1)
+        if (puIndex == -1)
         {
             puName = "sflip";
         }
@@ -1000,9 +1012,12 @@ public class BattleSystem : StateMachine
 
     public void UpdateWinnerDB()
     {
-        gameManager.UpdateWinnerDB(player.id, () =>
-                    Debug.Log("Winner updated!"),
-                    Debug.LogError);
+        if (!TEST_MODE && !BOT_MODE)
+        {
+            gameManager.UpdateWinnerDB(player.id, () =>
+                        Debug.Log("Winner updated!"),
+                        Debug.LogError);
+        }
     }
 
 
@@ -1049,7 +1064,7 @@ public class BattleSystem : StateMachine
         {
             return LocalTurnSystem.Instance.IsPlayerTurn();
         }
-        return firstToPlayBotMode;
+        return isPlayerBotModeTurn;
     }
 
     public void DissolvePuAfterUse(bool isPlayer, int index)
@@ -1166,6 +1181,10 @@ public class BattleSystem : StateMachine
         {
             StartCoroutine(AutoEndTurn());
         }
+        else
+        {
+            finishPuDissolve = true;
+        }
     }
     internal void ResetPuUi(PowerUpUi pu)
     {
@@ -1195,7 +1214,7 @@ public class BattleSystem : StateMachine
 
     public void UpdateReplacePuInDb(int puIndex)
     {
-        if (!TEST_MODE)
+        if (!TEST_MODE && !BOT_MODE)
             gameManager.SetNewPowerupUseDB(new PowerUpInfo(player.id, "replace", "empty", "empty", puIndex, CreateTimeStamp()), () =>
             {
                 gameManager.AddGameActionLog(GameManager.ActionEnum.ReplacePu, "index: " + puIndex, () => { }, Debug.Log);
@@ -1228,6 +1247,7 @@ public class BattleSystem : StateMachine
         {
             if (isPlayer)
             {
+                Debug.Log("doneProgress");
                 ReplaceInProgress = false;
                 EnableReplaceDialog(true, false);
                 if (energyCounter == 0)
@@ -1637,7 +1657,7 @@ public class BattleSystem : StateMachine
     [Button]
     public void ClickForInfo()
     {
-        Debug.LogError("HowM " + puDeckUi.GetPuListCount(true));
+        Debug.LogError("HowM " + GenerateRandom(0, 2));
 
     }
 
@@ -1769,8 +1789,7 @@ public class BattleSystem : StateMachine
     {
         if (waitForDrawerAnimationToEnd)
         {
-            Debug.Log("BDealing");
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(1f);
             StartCoroutine(DealPuCourotine(isPlayer, OnEnd));
         }
         else
@@ -1983,6 +2002,7 @@ public class BattleSystem : StateMachine
         {
             if (enable && !endTurnInProcess)
             {
+                Constants.TemproryUnclickable = false;
                 ui.EnablePlayerButtons(true);
                 ActivatePlayerPus();
             }
@@ -2064,9 +2084,8 @@ public class BattleSystem : StateMachine
 
     private void UpdateEmojiDB(int emojiId)
     {
-        if (!TEST_MODE)
+        if (!TEST_MODE && !BOT_MODE)
         {
-
             gameManager.UpdateEmojiDB(new EmojiInfo(currentGameInfo.localPlayerId, emojiId, CreateTimeStamp()), () =>
                                  Debug.Log("EmojiSent" + emojiId),
                                 Debug.LogError);
@@ -2123,7 +2142,7 @@ public class BattleSystem : StateMachine
         }
         else if (!ReplaceInProgress && powerUpUi.isPlayer && powerUpUi.replaceMode)
         {
-            Debug.LogError("unc " + Constants.TemproryUnclickable);
+            Debug.Log("PUCli " + " TU " + Constants.TemproryUnclickable);
             Debug.LogError("clica " + powerUpUi.isClickable);
             ReplacePu(true, powerUpUi.puIndex);
         }
