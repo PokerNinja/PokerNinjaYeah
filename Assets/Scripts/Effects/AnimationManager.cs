@@ -1430,7 +1430,6 @@ public class AnimationManager : Singleton<AnimationManager>
 
         while (dissolveAmount != target)
         {
-            Debug.LogError("walla" + dissolveAmount);
             yield return new WaitForFixedUpdate();
             if (increas)
             {

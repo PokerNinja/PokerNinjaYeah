@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Linq;
 using APIs;
@@ -19,18 +19,20 @@ namespace Handlers
         private string gameId;
         private bool isReady = false;
 
-        private string tip1 = "The ninja's last turn gets you only 1 energy instead of 2. STRATEGIZE!";
-        private string tip2 = "There's only 1 flip per round! USE IT WISELY!";
-        private string tip3 = "You can always HOLD your finger on a card or button to read what it does.";
-        private string tip4 = "Use fire cards on frozen cards to unfreeze them!";
-        private string tip5 = "You can always see the hand ranks from the scroll-menu on the right.";
-        private string tip6 = "You can't hold more than 2 ninja cards at a time - the left one will be destroyed!";
-        private string tip7 = "Remember you can express yourself by holding your finger on the ninja and choose the expression you want.";
-        private string tip8 = "If you have 2 ninja-cards and you use DRAW - you need to choose which one you want to destroy.";
-        private string tip9 = "Hold your finger on your cards- it will show you your current highest hand combination.";
-        private string tip10 = "Tie results in no points.";
-        private string tip11 = "MONSTER Ninja-cards can flip the game around! They cost 2 energy. ";
-        private string[] tips;
+        private readonly string tip1 = "The ninja's last turn gets you only 1 energy instead of 2. STRATEGIZE!";
+        private readonly string tip2 = "There's only 1 flip per round! USE IT WISELY!";
+        private readonly string tip3 = "You can always HOLD your finger on a card or button to read what it does.";
+        private readonly string tip4 = "Use fire cards on frozen cards to unfreeze them!";
+        private readonly string tip5 = "You can always see the hand ranks from the scroll-menu on the right.";
+        private readonly string tip6 = "You can't hold more than 2 ninja cards at a time - the left one will be destroyed!";
+        private readonly string tip7 = "Remember you can express yourself by holding your finger on the ninja and choose the expression you want.";
+        private readonly string tip8 = "If you have 2 ninja-cards and you use DRAW - you need to choose which one you want to destroy.";
+        private readonly string tip9 = "Hold your finger on your cards- it will show you your current highest hand combination.";
+        private readonly string tip10 = "Tie results in no points.";
+        private readonly string tip11 = "MONSTER Ninja-cards can flip the game around! They cost 2 energy.";
+        private readonly string tip12 = "Ninja-Cards have an easy indications symbols. ▼ -Effects your hand. ▲ - Effects opponent’s hand.  ▬  - Effects the board.";
+        private readonly string tip13 = "Ninja-cards are divided to 3 Elements- Fire, ice, Wind. Fire burns. Ice freezes. Wind swaps.";
+        private  string[] tips;
 
         private void Start()
         {
@@ -38,17 +40,20 @@ namespace Handlers
             gameFound = false;
             searchingText.text = "Looking for opponent...";
             JoinQueue();
-            tips =  new string[]{ tip1,tip2,tip3,tip4,tip5,tip6,tip7,tip8,tip9,tip10,tip11};
+            tips =  new string[]{ tip1,tip2,tip3,tip4,tip5,tip6,tip7,tip8,tip9,tip10,tip11,tip12,tip13};
             StartCoroutine(DisplayRandomTip());
             StartCoroutine(StartBotGame());
         }
 
         private IEnumerator StartBotGame()
         {
-            yield return new WaitForSeconds(10f);
+            yield return new WaitForSeconds(13f);
+            if (!gameFound)
+            {
             LeaveQueue();
             Constants.BOT_MODE = true;
             SceneManager.LoadScene("GameScene2");
+            }
         }
 
         private IEnumerator DisplayRandomTip()

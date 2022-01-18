@@ -149,7 +149,7 @@ public class BattleSystem : StateMachine
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
-        Constants.BOT_MODE = true;
+      //  Constants.BOT_MODE = false;
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
         {
@@ -860,7 +860,6 @@ public class BattleSystem : StateMachine
 
     public async void FakeEnemyPuUse(int puIndex, string cardPlace1, string cardPlace2, bool endTurn)
     {
-        finishPuDissolve = false;
         Debug.LogWarning("FAking it");
         string puName = "";
         if (puIndex == -1)
@@ -869,6 +868,7 @@ public class BattleSystem : StateMachine
         }
         else
         {
+            finishPuDissolve = false;
             puName = puDeckUi.GetPuFromList(false, puIndex).puName;
         }
         PowerUpInfo puInfo = new PowerUpInfo("Alex", puName, cardPlace2, cardPlace1, puIndex, 12345);
@@ -1853,10 +1853,8 @@ public class BattleSystem : StateMachine
         else if (btnReplaceClickable || endTurn || disable)
         {
             Constants.TemproryUnclickable = true;
-            Debug.LogError("1");
             if (/*replaceMode ||*/ IsPlayerTurn() && energyCounter > 0)
             {
-                Debug.LogError("2");
                 PowerUpUi[] playerPus = puDeckUi.GetPuList(true);
                 if (playerPus[0] != null || playerPus[1] != null)
                 {
@@ -2142,8 +2140,6 @@ public class BattleSystem : StateMachine
         }
         else if (!ReplaceInProgress && powerUpUi.isPlayer && powerUpUi.replaceMode)
         {
-            Debug.Log("PUCli " + " TU " + Constants.TemproryUnclickable);
-            Debug.LogError("clica " + powerUpUi.isClickable);
             ReplacePu(true, powerUpUi.puIndex);
         }
         else if (powerUpUi.isPlayer || !powerUpUi.isPlayer)

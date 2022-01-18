@@ -411,7 +411,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
     internal IEnumerator Dissolve(bool isFrozen, Material dissolveMaterial, float delayInSec, Action onFinishDissolve)
     {
-        //spriteRenderer.material = dissolveMaterial;
+        spriteRenderer.material = dissolveMaterial;
         //TODO MAYBE NEED DISSOLVEMAT
         float dissolveAmount = -0.01f;
         yield return new WaitForSeconds(delayInSec);

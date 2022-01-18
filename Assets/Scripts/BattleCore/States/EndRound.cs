@@ -155,6 +155,7 @@ public class EndRound : State
 
     private void AnimateWinWithHand(Hand winningHand, bool isPlayerWin)
     {
+        Debug.Log("animata");
         //MAKE IT BETTER
         List<Card> winningCards = winningHand.getCards();
         List<CardUi> winningPlayersCards = new List<CardUi>();
@@ -254,7 +255,7 @@ public class EndRound : State
              }); */
 
         winningPlayersCards = winningPlayersCards.Concat(winningBoardCards).ToList();
-        winningPlayersCards = RearangeWinningCards(winningPlayersCards, IsStrightOrFlush(winningHand.Rank));
+        winningPlayersCards = RearangeWinningCards(winningPlayersCards, winningHand.Rank);
          AnimationManager.Instance.AnimateWinningHandToBoard2(winningPlayersCards,
             ConvertRankToCardToGlow(battleSystem.Interface.ConvertHandRankToTextNumber(winningHand.Rank)),
             losingBoardCards, battleSystem.cardsDeckUi.boardTransform,
@@ -288,19 +289,32 @@ public class EndRound : State
         return 5;
     }
 
-    private bool IsStrightOrFlush(int rank)
+    private bool IsStrightFlushOrFull(int rank)
     {
-        return (rank <= 1609 && rank >= 323) || rank <= 166;
+        return (rank <= 1609 && rank >= 167) || rank <= 10;
+    }
+    private bool IsFourOfAKind(int rank)
+    {
+        return (rank <= 166 && rank >= 11);
     }
 
-    private List<CardUi> RearangeWinningCards(List<CardUi> winningHand, bool isStrightOrFlush)
+    private List<CardUi> RearangeWinningCards(List<CardUi> winningHand, int handRank)
     {
         List<CardUi> arangedCards = new List<CardUi>();
 
         winningHand = winningHand.OrderByDescending(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
-        if (isStrightOrFlush)
+        if (IsStrightFlushOrFull(handRank))
         {
             return winningHand;
+        }else if (IsFourOfAKind(handRank))
+        {
+            if(winningHand[0].cardDescription[0].ToString() != winningHand[1].cardDescription[0].ToString())
+            {
+                CardUi cardToMove = winningHand[0];
+                winningHand.RemoveAt(0);
+                winningHand.Add(cardToMove);
+            } 
+                return winningHand;
         }
         else
         {

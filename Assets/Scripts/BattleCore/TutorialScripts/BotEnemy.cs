@@ -127,10 +127,11 @@ public class BotEnemy : State
             case 4:
             case 3:
                 drawOdds = 3;
-                skillOdds = 2;
+                skillOdds = 3;
                 if (energyLeft == 1)
                 {
                     endTurnOdds = 3;
+                    drawOdds = 1;
                 }
                 break;
             case 2:
@@ -173,7 +174,7 @@ public class BotEnemy : State
     {
         await Task.Delay(3000);
         int costOfAction = 0;
-        int delay = 7000;
+        int delay = 6000;
         if (options.Count > 0)
         {
             int act = options[battleSystem.GenerateRandom(0, options.Count)];
@@ -226,7 +227,7 @@ public class BotEnemy : State
         }
         else
         {
-            StartAutoEndWithDelay(delay, true);
+            StartAutoEndWithDelay(2000, true);
         }
 
 
@@ -449,8 +450,6 @@ public class BotEnemy : State
 
                     if (!cards[i].cardPlace.Equals(differentThan))
                     {
-                        Debug.Log("current " + cards[i].cardPlace);
-                        Debug.Log("differentThan " + differentThan);
                         int boardCardRank = Card.StringValueToInt(boardCards[j].cardDescription.Substring(0, 1));
                         int currentCardRank = Card.StringValueToInt(cards[i].cardDescription.Substring(0, 1));
                         if (isDuplicate)

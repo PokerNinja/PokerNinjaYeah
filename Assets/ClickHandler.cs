@@ -92,8 +92,6 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     public void OnPointerUp(PointerEventData eventData)
     {
         LoadSpriteBtn(false);
-        Debug.LogError("UUp");
-
         CancelInvoke("OnLongPress");
 
         if (!held)
@@ -122,7 +120,6 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         LoadSpriteBtn(true);
         held = false;
         Invoke("OnLongPress", holdTime);
-        Debug.LogError("DDown");
 
     }
     private void LoadSpriteBtn(bool press)
