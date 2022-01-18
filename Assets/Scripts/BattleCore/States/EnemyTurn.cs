@@ -25,7 +25,7 @@ public class EnemyTurn : State
         battleSystem.DisablePlayerPus();
         battleSystem.DealPu(false, () =>
          {
-             battleSystem.Interface.enemyNameText.text = "afterDeal";
+            // battleSystem.Interface.enemyNameText.text = "afterDeal";
              Debug.Log("end Deal");
              battleSystem.Interface.SetTurnIndicator(false, true);
              battleSystem.Interface.WhosTurnAnimation(false, false, isFinalTurn, () => battleSystem.turnInitInProgress = false);

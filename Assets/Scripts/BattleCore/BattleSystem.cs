@@ -808,13 +808,13 @@ public class BattleSystem : StateMachine
             if (s == LocalTurnSystem.Instance.PlayerID.Value)
             {
                 StartCoroutine(StartPlayerTurn(false, null));
-                ui.playerNameText.text = "Bind " + currentTurn;
+              //  ui.playerNameText.text = "Bind " + currentTurn;
 
             }
             else
             {
                 SetState(new EnemyTurn(this, currentTurn));
-                ui.enemyNameText.text = "Bind " + currentTurn;
+               // ui.enemyNameText.text = "Bind " + currentTurn;
             }
 
 
@@ -832,7 +832,7 @@ public class BattleSystem : StateMachine
         StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(),
             false, Values.Instance.textTurnFadeOutDuration, () =>
             {
-                ui.playerNameText.text = "start " + currentTurn;
+               // ui.playerNameText.text = "start " + currentTurn;
                 EndAction?.Invoke();
                 StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
             }));

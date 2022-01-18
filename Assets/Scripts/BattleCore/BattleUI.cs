@@ -166,7 +166,6 @@ public class BattleUI : MonoBehaviour
     }
     private void InitializeEnemy(PlayerInfo enemy)
     {
-        enemyNameText.text = enemy.id;
         enemyName = enemy.id;
         enemyNameText.text = enemyName;
     }
