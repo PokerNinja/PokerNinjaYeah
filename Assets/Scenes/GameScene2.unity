@@ -7702,7 +7702,7 @@ MonoBehaviour:
   coinHit: {fileID: 8300000, guid: 93355b14134c6e4498d0d98817bb9296, type: 3}
   coinLose: {fileID: 8300000, guid: 7071b0e274428c04e9e05f0e2e3a139e, type: 3}
   armagedon: {fileID: 8300000, guid: 28b557522f9ecac428a2d7155310ba5e, type: 3}
-  coinFlipStart: {fileID: 8300000, guid: 0631c92f5b2728d468dc100912362404, type: 3}
+  coinFlipStart: {fileID: 8300000, guid: 1dab8cd4f9acfcf4db9f8026438afa0f, type: 3}
   energyCharge: {fileID: 8300000, guid: e1bb4bf923ec8ec47833cc09ac4a7f16, type: 3}
   tornado: {fileID: 8300000, guid: 59585c1f59bc9bc40a28cf80ea7c735e, type: 3}
   iceagedon: {fileID: 8300000, guid: e7b017d2f388d8f49a50bf0c2854bf7e, type: 3}
