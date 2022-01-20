@@ -10,14 +10,12 @@ using UnityEngine;
 public class EndRound : State
 {
     private bool isTimedOut;
-    private bool enemyStartsNextRound;
     bool startNewRound = false;
 
-    public EndRound(BattleSystem battleSystem, bool enemyStartsNextRound, bool isTimedOut) : base(battleSystem)
+    public EndRound(BattleSystem battleSystem,  bool isTimedOut) : base(battleSystem)
     {
-        Debug.Log("eniding ROund");
+        Debug.Log("eniding ROund ()()()()()");
         this.isTimedOut = isTimedOut;
-        this.enemyStartsNextRound = enemyStartsNextRound;
     }
 
     public override IEnumerator Start()
@@ -254,16 +252,17 @@ public class EndRound : State
                  StartNewRoundAction(false);
              }); */
 
+        battleSystem.Interface.UpdateVisionColor(battleSystem.Interface.ConvertHandRankToTextNumber(winningHand.Rank));
         winningPlayersCards = winningPlayersCards.Concat(winningBoardCards).ToList();
         winningPlayersCards = RearangeWinningCards(winningPlayersCards, winningHand.Rank);
-         AnimationManager.Instance.AnimateWinningHandToBoard2(winningPlayersCards,
-            ConvertRankToCardToGlow(battleSystem.Interface.ConvertHandRankToTextNumber(winningHand.Rank)),
-            losingBoardCards, battleSystem.cardsDeckUi.boardTransform,
-            () =>
-            {
-                battleSystem.EndRoundVisual(isPlayerWin);
-                StartNewRoundAction(true);
-            });
+        AnimationManager.Instance.AnimateWinningHandToBoard2(winningPlayersCards,
+           ConvertRankToCardToGlow(battleSystem.Interface.ConvertHandRankToTextNumber(winningHand.Rank)),
+           losingBoardCards, battleSystem.cardsDeckUi.boardTransform,
+           () =>
+           {
+               battleSystem.EndRoundVisual(isPlayerWin);
+               StartNewRoundAction(true);
+           });
     }
 
     private int ConvertRankToCardToGlow(int rank)
@@ -305,16 +304,19 @@ public class EndRound : State
         winningHand = winningHand.OrderByDescending(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
         if (IsStrightFlushOrFull(handRank))
         {
-            return winningHand;
-        }else if (IsFourOfAKind(handRank))
-        {
-            if(winningHand[0].cardDescription[0].ToString() != winningHand[1].cardDescription[0].ToString())
+            if (handRank >= 1600 && Card.StringValueToInt(winningHand[0].cardDescription[0].ToString()) == CardEnum.Ace.GetHashCode())
             {
-                CardUi cardToMove = winningHand[0];
-                winningHand.RemoveAt(0);
-                winningHand.Add(cardToMove);
-            } 
-                return winningHand;
+                winningHand = MoveFirstItemToLast(winningHand);
+            }
+            return winningHand;
+        }
+        else if (IsFourOfAKind(handRank))
+        {
+            if (winningHand[0].cardDescription[0].ToString() != winningHand[1].cardDescription[0].ToString())
+            {
+                winningHand = MoveFirstItemToLast(winningHand);
+            }
+            return winningHand;
         }
         else
         {
@@ -342,6 +344,14 @@ public class EndRound : State
         }
         arangedCards = arangedCards.Concat(winningHand).ToList();
         return arangedCards;
+    }
+
+    private List<CardUi> MoveFirstItemToLast(List<CardUi> winningHand)
+    {
+        CardUi cardToMove = winningHand[0];
+        winningHand.RemoveAt(0);
+        winningHand.Add(cardToMove);
+        return winningHand;
     }
 
     private void StartNewRoundAction(bool delay)

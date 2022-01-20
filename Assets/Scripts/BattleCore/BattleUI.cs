@@ -19,6 +19,7 @@ public class BattleUI : MonoBehaviour
     [SerializeField] public CoinFlipScript coinFlipTurn;
     [SerializeField] public TextMeshProUGUI playerNameText;
     [SerializeField] public TextMeshProUGUI enemyNameText;
+    [SerializeField] public TextMeshProUGUI winLoseBot;
     [SerializeField] public GameObject[] playerLifeUi;
     [SerializeField] public GameObject[] enemyLifeUi;
     [SerializeField] public PowerUpUi[] enemyPus;
@@ -37,7 +38,6 @@ public class BattleUI : MonoBehaviour
 
     [SerializeField] public Transform infoDialog;
     [SerializeField] public SpriteRenderer dialogSprite;
-    [SerializeField] public Transform targetDialogTransform;
 
     [SerializeField] public GameObject rankImageParent;
     [SerializeField] public SpriteRenderer darkScreenRenderer;
@@ -86,7 +86,8 @@ public class BattleUI : MonoBehaviour
     public Animator playerAvatarAnimator;
     public Animator enemyAvatarAnimator;
 
-    public ParticleSystem rightSlash, leftSlash, winParticle;
+    public ParticleSystem rightSlash, leftSlash;
+    public ParticleSystem winParticle;
     public GameObject rightCard, leftCard;
 
 
@@ -257,7 +258,7 @@ public class BattleUI : MonoBehaviour
     }
     public void WinParticleEffect()
     {
-        winParticle.Play();
+       Instantiate(winParticle.gameObject);
     }
 
     public void LoseLifeUi(bool isPlayer, int lifeIndex)
@@ -434,10 +435,15 @@ public class BattleUI : MonoBehaviour
         if (!sliding)
         {
             sliding = true;
-            StartCoroutine(AnimationManager.Instance.SmoothMoveRank(rankImageParent.transform, Values.Instance.rankInfoMoveDuration, () => rankImageParent.SetActive(false)/*rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_empty", typeof(Sprite)) as Sprite*/,
-                () => rankImageParent.SetActive(true)/*rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_full", typeof(Sprite)) as Sprite*/, () => sliding = false));
+            StartCoroutine(AnimationManager.Instance.SmoothMoveRank(rankImageParent.transform, Values.Instance.rankInfoMoveDuration, 
+                () => rankImageParent.SetActive(false),
+                () => rankImageParent.SetActive(true)
+                , () => sliding = false));
         }
-
+    }
+    public bool IsSliderOpen()
+    {
+        return rankImageParent.activeSelf;
     }
 
 
@@ -450,6 +456,7 @@ public class BattleUI : MonoBehaviour
         {
             FadeCancelSelectModeScreen(false);
         }
+
     }
 
     public void FadeCancelSelectModeScreen(bool enable)
@@ -637,7 +644,7 @@ public class BattleUI : MonoBehaviour
      {
          SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankDown);
      }*/
-    private void UpdateVisionColor(int currentHandRank)
+    public void UpdateVisionColor(int currentHandRank)
     {
         Values.Instance.currentVisionColor = Values.Instance.visionColorsByRank[currentHandRank - 1];
     }
@@ -1202,26 +1209,37 @@ public class BattleUI : MonoBehaviour
         Destroy(ps.gameObject);
     }
 
+    [Button]
+    public void ICE()
+    {
+        WinParticleEffect();
+
+    }
     internal IEnumerator StartIcenado()
     {
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Iceagedon, true);
-        icenadoPS.Play();
+        // icenadoPS.Play();
+        GameObject ps = Instantiate(icenadoPS.gameObject) ;
         yield return new WaitForSeconds(3f);
-        var main = icenadoPS.main;
+        var main = ps.GetComponent<ParticleSystem>().main;
         main.startLifetime = 0;
-        yield return new WaitForSeconds(2f);
-        icenadoPS.Stop();
+        //yield return new WaitForSeconds(5f);
+        // icenadoPS.Stop();
+        Destroy(ps.gameObject,6f);
     }
+
     internal IEnumerator StartArmageddon()
     {
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Armagedon, true);
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Armagedon2, true);
-        armageddonPS.Play();
+        GameObject ps = Instantiate(armageddonPS.gameObject);
+        // armageddonPS.Play();
         yield return new WaitForSeconds(3f);
-        var main = armageddonPS.main;
+        var main = ps.GetComponent<ParticleSystem>().main;
         main.startLifetime = 0;
-        yield return new WaitForSeconds(2f);
-        armageddonPS.Stop();
+       // yield return new WaitForSeconds(5f);
+        //  armageddonPS.Stop();
+        Destroy(ps.gameObject,6f);
     }
 
     internal void SlideRankingImgIfOpen()

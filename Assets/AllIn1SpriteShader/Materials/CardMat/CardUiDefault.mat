@@ -176,7 +176,7 @@ Material:
     - _OnlyOutline: 0
     - _Outline8Directions: 0
     - _OutlineAlpha: 0
-    - _OutlineDistortAmount: 0.3
+    - _OutlineDistortAmount: 0.45
     - _OutlineDistortTexXSpeed: -1
     - _OutlineDistortTexYSpeed: -8
     - _OutlineDistortToggle: 1
@@ -187,7 +187,7 @@ Material:
     - _OutlineTexToggle: 1
     - _OutlineTexXSpeed: 10
     - _OutlineTexYSpeed: 0
-    - _OutlineWidth: 0.055
+    - _OutlineWidth: 0.064
     - _OverlayBlend: 0
     - _OverlayGlow: 23.9
     - _PinchUvAmount: 0

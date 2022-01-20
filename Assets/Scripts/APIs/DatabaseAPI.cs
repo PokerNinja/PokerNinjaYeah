@@ -50,7 +50,7 @@ public class DataBaseAPI : MonoBehaviour
         }
 
 
-        
+
 
         public static void CheckIfVersionUpdated(string currentVersion, Action callback, Action fallback)
         {
@@ -168,6 +168,8 @@ public class DataBaseAPI : MonoBehaviour
             GetJSON(path,
                 json => { callback((T)StringSerializationAPI.Deserialize(typeof(T), json.GetRawJsonValue())); },
                 fallback);
+
+      
 
         public static void GetJSON(string path, Action<DataSnapshot> callback, Action<AggregateException> fallback)
         {

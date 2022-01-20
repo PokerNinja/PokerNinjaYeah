@@ -8,6 +8,8 @@ public class Constants : Singleton<Constants>
 
     public readonly string volumeSoundKey = "music_key";
     public readonly string botEnergyKey = "bot_energy_key";
+    public readonly string PLAYER_WIN_BOT = "PLAYER_WIN_BOT";
+    public readonly string PLAYER_LOSE_BOT = "PLAYER_LOSE_BOT";
     public const string PlayerCardsTag = "CardP";
     public const string EnemyCardsTag = "CardE";
     public const string BoardCardsTag = "CardB";

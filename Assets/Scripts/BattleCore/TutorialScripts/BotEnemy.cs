@@ -46,34 +46,34 @@ public class BotEnemy : State
         battleSystem.finishPuDissolve = true;
         pu1 = "";
         pu2 = "";
-        card1 = GetEnemyCard(0);
-        card2 = GetEnemyCard(1);
+        card1 = GetEnemyCardRank(0);
+        card2 = GetEnemyCardRank(1);
         currentRank = GetHandRank();
-        playerRevealdCard = GetWhatPlayerCardRevealed();
+        playerRevealdCard = GetWhatPlayerCardValueRevealed();
         boardCardsUi = battleSystem.cardsDeckUi.boardCardsUi;
         CheckMyOptions();
     }
 
-    private int GetWhatPlayerCardRevealed()
+    private int GetWhatPlayerCardValueRevealed()
     {
         if (battleSystem.cardsDeckUi.playerCardsUi[0].cardMark.activeSelf)
         {
-            return GetPlayerCard(0);
+            return GetPlayerCardRank(0);
         }
         if (battleSystem.cardsDeckUi.playerCardsUi[1].cardMark.activeSelf)
         {
-            return GetPlayerCard(1);
+            return GetPlayerCardRank(1);
         }
         return 0;
     }
 
-    private int GetEnemyCard(int index)
+    private int GetEnemyCardRank(int index)
     {
-        return Card.StringValueToInt(battleSystem.cardsDeckUi.enemyCardsUi[index].cardDescription.Substring(0, 1));
+        return GetRankFromCardDesc(battleSystem.cardsDeckUi.enemyCardsUi[index].cardDescription);
     }
-    private int GetPlayerCard(int index)
+    private int GetPlayerCardRank(int index)
     {
-        return Card.StringValueToInt(battleSystem.cardsDeckUi.playerCardsUi[index].cardDescription.Substring(0, 1));
+        return GetRankFromCardDesc(battleSystem.cardsDeckUi.playerCardsUi[index].cardDescription);
     }
 
     private int GetHandRank()
@@ -121,7 +121,7 @@ public class BotEnemy : State
                 skillOdds = 4;
                 if (energyLeft == 1)
                 {
-                    endTurnOdds = 2;
+                    endTurnOdds = 3;
                 }
                 break;
             case 4:
@@ -182,40 +182,45 @@ public class BotEnemy : State
             {
                 case (int)EnemyActions.EndTurn:
                     {
-                        //battleSystem.FakeEnemyEndTurn();
+                        Debug.Log("Bot EndTurn");
                         delay = 1000;
                         break;
                     }
                 case (int)EnemyActions.SkillUse:
                     {
+                        Debug.Log("Bot Skill");
                         battleSystem.enemyBotSkillUsed = true;
                         battleSystem.FakeEnemyPuUse(-1,
                         battleSystem.cardsDeckUi.GetListByTag(Constants.PlayerCardsTag)[battleSystem.GenerateRandom(0, 2)].cardPlace, "", false);
                         costOfAction = 2;
-                        delay -= 3000;
+                        delay = 2500;
                         break;
                     }
                 case (int)EnemyActions.DrawPu:
                     {
+                        Debug.Log("Bot Draw");
                         BotDraweCard();
                         costOfAction = 1;
-                        delay -= 1500;
+                        delay = battleSystem.GenerateRandom(2200, 2300);
                         break;
                     }
                 case (int)EnemyActions.Pu1Use:
                     {
+                        Debug.Log("Bot PU1");
                         BotPuUse(pu1, 0);
                         costOfAction = GetPuCost(pu1);
                         break;
                     }
                 case (int)EnemyActions.Pu2Use:
                     {
+                        Debug.Log("Bot PU2");
                         BotPuUse(pu2, 1);
                         costOfAction = GetPuCost(pu2);
                         break;
                     }
                 case (int)EnemyActions.PuRandomUse:
                     {
+                        Debug.Log("Bot RANDOM");
                         string[] pus = { pu1, pu2 };
                         int index = battleSystem.GenerateRandom(0, 2);
                         BotPuUse(pus[index], index);
@@ -227,7 +232,7 @@ public class BotEnemy : State
         }
         else
         {
-            StartAutoEndWithDelay(2000, true);
+            StartAutoEndWithDelay(battleSystem.GenerateRandom(1100,1700), true);
         }
 
 
@@ -242,7 +247,7 @@ public class BotEnemy : State
         switch (puName)
         {
             case "f1":
-                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", true, false, true);
+                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", 0, true, false, true);
                 break;
             case "f2":
                 if (playerRevealdCard > 0)
@@ -251,9 +256,9 @@ public class BotEnemy : State
                 }
                 if (cardTarget1.Equals(""))
                 {
-                    cardTarget1 = GetCardOf(Constants.BoardCardsTag, "", true, false, true);
+                    cardTarget1 = GetCardOf(Constants.BoardCardsTag, "", 0, true, false, true);
                 }
-                cardTarget2 = GetCardOf(Constants.BoardCardsTag, cardTarget1, true, false, true);
+                cardTarget2 = GetCardOf(Constants.BoardCardsTag, cardTarget1, 0, true, false, true);
                 break;
             case "f3":
                 if (!playerDuplicateOnBoard.Equals(""))
@@ -280,11 +285,11 @@ public class BotEnemy : State
                 }
                 break;
             case "i2":
-                cardTarget1 = GetCardOf(Constants.BoardCardsTag, "", false, true, false);
-                cardTarget2 = GetCardOf(Constants.BoardCardsTag, cardTarget1, false, true, false);
+                cardTarget1 = GetCardOf(Constants.BoardCardsTag, "", 0, false, true, false);
+                cardTarget2 = GetCardOf(Constants.BoardCardsTag, cardTarget1, 0, false, true, false);
                 break;
             case "i3":
-                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", false, true, false);
+                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", 0, false, true, false);
                 break;
             case "w1":
                 if (!playerDuplicateOnBoard.Equals("") || playerRevealdCard > 13)
@@ -295,11 +300,11 @@ public class BotEnemy : State
                 {
                     cardTarget1 = GetPlayerRevealedCardAndIfFreeze(false, false);
                 }
-                cardTarget2 = GetCardOf(Constants.EnemyCardsTag, "", true, false, false);
+                cardTarget2 = GetCardOf(Constants.EnemyCardsTag, "", GetRankFromCardPlace(cardTarget1), true, false, false);
                 break;
             case "w2":
-                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", true, false, false);
-                cardTarget2 = GetCardOf(Constants.BoardCardsTag, "", false, true, false);
+                cardTarget1 = GetCardOf(Constants.EnemyCardsTag, "", 0, true, false, false);
+                cardTarget2 = GetCardOf(Constants.BoardCardsTag, "", GetRankFromCardPlace(cardTarget1), false, true, false);
                 break;
             case "w3":
                 if (!playerDuplicateOnBoard.Equals(""))
@@ -314,17 +319,33 @@ public class BotEnemy : State
                 {
                     cardTarget1 = GetPlayerRevealedCardAndIfFreeze(false, false);
                 }
-                cardTarget2 = GetCardOf(Constants.BoardCardsTag, "", true, false, false);
+                cardTarget2 = GetCardOf(Constants.BoardCardsTag, "", GetRankFromCardPlace(cardTarget1), true, false, false);
                 break;
             case "fm1":
-                cardTarget1 = GetCardOf(Constants.DeckCardsTag, "", false, true, false);
-                cardTarget2 = GetCardOf(Constants.EnemyCardsTag, "", true, false, false);
+                cardTarget1 = Constants.Deck1;
+                cardTarget2 = GetCardOf(Constants.EnemyCardsTag, "", 0, true, false, false);
                 break;
+            case "wm2":
+                cardTarget1 = GetListOfRandomCardsForMonster();
+                break;
+            case "im2":
+                cardTarget2 = battleSystem.GenerateRandom(4, 6).ToString();
+                cardTarget1 = GetListOfRandomCardsForMonster();
+                break;
+            case "fm2":
+                cardTarget2 = battleSystem.GenerateRandom(5, 7).ToString();
+                cardTarget1 = GetListOfRandomCardsForMonster();
+                break;
+
         }
         Debug.LogWarning("pu " + index + " c " + cardTarget1 + " , " + cardTarget2);
         battleSystem.FakeEnemyPuUse(index, cardTarget1, cardTarget2, false);
     }
 
+    private string GetListOfRandomCardsForMonster()
+    {
+        return string.Join(",", battleSystem.GetRandomAvailableCardsNames());
+    }
     private string GetPlayerRevealedCardAndIfFreeze(bool reveald, bool canTargetFreeze)
     {
         string cardPlace = GetPlayerRevealedCard(reveald);
@@ -376,7 +397,7 @@ public class BotEnemy : State
         {
             if (canTargetFreeze || !boardsCards[i].freeze)
             {
-                if (Card.StringValueToInt(boardsCards[i].cardDescription.Substring(0, 1)) == playerRevealdCard)
+                if (GetRankFromCardDesc(boardsCards[i].cardDescription) == playerRevealdCard)
                 {
                     return boardsCards[i].cardPlace;
                 }
@@ -424,17 +445,17 @@ public class BotEnemy : State
 
     }
 
-    private string GetCardOf(string cardsTag, string differentThan, bool lowest, bool isDuplicate, bool canTargetFreeze)
+    private string GetCardOf(string cardsTag, string differentCard, int differentRank, bool lowest, bool isDuplicate, bool canTargetFreeze)
     {
 
         List<CardUi> cards = new List<CardUi>(battleSystem.cardsDeckUi.GetListByTag(cardsTag).ToArray());
         if (lowest)
         {
-            cards = cards.OrderBy(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
+            cards = cards.OrderBy(h => GetRankFromCardDesc(h.cardDescription)).ToList<CardUi>();
         }
         else
         {
-            cards = cards.OrderByDescending(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
+            cards = cards.OrderByDescending(h => GetRankFromCardDesc(h.cardDescription)).ToList<CardUi>();
         }
         List<CardUi> boardCards = battleSystem.cardsDeckUi.GetListByTag(Constants.BoardCardsTag);
         if (cardsTag.Equals(Constants.BoardCardsTag))
@@ -447,11 +468,16 @@ public class BotEnemy : State
             {
                 if (canTargetFreeze || !cards[i].freeze)
                 {
+                    int currentCardRank = GetRankFromCardDesc(cards[i].cardDescription);
 
-                    if (!cards[i].cardPlace.Equals(differentThan))
+                    if (!cards[i].cardPlace.Equals(differentCard) && currentCardRank != differentRank)
                     {
-                        int boardCardRank = Card.StringValueToInt(boardCards[j].cardDescription.Substring(0, 1));
-                        int currentCardRank = Card.StringValueToInt(cards[i].cardDescription.Substring(0, 1));
+                        Debug.LogError("INSIDE@#@@#@ " + currentCardRank);
+                        Debug.LogError("INSIDE@##@ " + differentRank);
+                        Debug.LogError("==================");
+                        Debug.LogError("INSIDE@#@@#@ " + cards[i].cardPlace);
+                        Debug.LogError("INSIDE@##@ " + differentCard);
+                        int boardCardRank = GetRankFromCardDesc(boardCards[j].cardDescription);
                         if (isDuplicate)
                         {
                             if (currentCardRank == boardCardRank)
@@ -472,10 +498,10 @@ public class BotEnemy : State
                 }
             }
         }
-        if (cards[0].cardPlace.Equals(differentThan))
+        if (cards[0].cardPlace.Equals(differentCard))
         {
             Debug.Log("toYse " + cards[0].cardPlace);
-            Debug.Log("differentThan " + differentThan);
+            Debug.Log("differentThan " + differentCard);
             return cards[1].cardPlace;
         }
         else
@@ -483,6 +509,15 @@ public class BotEnemy : State
             Debug.Log("ChoseFirst " + cards[0].cardPlace);
             return cards[0].cardPlace;
         }
+    }
+
+    private int GetRankFromCardDesc(string cardDescription)
+    {
+        return Card.StringValueToInt(cardDescription[0].ToString());
+    }
+    private int GetRankFromCardPlace(string cardPlace)
+    {
+        return GetRankFromCardDesc(battleSystem.cardsDeckUi.GetCardUiByName(cardPlace).cardDescription);
     }
     private string GetRandomCardOf(string cardsTag)
     {
@@ -677,7 +712,7 @@ public class BotEnemy : State
                         }
                         break;
                     case "w3":
-                        if (UnfrozenCardsAvailable(Constants.PlayerCardsTag, 1) && UnfrozenCardsAvailable(Constants.BoardCardsTag, 1))
+                        if (currentRank >= 7 && UnfrozenCardsAvailable(Constants.PlayerCardsTag, 1) && UnfrozenCardsAvailable(Constants.BoardCardsTag, 1))
                         {
                             if (PlayerGotDuplicateCard())
                             {
@@ -788,7 +823,7 @@ public class BotEnemy : State
     {
         foreach (CardUi card in boardCardsUi)
         {
-            int boardCardRank = Card.StringValueToInt(card.cardDescription.Substring(0, 1));
+            int boardCardRank = GetRankFromCardDesc(card.cardDescription);
             if (card1 == boardCardRank)
             {
                 card1DuplicateBoard = true;
@@ -806,8 +841,7 @@ public class BotEnemy : State
         {
             foreach (CardUi card in boardCardsUi)
             {
-                int boardCardRank = Card.StringValueToInt(card.cardDescription.Substring(0, 1));
-                if (playerRevealdCard == boardCardRank)
+                if (playerRevealdCard == GetRankFromCardDesc(card.cardDescription))
                 {
                     return true;
                 }

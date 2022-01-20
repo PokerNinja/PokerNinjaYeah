@@ -87,6 +87,7 @@ public class Values : Singleton<Values>
 
     [Title("CardUi", bold: false)]
     public Color cardSelectionColor;
+    public float drawerMoveDuration = 0.9f;
     public float FreezeDuration = 3f;
     public float cardDrawMoveDuration = 2f;
     public float cardSwapMoveDuration = 2f;
@@ -113,7 +114,6 @@ public class Values : Singleton<Values>
     public float turnBtnAlphaDuration = 1f;
     public float turnTextMoveDuration = 1.9f;
     public float turnTextScaleDuration = 1.3f;
-    public float drawerMoveDuration = 0.9f;
     public float textTurnFadeOutDuration = 1f;
     public float turnIndicatorFadeDuration = 1.2f;
 

@@ -8,6 +8,8 @@ using System;
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using Firebase.Database;
+using System.Collections;
+
 public class GameMenuHandler : MonoBehaviour
 {
     public TMP_InputField playerName;
@@ -16,6 +18,8 @@ public class GameMenuHandler : MonoBehaviour
     public GameObject wrongTypeText;
     public GameObject tutorialImage;
     public GameObject updateCanvas;
+    public GameObject rankImageParent;
+    public GameObject canvasExitDialog;
 
     [GUIColor(0.3f, 0.8f, 0.8f)]
     public bool TEST_MODE;
@@ -40,12 +44,14 @@ public class GameMenuHandler : MonoBehaviour
             StartMultiplayer();
         }
 
-        ListenForUpdate( targetVersion=> { 
+        ListenForUpdate(targetVersion =>
+        {
             if (Application.version.ToString().Equals(targetVersion))
             {
-            Debug.LogError("You are updated");
+                Debug.LogError("You are updated");
             }
-            else {
+            else
+            {
                 ShowUpdateDialog();
             }
         }, Debug.Log);
@@ -59,18 +65,38 @@ public class GameMenuHandler : MonoBehaviour
     {
         Application.OpenURL("market://details?id=com.DefaultCompany.SpeedWeedGrinder");
     }
-
     private void OnGUI()
     {
-        if (Input.GetKeyUp("escape"))
+        if (Event.current.type == EventType.KeyDown)
         {
-            //LoadMenuScene(false);
+
+            if (Input.GetKeyDown("escape"))
+            {
+                if ( !isRankOpen && !sliding)
+                {
+                    EnableExitDialog(true);
+                }
+                else if ( isRankOpen)
+                {
+                    SlideImgRank();
+                }
+            }
         }
+    }
+    public void EnableExitDialog(bool enable)
+    {
+       
+        canvasExitDialog.SetActive(enable);
+    }
+    public void BtnExit()
+    {
+        SlideImgRank();
+        canvasExitDialog.SetActive(true);
     }
 
     private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> versionListener;
 
-    public void ListenForUpdate( Action<string> callback,
+    public void ListenForUpdate(Action<string> callback,
         Action<AggregateException> fallback)
     {
         // Should update when return to main?
@@ -82,7 +108,7 @@ public class GameMenuHandler : MonoBehaviour
                 string version = args.Snapshot.GetRawJsonValue() as
                             string;
                 callback(version);
-               // Constants.updated = currentVersion.Equals(version);
+                // Constants.updated = currentVersion.Equals(version);
                 Debug.LogWarning("target " + version);
             },
             fallback);
@@ -254,6 +280,65 @@ public class GameMenuHandler : MonoBehaviour
         }
         Debug.LogError("count " + counter);
         Debug.LogError("dount " + dounter);
+    }
+
+    bool sliding = false;
+    public void SlideImgRank()
+    {
+        if (!sliding)
+        {
+            sliding = true;
+            StartCoroutine(SmoothMoveRank(rankImageParent.transform, 1f, () => rankImageParent.SetActive(false)/*rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_empty", typeof(Sprite)) as Sprite*/,
+                () => rankImageParent.SetActive(true)/*rankingImg.GetComponent<SpriteRenderer>().sprite = Resources.Load("Sprites/GameScene/Buttons/ranking_full", typeof(Sprite)) as Sprite*/, () => sliding = false));
+        }
+    }
+    bool isRankOpen = false;
+    public IEnumerator SmoothMoveRank(Transform selector, float movementDuration, Action endActionEmptyScroll, Action endActionFullScroll, Action finishSliding)
+    {
+        float startTime = Time.time;
+        float t;
+        float targetPositionX;
+        bool toFull;
+        float targetFull = 2.82f;
+        float targetEmpty = 14.72f;
+
+        // SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
+        if (selector.localPosition.x <= targetFull)
+        {
+            toFull = false;
+            targetPositionX = targetEmpty;
+        }
+        else
+        {
+            toFull = true;
+            targetPositionX = targetFull;
+        }
+        if (toFull)
+        {
+            endActionFullScroll?.Invoke();
+        }
+        isRankOpen = toFull;
+        while (selector.localPosition.x != targetPositionX)
+        {
+            t = (Time.time - startTime) / movementDuration;
+            selector.position = new Vector3(Mathf.SmoothStep(selector.localPosition.x, targetPositionX, t / 2), selector.localPosition.y, 24f);
+
+            if (selector.localPosition.x == targetPositionX)
+            {
+                finishSliding?.Invoke();
+                if (!toFull)
+                {
+                    endActionEmptyScroll?.Invoke();
+                }
+            }
+            yield return new WaitForFixedUpdate();
+        }
+        yield break;
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 }
 

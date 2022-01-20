@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Threading.Tasks;
 using APIs;
 using Managers;
 using TMPro;
@@ -13,6 +14,8 @@ namespace Handlers
     {
         [SerializeField] TextMeshProUGUI searchingText;
         [SerializeField] TextMeshProUGUI randomTip;
+        [SerializeField] SpriteRenderer tip12SR;
+        [SerializeField] SpriteRenderer tip13SP;
 
         private bool gameFound;
         private bool readyingUp;
@@ -32,7 +35,7 @@ namespace Handlers
         private readonly string tip11 = "MONSTER Ninja-cards can flip the game around! They cost 2 energy.";
         private readonly string tip12 = "Ninja-Cards have an easy indications symbols. ▼ -Effects your hand. ▲ - Effects opponent’s hand.  ▬  - Effects the board.";
         private readonly string tip13 = "Ninja-cards are divided to 3 Elements- Fire, ice, Wind. Fire burns. Ice freezes. Wind swaps.";
-        private  string[] tips;
+        private string[] tips;
 
         private void Start()
         {
@@ -40,19 +43,19 @@ namespace Handlers
             gameFound = false;
             searchingText.text = "Looking for opponent...";
             JoinQueue();
-            tips =  new string[]{ tip1,tip2,tip3,tip4,tip5,tip6,tip7,tip8,tip9,tip10,tip11,tip12,tip13};
+            tips = new string[] { tip1, tip2, tip3, tip4, tip5, tip6, tip7, tip8, tip9, tip10, tip11, tip12, tip13 };
             StartCoroutine(DisplayRandomTip());
             StartCoroutine(StartBotGame());
         }
 
         private IEnumerator StartBotGame()
         {
-            yield return new WaitForSeconds(13f);
+            yield return new WaitForSeconds(18f);
             if (!gameFound)
             {
-            LeaveQueue();
-            Constants.BOT_MODE = true;
-            SceneManager.LoadScene("GameScene2");
+                LeaveQueue();
+                Constants.BOT_MODE = true;
+                SceneManager.LoadScene("GameScene2");
             }
         }
 
@@ -64,10 +67,27 @@ namespace Handlers
             string[] shuffleTips = tips.OrderBy(a => Guid.NewGuid()).ToArray();
             while (!gameFound)
             {
-                randomTip.text = shuffleTips[i++];
-                StartCoroutine(AlphaFontAnim(randomTip, true, duration, null));
-                yield return new WaitForSeconds(7f);
-                StartCoroutine(AlphaFontAnim(randomTip, false, duration, null));
+
+                randomTip.text = shuffleTips[i];
+
+                if (shuffleTips[i].Equals(tip12) || shuffleTips[i].Equals(tip13))
+                {
+                    SpriteRenderer tip = tip12SR;
+                    if (shuffleTips[i].Equals(tip13))
+                    {
+                        tip = tip13SP;
+                    }
+                    StartCoroutine(AlphaAnimation(tip, true, duration, null));
+                    yield return new WaitForSeconds(5.5f);
+                    StartCoroutine(AlphaAnimation(tip, false, duration, null));
+                }
+                else
+                {
+                    StartCoroutine(AlphaFontAnim(randomTip, true, duration, null));
+                    yield return new WaitForSeconds(5.5f);
+                    StartCoroutine(AlphaFontAnim(randomTip, false, duration, null));
+                }
+                i++;
                 yield return new WaitForSeconds(duration);
             }
         }
@@ -95,32 +115,39 @@ namespace Handlers
 
         private void Update()
         {
-            if(gameFound && !readyingUp)
+            if (gameFound && !readyingUp)
             {
-            readyingUp = true;
-            GameFound();
+                readyingUp = true;
+                GameFound();
             }
 
         }
 
+
+        private bool cancelGame = false;
         private void GameFound()
         {
             MainManager.Instance.gameManager.GetCurrentGameInfo(gameId, MainManager.Instance.currentLocalPlayerId,
                 gameInfo =>
                 {
                     Debug.Log("Game found. Ready-up!");
+                    StartCoroutine(CheckIfGameForReal());
                     gameFound = true;
                     StartCoroutine(AutoReady());
                     MainManager.Instance.gameManager.ListenForAllPlayersReady(gameInfo.playersIds,
-                        playerId => Debug.Log(playerId + " is ready!"), () =>
+                        playerId =>
+                        {
+                            Debug.Log(playerId + " is ready!");
+                            cancelGame = playerId.ToString() == MainManager.Instance.gameManager.currentGameInfo.localPlayerId.ToString();
+                        }
+                        , () =>
                         {
                             var dbrefOfGameRoom = DataBaseAPI.DatabaseAPI.GetReferenceFromPath($"games/{gameId}");
-                            
                             Debug.Log("All players are ready!");
                             // SingleOrMultiplayer.CrossSceneInformation = "MP";
                             //NO INIT MP
 
-                          //  LocalTurnSystem.Instance.Init(dbrefOfGameRoom, gameInfo.playersIds, MainManager.Instance.currentLocalPlayerId);
+                            //  LocalTurnSystem.Instance.Init(dbrefOfGameRoom, gameInfo.playersIds, MainManager.Instance.currentLocalPlayerId);
                             LocalTurnSystem.Instance.Init(dbrefOfGameRoom, gameInfo.playersIds, MainManager.Instance.currentLocalPlayerId);
 
                             // Initilize Turn Manager here! Destroy when leave
@@ -130,6 +157,42 @@ namespace Handlers
             searchingText.text = "Game found!";
         }
 
+        private IEnumerator CheckIfGameForReal()
+        {
+            yield return new WaitForSeconds(35f);
+            if (cancelGame)
+            {
+                MainManager.Instance.gameManager.StopListeningForAllPlayersReady();
+                DeleteGame(()=>Debug.Log("YEAH DELETEEE"),Debug.LogError);
+                LeaveQueue();
+                yield return new WaitForSeconds(3f);
+                SceneManager.LoadScene("GameMenuScene");
+            }
+        }
+        public  void DeleteGame( Action callback, Action<AggregateException> fallback)
+        {
+            var dbrefOfGameRoom = DataBaseAPI.DatabaseAPI.GetReferenceFromPath($"games/{gameId}");
+            dbrefOfGameRoom.RemoveValueAsync().ContinueWith(task =>
+            {
+                if (task.IsCanceled)
+                {
+                    Debug.LogError("PostJSON was canceled.");
+                    fallback(task.Exception);
+                    return;
+                }
+
+                if (task.IsFaulted)
+                {
+                    Debug.LogError("PostJSON encountered an error: " + task.Exception);
+                    fallback(task.Exception);
+                    return;
+                }
+
+                callback();
+            }
+                );
+
+        }
         private void InternetCheck()
         {
             Debug.Log("internet check");
@@ -142,7 +205,7 @@ namespace Handlers
 
         public void LeaveQueue()
         {
-            
+
             if (gameFound) MainManager.Instance.gameManager.StopListeningForAllPlayersReady();
             else
                 MainManager.Instance.matchmakingManager.LeaveQueue(MainManager.Instance.currentLocalPlayerId,
@@ -190,7 +253,58 @@ namespace Handlers
                 OnFinish?.Invoke();
             }
         }
-        IEnumerator AutoReady()
+
+        public IEnumerator AlphaAnimation(SpriteRenderer spriteRenderer, bool fadeIn, float duration, Action OnFinish)
+        {
+            float r = spriteRenderer.color.r;
+            float g = spriteRenderer.color.g;
+            float b = spriteRenderer.color.b;
+            float startingAlpha = spriteRenderer.color.a;
+            float dissolveAmount = 1;
+            float alphaTarget = 0;
+            if (fadeIn)
+            {
+                dissolveAmount = 0;
+                alphaTarget = 1;
+            }
+            if (startingAlpha == alphaTarget)
+            {
+                Debug.LogError("SAME VaLUE");
+                OnFinish?.Invoke();
+            }
+            else
+            {
+
+                spriteRenderer.color = new Color(r, g, b, dissolveAmount);
+                //FIXIT
+                while (dissolveAmount != alphaTarget)
+                {
+                    //yield return new WaitForFixedUpdate();
+                    yield return null;
+                    if (fadeIn)
+                    {
+                        dissolveAmount += Time.deltaTime / duration;
+                    }
+                    else
+                    {
+                        dissolveAmount -= Time.deltaTime / duration;
+                    }
+
+                    spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
+                    if (dissolveAmount >= 1 || dissolveAmount <= 0)
+                    {
+                        // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
+                        // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
+
+                        spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaTarget));
+                        OnFinish?.Invoke();
+                        break;
+                    }
+                }
+            }
+        }
+
+        private IEnumerator AutoReady()
         {
             if (MainManager.Instance.gameManager.currentGameInfo.gameId.Length > 0)
             {
@@ -199,13 +313,15 @@ namespace Handlers
             }
             yield return new WaitForSeconds(1f);
             if (!isReady)
-            { 
-            StartCoroutine(AutoReady());
+            {
+                StartCoroutine(AutoReady());
             }
         }
 
         public void Ready() =>
-            MainManager.Instance.gameManager.SetLocalPlayerReady(true,() => Debug.Log("You are now ready!"), Debug.Log);
+            MainManager.Instance.gameManager.SetLocalPlayerReady(true, () => Debug.Log("You are now ready!"), Debug.Log);
     }
-   
+
+
+
 }

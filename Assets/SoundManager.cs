@@ -67,6 +67,7 @@ public class SoundManager : Singleton<SoundManager>
     public float HighPitchRange = 1.05f;
 
     private bool musicOn;
+    private bool mute = false;
 
     private void Awake()
     {
@@ -214,7 +215,21 @@ public class SoundManager : Singleton<SoundManager>
 
     }
   
-    public void ChangeMusicVolume(float value)
+    public void EnableMusicWithVolume()
+    {
+        if (mute)
+        {
+            mute = false;
+            ChangeMusicVolume(Values.Instance.musicVolume);
+        }
+        else
+        {
+            mute = true;
+             ChangeMusicVolume(0);
+        }
+    }
+
+    private void ChangeMusicVolume(float value)
     {
         constantsSounds[0].volume = value;
     }

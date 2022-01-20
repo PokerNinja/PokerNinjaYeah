@@ -143,6 +143,7 @@ public class PowerUpState : State
 
     private string GetListOfRandomCardsForMonster()
     {
+        Debug.LogError("HELLO");
         if (powerUpName.Equals("wm2") || powerUpName.Equals("im2") || powerUpName.Equals("fm2"))
         {
             return string.Join(",", battleSystem.GetRandomAvailableCardsNames());
@@ -152,6 +153,8 @@ public class PowerUpState : State
 
     private void ActivateSelectMode(int cardsToSelect, string powerUpName)
     {
+        Debug.LogError("DODRAWERACTION" + powerUpName);
+
         battleSystem.SetCardsSelectionAndDisplayInfo(cardsToSelect, powerUpName);
         ActivateCardSelection(PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true));
     }
