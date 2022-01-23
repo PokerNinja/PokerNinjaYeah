@@ -54,7 +54,7 @@ public class BattleSystem : StateMachine
 
     public int prizeAmount = 1000;
     public int currentTurn = 6;
-    private bool firstRound = true;
+    public bool firstRound = true;
     private bool gameEndByBet = false;
     public Timer turnTimer;
     public bool enemyPuIsRunning;
@@ -151,7 +151,7 @@ public class BattleSystem : StateMachine
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
-        //Constants.BOT_MODE = true;
+        Constants.BOT_MODE = true;
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
         {
@@ -408,7 +408,7 @@ public class BattleSystem : StateMachine
     public void SoundCheck(int emojiId)
     {
         SavePrefsInt(Constants.Instance.PLAYER_WIN_BOT, 0);
-        SavePrefsInt(Constants.Instance.PLAYER_LOSE_BOT,0);
+        SavePrefsInt(Constants.Instance.PLAYER_LOSE_BOT, 0);
         //SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndRoundGong, true);
         //StartCoroutine(ui.DisplayEmoji(false, emojiId, null));
         //  SavePrefsInt(Constants.Instance.PLAYER_WIN_BOT,/*LoadPrefsInt(Constants.Instance.PLAYER_WIN_BOT) +*/ 1);
@@ -426,13 +426,13 @@ public class BattleSystem : StateMachine
         else
         {
             currentTurn = 6;
-            currentRound++;
             isRoundReady = true;
             currentGameInfo.cardDeck = CreateCardsDeck(true);
             ui.winLabel.SetActive(false);
             firstToPlayBotMode = !firstToPlayBotMode;
             SetState(new BeginRound(this, firstToPlayBotMode, false));
         }
+            currentRound++;
     }
 
     private IEnumerator CheckIfNewRoundReadyAndStart()
@@ -489,8 +489,7 @@ public class BattleSystem : StateMachine
         }
         else
         {
-            ui.UpdateCardRank(7000);
-
+            ui.currentRankNumber.text = "10";
         }
     }
 
@@ -506,13 +505,13 @@ public class BattleSystem : StateMachine
         switch (currentTurn)
         {
             case 4:
-               // firstDeck = false;
-              //  waitForDrawerAnimationToEnd = true;
+                // firstDeck = false;
+                //  waitForDrawerAnimationToEnd = true;
                 //  yield return new WaitForSeconds(0.7f);
                 //cardsDeckUi.DealCardsForBoard(true, () => waitForDrawerAnimationToEnd = false, () => UpdateHandRank(false));
                 break;
             case 2:
-               // cardsDeckUi.DealCardsForBoard(true, () => waitForDrawerAnimationToEnd = false, () => UpdateHandRank(false));
+                // cardsDeckUi.DealCardsForBoard(true, () => waitForDrawerAnimationToEnd = false, () => UpdateHandRank(false));
                 break;
             case 1:
                 break;
@@ -601,13 +600,14 @@ public class BattleSystem : StateMachine
             else
             {
                 isPlayerBotModeTurn = false;
-               // TurnEvents(--currentTurn);// SIM LEV MINUS TURN
+                // TurnEvents(--currentTurn);// SIM LEV MINUS TURN
                 if (--currentTurn > 0)
                 {
                     SetState(new EnemyTurn(this, currentTurn));
-                }else if(currentTurn == 0)
+                }
+                else if (currentTurn == 0)
                 {
-                    SetState(new EndRound(this,  false));
+                    SetState(new EndRound(this, false));
                 }
             }
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
@@ -864,9 +864,9 @@ public class BattleSystem : StateMachine
                 StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnBtnSpriteREnderer, true, Values.Instance.turnBtnAlphaDuration, null));
             }));
         }
-        else if( currentTurn == 0)
+        else if (currentTurn == 0)
         {
-                SetState(new EndRound(this, false));
+            SetState(new EndRound(this, false));
         }
     }
 
@@ -908,9 +908,9 @@ public class BattleSystem : StateMachine
         LocalTurnSystem.Instance.TurnCounter.onValueChanged += i =>
         {
             currentTurn = (int)i;
-             if (currentTurn == -1)
+            if (currentTurn == -1)
             {
-                SetState(new EndRound(this,  false));
+                SetState(new EndRound(this, false));
             }
         };
     }
@@ -1018,12 +1018,24 @@ public class BattleSystem : StateMachine
         return isGameOver;
     }
 
+    [Button]
+    private void ShowEmojiBot(bool isHappy)
+    {
+        if (GenerateRandom(0, 11) < Values.Instance.ChanceForBotEmoji)
+        {
+            int emojiIndex = GenerateRandom(0, 2);
+            int[] emojis = { 0, 2, 1, 3 };
+            if (isHappy)
+            {
+                emojiIndex += 2;
+            }
+            StartCoroutine(ui.DisplayEmoji(false, emojis[emojiIndex], null));
+        }
+    }
 
     public void DisplayWinner(string winningText)
     {
         StartCoroutine(ui.ShowWinner(winningText));
-
-
     }
 
     public void UpdateWinnerDB()
@@ -1057,7 +1069,6 @@ public class BattleSystem : StateMachine
             this.newEnergyCost = energyCost;
 
             SetState(new PowerUpState(this, true, energyCost, newPowerUpName, "", "", new Vector2(0, 0), new Vector2(0, 0), newPuSlotIndexUse));
-
         }
         else if (energyCounter - energyCost < 0)
         {
@@ -1206,6 +1217,11 @@ public class BattleSystem : StateMachine
         else
         {
             finishPuDissolve = true;
+        }
+        if (BOT_MODE)
+        {
+            yield return new WaitForSeconds(GenerateRandom(1, 4));
+            ShowEmojiBot(!isPlayer);
         }
     }
     internal void ResetPuUi(PowerUpUi pu)
@@ -2269,9 +2285,10 @@ public class BattleSystem : StateMachine
     }
     internal void DealBoardCard()
     {
-         //   waitForDrawerAnimationToEnd = false;
-        cardsDeckUi.DealCardsForBoard(true,null /*() => waitForDrawerAnimationToEnd = false*/, () => UpdateHandRank(false));
+        //   waitForDrawerAnimationToEnd = false;
+        cardsDeckUi.DealCardsForBoard(true, null /*() => waitForDrawerAnimationToEnd = false*/, () => UpdateHandRank(false));
     }
+
     /* internal void FreezePu(string puTarget, bool isToFreeze)
 {
     PowerUpUi cardToFreeze = GameObject.Find(puTarget).GetComponent<PowerUpUi>();

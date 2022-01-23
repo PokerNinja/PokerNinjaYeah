@@ -25,6 +25,7 @@ public class Values : Singleton<Values>
     public int energyCostForDraw = 1;
     public float tutoObjsFadeDuration = 0.7f;
     public float fontAppearance = 0.7f;
+    public int ChanceForBotEmoji = 3;
 
     // public int replaceUseLimit = 1;
     //    public GamePhase resetReplaceEvery = GamePhase.Turn;

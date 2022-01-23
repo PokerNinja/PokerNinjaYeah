@@ -28,7 +28,7 @@ public class BotEnemy : State
         Debug.Log("BOTSTATER");
         this.battleSystem = battleSystem;
         this.turnCounter = turnCounter;
-        if (turnCounter > 4)
+        if (turnCounter > 4 && battleSystem.firstRound)
         {
             energyLeft = 0;
         }
@@ -38,6 +38,7 @@ public class BotEnemy : State
         }
         ChreageEnergy();
         InitBotTurn();
+        Debug.Log("BOT ENERGY:" + energyLeft);
     }
 
     private async void InitBotTurn()
@@ -207,6 +208,10 @@ public class BotEnemy : State
                 case (int)EnemyActions.Pu1Use:
                     {
                         Debug.Log("Bot PU1");
+                        if (!IsMonster(pu1))
+                        {
+                            delay = 3500;
+                        }
                         BotPuUse(pu1, 0);
                         costOfAction = GetPuCost(pu1);
                         break;
@@ -214,6 +219,10 @@ public class BotEnemy : State
                 case (int)EnemyActions.Pu2Use:
                     {
                         Debug.Log("Bot PU2");
+                        if (!IsMonster(pu1))
+                        {
+                            delay = 3500;
+                        }
                         BotPuUse(pu2, 1);
                         costOfAction = GetPuCost(pu2);
                         break;
@@ -223,6 +232,10 @@ public class BotEnemy : State
                         Debug.Log("Bot RANDOM");
                         string[] pus = { pu1, pu2 };
                         int index = battleSystem.GenerateRandom(0, 2);
+                        if (!IsMonster(pus[index]))
+                        {
+                            delay = 3500;
+                        }
                         BotPuUse(pus[index], index);
                         costOfAction = GetPuCost(pus[index]);
                         break;
@@ -232,11 +245,13 @@ public class BotEnemy : State
         }
         else
         {
-            StartAutoEndWithDelay(battleSystem.GenerateRandom(1100,1700), true);
+            StartAutoEndWithDelay(battleSystem.GenerateRandom(1100, 1700), true);
         }
+    }
 
-
-
+    private bool IsMonster(string pu)
+    {
+        return pu.Contains("m");
     }
 
     private void BotPuUse(string puName, int index)
@@ -868,6 +883,9 @@ public class BotEnemy : State
         }
         return GenerateListProbability(EnemyActions.SkillUse, amount);
     }
+
+
+
 
     private List<int> GenerateListProbability(EnemyActions skillUse, int amount)
     {
