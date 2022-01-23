@@ -233,8 +233,12 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
     [Button]
     public bool IsPlayerTurn()
     {
-
         return CurrentPlayerID.Value.ToString().Equals(PlayerID.Value.ToString());
+    }
+
+    public void LeaveGame()
+    {
+        CurrentPlayerID.Value = PlayerID.Value.ToString() + "(#Exit#)";
     }
  
 }

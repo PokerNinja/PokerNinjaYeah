@@ -10,8 +10,7 @@ Material:
   m_Name: CardUiBurn
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA FADE_ON GRADIENT_ON OUTBASE_ON OUTDIST_ON
-    OUTTEX_ON RADIALGRADIENT_ON SHAKEUV_ON SHINE_ON _GRADISRADIAL_ON _OUTLINEDISTORTTOGGLE_ON
-    _OUTLINETEXTOGGLE_ON
+    RADIALGRADIENT_ON SHAKEUV_ON SHINE_ON _GRADISRADIAL_ON _OUTLINEDISTORTTOGGLE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -183,7 +182,7 @@ Material:
     - _OutlineIsPixel: 0
     - _OutlinePixelWidth: 1
     - _OutlineTexGrey: 0
-    - _OutlineTexToggle: 1
+    - _OutlineTexToggle: 0
     - _OutlineTexXSpeed: 10
     - _OutlineTexYSpeed: 0
     - _OutlineWidth: 0.055

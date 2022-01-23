@@ -191,8 +191,9 @@ public class BotEnemy : State
                     {
                         Debug.Log("Bot Skill");
                         battleSystem.enemyBotSkillUsed = true;
+                        string playerCardPlace = GetAvailablePlayerCard();
                         battleSystem.FakeEnemyPuUse(-1,
-                        battleSystem.cardsDeckUi.GetListByTag(Constants.PlayerCardsTag)[battleSystem.GenerateRandom(0, 2)].cardPlace, "", false);
+                        playerCardPlace, "", false);
                         costOfAction = 2;
                         delay = 2500;
                         break;
@@ -247,6 +248,20 @@ public class BotEnemy : State
         {
             StartAutoEndWithDelay(battleSystem.GenerateRandom(1100, 1700), true);
         }
+    }
+
+    private string GetAvailablePlayerCard()
+    {
+        List<CardUi> playerCards = battleSystem.cardsDeckUi.playerCardsUi;
+        if (playerCards[0].freeze)
+        {
+            return Constants.PlayerCard2;
+        }
+        else if(playerCards[1].freeze)
+        {
+            return Constants.PlayerCard1;
+        }
+        return battleSystem.cardsDeckUi.playerCardsUi[battleSystem.GenerateRandom(0, 2)].cardPlace;
     }
 
     private bool IsMonster(string pu)
@@ -871,7 +886,7 @@ public class BotEnemy : State
 
     private List<int> CalculateSkillProbability(int amount)
     {
-        if (battleSystem.enemyBotSkillUsed || energyLeft == 1)
+        if (battleSystem.enemyBotSkillUsed || energyLeft == 1 || (battleSystem.cardsDeckUi.playerCardsUi[0].freeze && battleSystem.cardsDeckUi.playerCardsUi[1].freeze))
         {
             amount = 0;
         }

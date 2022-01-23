@@ -148,10 +148,37 @@ public class BattleSystem : StateMachine
     public bool isPlayerBotModeTurn;
 
     public event Action onGameStarted;
+
+
+
+    [Button]
+    public void CheckValues()
+    {
+        Debug.Log("currentRound" + currentRound);
+        Debug.Log("currentTurn" + currentTurn);
+        Debug.Log("IsPlayerTurn" + IsPlayerTurn());
+        Debug.Log("ReplaceInProgress" + ReplaceInProgress);
+        Debug.Log("++++++++++++++++++");
+        Debug.Log("playerPuInProcess" + playerPuInProcess);
+        Debug.Log("btnReplace" + btnReplaceClickable);
+        Debug.Log("energyCounter" + energyCounter);
+        Debug.Log("TemproryUnclickable" + Constants.TemproryUnclickable);
+        Debug.Log("replaceMode" + replaceMode);
+        Debug.Log("++++++++++++++++++");
+        Debug.Log("selectMode" + selectMode);
+        Debug.Log("endTurnInProcess" + endTurnInProcess);
+        Debug.Log("timedOut" + timedOut);
+        Debug.Log("infoShow" + infoShow);
+        Debug.Log("deckGenerate" + deckGenerate);
+        Debug.Log("endRoutineFinished" + endRoutineFinished);
+        Debug.Log("firstRound" + firstRound);
+
+    }
+
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
-        Constants.BOT_MODE = true;
+       // Constants.BOT_MODE = true;
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
         {
@@ -362,7 +389,15 @@ public class BattleSystem : StateMachine
         Destroy(GameObject.Find("LocalTurnSystem"));
         Destroy(GameObject.Find("SoundManager"));
         Destroy(GameObject.Find("BattleSystem"));
+    }
 
+    public void ExitGame()
+    {
+        if (!TEST_MODE && !BOT_MODE)
+        {
+            LocalTurnSystem.Instance.LeaveGame();
+        }
+        LoadMenuScene(false);
     }
 
     public void PlayMusic(bool enable)
@@ -488,7 +523,7 @@ public class BattleSystem : StateMachine
         }
         else
         {
-            ui.currentRankNumber.text = "10";
+            ui.ResetHandRank();
         }
     }
 
@@ -823,10 +858,16 @@ public class BattleSystem : StateMachine
                 //  ui.playerNameText.text = "Bind " + currentTurn;
 
             }
-            else
+            else if( s == currentGameInfo.EnemyId)
             {
                 SetState(new EnemyTurn(this, currentTurn));
                 // ui.enemyNameText.text = "Bind " + currentTurn;
+            }
+            else if (s.Contains("(#Exit#)"))
+            {
+                ActivatePlayerButtons(false, false);
+                ui.WinPanelAfterEnemyLeaveGame(currentGameInfo.EnemyId);
+                SetState(new GameOver(this, true));
             }
 
 
@@ -2286,6 +2327,26 @@ public class BattleSystem : StateMachine
     {
         //   waitForDrawerAnimationToEnd = false;
         cardsDeckUi.DealCardsForBoard(true, null /*() => waitForDrawerAnimationToEnd = false*/, () => UpdateHandRank(false));
+    }
+
+
+    [Button]
+    public void InternetChecK()
+    {
+        StartCoroutine(CheckInternetConnection(result => Debug.Log("Internet: "+ result)));
+    }
+    public IEnumerator CheckInternetConnection(Action<bool> syncResult)
+    {
+        const string echoServer = "http://google.com";
+
+        bool result;
+        using (var request = UnityEngine.Networking.UnityWebRequest.Head(echoServer))
+        {
+            request.timeout = 5;
+            yield return request.SendWebRequest();
+            result = !request.isNetworkError && !request.isHttpError && request.responseCode == 200;
+        }
+        syncResult(result);
     }
 
     /* internal void FreezePu(string puTarget, bool isToFreeze)
