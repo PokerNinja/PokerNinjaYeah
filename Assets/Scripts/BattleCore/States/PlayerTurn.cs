@@ -25,7 +25,10 @@ public class PlayerTurn : State
             finalTurn = true;
             energyChargeCount = 1;
         }
-
+        if (turnCounter == 4 || turnCounter == 2)
+        {
+            battleSystem.DealBoardCard();
+        }
         /* if(turnCounter == 6 || turnCounter == 5)
          {
              cancaleTimer = true;

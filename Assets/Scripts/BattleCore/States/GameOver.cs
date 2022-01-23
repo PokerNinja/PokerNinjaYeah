@@ -8,6 +8,17 @@ public class GameOver : State
     public GameOver(BattleSystem battleSystem , bool isPlayerWin) : base(battleSystem)
     {
         this.isPlayerWin = isPlayerWin;
+        if (battleSystem.BOT_MODE)
+        {
+            if (isPlayerWin)
+            {
+            battleSystem.SavePrefsInt(Constants.Instance.PLAYER_WIN_BOT, battleSystem.LoadPrefsInt(Constants.Instance.PLAYER_WIN_BOT)+1);
+            }
+            else
+            {
+            battleSystem.SavePrefsInt(Constants.Instance.PLAYER_LOSE_BOT, battleSystem.LoadPrefsInt(Constants.Instance.PLAYER_LOSE_BOT)+1);
+            }
+        }
     }
 
     public override IEnumerator Start()

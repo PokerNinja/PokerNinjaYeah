@@ -10,7 +10,7 @@ public class SoundManager : Singleton<SoundManager>
     // Audio players components.
     //public AudioSource effectsSource1, effectsSource2, effectsSource3, effectsSource4, effectsSource5, effectsSource6, effectsSource7, effectsSource8, effectsSource9, effectsSource10, effectsSource11, effectsSource12, effectsSource13, effectsSource14, effectsSource15, effectsSource16, effectsSource17, effectsSource18;
     public float GLOBAL_SFX_VOLUME = 1f;
-    public float MAX_VOL_MUSIC = 0.65f;
+    public float MUSIC_VOLUME = 0.65f;
     public AudioSource[] constantsSounds;
     public enum ConstantSoundsEnum { Music, LastSeconds, Vision, }
     private Queue<AudioSource> soundPool;
@@ -67,14 +67,38 @@ public class SoundManager : Singleton<SoundManager>
     public float HighPitchRange = 1.05f;
 
     private bool musicOn;
+    private bool mute = false;
 
     private void Awake()
     {
         GLOBAL_SFX_VOLUME = Values.Instance.sfxVolume;
-        MAX_VOL_MUSIC = Values.Instance.musicVolume;
+        MUSIC_VOLUME = LoadVolume();
         LowPitchRange = Values.Instance.lowPitchRange;
         HighPitchRange = Values.Instance.highPitchRange;
         InitPool();
+    }
+
+    private void Start()
+    {
+        
+    }
+
+    private string MUSIC_VOLUME_KEY = "MUSIC_VOLUME_KEY";
+    private void SaveVolumePrefs(float volume)
+    {
+        PlayerPrefs.SetFloat(MUSIC_VOLUME_KEY,volume);
+    }
+
+    private float LoadVolume()
+    {
+        if (PlayerPrefs.HasKey(MUSIC_VOLUME_KEY))
+        {
+            return PlayerPrefs.GetFloat(MUSIC_VOLUME_KEY);
+        }
+        else
+        {
+            return Values.Instance.musicVolume;
+        }
     }
 
     public void PlayMusic()
@@ -115,7 +139,7 @@ public class SoundManager : Singleton<SoundManager>
 
 
     // Play a single clip through the sound effects source.
-    private async Task PlayAsync(AudioClip clip,bool normalPitch)
+    private async Task PlayAsync(AudioClip clip, bool normalPitch)
     {
         float pitch = 1f;
         AudioSource currentSource = await GetAvailableAudioSource();/*
@@ -139,7 +163,7 @@ public class SoundManager : Singleton<SoundManager>
 
     private IEnumerator DisableAudioSource(AudioSource currentSource, float length)
     {
-        yield return new WaitForSeconds(length );
+        yield return new WaitForSeconds(length);
         currentSource.gameObject.SetActive(false);
     }
 
@@ -174,20 +198,20 @@ public class SoundManager : Singleton<SoundManager>
             for (int i = 0; i < soundPool.Count; i++)
             {
                 AudioSource currentSource = soundPool.Dequeue();
-                if ( !currentSource.isPlaying)
+                if (!currentSource.isPlaying)
                 {
                     currentSource.gameObject.SetActive(true);
                     return currentSource;
                 }
                 else
                 {
-                    
+
                     Debug.LogWarning("oh no sound");
                 }
                 await Task.Yield();
             }
         }
-       // AudioSource obj = Instantiate(audioPrefab, gameObject.transform);
+        // AudioSource obj = Instantiate(audioPrefab, gameObject.transform);
         return null;
     }
 
@@ -199,7 +223,7 @@ public class SoundManager : Singleton<SoundManager>
         if (enable)
         {
             constantsSounds[audioSourceIndex].Play();
-            StartCoroutine(FadeIn(constantsSounds[audioSourceIndex], Values.Instance.musicVolume));
+            StartCoroutine(FadeIn(constantsSounds[audioSourceIndex], MUSIC_VOLUME));
             if (sound == ConstantSoundsEnum.Music)
             {
 
@@ -213,19 +237,35 @@ public class SoundManager : Singleton<SoundManager>
         }
 
     }
-  
-    public void ChangeMusicVolume(float value)
+
+    public void EnableMusicWithVolume()
+    {
+        if (mute)
+        {
+            mute = false;
+            MUSIC_VOLUME = Values.Instance.musicVolume;
+        }
+        else
+        {
+            mute = true;
+            MUSIC_VOLUME = 0f;
+        }
+        SaveVolumePrefs(MUSIC_VOLUME);
+        ChangeMusicVolume(MUSIC_VOLUME);
+    }
+
+    private void ChangeMusicVolume(float value)
     {
         constantsSounds[0].volume = value;
     }
 
-    public  IEnumerator FadeIn(AudioSource audioSource, float FadeTime)
+    public IEnumerator FadeIn(AudioSource audioSource, float FadeTime)
     {
         audioSource.volume = 0f;
         audioSource.Play();
         while (audioSource.volume < FadeTime)
         {
-            audioSource.volume +=  Time.deltaTime/2 ;
+            audioSource.volume += Time.deltaTime / 2;
             if (audioSource.volume >= FadeTime)
             {
                 audioSource.volume = FadeTime;
@@ -269,7 +309,7 @@ public class SoundManager : Singleton<SoundManager>
         Task task = RandomSoundEffectTask(whatSounds);
         task.Wait();
     }
-    private async Task RandomSoundEffectTask(SoundName whatSounds )
+    private async Task RandomSoundEffectTask(SoundName whatSounds)
     {
 
         AudioClip[] targetClipSound = null;
@@ -310,8 +350,8 @@ public class SoundManager : Singleton<SoundManager>
         int randomIndex = Random.Range(0, targetClipSound.Length);
         // Is above range takin?
 
-        
-        await PlayAsync(targetClipSound[randomIndex] , false);
+
+        await PlayAsync(targetClipSound[randomIndex], false);
 
 
     }
@@ -321,7 +361,7 @@ public class SoundManager : Singleton<SoundManager>
         Task task = PlaySingleSoundTask(whatSound, normalPitch);
         task.Wait();
     }
-    private async Task PlaySingleSoundTask(SoundName whatSound,bool normalPitch)
+    private async Task PlaySingleSoundTask(SoundName whatSound, bool normalPitch)
     {
         AudioClip soundToPlay = null;
         switch (whatSound)

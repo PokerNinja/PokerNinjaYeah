@@ -661,6 +661,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
             if (selector.position.x == targetPosition.x)
             {
+                Debug.LogError("DODRAWERACTION");
                 endAction?.Invoke();
                 break;
             }
@@ -1284,6 +1285,7 @@ public class AnimationManager : Singleton<AnimationManager>
     }
     public void AnimateWinningHandToBoard2(List<CardUi> winningPlayerCards, int cardToGlow, List<CardUi> losingBoardCards, Transform[] boardTransform, Action UpdateValueEndRoutine)
     {
+
         Vector3 targetScale = new Vector3(0.75f, 0.75f, 0.75f);
         Action EndAction = null;
         foreach (CardUi card in losingBoardCards)

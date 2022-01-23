@@ -554,6 +554,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                     combinedList.AddRange(playerCardsUi);
                     combinedList.AddRange(enemyCardsUi);
                     combinedList.AddRange(boardCardsUi);
+                    combinedList.AddRange(extraDeckCardsUi);
                     return combinedList;
                 }
         }
@@ -1054,9 +1055,20 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal bool IsOneCardFromHandsFreeze()
     {
-        if (playerCardsUi[0].freeze || playerCardsUi[1].freeze || enemyCardsUi[1].freeze || enemyCardsUi[1].freeze)
+        if (playerCardsUi[0].freeze || playerCardsUi[1].freeze || enemyCardsUi[0].freeze || enemyCardsUi[1].freeze)
         {
             return true;
+        }
+        return false;
+    }
+    internal bool IsOneCardFromBoardFreeze()
+    {
+        foreach (CardUi card in boardCardsUi)
+        {
+            if (card.freeze)
+            {
+                return true;
+            }
         }
         return false;
     }
@@ -1778,10 +1790,16 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     {
         if (enable)
         {
-
             if (tagFrom == Constants.EnemyCardsTag)
             {
+                if(tagTo == Constants.EnemyCardsTag)
+                {
+                cardToFlip.FlipCard(false, null);
+                }
+                else
+                {
                 cardToFlip.FlipCard(true, null);
+                }
             }
             else if (tagTo == Constants.EnemyCardsTag)
             {

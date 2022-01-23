@@ -8138,7 +8138,7 @@ MonoBehaviour:
   coinHit: {fileID: 8300000, guid: 93355b14134c6e4498d0d98817bb9296, type: 3}
   coinLose: {fileID: 8300000, guid: 7071b0e274428c04e9e05f0e2e3a139e, type: 3}
   armagedon: {fileID: 8300000, guid: 416921bf7b90ce143a4ab2dd5361e2e3, type: 3}
-  coinFlipStart: {fileID: 8300000, guid: 0631c92f5b2728d468dc100912362404, type: 3}
+  coinFlipStart: {fileID: 8300000, guid: e81b70d9d222609468ea8ca191f9bee0, type: 3}
   energyCharge: {fileID: 8300000, guid: e1bb4bf923ec8ec47833cc09ac4a7f16, type: 3}
   tornado: {fileID: 0}
   iceagedon: {fileID: 0}
@@ -8959,6 +8959,7 @@ MonoBehaviour:
   resetSkillEvery: 1
   energyCostForDraw: 1
   tutoObjsFadeDuration: 0.7
+  fontAppearance: 0.7
   puProjectileMoveDuration: 2
   puProjectileFadeOutDuration: 0.7
   windMoveDuration: 0.3
@@ -9008,6 +9009,7 @@ MonoBehaviour:
   emojiStay: 3.3
   emojiCoolDown: 5
   cardSelectionColor: {r: 0.92941177, g: 0.654902, b: 0.21960784, a: 0}
+  drawerMoveDuration: 0.9
   FreezeDuration: 3
   cardDrawMoveDuration: 2
   cardSwapMoveDuration: 2
@@ -9030,7 +9032,6 @@ MonoBehaviour:
   turnBtnAlphaDuration: 1
   turnTextMoveDuration: 1.9
   turnTextScaleDuration: 1.3
-  drawerMoveDuration: 0.9
   textTurnFadeOutDuration: 0.5
   turnIndicatorFadeDuration: 0.9
   delayBetweenCardWinArrangeInMilli: 1
@@ -19952,7 +19953,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8090189717511497824, guid: 8576ffd9d2046dc4eb3482c5136fc709, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8090189717511497830, guid: 8576ffd9d2046dc4eb3482c5136fc709, type: 3}
       propertyPath: m_RootOrder

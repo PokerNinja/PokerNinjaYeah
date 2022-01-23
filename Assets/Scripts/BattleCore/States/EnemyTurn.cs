@@ -15,6 +15,10 @@ public class EnemyTurn : State
         {
             isFinalTurn = true;
         }
+        if (turnCounter == 4 || turnCounter == 2)
+        {
+            battleSystem.DealBoardCard();
+        }
 
     }
     public override IEnumerator Start()
@@ -25,16 +29,16 @@ public class EnemyTurn : State
         battleSystem.DisablePlayerPus();
         battleSystem.DealPu(false, () =>
          {
-            // battleSystem.Interface.enemyNameText.text = "afterDeal";
+             // battleSystem.Interface.enemyNameText.text = "afterDeal";
              Debug.Log("end Deal");
              battleSystem.Interface.SetTurnIndicator(false, true);
              battleSystem.Interface.WhosTurnAnimation(false, false, isFinalTurn, () => battleSystem.turnInitInProgress = false);
-                 battleSystem.NewTimerStarter(false);
+             battleSystem.NewTimerStarter(false);
              if (battleSystem.BOT_MODE)
              {
-                 battleSystem.SetState(new BotEnemy(battleSystem,turnCounter));
+                 battleSystem.SetState(new BotEnemy(battleSystem, turnCounter));
              }
-             
+
          }
         );
         yield break;
