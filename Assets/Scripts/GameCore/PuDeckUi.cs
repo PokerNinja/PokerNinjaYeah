@@ -67,6 +67,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void InitDeckFromServer(string[] deckFromDB)
     {
+        Debug.LogError("newPUDECK");
         deck = new Stack<string>();
         foreach (string puString in deckFromDB)
         {

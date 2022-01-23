@@ -617,7 +617,7 @@ public class BattleSystem : StateMachine
     public void EndTurn()
     {
         Debug.LogError("CurrentT " + currentTurn);
-        if (!endTurnInProcess)
+        if (!endTurnInProcess && !ReplaceInProgress)
         {
             endTurnInProcess = true;
             DisableSelectMode(true);
@@ -1731,7 +1731,7 @@ public class BattleSystem : StateMachine
             Debug.LogError("ending");
             timedOut = false;
             yield return new WaitForSeconds(1.5f);
-            if (newPowerUpName.Contains("m2"))
+            if (newPowerUpName.Contains("m2") || ReplaceInProgress)
             {
                 yield return new WaitForSeconds(2.5f);
             }

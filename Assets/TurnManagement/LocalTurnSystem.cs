@@ -90,9 +90,9 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
             if (TurnCounter.Value == 1)
             {
                 TurnCounter.Value = -1;
-
+                CurrentPlayerID.Value = OtherPlayerID;
             }
-            else if (TurnCounter.Value > 0)
+            else if (TurnCounter.Value > 1)
             {
                 TurnCounter.Value -= 1;
                 CurrentPlayerID.Value = OtherPlayerID;
