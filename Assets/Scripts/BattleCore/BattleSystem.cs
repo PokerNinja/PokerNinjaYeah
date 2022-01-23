@@ -191,7 +191,6 @@ public class BattleSystem : StateMachine
                      SetState(new BeginRound(this, firstToPlayBotMode, true));
                  }
              }));
-
         }
     }
 

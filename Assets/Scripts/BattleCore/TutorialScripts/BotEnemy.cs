@@ -487,11 +487,6 @@ public class BotEnemy : State
 
                     if (!cards[i].cardPlace.Equals(differentCard) && currentCardRank != differentRank)
                     {
-                        Debug.LogError("INSIDE@#@@#@ " + currentCardRank);
-                        Debug.LogError("INSIDE@##@ " + differentRank);
-                        Debug.LogError("==================");
-                        Debug.LogError("INSIDE@#@@#@ " + cards[i].cardPlace);
-                        Debug.LogError("INSIDE@##@ " + differentCard);
                         int boardCardRank = GetRankFromCardDesc(boardCards[j].cardDescription);
                         if (isDuplicate)
                         {
@@ -674,7 +669,6 @@ public class BotEnemy : State
                     case "i2":
                         if (UnfrozenCardsAvailable(Constants.BoardCardsTag, 2))
                         {
-
                             if (AreBotCardsDuplicateOnBoard(true))
                             {
                                 odds = 10;
