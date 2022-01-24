@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class InternetCheck : MonoBehaviour
 {
@@ -9,9 +11,6 @@ public class InternetCheck : MonoBehaviour
     private IEnumerator CheckConnection(string url)
     {
         isRunning = true;
-
-        
-
             WWW www = new WWW(url); // Find A
         float elapsedTime = 0.0f;
 
@@ -29,10 +28,10 @@ public class InternetCheck : MonoBehaviour
             isConnect = false;
             yield break;
         }
-
         isConnect = true;
         isRunning = false;
     }
+ 
 
     void Start()
     {

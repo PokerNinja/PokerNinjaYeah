@@ -194,7 +194,6 @@ public class AnimationManager : Singleton<AnimationManager>
         }
         if (startingAlpha == alphaTarget)
         {
-            Debug.LogError("SAME VaLUE");
             OnFinish?.Invoke();
         }
         else
@@ -661,7 +660,6 @@ public class AnimationManager : Singleton<AnimationManager>
 
             if (selector.position.x == targetPosition.x)
             {
-                Debug.LogError("DODRAWERACTION");
                 endAction?.Invoke();
                 break;
             }
@@ -810,7 +808,6 @@ public class AnimationManager : Singleton<AnimationManager>
             if (!alphaLoopEnable)
             {
                 spriteTarget.color = new Color(r, g, b, 0f);
-                Debug.LogError("diasbleLoop");
                 break;
             }
         }
@@ -1231,9 +1228,6 @@ public class AnimationManager : Singleton<AnimationManager>
 
     public void VisionEffect(List<CardUi> winningPlayersCards, int cardToGlow, bool enable)
     {
-        Debug.LogWarning("enableCG" + enable);
-        Debug.LogWarning("cardsG" + cardToGlow);
-        Debug.LogWarning("cardsLast" + winningPlayersCards.Count);
         float alphaAmoint = 0f;
         float burnAmoint = 0.6f;
         Color visionColor = Values.Instance.currentVisionColor;
@@ -1300,7 +1294,6 @@ public class AnimationManager : Singleton<AnimationManager>
             {
                 EndAction += UpdateValueEndRoutine;
                 EndAction += () => ShineWinningCards(winningPlayerCards, cardToGlow);
-                Debug.LogError("Shinning" + cardToGlow);
             }
             StartCoroutine(SmoothMove(winningPlayerCards[i].transform, boardTransform[i].position, targetScale, Values.Instance.winningCardsMoveDuration, null, null, null, EndAction));
         }

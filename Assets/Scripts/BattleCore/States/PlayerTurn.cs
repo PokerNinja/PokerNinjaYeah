@@ -52,7 +52,6 @@ public class PlayerTurn : State
         }
         battleSystem.DealPu(true, () =>
         {
-        Debug.Log("AfterPlayerDeal;");
             battleSystem.isPlayerBotModeTurn = true;
             Action tutorialAction = null;
             battleSystem.NewTimerStarter(true);

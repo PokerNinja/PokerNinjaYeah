@@ -119,7 +119,7 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private GameObject turnBtn;
     [SerializeField] public SpriteRenderer turnBtnSpriteREnderer;
     [SerializeField] public TextMeshProUGUI currentRankText;
-    [SerializeField] public TextMeshProUGUI currentRankNumber;
+    [SerializeField] private TextMeshProUGUI currentRankNumber;
 
     [SerializeField] private GameObject pFlusher, pStrighter, eFlusher, eStrighter;
 
@@ -315,6 +315,12 @@ public class BattleUI : MonoBehaviour
         winLabel.SetActive(true);
     }
 
+    public void WinPanelAfterEnemyLeaveGame(string otherPlayer)
+    {
+        textWinLabel.text = otherPlayer + " left the game. You Win!";
+        winLabel.SetActive(true);
+    }
+
     public void EnablePlayerButtons(bool enable)
     {
         EnableEndTurnBtn(enable);
@@ -428,6 +434,12 @@ public class BattleUI : MonoBehaviour
         {
             youLose.SetActive(true);
         }
+    }
+
+    internal void ResetHandRank()
+    {
+       lastHandRank = 10;
+       currentRankNumber.text = "10";
     }
 
     internal void SlideRankingImg()
