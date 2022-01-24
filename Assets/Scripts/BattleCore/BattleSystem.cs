@@ -154,31 +154,20 @@ public class BattleSystem : StateMachine
     [Button]
     public void CheckValues()
     {
+        Debug.Log("^$#%$#%$#%$#");
+        Debug.Log("IsPlayerTurn" + IsPlayerTurn());
         Debug.Log("currentRound" + currentRound);
         Debug.Log("currentTurn" + currentTurn);
-        Debug.Log("IsPlayerTurn" + IsPlayerTurn());
-        Debug.Log("ReplaceInProgress" + ReplaceInProgress);
-        Debug.Log("++++++++++++++++++");
-        Debug.Log("playerPuInProcess" + playerPuInProcess);
-        Debug.Log("btnReplace" + btnReplaceClickable);
-        Debug.Log("energyCounter" + energyCounter);
-        Debug.Log("TemproryUnclickable" + Constants.TemproryUnclickable);
-        Debug.Log("replaceMode" + replaceMode);
-        Debug.Log("++++++++++++++++++");
-        Debug.Log("selectMode" + selectMode);
-        Debug.Log("endTurnInProcess" + endTurnInProcess);
-        Debug.Log("timedOut" + timedOut);
-        Debug.Log("infoShow" + infoShow);
-        Debug.Log("deckGenerate" + deckGenerate);
-        Debug.Log("endRoutineFinished" + endRoutineFinished);
-        Debug.Log("firstRound" + firstRound);
+        Debug.Log("starter" + LocalTurnSystem.Instance.isPlayerFirstPlayer);
+        Debug.Log("start eound" + LocalTurnSystem.Instance.IsPlayerStartRound());
+      
 
     }
 
     private void Start()
     {
         TEST_MODE = Values.Instance.TEST_MODE;
-       // Constants.BOT_MODE = true;
+        // Constants.BOT_MODE = true;
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
         {
@@ -346,8 +335,6 @@ public class BattleSystem : StateMachine
 
     public void DisableSelectMode(bool endTurn)
     {
-        Debug.Log("Start" + " TU " + Constants.TemproryUnclickable);
-
         if (selectMode && !Constants.TemproryUnclickable)
         {
             selectMode = false;
@@ -466,7 +453,7 @@ public class BattleSystem : StateMachine
             firstToPlayBotMode = !firstToPlayBotMode;
             SetState(new BeginRound(this, firstToPlayBotMode, false));
         }
-            currentRound++;
+       // currentRound++;
     }
 
     private IEnumerator CheckIfNewRoundReadyAndStart()
@@ -571,7 +558,8 @@ public class BattleSystem : StateMachine
         }
         if (!TEST_MODE && !BOT_MODE)
         {
-            if (!deckGenerate && LocalTurnSystem.Instance.isPlayerFirstPlayer)
+           // if (LocalTurnSystem.Instance.IsPlayerStartRound() && !deckGenerate  /*LocalTurnSystem.Instance.isPlayerFirstPlayer*/)
+            if (!LocalTurnSystem.Instance.IsPlayerTurn() && !deckGenerate  /*LocalTurnSystem.Instance.isPlayerFirstPlayer*/)
             {
                 deckGenerate = true;
                 DeckGeneratorDB();
@@ -643,6 +631,12 @@ public class BattleSystem : StateMachine
                 {
                     SetState(new EndRound(this, false));
                 }
+                else
+                {
+                    Debug.Log("IM das" + currentTurn);
+                }
+                ui.playerNameText.text = "turn:" + currentTurn;
+                Debug.LogWarning("tunr: " + LocalTurnSystem.Instance.CurrentPlayerID);
             }
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
         }
@@ -789,7 +783,8 @@ public class BattleSystem : StateMachine
 
     private void ResetRoundAndTurnCounter()
     {
-        if (LocalTurnSystem.Instance.isPlayerFirstPlayer)
+       // if (!LocalTurnSystem.Instance.IsPlayerStartRound())
+        if (LocalTurnSystem.Instance.IsPlayerTurn())
         {
             LocalTurnSystem.Instance.RoundCounter.Value = currentRound + 1;
             LocalTurnSystem.Instance.TurnCounter.Value = TURN_COUNTER_INIT;
@@ -825,12 +820,10 @@ public class BattleSystem : StateMachine
     }
     private void BindRoundCounter()
     {
-
         LocalTurnSystem.Instance.RoundCounter.onValueChanged += i =>
         {
             if ((int)i != 1)
             {
-
                 if (!gameOver && currentRound + 1 == (int)i)
                 {
                     currentRound = (int)i;
@@ -858,7 +851,7 @@ public class BattleSystem : StateMachine
                 //  ui.playerNameText.text = "Bind " + currentTurn;
 
             }
-            else if( s == currentGameInfo.EnemyId)
+            else if (s == currentGameInfo.EnemyId)
             {
                 SetState(new EnemyTurn(this, currentTurn));
                 // ui.enemyNameText.text = "Bind " + currentTurn;
@@ -972,10 +965,11 @@ public class BattleSystem : StateMachine
         if (currentRound == i && LocalTurnSystem.Instance.PlayerReady.Value == i)
         {
             playersReadyForNewRound = true;
+            Debug.LogError("Players Synced!");
         }
         else
         {
-            Debug.LogError("Players Not Synces2");
+            Debug.LogError("Players Not Synced2");
         }
     }
 
@@ -2092,7 +2086,6 @@ public class BattleSystem : StateMachine
 
     internal void ActivatePlayerButtons(bool enable, bool delay)
     {
-        Debug.Log("ap " + enable + " " + endTurnInProcess);
         if (delay)
         {
             StartCoroutine(ActivePlayerButtonWithDelay());
@@ -2333,7 +2326,7 @@ public class BattleSystem : StateMachine
     [Button]
     public void InternetChecK()
     {
-        StartCoroutine(CheckInternetConnection(result => Debug.Log("Internet: "+ result)));
+        StartCoroutine(CheckInternetConnection(result => Debug.Log("Internet: " + result)));
     }
     public IEnumerator CheckInternetConnection(Action<bool> syncResult)
     {

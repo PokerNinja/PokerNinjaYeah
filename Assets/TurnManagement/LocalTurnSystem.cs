@@ -90,14 +90,18 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
             if (TurnCounter.Value == 1)
             {
                 TurnCounter.Value = -1;
-                CurrentPlayerID.Value = OtherPlayerID;
             }
             else if (TurnCounter.Value > 1)
             {
                 TurnCounter.Value -= 1;
                 CurrentPlayerID.Value = OtherPlayerID;
                 // TurnStartedNotificationTrigger.Value += 1;
-            }
+            }/*else if(TurnCounter.Value == -1)
+            {
+                //CurrentPlayerID.Value = OtherPlayerID;
+                Debug.LogError("WHARME");
+            }*/
+
 
         }
     }
@@ -113,7 +117,6 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
             return PlayerID.Value.Equals(FirstPlayerStr);
         }
     }
-
 
     public SynchronyzedFirebaseProperty<long> TurnStartedNotificationTrigger = new SynchronyzedFirebaseProperty<long>(-1);
     public SynchronyzedFirebaseProperty<long> GameStartedNotificationTrigger = new SynchronyzedFirebaseProperty<long>(-1);

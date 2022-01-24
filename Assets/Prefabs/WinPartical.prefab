@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4783028347898946969}
   - component: {fileID: 4783028347898946966}
   m_Layer: 0
-  m_Name: Win
+  m_Name: WinPartical
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
