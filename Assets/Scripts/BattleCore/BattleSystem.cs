@@ -631,12 +631,6 @@ public class BattleSystem : StateMachine
                 {
                     SetState(new EndRound(this, false));
                 }
-                else
-                {
-                    Debug.Log("IM das" + currentTurn);
-                }
-                ui.playerNameText.text = "turn:" + currentTurn;
-                Debug.LogWarning("tunr: " + LocalTurnSystem.Instance.CurrentPlayerID);
             }
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
         }
