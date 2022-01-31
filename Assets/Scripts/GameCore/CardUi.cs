@@ -42,15 +42,18 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     [Button]
     public void ChangeBool(bool enable)
     {
-        if (enable)
-        {
-            spriteRenderer.sharedMaterial.SetFloat("_OnlyInnerOutline", 0.0f);
-        }
-        else
-        {
-            spriteRenderer.sharedMaterial.SetFloat("_OnlyInnerOutline", 1.0f);
-        }
+        /*   if (enable)
+           {
+               spriteRenderer.sharedMaterial.SetFloat("_OnlyInnerOutline", 0.0f);
+           }
+           else
+           {
+               spriteRenderer.sharedMaterial.SetFloat("_OnlyInnerOutline", 1.0f);
+           }*/
+        spriteRenderer.material.SetFloat("_OnlyInnerOutline", 0.0f);
+
     }
+
     #region Settings
 
     public void OnObjectSpawn()
@@ -418,7 +421,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         if (isFrozen)
         {
             StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_FadeBurnWidth", dissolveAmount, spriteRenderer.material, 0,
-                () => spriteRenderer.material.SetFloat("_FadeBurnWidth", 0.56f)));
+                () => spriteRenderer.material.SetFloat("_FadeBurnWidth", 0.088f)));
         }
         while (dissolveAmount < 1)
         {

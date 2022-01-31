@@ -8477,7 +8477,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3650916954676629425, guid: a8b6d838b7edcf849a4d21071f9a7677, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -5.22
+      value: -5.17
       objectReference: {fileID: 0}
     - target: {fileID: 3650916954676629425, guid: a8b6d838b7edcf849a4d21071f9a7677, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8771,7 +8771,7 @@ MonoBehaviour:
   windRorationSpeed: 2
   circularRadiusMove: 1
   circularMoveDuration: 1
-  circualScaleMultiplication: 1.25
+  circualScaleMultiplication: 1.33
   winningCardProjectileMoveDuration: 18
   winCardRightStart: {fileID: 338960049}
   winCardLeftStart: {fileID: 388609282}
@@ -8795,6 +8795,7 @@ MonoBehaviour:
   durationGlitchAfterChange: 1
   coinFlipEndMoveDuration: 1
   tutoMaskFadeLoopDuration: 0.75
+  delayBetweenProjectiles: 0.25
   woodFrameColor: {r: 0.61960787, g: 0.42352942, b: 0.23921569, a: 1}
   greenFrameColor: {r: 0.12941177, g: 0.45098042, b: 0.30588236, a: 1}
   dojoFrameColor: {r: 0.49803925, g: 0.19215688, b: 0.18431373, a: 1}
@@ -8823,6 +8824,7 @@ MonoBehaviour:
   delayBetweenHandsAndFlopDeal: 0.6
   delayBetweenDealPlayersCards: 0.18
   delayBetweenDealBoardCards: 0.18
+  freezeMaterialFadeBurnWidth: 0.56
   pusDrawerMoveDuration: 0.8
   puPushNewSlotMoveDuration: 2
   puDrawMoveDuration: 1.6
@@ -9479,7 +9481,7 @@ MonoBehaviour:
   isPlayerActivatePu: 0
   playerLifeLeft: 0
   enemyLifeLeft: 0
-  replacePuLeft: 0
+  replacePuLeft: 1
   skillUseLeft: 0
   sameCardsSelection: 0
   selectMode: 0

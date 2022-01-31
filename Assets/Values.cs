@@ -22,6 +22,7 @@ public class Values : Singleton<Values>
     public int delayTimerStart = 3;
     public int skillUseLimit = 1;
     public GamePhase resetSkillEvery = GamePhase.Round;
+    [GUIColor(0.176f, 1f, 0.130f)]
     public int energyCostForDraw = 1;
     public float tutoObjsFadeDuration = 0.7f;
     public float fontAppearance = 0.7f;
@@ -56,6 +57,7 @@ public class Values : Singleton<Values>
     public float durationGlitchAfterChange = 2f;
     public float coinFlipEndMoveDuration = 1f;
     public float tutoMaskFadeLoopDuration = 0.75f;
+    public float delayBetweenProjectiles = 0.25f;
 
 
     [Title("Ninja")]
@@ -98,6 +100,7 @@ public class Values : Singleton<Values>
     public float delayBetweenHandsAndFlopDeal = 0.6f;
     public float delayBetweenDealPlayersCards = 0.18f;
     public float delayBetweenDealBoardCards = 0.18f;
+    public float freezeMaterialFadeBurnWidth = 0.56f;
 
     [Title("PowerUpUi", bold: false)]
     public float pusDrawerMoveDuration = 2f;

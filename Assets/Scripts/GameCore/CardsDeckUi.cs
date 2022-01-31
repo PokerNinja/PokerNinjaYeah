@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -440,7 +441,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         ResetCardUI(cardToDestroy);
         OnEnd?.Invoke();
     }
-    private void ResetCardUI(CardUi cardToReset)
+    public void ResetCardUI(CardUi cardToReset)
     {
         cardToReset.name = "CardUII";
         if (cardToReset.freeze)
@@ -450,6 +451,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
 
         cardToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
+        cardToReset.spriteRenderer.material.SetFloat("_ShakeUvSpeed", 0f);
         cardToReset.transform.position = cardTransform.position;
         cardToReset.transform.localScale = cardTransform.localScale;
         cardToReset.transform.SetParent(objectPooler.transform);
@@ -646,7 +648,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return playerHandWithBoard;
     }
 
-    internal List<string> GetAvailbeCards()
+    internal List<string> GetAvailbeCards(bool onlyUnfreeze)
     {
         List<string> allCardsNames = new List<string>();
         allCardsNames.Add(Constants.PlayerCard1);
@@ -663,6 +665,16 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         else if (boardCardsUi.Count == 5)
         {
             allCardsNames.Add(Constants.BRiver5);
+        }
+        if (onlyUnfreeze)
+        {
+            for (int i = allCardsNames.Count - 1; i >= 0; i--)
+            {
+                if (GetCardUiByName(allCardsNames[i]).freeze)
+                {
+                    allCardsNames.RemoveAt(i);
+                }
+            }
         }
         return allCardsNames;
     }
@@ -1060,6 +1072,18 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             return true;
         }
         return false;
+    }
+    internal int GetHowManyAvailableUnfrozenCards()
+    {
+        int unFrozenCounter = 0;
+        foreach (CardUi card in GetListByTag(Constants.AllCardsTag))
+        {
+            if (!card.freeze)
+            {
+                unFrozenCounter++;
+            }
+        }
+        return unFrozenCounter;
     }
     internal bool IsOneCardFromBoardFreeze()
     {
@@ -1650,31 +1674,37 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         targetMaterial.SetFloat("_FlickerPercent", flickerAmount);
     }
 
-    internal void SwapTwoCards(string cardToSwap, string cardTarget, Action DisableDarkScreen)
+    internal  void SwapTwoCards(string cardToSwap, string cardTarget, Action DisableDarkScreen)
     {
         Debug.LogError("swaping");
         CardUi cardUiToSwap = GetCardUiByName(cardToSwap);
         CardUi cardUiTarget = GetCardUiByName(cardTarget);
 
         SwapCardUiList(cardUiToSwap, cardUiTarget);
-        bool card1WasFaceDown = cardUiToSwap.GetisFaceDown();
-        bool card2WasFaceDown = cardUiTarget.GetisFaceDown(); // NOT IMPLENMANETD
-        Transform tempTransform1 = cardUiToSwap.transform;
-        Transform tempTransform2 = cardUiTarget.transform;
+        bool card1ToFlip = !cardUiToSwap.cardMark.activeSelf;
+        bool card2ToFlip = !cardUiTarget.cardMark.activeSelf; // NOT IMPLENMANETD
+        Vector2 temp1Position = cardUiToSwap.transform.position;
+        Vector2 temp2Position = cardUiTarget.transform.position;
+        Vector2 tempTransform1 = cardUiToSwap.transform.localScale;
+        Vector2 tempTransform2 = cardUiTarget.transform.localScale;
         SwitchCardsInfo(cardUiToSwap, cardUiTarget);
 
-        StartCoroutine(AnimationManager.Instance.FollowArc(cardUiToSwap.transform, cardUiToSwap.transform.position, cardUiTarget.transform.position,
-            Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
-        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiToSwap.transform, cardUiTarget.transform.localScale,
+
+        //await Task.Delay(1000);
+
+        /*StartCoroutine(*/AnimationManager.Instance.FollowArc(cardUiToSwap.transform, temp1Position, temp2Position,
+           1f, Values.Instance.circularMoveDuration, () =>
+        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiToSwap.transform, tempTransform2,
         Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiToSwap,
-        !cardUiToSwap.cardMark.activeSelf, CardPlaceToTag(cardToSwap), CardPlaceToTag(cardTarget))), null, null));
+        card1ToFlip, CardPlaceToTag(cardToSwap), CardPlaceToTag(cardTarget))), null, null);
 
-        StartCoroutine(AnimationManager.Instance.FollowArc(cardUiTarget.transform, cardUiTarget.transform.position, cardUiToSwap.transform.position,
-            Values.Instance.circularRadiusMove, Values.Instance.circularMoveDuration, () =>
-        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiTarget.transform, cardUiToSwap.transform.localScale,
+      //  await Task.Delay(2000);
+        /*StartCoroutine(*/AnimationManager.Instance.FollowArc(cardUiTarget.transform, temp2Position, temp1Position,
+            1f, Values.Instance.circularMoveDuration, () =>
+        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiTarget.transform, tempTransform1,
         Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiTarget,
-        !cardUiTarget.cardMark.activeSelf, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, DisableDarkScreen));
-
+        card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, DisableDarkScreen);
+        //Lehalif
 
         Card tempCard1 = Card.StringToCard(cardUiToSwap.cardDescription);
         Card tempCard2 = Card.StringToCard(cardUiTarget.cardDescription);
@@ -1792,13 +1822,13 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             if (tagFrom == Constants.EnemyCardsTag)
             {
-                if(tagTo == Constants.EnemyCardsTag)
+                if (tagTo == Constants.EnemyCardsTag)
                 {
-                cardToFlip.FlipCard(false, null);
+                    cardToFlip.FlipCard(false, null);
                 }
                 else
                 {
-                cardToFlip.FlipCard(true, null);
+                    cardToFlip.FlipCard(true, null);
                 }
             }
             else if (tagTo == Constants.EnemyCardsTag)
@@ -1834,7 +1864,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         cardSwap2.InitCardsTag(tempTag1);
         cardSwap1.EnableSelecetPositionZ(false);
         cardSwap2.EnableSelecetPositionZ(false);
-
     }
 
     private void GhostCardEffect(bool enable, CardUi cardObject)

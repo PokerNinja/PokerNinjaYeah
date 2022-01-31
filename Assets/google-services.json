@@ -41,6 +41,42 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230449467728:android:2823788b4829a1749d9c55",
+        "android_client_info": {
+          "package_name": "poker.ninja.oabk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230449467728-6mnsejgukat3agdhjd39g29qu2g09lhm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXHfHq3fr6k2ztScMKuSgtOTjmnImblzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230449467728-6mnsejgukat3agdhjd39g29qu2g09lhm.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "230449467728-k6si495fl6ueseegcmvgbo4808b0apgh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.OABK.NinjaPoker"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

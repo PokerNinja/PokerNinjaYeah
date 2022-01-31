@@ -39,6 +39,7 @@ public class Constants : Singleton<Constants>
 
     public static bool TUTORIAL_MODE = false;
     public static bool BOT_MODE = false;
+    public static bool IL2CPP_MOD = false;
     public static bool TemproryUnclickable = false;
     public static int cardsToSelectCounter = 0;
 

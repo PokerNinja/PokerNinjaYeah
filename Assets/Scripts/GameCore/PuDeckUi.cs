@@ -430,10 +430,6 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    internal bool IsCardFreeze(string cardPlace)
-    {
-        return GameObject.Find(cardPlace).GetComponent<CardUi>().freeze;
-    }
 
     internal Vector2 GetPuPosition(bool isPlayer, int puIndex)
     {

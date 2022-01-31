@@ -15,11 +15,13 @@ public class GameMenuHandler : MonoBehaviour
     public TMP_InputField playerName;
     public TextMeshProUGUI infoText;
     public TextMeshProUGUI appVersion;
+    public TextMeshProUGUI dialogUpdateText;
     public GameObject wrongTypeText;
     public GameObject tutorialImage;
     public GameObject updateCanvas;
     public GameObject rankImageParent;
     public GameObject canvasExitDialog;
+    public string linkToDrive;
 
     [GUIColor(0.3f, 0.8f, 0.8f)]
     public bool TEST_MODE;
@@ -48,22 +50,34 @@ public class GameMenuHandler : MonoBehaviour
         {
             if (Application.version.ToString().Equals(targetVersion))
             {
-                Debug.LogError("You are updated");
+               // Debug.LogError("You are updated");
             }
             else
             {
                 ShowUpdateDialog();
             }
         }, Debug.Log);
+
+        ListenForTextUpdate(updateTxt => linkToDrive = updateTxt
+        , Debug.Log); ;
     }
 
     private void ShowUpdateDialog()
     {
         updateCanvas.SetActive(true);
     }
-    public void SendUserToUpdate()
+    public void SendUserToDriveApk()
     {
-        Application.OpenURL("market://details?id=com.DefaultCompany.SpeedWeedGrinder");
+       // dialogUpdateText.text = linkToDrive;
+        //dialogUpdateText.text ="< link ="+ linkToDrive+"/> </ link >";
+        string newUrl = linkToDrive.Trim('"');
+        Application.OpenURL(newUrl);
+
+        
+    }
+    public void SendUserToStore()
+    {
+        Application.OpenURL("https://play.google.com/store/apps/details?id=poker.ninja.oabk");
     }
     private void OnGUI()
     {
@@ -110,6 +124,23 @@ public class GameMenuHandler : MonoBehaviour
                 callback(version);
                 // Constants.updated = currentVersion.Equals(version);
                 Debug.LogWarning("target " + version);
+            },
+            fallback);
+    }
+    public void ListenForTextUpdate(Action<string> callback,
+        Action<AggregateException> fallback)
+    {
+        // Should update when return to main?
+        versionListener =
+            DatabaseAPI.ListenForValueChanged("update_msg", args =>
+            {
+                if (!args.Snapshot.Exists) return;
+
+                string text = args.Snapshot.GetRawJsonValue() as
+                            string;
+                callback(text);
+                // Constants.updated = currentVersion.Equals(version);
+                Debug.LogWarning("target " + text);
             },
             fallback);
     }
@@ -339,6 +370,29 @@ public class GameMenuHandler : MonoBehaviour
     public void ExitGame()
     {
         Application.Quit();
+    }
+
+    [Button]
+    public void EmailUs()
+    {
+        //email Id to send the mail to
+        string email = "pokerninjateam@gmail.com";
+        //subject of the mail
+        string subject = MyEscapeURL("FEEDBACK/SUGGESTION");
+        //body of the mail which consists of Device Model and its Operating System
+        string body = MyEscapeURL("Please Enter your message here\n\n\n\n" +
+         "________" +
+         "\n\nPlease Do Not Modify This\n\n" +
+         "Model: " + SystemInfo.deviceModel + "\n\n" +
+            "OS: " + SystemInfo.operatingSystem + "\n\n" +
+         "________");
+        //Open the Default Mail App
+        Application.OpenURL("mailto:" + email + "?subject=" + subject + "&body=" + body);
+    }
+
+    string MyEscapeURL(string url)
+    {
+        return WWW.EscapeURL(url).Replace("+", "%20");
     }
 }
 

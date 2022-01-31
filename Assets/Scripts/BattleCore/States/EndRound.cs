@@ -302,9 +302,13 @@ public class EndRound : State
         List<CardUi> arangedCards = new List<CardUi>();
 
         winningHand = winningHand.OrderByDescending(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
+        foreach(CardUi cardUi in winningHand)
+        {
+            cardUi.EnableSelecetPositionZ(true);
+        }
         if (IsStrightFlushOrFull(handRank))
         {
-            if (handRank >= 1600 && Card.StringValueToInt(winningHand[0].cardDescription[0].ToString()) == CardEnum.Ace.GetHashCode())
+            if (handRank >= 1600 && Card.StringValueToInt(winningHand[0].cardDescription[0].ToString()) == CardEnum.Ace.GetHashCode() && Card.StringValueToInt(winningHand[1].cardDescription[0].ToString()) == CardEnum.Five.GetHashCode())
             {
                 winningHand = MoveFirstItemToLast(winningHand);
             }

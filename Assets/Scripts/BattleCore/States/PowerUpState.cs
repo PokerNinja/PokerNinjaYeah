@@ -44,7 +44,7 @@ public class PowerUpState : State
         }
         if (!isPlayerActivate)
         {
-            battleSystem.Interface.InitNinjaAttackAnimation(false, puElement);
+           // battleSystem.Interface.InitNinjaAttackAnimation(false, puElement);
 
             if (waitForAction) // DRAW_2_CARDS
             {
@@ -77,7 +77,7 @@ public class PowerUpState : State
             int cardsToSelect = PowerUpStruct.Instance.GetPowerUpCardsToSelect(powerUpName);
             if (cardsToSelect == 0 || cardTarget2.Length > 0)
             {// Shove IT somewhereElse
-                battleSystem.Interface.InitNinjaAttackAnimation(true, puElement);
+              //  battleSystem.Interface.InitNinjaAttackAnimation(true, puElement);
                 if (puIndex != -1)
                 {
                     battleSystem.skillUsed = false;
@@ -144,9 +144,12 @@ public class PowerUpState : State
     private string GetListOfRandomCardsForMonster()
     {
         Debug.LogError("HELLO");
-        if (powerUpName.Equals("wm2") || powerUpName.Equals("im2") || powerUpName.Equals("fm2"))
+        if (powerUpName.Equals("im2") || powerUpName.Equals("fm2"))
         {
-            return string.Join(",", battleSystem.GetRandomAvailableCardsNames());
+            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(false));
+        }else if (powerUpName.Equals("wm2"))
+        {
+            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true));
         }
         return cardTarget2;
     }
@@ -161,6 +164,7 @@ public class PowerUpState : State
 
     private void IgnitePowerUp(string powerUpName, string cardTarget1, string cardTarget2)
     {
+        battleSystem.Interface.InitNinjaAttackAnimation(isPlayerActivate, puElement);
         if (puIndex != -1)
         {
             battleSystem.DissolvePuAfterUse(isPlayerActivate, puIndex);
@@ -185,8 +189,9 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.f2): // draw_board
                 {
-                    battleSystem.DestroyAndDrawCard(cardTarget2, Values.Instance.test1, false, true, false);
-                    battleSystem.DestroyAndDrawCard(cardTarget1, Values.Instance.test2, true, false, true);
+                    bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
+                    battleSystem.DestroyAndDrawCard(cardTarget1, 0f, false, true, false);
+                    battleSystem.DestroyAndDrawCard(cardTarget2, Values.Instance.delayBetweenProjectiles, true, isFirstTargetFreeze, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.w2)://swap_player_board = w2
@@ -213,7 +218,7 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.enemy_pu_freeze): //enemy_pu_freeze
                 {
-                    battleSystem.FreezePlayingCard(cardTarget2, true, true);
+                    battleSystem.FreezePlayingCard(cardTarget2,0, true, true);
                     // battleSystem.FreezePu(isPlayerTurn);
                     break;
                 }
@@ -231,19 +236,19 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.i1): //block_enemy_card = i1
             case nameof(PowerUpNamesEnum.i3): //block_player_card = i3
                 {
-                    battleSystem.FreezePlayingCard(cardTarget2, true, true);
+                    battleSystem.FreezePlayingCard(cardTarget2,0, true, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.i2): //block_board_card = i2
                 {
-                    battleSystem.FreezePlayingCard(cardTarget2, true, false);
-                    battleSystem.FreezePlayingCard(cardTarget1, true, true);
+                    battleSystem.FreezePlayingCard(cardTarget1,0, true, false);
+                    battleSystem.FreezePlayingCard(cardTarget2,250, true, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.im1): //block_player_2_cards = im1
                 {
-                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard1), true, false);
-                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2), true, true);
+                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard1),0, true, false);
+                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2),250, true, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.sm2): //sm2 = 22, //strighter
@@ -317,14 +322,36 @@ public class PowerUpState : State
         //  List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
         List<string> cardsNames = new List<string>(listOfCards.Split(','));
         int i = 0;
+        int count = cardsNames.Count;
+        Debug.LogError("COUNT " + cardsNames.Count);
         await Task.Delay(150);
-        battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), false);
-        await Task.Delay(320);
-        battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), false);
-        await Task.Delay(210);
-        battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), true);
+        battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), IsResetTornado(count - i));
+
+        if (count >3)
+        {
+            await Task.Delay(320);
+            battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), IsResetTornado(count - i));
+        }
+        if (count > 5)
+        {
+            await Task.Delay(210);
+            battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), IsResetTornado(count - i));
+        }
+        if (count >7)
+        {
+            await Task.Delay(150);
+            battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), IsResetTornado(count - i));
+        }
     }
 
+    private bool IsResetTornado(int count)
+    {
+        if (count <= 2)
+        {
+            return true;
+        }
+        return false;
+    }
 
     private async void BurnRandomCards(string listOfCards, string limit)
     {
@@ -346,7 +373,7 @@ public class PowerUpState : State
         }
     }
 
-    private async void FreezeRandomCards(string listOfCards, string limit)
+    private void FreezeRandomCards(string listOfCards, string limit)
     {
         List<string> cardsNames = new List<string>(listOfCards.Split(','));
         int randomAmount = int.Parse(limit);
@@ -357,8 +384,8 @@ public class PowerUpState : State
             {
                 isLast = true;
             }
-            await Task.Delay(battleSystem.GenerateRandom(400, 800));
-            battleSystem.FreezePlayingCard(ConvertFixedCardPlace(cardsNames[i]), true, isLast);
+            //await Task.Delay(battleSystem.GenerateRandom(400, 800));
+            battleSystem.FreezePlayingCard(ConvertFixedCardPlace(cardsNames[i]), battleSystem.GenerateRandom(400, 800), true, isLast);
         }
     }
 

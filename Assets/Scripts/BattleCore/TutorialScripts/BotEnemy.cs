@@ -163,11 +163,10 @@ public class BotEnemy : State
             List<int> options = puness.Concat(skillness).Concat(drawness).Concat(endness).ToList();
             BotRandomAct(options);
 
-            Debug.Log("total:" + options.Count);
             Debug.Log("pu: " + puness.Count + " skill:" + skillness.Count + " draw:" + drawness.Count + " end:" + endness.Count);
-            Debug.Log("rank:" + currentRank);
+            Debug.Log("total:" + options.Count);
+            Debug.Log("rank:" + currentRank + "  energy:" + energyLeft);
             Debug.Log("hand:" + card1 + "," + card2);
-            Debug.Log("energy:" + energyLeft);
         }
     }
 
@@ -211,7 +210,7 @@ public class BotEnemy : State
                         Debug.Log("Bot PU1");
                         if (!IsMonster(pu1))
                         {
-                            delay = 3500;
+                            delay = 4200;
                         }
                         BotPuUse(pu1, 0);
                         costOfAction = GetPuCost(pu1);
@@ -222,7 +221,7 @@ public class BotEnemy : State
                         Debug.Log("Bot PU2");
                         if (!IsMonster(pu1))
                         {
-                            delay = 3500;
+                            delay = 4200;
                         }
                         BotPuUse(pu2, 1);
                         costOfAction = GetPuCost(pu2);
@@ -235,7 +234,7 @@ public class BotEnemy : State
                         int index = battleSystem.GenerateRandom(0, 2);
                         if (!IsMonster(pus[index]))
                         {
-                            delay = 3500;
+                            delay = 4200;
                         }
                         BotPuUse(pus[index], index);
                         costOfAction = GetPuCost(pus[index]);
@@ -257,7 +256,7 @@ public class BotEnemy : State
         {
             return Constants.PlayerCard2;
         }
-        else if(playerCards[1].freeze)
+        else if (playerCards[1].freeze)
         {
             return Constants.PlayerCard1;
         }
@@ -356,15 +355,15 @@ public class BotEnemy : State
                 cardTarget2 = GetCardOf(Constants.EnemyCardsTag, "", 0, true, false, false);
                 break;
             case "wm2":
-                cardTarget1 = GetListOfRandomCardsForMonster();
+                cardTarget1 = GetListOfRandomCardsForMonster(true);
                 break;
             case "im2":
                 cardTarget2 = battleSystem.GenerateRandom(4, 6).ToString();
-                cardTarget1 = GetListOfRandomCardsForMonster();
+                cardTarget1 = GetListOfRandomCardsForMonster(false);
                 break;
             case "fm2":
                 cardTarget2 = battleSystem.GenerateRandom(5, 7).ToString();
-                cardTarget1 = GetListOfRandomCardsForMonster();
+                cardTarget1 = GetListOfRandomCardsForMonster(false);
                 break;
 
         }
@@ -372,9 +371,9 @@ public class BotEnemy : State
         battleSystem.FakeEnemyPuUse(index, cardTarget1, cardTarget2, false);
     }
 
-    private string GetListOfRandomCardsForMonster()
+    private string GetListOfRandomCardsForMonster(bool onlyUnfreeze)
     {
-        return string.Join(",", battleSystem.GetRandomAvailableCardsNames());
+        return string.Join(",", battleSystem.GetRandomAvailableCardsNames(onlyUnfreeze));
     }
     private string GetPlayerRevealedCardAndIfFreeze(bool reveald, bool canTargetFreeze)
     {
@@ -523,17 +522,35 @@ public class BotEnemy : State
                 }
             }
         }
-        if (cards[0].cardPlace.Equals(differentCard))
+        return GetFirstCard(cards,differentCard,canTargetFreeze);
+      /*  if (cards[0].cardPlace.Equals(differentCard))
         {
             Debug.Log("toYse " + cards[0].cardPlace);
             Debug.Log("differentThan " + differentCard);
-            return cards[1].cardPlace;
+            return GetFirstCard(cards, 1, canTargetFreeze);
+            //  return cards[1].cardPlace;
         }
         else
         {
             Debug.Log("ChoseFirst " + cards[0].cardPlace);
-            return cards[0].cardPlace;
+            return GetFirstCard(cards, 0, canTargetFreeze);
+        }*/
+    }
+
+    private string GetFirstCard(List<CardUi> cards, string differetnThan, bool canTargetFreeze)
+    {
+
+        for (int i = 0; i < cards.Count; i++)
+        {
+            if (!cards[i].cardPlace.Equals(differetnThan))
+            {
+                if (canTargetFreeze || !cards[i].freeze)
+                {
+                    return cards[i].cardPlace;
+                }
+            }
         }
+                    return cards[0].cardPlace;
     }
 
     private int GetRankFromCardDesc(string cardDescription)

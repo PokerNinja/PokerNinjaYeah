@@ -50,7 +50,7 @@ namespace Handlers
 
         private IEnumerator StartBotGame()
         {
-            yield return new WaitForSeconds(18f);
+            yield return new WaitForSeconds(20f);
             if (!gameFound)
             {
                 LeaveQueue();
@@ -159,7 +159,7 @@ namespace Handlers
 
         private IEnumerator CheckIfGameForReal()
         {
-            yield return new WaitForSeconds(35f);
+            yield return new WaitForSeconds(20f);
             if (cancelGame)
             {
                 MainManager.Instance.gameManager.StopListeningForAllPlayersReady();

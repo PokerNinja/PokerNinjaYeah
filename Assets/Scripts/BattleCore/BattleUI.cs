@@ -760,8 +760,8 @@ public class BattleUI : MonoBehaviour
             }
             else
             {
-                StartCoroutine(ShootProjectile(true, startingPos, projectile1, posTarget1, null));
-                StartCoroutine(ShootProjectile(false, startingPos, projectile2, posTarget2, PuIgnite));
+                StartCoroutine(ShootProjectile(false, startingPos, projectile1, posTarget1, null));
+                StartCoroutine(ShootProjectile(true, startingPos, projectile2, posTarget2, PuIgnite));
             }
         }
         else
@@ -792,7 +792,7 @@ public class BattleUI : MonoBehaviour
         projectile.SetActive(true);
         if (delay)
         {
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(Values.Instance.delayBetweenProjectiles);
         }
         StartCoroutine(AnimationManager.Instance.AnimateShootProjectile(false, projectile.transform, new Vector3(posTarget.x, posTarget.y, projectile.transform.position.z),
         () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(headRenderer, false, Values.Instance.puProjectileFadeOutDuration, () => projectile.SetActive(false))), EndAction));

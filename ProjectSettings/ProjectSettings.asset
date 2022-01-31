@@ -134,7 +134,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 3.4
+  bundleVersion: 3.51
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -153,14 +153,14 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.OABK.NinjaPoker
+    Android: poker.ninja.oabk
     iPhone: com.OABK.NinjaPoker
   buildNumber:
     Standalone: 0
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 12
+  AndroidBundleVersionCode: 15
   AndroidMinSdkVersion: 23
   AndroidTargetSdkVersion: 30
   AndroidPreferredInstallLocation: 1
@@ -168,7 +168,7 @@ PlayerSettings:
   stripEngineCode: 1
   iPhoneStrippingLevel: 0
   iPhoneScriptCallOptimization: 0
-  ForceInternetPermission: 0
+  ForceInternetPermission: 1
   ForceSDCardPermission: 0
   CreateWallpaper: 0
   APKExpansionFiles: 0
@@ -247,15 +247,15 @@ PlayerSettings:
   AndroidTargetDevices: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: C:/Aviad/keys/pn.keystore
-  AndroidKeyaliasName: pokerninja
+  AndroidKeystoreName: '{dedicated}: Desktop/user.keystore'
+  AndroidKeyaliasName: babu1234
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 0
   AndroidIsGame: 1
   AndroidEnableTango: 0
   androidEnableBanner: 1
   androidUseLowAccuracyLocation: 0
-  androidUseCustomKeystore: 0
+  androidUseCustomKeystore: 1
   m_AndroidBanners:
   - width: 320
     height: 180
@@ -271,6 +271,42 @@ PlayerSettings:
   m_BuildTargetPlatformIcons:
   - m_BuildTarget: Android
     m_Icons:
+    - m_Textures:
+      - {fileID: 2800000, guid: a543476ec22e7cc4ca7255c56fd834e8, type: 3}
+      m_Width: 192
+      m_Height: 192
+      m_Kind: 0
+      m_SubKind: 
+    - m_Textures:
+      - {fileID: 2800000, guid: cbb0da17a89fd7449809a614bd08ab47, type: 3}
+      m_Width: 144
+      m_Height: 144
+      m_Kind: 0
+      m_SubKind: 
+    - m_Textures:
+      - {fileID: 2800000, guid: ee04133842b42664ea8556484ff7b447, type: 3}
+      m_Width: 96
+      m_Height: 96
+      m_Kind: 0
+      m_SubKind: 
+    - m_Textures:
+      - {fileID: 2800000, guid: a5b85998e1847ce4fba0dea0589cd1ad, type: 3}
+      m_Width: 72
+      m_Height: 72
+      m_Kind: 0
+      m_SubKind: 
+    - m_Textures:
+      - {fileID: 2800000, guid: daba073692b0cc643a961dfc3cb2a0af, type: 3}
+      m_Width: 48
+      m_Height: 48
+      m_Kind: 0
+      m_SubKind: 
+    - m_Textures:
+      - {fileID: 2800000, guid: 58ab292a953f52f47aaf0188fb5223ec, type: 3}
+      m_Width: 36
+      m_Height: 36
+      m_Kind: 0
+      m_SubKind: 
     - m_Textures:
       - {fileID: 2800000, guid: eeb1b7a49aeefe14f9d043cbd3695f3c, type: 3}
       - {fileID: 2800000, guid: 6143a07432756c8438f2fe4a1efee56c, type: 3}
@@ -348,42 +384,6 @@ PlayerSettings:
       m_Width: 36
       m_Height: 36
       m_Kind: 1
-      m_SubKind: 
-    - m_Textures:
-      - {fileID: 2800000, guid: a543476ec22e7cc4ca7255c56fd834e8, type: 3}
-      m_Width: 192
-      m_Height: 192
-      m_Kind: 0
-      m_SubKind: 
-    - m_Textures:
-      - {fileID: 2800000, guid: cbb0da17a89fd7449809a614bd08ab47, type: 3}
-      m_Width: 144
-      m_Height: 144
-      m_Kind: 0
-      m_SubKind: 
-    - m_Textures:
-      - {fileID: 2800000, guid: ee04133842b42664ea8556484ff7b447, type: 3}
-      m_Width: 96
-      m_Height: 96
-      m_Kind: 0
-      m_SubKind: 
-    - m_Textures:
-      - {fileID: 2800000, guid: a5b85998e1847ce4fba0dea0589cd1ad, type: 3}
-      m_Width: 72
-      m_Height: 72
-      m_Kind: 0
-      m_SubKind: 
-    - m_Textures:
-      - {fileID: 2800000, guid: daba073692b0cc643a961dfc3cb2a0af, type: 3}
-      m_Width: 48
-      m_Height: 48
-      m_Kind: 0
-      m_SubKind: 
-    - m_Textures:
-      - {fileID: 2800000, guid: 58ab292a953f52f47aaf0188fb5223ec, type: 3}
-      m_Width: 36
-      m_Height: 36
-      m_Kind: 0
       m_SubKind: 
   m_BuildTargetBatching:
   - m_BuildTarget: Android
@@ -706,7 +706,8 @@ PlayerSettings:
   platformArchitecture: {}
   scriptingBackend:
     Android: 0
-  il2cppCompilerConfiguration: {}
+  il2cppCompilerConfiguration:
+    Android: 1
   managedStrippingLevel: {}
   incrementalIl2cppBuild: {}
   suppressCommonWarnings: 1

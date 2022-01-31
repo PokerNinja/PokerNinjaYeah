@@ -67,7 +67,6 @@ public class ObjectPooler : Singleton<ObjectPooler>
             CardUi newCard = Instantiate(cardPrefab);
             return newCard;
         }
-
     }
     public void ReturnCard(CardUi card)
     {

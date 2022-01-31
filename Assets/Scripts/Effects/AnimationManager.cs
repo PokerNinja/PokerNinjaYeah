@@ -489,7 +489,7 @@ public class AnimationManager : Singleton<AnimationManager>
             }
         }
     }
-    public IEnumerator FollowArc(
+    public async void FollowArc(
          Transform mover,
          Vector2 start,
          Vector2 end,
@@ -509,7 +509,6 @@ public class AnimationManager : Singleton<AnimationManager>
         {
             radius = absRadius = span / 2f;
         }
-
         Vector2 perpendicular = new Vector2(difference.y, -difference.x) / span;
         perpendicular *= Mathf.Sign(radius) * Mathf.Sqrt(radius * radius - span * span / 4f);
 
@@ -523,15 +522,22 @@ public class AnimationManager : Singleton<AnimationManager>
 
         // Choose the smaller of two angles separating the start & end
         float travel = (endAngle - startAngle + 5f * Mathf.PI) % (2f * Mathf.PI) - Mathf.PI;
-
+        if (Constants.IL2CPP_MOD && start.y < end.y)
+        {
+            travel *= -1f;
+        }
         float progress = 0f;
         bool EndMovement = false;
+        // ANGLE is different somehow. maybe start angle
         while (progress < 1f)
         {
             float angle = startAngle + progress * travel;
             mover.position = center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * absRadius;
             progress += Time.deltaTime / duration;
-            yield return null;
+            await Task.Yield();
+            // BattleSystem.Instance.Interface.playerNameText.text = angle.ToString();
+
+            //yield return null;
             if (progress >= 1f)
             {
                 mover.position = end;
@@ -1081,14 +1087,15 @@ public class AnimationManager : Singleton<AnimationManager>
         }
         if (!isPlayerActivate)
         {
-            newYcenter *= -1; 
+            newYcenter *= -1;
         }
         if (!puName.Equals("wm2"))
         {
             SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.WindSound);
-        }else if (extraWind)
+        }
+        else if (extraWind)
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Tornado,true);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Tornado, true);
             yield return new WaitForSeconds(0.3f);
         }
         wind.SetActive(true);
@@ -1261,30 +1268,32 @@ public class AnimationManager : Singleton<AnimationManager>
 
 
 
-    public async void AnimateWinningHandToBoard(List<CardUi> winningPlayerCards, List<CardUi> losingBoardCards, Action UpdateValueEndRoutine)
-    {
-        await Task.Delay(500);
+    /*  public async void AnimateWinningHandToBoard(List<CardUi> winningPlayerCards, List<CardUi> losingBoardCards, Action UpdateValueEndRoutine)
+      {
+          await Task.Delay(500);
 
-        //int layoutOrder = losingBoardCards[0].spriteRenderer.sortingOrder;
-        for (int i = 0; i < winningPlayerCards.Count; i++)
-        {
-            //winningPlayerCards[i].EnableSelecetPositionZ(true);
-            Vector3 targetPosition = new Vector3(losingBoardCards[i].transform.position.x, losingBoardCards[i].transform.position.y, winningPlayerCards[i].transform.position.z);
-            StartCoroutine(SmoothMove(winningPlayerCards[i].transform, targetPosition, losingBoardCards[i].transform.localScale, Values.Instance.winningCardsMoveDuration, null, UpdateValueEndRoutine, null, null));
-        }
-        foreach (CardUi card in losingBoardCards)
-        {
-            StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, null));
-        }
-    }
+          //int layoutOrder = losingBoardCards[0].spriteRenderer.sortingOrder;
+          for (int i = 0; i < winningPlayerCards.Count; i++)
+          {
+              //winningPlayerCards[i].EnableSelecetPositionZ(true);
+              Vector3 targetPosition = new Vector3(losingBoardCards[i].transform.position.x, losingBoardCards[i].transform.position.y, winningPlayerCards[i].transform.position.z);
+              StartCoroutine(SmoothMove(winningPlayerCards[i].transform, targetPosition, losingBoardCards[i].transform.localScale, Values.Instance.winningCardsMoveDuration, null, UpdateValueEndRoutine, null, null));
+          }
+          foreach (CardUi card in losingBoardCards)
+          {
+              StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, null));
+          }
+      }*/
     public void AnimateWinningHandToBoard2(List<CardUi> winningPlayerCards, int cardToGlow, List<CardUi> losingBoardCards, Transform[] boardTransform, Action UpdateValueEndRoutine)
     {
 
         Vector3 targetScale = new Vector3(0.75f, 0.75f, 0.75f);
         Action EndAction = null;
+        BattleSystem battleSystem = BattleSystem.Instance;
         foreach (CardUi card in losingBoardCards)
         {
-            StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, null));
+            // MUST MAKE BETTER
+            StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, () => battleSystem.cardsDeckUi.ResetCardUI(card)));
         }
         VisionEffect(winningPlayerCards, cardToGlow, true);
         for (int i = 0; i < 5; i++)
@@ -1295,10 +1304,11 @@ public class AnimationManager : Singleton<AnimationManager>
                 EndAction += UpdateValueEndRoutine;
                 EndAction += () => ShineWinningCards(winningPlayerCards, cardToGlow);
             }
+
             StartCoroutine(SmoothMove(winningPlayerCards[i].transform, boardTransform[i].position, targetScale, Values.Instance.winningCardsMoveDuration, null, null, null, EndAction));
         }
-
     }
+
 
     private void ShineWinningCards(List<CardUi> winningPlayerCards, int cardsToGlow)
     {

@@ -838,7 +838,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
 
     public void DestroyAndDrawCard(string cardPlace, float delay, bool ResetEnable, bool firstCard, bool lastCard)
     {
-        if (puDeckUi.IsCardFreeze(cardPlace))
+        if (cardsDeckUi.GetCardUiByName(cardPlace).freeze)
         {
             FreezePlayingCard(cardPlace, false, ResetEnable);
         }

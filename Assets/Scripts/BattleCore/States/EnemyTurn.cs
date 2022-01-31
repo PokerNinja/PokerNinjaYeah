@@ -8,7 +8,7 @@ public class EnemyTurn : State
     private int turnCounter;
     public EnemyTurn(BattleSystem battleSystem, int turnCounter) : base(battleSystem)
     {
-
+       battleSystem.isPlayerBotModeTurn = false;
         isFinalTurn = false;
         this.turnCounter = turnCounter;
         if (turnCounter == 1)

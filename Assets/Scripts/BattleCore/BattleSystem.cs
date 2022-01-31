@@ -154,20 +154,28 @@ public class BattleSystem : StateMachine
     [Button]
     public void CheckValues()
     {
-        Debug.Log("^$#%$#%$#%$#");
+        /*Debug.Log("^$#%$#%$#%$#");
         Debug.Log("IsPlayerTurn" + IsPlayerTurn());
         Debug.Log("currentRound" + currentRound);
         Debug.Log("currentTurn" + currentTurn);
         Debug.Log("starter" + LocalTurnSystem.Instance.isPlayerFirstPlayer);
         Debug.Log("start eound" + LocalTurnSystem.Instance.IsPlayerStartRound());
-      
+*/
+        cardsDeckUi.SwapTwoCards(Constants.PlayerCard1, Constants.EnemyCard1, null);
 
     }
 
     private void Start()
     {
+
+        /* UnityEditor.ScriptingImplementation backend = (UnityEditor.ScriptingImplementation)UnityEditor.PlayerSettings.GetPropertyInt("ScriptingBackend", UnityEditor.BuildTargetGroup.Android);
+         if (backend != UnityEditor.ScriptingImplementation.Mono2x)
+         {
+             Constants.IL2CPP_MOD = true;
+         }*/
+       
         TEST_MODE = Values.Instance.TEST_MODE;
-        // Constants.BOT_MODE = true;
+       //Constants.BOT_MODE = true;
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
         {
@@ -188,6 +196,10 @@ public class BattleSystem : StateMachine
         startNewRound = true;
         ui.LoadNinjaBG();
         ui.InitAvatars();
+        if (!Debug.isDebugBuild)
+        {
+            Constants.IL2CPP_MOD = true;
+        }
         if (!TEST_MODE && !BOT_MODE)
         {
             StartCoroutine(ui.CoinFlipStartGame(currentGameInfo.playersIds[0].ToString().Equals(player.id), () => ui.SlidePuSlots()));
@@ -241,8 +253,9 @@ public class BattleSystem : StateMachine
         currentGameInfo.turn = "6";
         currentTurn = 6;
         currentGameInfo.cardDeck = CreateCardsDeck(BOT_MODE);
-
         currentGameInfo.puDeck = CreatePuDeck(BOT_MODE);
+        SavePrefsInt(Constants.Instance.botEnergyKey.ToString(), 0);
+
     }
 
     private string[] CreatePuDeck(bool newDeck)
@@ -268,8 +281,9 @@ public class BattleSystem : StateMachine
                  "w1","w2","w3",
                  "fm2","wm2","fm2",
                  "fm1","fm1","fm1",
-                 "fm1","fm1","fm1",
-                "fm1", "fm1"};
+                 "fm1","fm1","im2",
+              "w2","wm1","w1","wm2","wm2","wm2","w1","w2","wm2",
+              "w1","w3","w2","w1","wm1","wm2"};
         }
         return deck;
     }
@@ -453,7 +467,7 @@ public class BattleSystem : StateMachine
             firstToPlayBotMode = !firstToPlayBotMode;
             SetState(new BeginRound(this, firstToPlayBotMode, false));
         }
-       // currentRound++;
+        // currentRound++;
     }
 
     private IEnumerator CheckIfNewRoundReadyAndStart()
@@ -558,7 +572,7 @@ public class BattleSystem : StateMachine
         }
         if (!TEST_MODE && !BOT_MODE)
         {
-           // if (LocalTurnSystem.Instance.IsPlayerStartRound() && !deckGenerate  /*LocalTurnSystem.Instance.isPlayerFirstPlayer*/)
+            // if (LocalTurnSystem.Instance.IsPlayerStartRound() && !deckGenerate  /*LocalTurnSystem.Instance.isPlayerFirstPlayer*/)
             if (!LocalTurnSystem.Instance.IsPlayerTurn() && !deckGenerate  /*LocalTurnSystem.Instance.isPlayerFirstPlayer*/)
             {
                 deckGenerate = true;
@@ -621,7 +635,6 @@ public class BattleSystem : StateMachine
             }
             else
             {
-                isPlayerBotModeTurn = false;
                 // TurnEvents(--currentTurn);// SIM LEV MINUS TURN
                 if (--currentTurn > 0)
                 {
@@ -640,14 +653,14 @@ public class BattleSystem : StateMachine
         }
     }
 
-    internal List<string> GetRandomAvailableCardsNames()
+    internal List<string> GetRandomAvailableCardsNames(bool onlyUnfreeze)
     {
-        List<string> cardsNames = cardsDeckUi.GetAvailbeCards();
+        List<string> cardsNames = cardsDeckUi.GetAvailbeCards(onlyUnfreeze);
         var rnd = new System.Random();
         List<string> shuffledcards = cardsNames.OrderBy(a => Guid.NewGuid()).ToList();
         return shuffledcards;
-
     }
+
 
 
     internal int GenerateRandom(int v1, int v2)
@@ -732,7 +745,14 @@ public class BattleSystem : StateMachine
     {
         cardsDeckUi = CardsDeckUi.Instance();
         cardsDeckUi.InitDeckFromServer(currentGameInfo.cardDeck);
+        if (BOT_MODE)
+        {
+        cardsDeckUi.isPlayerFirst = firstToPlayBotMode;
+        }
+        else
+        {
         cardsDeckUi.isPlayerFirst = IsPlayerTurn();
+        }
         puDeckUi = PuDeckUi.Instance();
         if (firstDeck)
         {
@@ -777,7 +797,7 @@ public class BattleSystem : StateMachine
 
     private void ResetRoundAndTurnCounter()
     {
-       // if (!LocalTurnSystem.Instance.IsPlayerStartRound())
+        // if (!LocalTurnSystem.Instance.IsPlayerStartRound())
         if (LocalTurnSystem.Instance.IsPlayerTurn())
         {
             LocalTurnSystem.Instance.RoundCounter.Value = currentRound + 1;
@@ -1403,7 +1423,7 @@ public class BattleSystem : StateMachine
             {
                 puUi.EnablePu(false);
             }
-            else if (puUi.puName.Equals("wm2") && (cardsDeckUi.IsOneCardFromHandsFreeze() || cardsDeckUi.IsOneCardFromBoardFreeze()))
+            else if (puUi.puName.Equals("wm2") && cardsDeckUi.GetHowManyAvailableUnfrozenCards() < 2)
             {
                 puUi.EnablePu(false);
             }
@@ -1504,7 +1524,7 @@ public class BattleSystem : StateMachine
     {
         if (enable && cardsDeckUi.GetCardUiByName(cardTarget2) != null && cardsDeckUi.GetCardUiByName(cardTarget2).freeze)
         {
-            FreezePlayingCard(cardTarget2, false, false);
+            FreezePlayingCard(cardTarget2, 0, false, false);
         }
         Action Reset = null;
         if (reset)
@@ -1554,7 +1574,7 @@ public class BattleSystem : StateMachine
         }
         AddGhostCardPu(cardsOwener, () => EnableDarkAndSorting(false));
     }
-    public void DestroyAndDrawCard(string cardPlace, float delay, bool ResetEnable, bool firstCard, bool lastCard)
+    public async void DestroyAndDrawCard(string cardPlace, float delay, bool ResetEnable, bool firstCard, bool lastCard)
     {
         /*if (currentTurn < 3 && cardPlace.Contains("River"))
         {
@@ -1572,11 +1592,12 @@ public class BattleSystem : StateMachine
                 ResetEnable = true;
             }
         }*/
-        if (puDeckUi.IsCardFreeze(cardPlace))
+        if (cardsDeckUi.GetCardUiByName(cardPlace).freeze)
         {
-            FreezePlayingCard(cardPlace, false, ResetEnable);
+            FreezePlayingCard(cardPlace, 0, false, ResetEnable);
             if (lastCard)
             {
+                await Task.Delay(1750);
                 cardsDeckUi.CloseDrawer();
             }
         }
@@ -1606,9 +1627,9 @@ public class BattleSystem : StateMachine
             }
         }*/
         await Task.Delay(delay);
-        if (puDeckUi.IsCardFreeze(cardPlace))
+        if (cardsDeckUi.GetCardUiByName(cardPlace).freeze)
         {
-            FreezePlayingCard(cardPlace, false, ResetEnable);
+            FreezePlayingCard(cardPlace, 0, false, ResetEnable);
         }
         else
         {
@@ -1752,9 +1773,10 @@ public class BattleSystem : StateMachine
         Constants.cardsToSelectCounter = cardsToSelectCounter;
     }
 
-    internal void FreezePlayingCard(string cardTarget, bool isToFreeze, bool reset)
+    internal async void FreezePlayingCard(string cardTarget, int delay, bool isToFreeze, bool reset)
     {
-        CardUi cardToFreeze = GameObject.Find(cardTarget).GetComponent<CardUi>();
+        await Task.Delay(delay);
+        CardUi cardToFreeze = cardsDeckUi.GetCardUiByName(cardTarget);
         cardToFreeze.freeze = isToFreeze;
         if (!reset)
         {
@@ -2334,6 +2356,11 @@ public class BattleSystem : StateMachine
             result = !request.isNetworkError && !request.isHttpError && request.responseCode == 200;
         }
         syncResult(result);
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        //  ExitGame();
     }
 
     /* internal void FreezePu(string puTarget, bool isToFreeze)
