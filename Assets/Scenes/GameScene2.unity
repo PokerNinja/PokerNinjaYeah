@@ -7625,6 +7625,7 @@ MonoBehaviour:
   tornado: {fileID: 8300000, guid: 59585c1f59bc9bc40a28cf80ea7c735e, type: 3}
   iceagedon: {fileID: 8300000, guid: e7b017d2f388d8f49a50bf0c2854bf7e, type: 3}
   armageddon2: {fileID: 8300000, guid: 416921bf7b90ce143a4ab2dd5361e2e3, type: 3}
+  shutterIce: {fileID: 8300000, guid: eec4bc6b2cd9567429467bed1963fb63, type: 3}
   LowPitchRange: 0.95
   HighPitchRange: 1.05
 --- !u!4 &813767122
@@ -8746,7 +8747,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e3ce115113eea42bbf042a3e756011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TEST_MODE: 1
+  TEST_MODE: 0
   TUTORIAL_MODE: 0
   flusherOn: 0
   strighterOn: 0
@@ -14999,6 +15000,7 @@ MonoBehaviour:
   showSmokeHand: {fileID: 616153946092843979, guid: 3b4a150c84c7b2b408aef15878a11350, type: 3}
   icenadoPS: {fileID: 1802644043305413069, guid: a365c67b00a0d56448ec49cb8e2b0143, type: 3}
   armageddonPS: {fileID: 5987234027720867167, guid: 6bc79ccf37095674e8b988a8407b43f1, type: 3}
+  shutterIce: {fileID: 3627225460389826505, guid: c773da1f89c789545b78af7fc5d9503d, type: 3}
   turnBtn: {fileID: 333540117}
   turnBtnSpriteREnderer: {fileID: 333540119}
   currentRankText: {fileID: 172212462}

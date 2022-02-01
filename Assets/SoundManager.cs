@@ -59,6 +59,7 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip tornado;
     public AudioClip iceagedon;
     public AudioClip armageddon2;
+    public AudioClip shutterIce;
 
 
 
@@ -541,6 +542,11 @@ public class SoundManager : Singleton<SoundManager>
                     soundToPlay = armageddon2;
                     break;
                 }
+            case SoundName.ShutterIce:
+                {
+                    soundToPlay = shutterIce;
+                    break;
+                }
         }
 
         await PlayAsync(soundToPlay, normalPitch);
@@ -591,5 +597,6 @@ public class SoundManager : Singleton<SoundManager>
         Tornado,
         Iceagedon,
         Armagedon2,
+        ShutterIce,
     }
 }
