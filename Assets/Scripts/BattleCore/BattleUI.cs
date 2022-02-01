@@ -441,6 +441,7 @@ public class BattleUI : MonoBehaviour
     {
        lastHandRank = 10;
        currentRankNumber.text = "10";
+        Values.Instance.currentVisionColor = Values.Instance.visionColorsByRank[9];
     }
 
     internal void SlideRankingImg()
