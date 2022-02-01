@@ -248,7 +248,7 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.im1): //block_player_2_cards = im1
                 {
-                    bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
+                    bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(ConvertFixedCardPlace(Constants.PlayerCard1)).freeze;
                     battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard1),0, true,true, false);
                     battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2),200, true,!isFirstTargetFreeze, true);
                     break;

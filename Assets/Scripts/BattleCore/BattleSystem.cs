@@ -176,6 +176,7 @@ public class BattleSystem : StateMachine
 
         TEST_MODE = Values.Instance.TEST_MODE;
         //Constants.BOT_MODE = true;
+        Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
         {
