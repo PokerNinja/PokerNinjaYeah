@@ -1752,13 +1752,13 @@ public class BattleSystem : StateMachine
         {
             resetAction = () => EnableDarkAndSorting(false);
         }
-        if (cardToFreeze.freeze)
+        if (isToFreeze && cardToFreeze.freeze)
         {
             DoubleFreezeCard(cardToFreeze, cardTarget, resetAction, isFirst, reset);
         }
         else
         {
-            
+
             cardToFreeze.freeze = isToFreeze;
             ui.FreezeObject(cardToFreeze.spriteRenderer, isToFreeze, cardToFreeze.GetisFaceDown(), resetAction, true);
             if (reset)
@@ -1778,7 +1778,7 @@ public class BattleSystem : StateMachine
         {
             cardUi.cardMark.SetActive(false);
         }
-       ui.DoubleFreezeEffect(cardUi.spriteRenderer,() => cardsDeckUi.ResetCardUI(cardUi), () => cardsDeckUi.DrawAndReplaceCard(cardTarget, IsEnemyCard(cardTarget), resetAction, isFirst, isLast));
+        ui.DoubleFreezeEffect(cardUi.spriteRenderer, () => cardsDeckUi.ResetCardUI(cardUi), () => cardsDeckUi.DrawAndReplaceCard(cardTarget, IsEnemyCard(cardTarget), resetAction, isFirst, isLast));
     }
 
     internal void SwapAndDestroy(string cardTarget1, string cardTarget2)
