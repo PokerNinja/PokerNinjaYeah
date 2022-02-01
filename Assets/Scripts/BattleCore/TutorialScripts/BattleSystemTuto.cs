@@ -862,7 +862,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     {
 
         yield return new WaitForSecondsRealtime(delay);
-        cardsDeckUi.DestroyCardObject(cardPlace, null);
+        cardsDeckUi.DestroyCardObjectFire(cardPlace, null);
         yield return new WaitForSeconds(delay + 0.4f);
         Action resetAction = null;
         if (ResetEnable)

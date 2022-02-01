@@ -1262,6 +1262,12 @@ public class BattleUI : MonoBehaviour
         }
     }
 
+    internal void DoubleFreezeEffect(SpriteRenderer spriteRenderer, Action ResetCard, Action DrawCard)
+    {
+        StartCoroutine(AnimationManager.Instance.DoubleFreezeEffect(spriteRenderer,ResetCard,DrawCard));
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuFreeze, false);
+    }
+
     //public void EnbaleMusic
 
     /* internal void SlidingWinnerEyes(bool isPlayerWin)

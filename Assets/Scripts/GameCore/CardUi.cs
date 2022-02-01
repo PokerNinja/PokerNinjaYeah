@@ -153,7 +153,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         bool okToSelect = true;
         if (freeze)
         {
-            if (puName.Equals("s1") || puElement.Equals("f") || !selectionEnable)
+            if (puName.Equals("s1") || puElement.Equals("f")|| puElement.Equals("i") || !selectionEnable)
             {
                 okToSelect = true;
             }

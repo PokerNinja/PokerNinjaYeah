@@ -184,14 +184,14 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.f1): //draw_player
             case nameof(PowerUpNamesEnum.f3): //enemy_player
                 {
-                    battleSystem.DestroyAndDrawCard(cardTarget2, 0.100f, true, true, true);
+                    battleSystem.DestroyAndDrawCard(cardTarget2, 0.100f,  true, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.f2): // draw_board
                 {
                     bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
-                    battleSystem.DestroyAndDrawCard(cardTarget1, 0f, false, true, false);
-                    battleSystem.DestroyAndDrawCard(cardTarget2, Values.Instance.delayBetweenProjectiles, true, isFirstTargetFreeze, true);
+                    battleSystem.DestroyAndDrawCard(cardTarget1, 0f,  true, false);
+                    battleSystem.DestroyAndDrawCard(cardTarget2, Values.Instance.delayBetweenProjectiles, isFirstTargetFreeze, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.w2)://swap_player_board = w2
@@ -218,7 +218,7 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.enemy_pu_freeze): //enemy_pu_freeze
                 {
-                    battleSystem.FreezePlayingCard(cardTarget2,0, true, true);
+                    battleSystem.FreezePlayingCard(cardTarget2,0, true, true,true);
                     // battleSystem.FreezePu(isPlayerTurn);
                     break;
                 }
@@ -236,19 +236,21 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.i1): //block_enemy_card = i1
             case nameof(PowerUpNamesEnum.i3): //block_player_card = i3
                 {
-                    battleSystem.FreezePlayingCard(cardTarget2,0, true, true);
+                    battleSystem.FreezePlayingCard(cardTarget2,0, true, true,true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.i2): //block_board_card = i2
                 {
-                    battleSystem.FreezePlayingCard(cardTarget1,0, true, false);
-                    battleSystem.FreezePlayingCard(cardTarget2,250, true, true);
+                    bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
+                    battleSystem.FreezePlayingCard(cardTarget1,0, true,true, false);
+                    battleSystem.FreezePlayingCard(cardTarget2,250, true, !isFirstTargetFreeze, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.im1): //block_player_2_cards = im1
                 {
-                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard1),0, true, false);
-                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2),250, true, true);
+                    bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
+                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard1),0, true,true, false);
+                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2),250, true,!isFirstTargetFreeze, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.sm2): //sm2 = 22, //strighter
@@ -368,7 +370,7 @@ public class PowerUpState : State
                 isLast = true;
             }
             await Task.Delay(battleSystem.GenerateRandom(400, 700));
-            battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(cardsNames[i]), 0.1f, isLast, isFirst, isLast);
+            battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(cardsNames[i]), 0.1f,  isFirst, isLast);
             isFirst = false;
         }
     }
@@ -377,15 +379,22 @@ public class PowerUpState : State
     {
         List<string> cardsNames = new List<string>(listOfCards.Split(','));
         int randomAmount = int.Parse(limit);
+        bool isFirstFrozen = false;
+        bool frozenCheck = true;
         bool isLast = false;
         for (int i = 0; i < randomAmount; i++)
         {
+            if (frozenCheck && battleSystem.cardsDeckUi.GetCardUiByName(cardsNames[i]).freeze)
+            {
+                isFirstFrozen = true;
+                frozenCheck = false;
+            }
             if (i == randomAmount - 1)
             {
                 isLast = true;
             }
-            //await Task.Delay(battleSystem.GenerateRandom(400, 800));
-            battleSystem.FreezePlayingCard(ConvertFixedCardPlace(cardsNames[i]), battleSystem.GenerateRandom(400, 800), true, isLast);
+            battleSystem.FreezePlayingCard(ConvertFixedCardPlace(cardsNames[i]), battleSystem.GenerateRandom(400, 800), true,isFirstFrozen, isLast);
+            isFirstFrozen = false;
         }
     }
 

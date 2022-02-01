@@ -173,9 +173,9 @@ public class BattleSystem : StateMachine
          {
              Constants.IL2CPP_MOD = true;
          }*/
-       
+
         TEST_MODE = Values.Instance.TEST_MODE;
-       //Constants.BOT_MODE = true;
+        //Constants.BOT_MODE = true;
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
         {
@@ -747,11 +747,11 @@ public class BattleSystem : StateMachine
         cardsDeckUi.InitDeckFromServer(currentGameInfo.cardDeck);
         if (BOT_MODE)
         {
-        cardsDeckUi.isPlayerFirst = firstToPlayBotMode;
+            cardsDeckUi.isPlayerFirst = firstToPlayBotMode;
         }
         else
         {
-        cardsDeckUi.isPlayerFirst = IsPlayerTurn();
+            cardsDeckUi.isPlayerFirst = IsPlayerTurn();
         }
         puDeckUi = PuDeckUi.Instance();
         if (firstDeck)
@@ -1397,7 +1397,7 @@ public class BattleSystem : StateMachine
         }
         else
         {
-            if (puUi.puElement.Equals("i") || (puUi.puElement.Equals("w") && !puUi.isMonster) || puUi.puName.Equals("fm1"))
+            if (/*puUi.puElement.Equals("i") ||*/ (puUi.puElement.Equals("w") && !puUi.isMonster) || puUi.puName.Equals("fm1"))
             {
                 string[] cardsTag = PowerUpStruct.Instance.GetReleventTagCards(puUi.name, true);
                 int cardsLimit = 0;
@@ -1414,11 +1414,11 @@ public class BattleSystem : StateMachine
                 {
                     puUi.EnablePu(true);
                 }
-            }
+            }/*
             else if (puUi.puName.Equals("im1") && cardsDeckUi.IsPlayerHandUnderSmoke())
             {
                 puUi.EnablePu(false);
-            }
+            }*/
             else if (puUi.puName.Equals("wm1") && cardsDeckUi.IsOneCardFromHandsFreeze())
             {
                 puUi.EnablePu(false);
@@ -1524,7 +1524,7 @@ public class BattleSystem : StateMachine
     {
         if (enable && cardsDeckUi.GetCardUiByName(cardTarget2) != null && cardsDeckUi.GetCardUiByName(cardTarget2).freeze)
         {
-            FreezePlayingCard(cardTarget2, 0, false, false);
+            FreezePlayingCard(cardTarget2, 0, false, false, false); // MAYBE BUG
         }
         Action Reset = null;
         if (reset)
@@ -1574,7 +1574,7 @@ public class BattleSystem : StateMachine
         }
         AddGhostCardPu(cardsOwener, () => EnableDarkAndSorting(false));
     }
-    public async void DestroyAndDrawCard(string cardPlace, float delay, bool ResetEnable, bool firstCard, bool lastCard)
+    public async void DestroyAndDrawCard(string cardPlace, float delay, bool firstCard, bool ResetEnable)
     {
         /*if (currentTurn < 3 && cardPlace.Contains("River"))
         {
@@ -1594,8 +1594,8 @@ public class BattleSystem : StateMachine
         }*/
         if (cardsDeckUi.GetCardUiByName(cardPlace).freeze)
         {
-            FreezePlayingCard(cardPlace, 0, false, ResetEnable);
-            if (lastCard)
+            FreezePlayingCard(cardPlace, 0, false, false, ResetEnable);
+            if (ResetEnable)
             {
                 await Task.Delay(1750);
                 cardsDeckUi.CloseDrawer();
@@ -1604,39 +1604,8 @@ public class BattleSystem : StateMachine
         else
         {
             bool isFlip = IsEnemyCard(cardPlace);
-            StartCoroutine(ReplaceSelectedCard(cardPlace, isFlip, delay, ResetEnable, firstCard, lastCard));
+            StartCoroutine(ReplaceSelectedCard(cardPlace, isFlip, delay, firstCard, ResetEnable));
             // ReplaceSelectedCard2(cardPlace, isFlip, delay, ResetEnable, firstCard, lastCard);
-        }
-    }
-    public async void DestroyAndDrawCard2(string cardPlace, int delay, bool ResetEnable, bool firstCard, bool lastCard)
-    {
-        /*if (currentTurn < 3 && cardPlace.Contains("River"))
-        {
-            Debug.LogError("card not excist");
-
-        }
-        else if ((currentTurn < 3 && cardPlace.Contains("Turn")))
-        {
-            Debug.LogError("card not excist");
-        }
-        else
-        {
-            if (currentTurn < 3 && cardPlace.Contains("Flop3"))
-            {
-                ResetEnable = true;
-            }
-        }*/
-        await Task.Delay(delay);
-        if (cardsDeckUi.GetCardUiByName(cardPlace).freeze)
-        {
-            FreezePlayingCard(cardPlace, 0, false, ResetEnable);
-        }
-        else
-        {
-            bool isFlip = IsEnemyCard(cardPlace);
-            float ddelay = delay / 1000;
-            //   StartCoroutine(ReplaceSelectedCard(cardPlace, isFlip, ddelay, ResetEnable, firstCard, lastCard));
-            ReplaceSelectedCard2(cardPlace, false, delay, ResetEnable, firstCard, lastCard);
         }
     }
 
@@ -1645,21 +1614,21 @@ public class BattleSystem : StateMachine
         return cardPlace.Contains("Enemy");
     }
 
-    public IEnumerator ReplaceSelectedCard(string cardPlace, bool isFlip, float delay, bool ResetEnable, bool isFirstCard, bool isLastCard)
+    public IEnumerator ReplaceSelectedCard(string cardPlace, bool isFlip, float delay, bool isFirstCard, bool ResetEnable)
     {
         if (cardsDeckUi.GetParentByPlace(cardPlace).smokeEnable)
         {
             SmokeCardPu(false, cardPlace, false, false, false);
         }
         yield return new WaitForSeconds(delay);
-        cardsDeckUi.DestroyCardObject(cardPlace, null);
+        cardsDeckUi.DestroyCardObjectFire(cardPlace, null);
         yield return new WaitForSeconds(0.4f);
         Action resetAction = null;
         if (ResetEnable)
         {
             resetAction = () => EnableDarkAndSorting(false);
         }
-        cardsDeckUi.DrawAndReplaceCard(cardPlace, isFlip, resetAction, isFirstCard, isLastCard);
+        cardsDeckUi.DrawAndReplaceCard(cardPlace, isFlip, resetAction, isFirstCard, ResetEnable);
     }
     public async void ReplaceSelectedCard2(string cardPlace, bool isFlip, int delay, bool ResetEnable, bool isFirstCard, bool isLastCard)
     {
@@ -1669,7 +1638,7 @@ public class BattleSystem : StateMachine
         }
 
         await Task.Delay(500);
-        cardsDeckUi.DestroyCardObject(cardPlace, null);
+        cardsDeckUi.DestroyCardObjectFire(cardPlace, null);
         await Task.Delay(500);
         Action resetAction = null;
         if (ResetEnable)
@@ -1773,21 +1742,43 @@ public class BattleSystem : StateMachine
         Constants.cardsToSelectCounter = cardsToSelectCounter;
     }
 
-    internal async void FreezePlayingCard(string cardTarget, int delay, bool isToFreeze, bool reset)
+    internal async void FreezePlayingCard(string cardTarget, int delay, bool isToFreeze, bool isFirst, bool reset)
     {
         await Task.Delay(delay);
         CardUi cardToFreeze = cardsDeckUi.GetCardUiByName(cardTarget);
-        cardToFreeze.freeze = isToFreeze;
-        if (!reset)
+        Action resetAction = null;
+        if (reset)
         {
-            ui.FreezeObject(cardToFreeze.spriteRenderer, isToFreeze, cardToFreeze.GetisFaceDown(), null, true);
+            resetAction = () => EnableDarkAndSorting(false);
+        }
+        if (cardToFreeze.freeze)
+        {
+            DoubleFreezeCard(cardToFreeze, cardTarget, resetAction, isFirst, reset);
         }
         else
         {
-            ui.FreezeObject(cardToFreeze.spriteRenderer, isToFreeze, cardToFreeze.GetisFaceDown(), () => EnableDarkAndSorting(false), true);
+            
+            cardToFreeze.freeze = isToFreeze;
+            ui.FreezeObject(cardToFreeze.spriteRenderer, isToFreeze, cardToFreeze.GetisFaceDown(), resetAction, true);
+            if (reset)
+            {
+                await Task.Delay(1750);
+                cardsDeckUi.CloseDrawer();
+            }
         }
+
     }
 
+    private void DoubleFreezeCard(CardUi cardUi, string cardTarget, Action resetAction, bool isFirst, bool isLast)
+    {
+
+        cardsDeckUi.RemoveFromList(cardUi);
+        if (cardUi.cardMark.activeSelf)
+        {
+            cardUi.cardMark.SetActive(false);
+        }
+       ui.DoubleFreezeEffect(cardUi.spriteRenderer, () => cardsDeckUi.ResetCardUI(cardUi), () => cardsDeckUi.DrawAndReplaceCard(cardTarget, IsEnemyCard(cardTarget), resetAction, isFirst, isLast));
+    }
 
     internal void SwapAndDestroy(string cardTarget1, string cardTarget2)
     {

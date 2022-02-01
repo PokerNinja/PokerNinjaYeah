@@ -1534,6 +1534,29 @@ public class AnimationManager : Singleton<AnimationManager>
 
     }
 
+    internal IEnumerator DoubleFreezeEffect(SpriteRenderer spriteRenderer, Action ResetCard, Action DrawCard)
+    {
+        float freezeDuration = Values.Instance.FreezeDuration;
+        float fadeAmount = spriteRenderer.material.GetFloat("_FadeAmount");
+        float fadeWidth = spriteRenderer.material.GetFloat("_FadeBurnWidth");
+        while (fadeWidth >= 0)
+        {
+            fadeAmount += Time.deltaTime / freezeDuration;
+            fadeWidth -= Time.deltaTime / freezeDuration;
+
+            spriteRenderer.material.SetFloat("_FadeAmount", fadeAmount);
+            spriteRenderer.material.SetFloat("_FadeBurnWidth", fadeWidth);
+            if (fadeWidth <=0 )
+            {
+                ResetCard?.Invoke();
+                DrawCard?.Invoke();
+                break;
+            }
+            yield return new WaitForFixedUpdate();
+        }
+        yield return new WaitForFixedUpdate();
+    }
+
     /*public static async void OutlineInit(Material targetObj, bool enable)
     {
 

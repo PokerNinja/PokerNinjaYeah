@@ -305,8 +305,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void ResetExtraDeckCards()
     {
-        DestroyCardObject(extraDeckCardsUi[1].cardPlace, null);
-        DestroyCardObject(extraDeckCardsUi[0].cardPlace, () => extraDeckCardsUi = new List<CardUi>());
+        DestroyCardObjectFire(extraDeckCardsUi[1].cardPlace, null);
+        DestroyCardObjectFire(extraDeckCardsUi[0].cardPlace, () => extraDeckCardsUi = new List<CardUi>());
 
     }
 
@@ -430,10 +430,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
 
 
-    private void RemoveFromList(List<CardUi> listToRemoveFrom, CardUi cardToDestroy)
+    public void RemoveFromList( CardUi cardToDestroy)
     {
-        listToRemoveFrom.Remove(cardToDestroy);
-
+        GetListByTag(cardToDestroy.tag).Remove(cardToDestroy);
     }
 
     private void RestAfterDestroy(CardUi cardToDestroy, Action OnEnd)
@@ -1439,7 +1438,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     {
         if (ghostCardUi != null)
         {
-            DestroyCardObject(ghostCardUi.cardPlace, () => AddGhostCard(cardsOwener, UpdateRank, Reset));
+            DestroyCardObjectFire(ghostCardUi.cardPlace, () => AddGhostCard(cardsOwener, UpdateRank, Reset));
         }
         else
         {
@@ -1548,15 +1547,20 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     }
 
 
-    internal void DestroyCardObject(string cardPlace, Action OnEnd)
+    internal void DestroyCardObjectFire(string cardPlace, Action OnEnd)
     {
         DestroyWithDelay(cardPlace, OnEnd);
+    }
+
+    internal void DestroyCardObjectIce(string cardPlace, Action OnEnd)
+    {
+      //  RemoveFromList(GetListByTag(cardToDestroy.tag), cardToDestroy);
     }
 
     private void DestroyWithDelay(string cardPlace, Action OnEnd)
     {
         CardUi cardToDestroy = GetCardUiByName(cardPlace);
-        RemoveFromList(GetListByTag(cardToDestroy.tag), cardToDestroy);
+        RemoveFromList( cardToDestroy);
         //boardCardsUi.Remove(cardToDestroy); //TODO why this
         if (cardToDestroy == null)
         {

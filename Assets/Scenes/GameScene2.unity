@@ -8746,7 +8746,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e3ce115113eea42bbf042a3e756011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TEST_MODE: 0
+  TEST_MODE: 1
   TUTORIAL_MODE: 0
   flusherOn: 0
   strighterOn: 0
