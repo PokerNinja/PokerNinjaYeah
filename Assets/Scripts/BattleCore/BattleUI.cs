@@ -115,6 +115,7 @@ public class BattleUI : MonoBehaviour
     public ParticleSystem showSmokeHand;
     public ParticleSystem icenadoPS;
     public ParticleSystem armageddonPS;
+    public ParticleSystem shutterIce;
 
     [SerializeField] private GameObject turnBtn;
     [SerializeField] public SpriteRenderer turnBtnSpriteREnderer;
@@ -1253,6 +1254,12 @@ public class BattleUI : MonoBehaviour
         //  armageddonPS.Stop();
         Destroy(ps.gameObject,6f);
     }
+    internal void ShutterIce(Vector2 position)
+    {
+        GameObject ps = Instantiate(shutterIce.gameObject);
+        ps.transform.position = position;
+        Destroy(ps.gameObject,3f);
+    }
 
     internal void SlideRankingImgIfOpen()
     {
@@ -1264,8 +1271,7 @@ public class BattleUI : MonoBehaviour
 
     internal void DoubleFreezeEffect(SpriteRenderer spriteRenderer, Action ResetCard, Action DrawCard)
     {
-        StartCoroutine(AnimationManager.Instance.DoubleFreezeEffect(spriteRenderer,ResetCard,DrawCard));
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuFreeze, false);
+        StartCoroutine(AnimationManager.Instance.DoubleFreezeEffect(spriteRenderer, ()=>ShutterIce(spriteRenderer.transform.position),ResetCard, DrawCard));
     }
 
     //public void EnbaleMusic

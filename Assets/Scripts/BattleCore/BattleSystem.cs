@@ -283,7 +283,7 @@ public class BattleSystem : StateMachine
                  "fm1","fm1","fm1",
                  "fm1","fm1","im2",
               "w2","wm1","w1","wm2","wm2","wm2","w1","w2","wm2",
-              "w1","w3","w2","w1","wm1","wm2"};
+              "w1","w3","w2","w1","i2","i2"};
         }
         return deck;
     }
@@ -1762,7 +1762,7 @@ public class BattleSystem : StateMachine
             ui.FreezeObject(cardToFreeze.spriteRenderer, isToFreeze, cardToFreeze.GetisFaceDown(), resetAction, true);
             if (reset)
             {
-                await Task.Delay(1750);
+                await Task.Delay(2650);
                 cardsDeckUi.CloseDrawer();
             }
         }
@@ -1777,7 +1777,7 @@ public class BattleSystem : StateMachine
         {
             cardUi.cardMark.SetActive(false);
         }
-       ui.DoubleFreezeEffect(cardUi.spriteRenderer, () => cardsDeckUi.ResetCardUI(cardUi), () => cardsDeckUi.DrawAndReplaceCard(cardTarget, IsEnemyCard(cardTarget), resetAction, isFirst, isLast));
+       ui.DoubleFreezeEffect(cardUi.spriteRenderer,() => cardsDeckUi.ResetCardUI(cardUi), () => cardsDeckUi.DrawAndReplaceCard(cardTarget, IsEnemyCard(cardTarget), resetAction, isFirst, isLast));
     }
 
     internal void SwapAndDestroy(string cardTarget1, string cardTarget2)

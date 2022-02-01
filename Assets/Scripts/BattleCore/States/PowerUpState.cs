@@ -243,14 +243,14 @@ public class PowerUpState : State
                 {
                     bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
                     battleSystem.FreezePlayingCard(cardTarget1,0, true,true, false);
-                    battleSystem.FreezePlayingCard(cardTarget2,250, true, !isFirstTargetFreeze, true);
+                    battleSystem.FreezePlayingCard(cardTarget2,200, true, !isFirstTargetFreeze, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.im1): //block_player_2_cards = im1
                 {
                     bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
                     battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard1),0, true,true, false);
-                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2),250, true,!isFirstTargetFreeze, true);
+                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2),200, true,!isFirstTargetFreeze, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.sm2): //sm2 = 22, //strighter

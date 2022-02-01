@@ -1534,11 +1534,12 @@ public class AnimationManager : Singleton<AnimationManager>
 
     }
 
-    internal IEnumerator DoubleFreezeEffect(SpriteRenderer spriteRenderer, Action ResetCard, Action DrawCard)
+    internal IEnumerator DoubleFreezeEffect(SpriteRenderer spriteRenderer, Action ShutterIceEffect, Action ResetCard, Action DrawCard)
     {
         float freezeDuration = Values.Instance.FreezeDuration;
         float fadeAmount = spriteRenderer.material.GetFloat("_FadeAmount");
         float fadeWidth = spriteRenderer.material.GetFloat("_FadeBurnWidth");
+        bool activateShutterEffect = true;
         while (fadeWidth >= 0)
         {
             fadeAmount += Time.deltaTime / freezeDuration;
@@ -1546,7 +1547,13 @@ public class AnimationManager : Singleton<AnimationManager>
 
             spriteRenderer.material.SetFloat("_FadeAmount", fadeAmount);
             spriteRenderer.material.SetFloat("_FadeBurnWidth", fadeWidth);
-            if (fadeWidth <=0 )
+            if (activateShutterEffect && fadeAmount >= 0.8)
+            {
+                activateShutterEffect = false;
+                SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.ShutterIce, false);
+                ShutterIceEffect?.Invoke();
+            }
+            if (fadeWidth <= 0)
             {
                 ResetCard?.Invoke();
                 DrawCard?.Invoke();
