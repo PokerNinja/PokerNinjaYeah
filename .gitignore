@@ -111,3 +111,5 @@ Assets/StreamingAssets/google-services-desktop.json.meta
 Assets/Scenes/GameScene2.unity
 Assets/Plugins/Android/FirebaseApp.androidlib/res/values/google-services.xml
 UserSettings/EditorUserSettings.asset
+ProjectSettings/HDRPProjectSettings.asset
+UserSettings/EditorUserSettings.asset
