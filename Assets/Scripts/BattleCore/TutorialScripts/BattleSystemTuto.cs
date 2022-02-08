@@ -699,7 +699,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         ui.ShowPuInfoDialog(new Vector2(0, 0), false, " ", " ", false, false, () =>
         {
             infoShow = false;
-            ui.dialogContentUi.color = new Color(1, 1, 1, 0);
+            //ui.dialogContentUi.color = new Color(1, 1, 1, 0);
         });
     }
 

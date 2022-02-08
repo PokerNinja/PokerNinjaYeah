@@ -36,8 +36,7 @@ public class BattleUI : MonoBehaviour
     [SerializeField] public GameObject handRankInfo;
     [SerializeField] public TextMeshProUGUI handRankText;
 
-    [SerializeField] public Transform infoDialog;
-    [SerializeField] public SpriteRenderer dialogSprite;
+    [SerializeField] private CanvasGroup infoCanvas;
 
     [SerializeField] public GameObject rankImageParent;
     [SerializeField] public SpriteRenderer darkScreenRenderer;
@@ -45,7 +44,7 @@ public class BattleUI : MonoBehaviour
     [SerializeField] public TextMeshProUGUI largeText;
     [SerializeField] public GameObject largeTextGO;
 
-    [SerializeField] public GameObject turnTextGO;
+    // [SerializeField] public GameObject turnTextGO;
     [SerializeField] public GameObject targetTurnSymbol;
 
     [SerializeField] public GameObject fireProjectile1;
@@ -55,6 +54,9 @@ public class BattleUI : MonoBehaviour
 
     [SerializeField] public GameObject iceProjectile1;
     [SerializeField] public GameObject iceProjectile2;
+
+
+
     //[SerializeField] public SpriteRenderer windSpriteRenderer;
     [SerializeField] public GameObject windEffect, windEffect2;
 
@@ -118,7 +120,8 @@ public class BattleUI : MonoBehaviour
     public ParticleSystem shutterIce;
 
     [SerializeField] private GameObject turnBtn;
-    [SerializeField] public SpriteRenderer turnBtnSpriteREnderer;
+    [SerializeField] public SpriteRenderer turnArrowSprite;// MAYBE in Timer
+    [SerializeField] public BetBtnUi betBtn;
     [SerializeField] public TextMeshProUGUI currentRankText;
     [SerializeField] private TextMeshProUGUI currentRankNumber;
 
@@ -130,6 +133,20 @@ public class BattleUI : MonoBehaviour
     private bool sliding;
     private int lastHandRank = 10;
     public GameObject psParent;
+    public Transform playerHpUi;
+    public Transform enemyHpUi;
+    [SerializeField] private TextMeshProUGUI totalHpText;
+    [SerializeField] private TextMeshProUGUI currentHpText;
+    [SerializeField] private CanvasGroup hpInfoCanvas;
+    [SerializeField] private Animator damageAnimationController;
+    [SerializeField] private Animator extraDamageAnimationController;
+    [SerializeField] private TextMeshProUGUI damageText;
+    [SerializeField] private TextMeshProUGUI extraDamageText;
+
+
+
+    [SerializeField] private Animation cameraShakeAnimation;
+
 
     public Transform pusThemePlayer, pusThemeEnemy;
 
@@ -141,11 +158,18 @@ public class BattleUI : MonoBehaviour
     private Color[] ninjaFrameColors;
 
 
-    public void Initialize(PlayerInfo player, PlayerInfo enemy)
+    public void Initialize(PlayerInfo player, PlayerInfo enemy, bool HP_GAME, float totalHp)
     {
         InitializePlayer(player);
         InitializeEnemy(enemy);
-        InitializeAnimations();
+        if (HP_GAME)
+        {
+            totalHpText.text = "/ " + totalHp;
+        }
+        else
+        {
+            InitializeAnimations();
+        }
     }
 
     private void InitializeAnimations()
@@ -183,7 +207,12 @@ public class BattleUI : MonoBehaviour
         }
     }
 
-
+    internal void ActivateHpObjects()
+    {
+        betBtn.gameObject.SetActive(true);
+        playerHpUi.parent.gameObject.SetActive(true);
+        enemyHpUi.parent.gameObject.SetActive(true);
+    }
 
     public IEnumerator CardProjectileEffect(bool isPlayerWin, Action HitEffect, Action LoseCoin)
     {
@@ -198,13 +227,21 @@ public class BattleUI : MonoBehaviour
             rightCard.transform.position = Values.Instance.winCardRightEnd.position;
             leftCard.transform.position = Values.Instance.winCardLeftEnd.position;
         }
-        HitEffect?.Invoke();
-        LoseCoin?.Invoke();
+        StartCoroutine(VisualDamage(HitEffect,LoseCoin));
         yield return new WaitForSeconds(0.25f);
         rightCard.SetActive(true);
         leftCard.SetActive(true);
-        StartCoroutine(AnimationManager.Instance.SpinRotateValue(rightCardChildSprite, null));
-        StartCoroutine(AnimationManager.Instance.SmoothMoveCardProjectile(isPlayerWin, true, rightCard.transform, rightCard.transform.localScale, Values.Instance.winningCardProjectileMoveDuration, null, () =>
+        StartCoroutine(AnimationManager.Instance.SpinRotateValue(rightCardChildSprite, () =>
+        {
+           /* HitEffect?.Invoke();
+            LoseCoin?.Invoke();*/
+        }));
+        StartCoroutine(AnimationManager.Instance.SmoothMoveCardProjectile(isPlayerWin, true, rightCard.transform, rightCard.transform.localScale, Values.Instance.winningCardProjectileMoveDuration,
+            () =>
+            {
+                /*HitEffect?.Invoke();
+                LoseCoin?.Invoke();*/
+            }, () =>
        {
            rightCard.SetActive(false);
        }));
@@ -220,6 +257,13 @@ public class BattleUI : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash2, true);
 
+    }
+
+    private IEnumerator VisualDamage(Action hitEffect, Action loseCoin)
+    {
+        yield return new WaitForSeconds(2f);
+        hitEffect.Invoke();
+        loseCoin.Invoke();
     }
 
     internal void SlidePuSlots()
@@ -259,7 +303,7 @@ public class BattleUI : MonoBehaviour
     }
     public void WinParticleEffect()
     {
-       Instantiate(winParticle.gameObject);
+        Instantiate(winParticle.gameObject);
     }
 
     public void LoseLifeUi(bool isPlayer, int lifeIndex)
@@ -326,22 +370,28 @@ public class BattleUI : MonoBehaviour
     {
         EnableEndTurnBtn(enable);
         EnableBtnReplace(enable);
+        if (Constants.HP_GAME)
+        {
+            betBtn.EnableBetBtn(enable);
+        }
         /* if (BattleSystem.Instance.replacePuLeft > 0)
          {
              EnableBtnReplace(enable);
          }*/
     }
 
+
+
     public void EnableEndTurnBtn(bool enable)
     {
         if (enable)
         {
-            StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnBtnSpriteREnderer, true, Values.Instance.turnBtnAlphaDuration, () => turnBtn.GetComponent<Button>().interactable = true));
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnArrowSprite, true, Values.Instance.turnBtnAlphaDuration, () => turnBtn.GetComponent<Button>().interactable = true));
         }
         else
         {
             turnBtn.GetComponent<Button>().interactable = false;
-            StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnBtnSpriteREnderer, false, Values.Instance.turnBtnAlphaDuration, () => turnBtn.GetComponent<Button>().interactable = false));
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnArrowSprite, false, Values.Instance.turnBtnAlphaDuration, null));
         }
     }
 
@@ -380,32 +430,59 @@ public class BattleUI : MonoBehaviour
         }
         if (isEnable)
         {
-            infoDialog.position = new Vector2(0, -7f);
-            infoDialog.localScale = new Vector2(0.1f, 0.1f);
+            infoCanvas.transform.position = new Vector2(0, -7f);
+            infoCanvas.transform.localScale = new Vector2(0.1f, 0.1f);
             if (puName.Equals("replace"))
             {
                 InitDialog(puDisplayName, Constants.ReplacePuInfo, isBtnOn);
+            }
+            else if (puName.Equals("bet"))
+            {
+                InitDialog(puDisplayName, Constants.BetInfo, isBtnOn);
             }
             else
             {
                 InitDialog(puDisplayName, PowerUpStruct.Instance.GetPuInfoByName(puName), isBtnOn);
             }
-            StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialog, OnEnd));
-            //StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialogTransform, OnEnd));
-            StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, true, Values.Instance.showDialogMoveDuration, null));
+            // infoCanvas.alpha = 1f;
+            StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoCanvas.transform, startingPosition, targetDialog, OnEnd));
+            StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(infoCanvas, true, Values.Instance.infoDialogFadeOutDuration, null));
+            // StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, true, Values.Instance.showDialogMoveDuration, null));
         }
         else
         {
-            if (dialogSprite.color.a > 0)
+            if (infoCanvas.alpha > 0)
             {
-                StartCoroutine(AnimationManager.Instance.AlphaAnimation(dialogSprite, false, Values.Instance.infoDialogFadeOutDuration, OnEnd));
-                StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, false, Values.Instance.infoDialogFadeOutDuration, null));
+                StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(infoCanvas, false, Values.Instance.infoDialogFadeOutDuration, OnEnd));
+
+                /* StartCoroutine(AnimationManager.Instance.AlphaAnimation(dialogSprite, false, Values.Instance.infoDialogFadeOutDuration, OnEnd));
+                 StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, false, Values.Instance.infoDialogFadeOutDuration, null));*/
             }
         }
 
     }
 
-
+    internal IEnumerator DisplayDamageText(bool isPlayerWin, float currentDamageThisRound, float extraDamage)
+    {
+        damageText.text ="-"+ currentDamageThisRound.ToString();
+        extraDamageText.text = "-" + extraDamage.ToString();
+        string anim = "hit_player";
+        if (!isPlayerWin)
+        {
+            anim = "hit_enemy";
+        }
+        damageText.gameObject.SetActive(true);
+        extraDamageText.gameObject.SetActive(extraDamage != 0);
+        damageAnimationController.Play(anim);
+        yield return new WaitForSeconds(0.2f);
+        if (extraDamage != 0)
+        {
+            extraDamageAnimationController.Play(anim);
+        }
+        yield return new WaitForSeconds(2f);
+        damageText.gameObject.SetActive(false);
+        extraDamageText.gameObject.SetActive(false);
+    }
 
     public void InitDialog(string dialogTitle, string dialogContent, bool enableBtns)
     {
@@ -439,8 +516,8 @@ public class BattleUI : MonoBehaviour
 
     internal void ResetHandRank()
     {
-       lastHandRank = 10;
-       currentRankNumber.text = "10";
+        lastHandRank = 10;
+        currentRankNumber.text = "10";
         Values.Instance.currentVisionColor = Values.Instance.visionColorsByRank[9];
     }
 
@@ -449,7 +526,7 @@ public class BattleUI : MonoBehaviour
         if (!sliding)
         {
             sliding = true;
-            StartCoroutine(AnimationManager.Instance.SmoothMoveRank(rankImageParent.transform, Values.Instance.rankInfoMoveDuration, 
+            StartCoroutine(AnimationManager.Instance.SmoothMoveRank(rankImageParent.transform, Values.Instance.rankInfoMoveDuration,
                 () => rankImageParent.SetActive(false),
                 () => rankImageParent.SetActive(true)
                 , () => sliding = false));
@@ -531,38 +608,38 @@ public class BattleUI : MonoBehaviour
         }
     }
 
-    public void WhosTurnAnimation(bool isPlayer, bool yourLastTurn, bool finalMove, Action EndRoutine)
-    {
-        string targetTurnTextPath;
-        Action endAction = null;
-        Action enableBGPulse = null;
-        turnTextGO.transform.localScale = new Vector2(0.1f, 0.1f);
-        turnTextGO.transform.position = new Vector2(0f, 0f);
-        turnTextGO.SetActive(true);
-        targetTurnTextPath = GetTurnTextPath(isPlayer, yourLastTurn, finalMove);
-        SpriteRenderer spriteRenderer = turnTextGO.GetComponent<SpriteRenderer>();
-        AnimationManager.Instance.SetAlpha(spriteRenderer, 1f);
-        spriteRenderer.sprite = Resources.Load(targetTurnTextPath, typeof(Sprite)) as Sprite;
+    /* public void WhosTurnAnimation(bool isPlayer, bool yourLastTurn, bool finalMove, Action EndRoutine)
+     {
+         string targetTurnTextPath;
+         Action endAction = null;
+         Action enableBGPulse = null;
+         turnTextGO.transform.localScale = new Vector2(0.1f, 0.1f);
+         turnTextGO.transform.position = new Vector2(0f, 0f);
+         turnTextGO.SetActive(true);
+         targetTurnTextPath = GetTurnTextPath(isPlayer, yourLastTurn, finalMove);
+         SpriteRenderer spriteRenderer = turnTextGO.GetComponent<SpriteRenderer>();
+         AnimationManager.Instance.SetAlpha(spriteRenderer, 1f);
+         spriteRenderer.sprite = Resources.Load(targetTurnTextPath, typeof(Sprite)) as Sprite;
 
-        if (finalMove || yourLastTurn)
-        {
-            enableBGPulse = () => EnableBgColor(true);
-        }
-        /* else
+         if (finalMove || yourLastTurn)
          {
-             alphaAction = () => StartCoroutine(AnimationManager.AlphaAnimation(spriteRenderer, false, 1f, () =>
-             {
-                 turnTextGO.SetActive(false);
-                 AnimationManager.SetAlpha(spriteRenderer, 1f);
-             }));
+             enableBGPulse = () => EnableBgColor(true);
+         }
+         *//* else
+          {
+              alphaAction = () => StartCoroutine(AnimationManager.AlphaAnimation(spriteRenderer, false, 1f, () =>
+              {
+                  turnTextGO.SetActive(false);
+                  AnimationManager.SetAlpha(spriteRenderer, 1f);
+              }));
 
-         }*/
-        endAction = () => StartCoroutine(AnimationManager.Instance.SmoothMove(turnTextGO.transform, targetTurnSymbol.transform.position, targetTurnSymbol.transform.localScale, Values.Instance.turnTextMoveDuration, null, null, EndRoutine, () =>
-                turnTextGO.transform.localPosition = new Vector3(turnTextGO.transform.localPosition.x, turnTextGO.transform.localPosition.y, 19.5f)));
+          }*//*
+         endAction = () => StartCoroutine(AnimationManager.Instance.SmoothMove(turnTextGO.transform, targetTurnSymbol.transform.position, targetTurnSymbol.transform.localScale, Values.Instance.turnTextMoveDuration, null, null, EndRoutine, () =>
+                 turnTextGO.transform.localPosition = new Vector3(turnTextGO.transform.localPosition.x, turnTextGO.transform.localPosition.y, 19.5f)));
 
-        StartCoroutine(AnimationManager.Instance.ScaleObjectRatio(11f, Values.Instance.turnTextScaleDuration, turnTextGO.transform, enableBGPulse, endAction));
+         StartCoroutine(AnimationManager.Instance.ScaleObjectRatio(11f, Values.Instance.turnTextScaleDuration, turnTextGO.transform, enableBGPulse, endAction));
 
-    }
+     }*/
 
     public void EnableBgColor(bool enable)
     {
@@ -593,7 +670,7 @@ public class BattleUI : MonoBehaviour
 
     public void ResetTurnPanels()
     {
-        turnTextGO.SetActive(false);
+        //  turnTextGO.SetActive(false);
     }
 
     public void EnableTurnIndicator(bool playerTurn, Action OnFinish)
@@ -869,7 +946,7 @@ public class BattleUI : MonoBehaviour
     {
         if (enable)
         {
-            handRankText.text = ConvertHandRankToTextDescription(rank);
+            handRankText.text = ConvertHandRankToTextDescription(rank) + " +" /*ConvertWinenerRankToDamage(!dealToPlayer)*/;
         }
         handRankInfo.SetActive(enable);
     }
@@ -928,14 +1005,19 @@ public class BattleUI : MonoBehaviour
 
     internal void EnableBtnReplace(bool enable)
     {
+        Action btnEnable = () => BattleSystem.Instance.btnReplaceClickable = enable; ;
         float value = 0.65f;
         if (enable)
         {
             value = 0;
         }
+        else
+        {
+            btnEnable.Invoke();
+            btnEnable = null;
+        }
         // Make IT more stable
-        BattleSystem.Instance.btnReplaceClickable = enable;
-        StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, btnReplaceRenderer.material, value, () => BattleSystem.Instance.btnReplaceClickable = enable));
+        StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, btnReplaceRenderer.material, value, btnEnable));
     }
 
     public void BgFadeInColor()
@@ -1233,13 +1315,13 @@ public class BattleUI : MonoBehaviour
     {
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Iceagedon, true);
         // icenadoPS.Play();
-        GameObject ps = Instantiate(icenadoPS.gameObject) ;
+        GameObject ps = Instantiate(icenadoPS.gameObject);
         yield return new WaitForSeconds(3f);
         var main = ps.GetComponent<ParticleSystem>().main;
         main.startLifetime = 0;
         //yield return new WaitForSeconds(5f);
         // icenadoPS.Stop();
-        Destroy(ps.gameObject,6f);
+        Destroy(ps.gameObject, 6f);
     }
 
     internal IEnumerator StartArmageddon()
@@ -1251,15 +1333,15 @@ public class BattleUI : MonoBehaviour
         yield return new WaitForSeconds(3f);
         var main = ps.GetComponent<ParticleSystem>().main;
         main.startLifetime = 0;
-       // yield return new WaitForSeconds(5f);
+        // yield return new WaitForSeconds(5f);
         //  armageddonPS.Stop();
-        Destroy(ps.gameObject,6f);
+        Destroy(ps.gameObject, 6f);
     }
     internal void ShutterIce(Vector2 position)
     {
         GameObject ps = Instantiate(shutterIce.gameObject);
         ps.transform.position = position;
-        Destroy(ps.gameObject,3f);
+        Destroy(ps.gameObject, 3f);
     }
 
     internal void SlideRankingImgIfOpen()
@@ -1272,8 +1354,63 @@ public class BattleUI : MonoBehaviour
 
     internal void DoubleFreezeEffect(SpriteRenderer spriteRenderer, Action ResetCard, Action DrawCard)
     {
-        StartCoroutine(AnimationManager.Instance.DoubleFreezeEffect(spriteRenderer, ()=>ShutterIce(spriteRenderer.transform.position),ResetCard, DrawCard));
+        StartCoroutine(AnimationManager.Instance.DoubleFreezeEffect(spriteRenderer, () => ShutterIce(spriteRenderer.transform.position), ResetCard, DrawCard));
     }
+
+    internal void UpdateDamage(float damage, bool dealToPlayer)
+    {
+        if (dealToPlayer)
+        {/*
+        playerHpUi.position -= new Vector3(0, damage,0);
+        playerHpUi.localScale -= new Vector3(0, damage,0);*/
+            StartCoroutine(AnimationManager.Instance.ScaleHp(playerHpUi, damage, ()=>ShakeCamera()));
+            playerHpUi.GetComponent<Animation>().Play();
+        }
+        else
+        {
+            StartCoroutine(AnimationManager.Instance.ScaleHp(enemyHpUi, damage, () => ShakeCamera()));
+            enemyHpUi.GetComponent<Animation>().Play();
+        }
+        Debug.Log("ge;" + damage);
+    }
+
+    internal void ActivateLifeCoins()
+    {
+        playerLifeUi[0].SetActive(true);
+        playerLifeUi[1].SetActive(true);
+        enemyLifeUi[0].SetActive(true);
+        enemyLifeUi[1].SetActive(true);
+    }
+
+    internal void DoubleDamageVisual(float damage)
+    {
+        betBtn.DisplayDoubleDamage(damage);
+    }
+
+    internal void ShowHpDialog(float currentHp, bool isPlayer)
+    {
+        float posY = -2.6f;
+        if (!isPlayer)
+        {
+            posY = 2.6f;
+        }
+        hpInfoCanvas.transform.position = new Vector3(hpInfoCanvas.transform.position.x, posY, hpInfoCanvas.transform.position.z);
+        currentHpText.text = " " + currentHp;
+        StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(hpInfoCanvas, true, Values.Instance.infoDialogFadeOutDuration, null));
+    }
+    public void HideHpDialog()
+    {
+        StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(hpInfoCanvas, false, Values.Instance.infoDialogFadeOutDuration, null));
+    }
+
+    /* internal void WhosTurnAnimation(bool isPlayer, bool yourLastTurn)
+     {
+         turnArrowSpriteRenderer.flipX = isPlayer;
+         if (yourLastTurn)
+         {
+             turnArrowAnimation.Play();
+         }
+     }*/
 
     //public void EnbaleMusic
 
@@ -1282,6 +1419,12 @@ public class BattleUI : MonoBehaviour
         winningEyes.transform.position = new Vector2(8f, winningEyes.transform.position.y);
         StartCoroutine(AnimationManager.SmoothMoveEyes(winningEyes.transform, 6f, null, () => StartCoroutine(SlashEffect())));
     }*/
+
+    
+    public void ShakeCamera()
+    {
+        cameraShakeAnimation.Play();
+    }
 
 }
 

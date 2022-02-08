@@ -38,9 +38,10 @@ public class ValuesText : Singleton<Values>
     /// ////////////// Player Last Turn
     /// </sy>
     public const string Final1Energy = "In the final turn of the round, you only get  1 energy!";
-    public const string WindHold = "\nHold to read the new Ninja card.";
+    public const string WindHold = "Hold to read\nthe new Ninja card.";
     public const string WindInfo = "Use the Ninja card to swap\nthe enemy’s card\nwith 1 from the board.";
-    public const string WindSelect = "Choose the '7' of your\nopponent's hand.And\nreplace it with a card other than '7' so your can have three of a kind.";
+    public const string WindSelect = "Select the '7' card of your\nopponent's hand. And replace\nit with a card from the field.";
+    //public const string WindSelect = "Choose the '7' of your\nopponent's hand.And\nreplace it with a card other than '7' so your can have three of a kind.";
     public const string RankUpd = "You just made a better hand rank! good job!";
     public const string tuto24 = "End tutorial";
     public static string[] tutoInfo = { Start, Coins, Energy, NinjaHold, CardCost, FreezeSelf, Choose, Nice, EndTurnEnergy,

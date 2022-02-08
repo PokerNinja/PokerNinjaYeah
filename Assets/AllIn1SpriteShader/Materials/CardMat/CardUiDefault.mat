@@ -178,7 +178,7 @@ Material:
     - _OutlineAlpha: 0
     - _OutlineDistortAmount: 0.3
     - _OutlineDistortTexXSpeed: -1
-    - _OutlineDistortTexYSpeed: -8
+    - _OutlineDistortTexYSpeed: -2
     - _OutlineDistortToggle: 1
     - _OutlineGlow: 1
     - _OutlineIsPixel: 0

@@ -53,10 +53,10 @@ public class PlayerTurn : State
         battleSystem.DealPu(true, () =>
         {
             battleSystem.isPlayerBotModeTurn = true;
-            Action tutorialAction = null;
+           // Action tutorialAction = null;
             battleSystem.NewTimerStarter(true);
             battleSystem.ActivatePlayerButtons(true, true);
-            battleSystem.Interface.WhosTurnAnimation(true, yourLastTurn, finalTurn, tutorialAction);
+           // battleSystem.WhosTurnAnimation(true, yourLastTurn);
             battleSystem.ChargeEnergyCounter(energyChargeCount);
             battleSystem.Interface.SetTurnIndicator(true, true);
 

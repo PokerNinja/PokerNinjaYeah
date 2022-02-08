@@ -36,8 +36,10 @@ public class Constants : Singleton<Constants>
     public static readonly string[] deckCardsNames = { Deck1, Deck2 };
     public static readonly string[] ghostCardsNames = { PlayerGhost, EnemyGhost, BoardGhost };
     public static string ReplacePuInfo = "Choose one PowerUp and replace it with a new one.";
+    public static string BetInfo = "Offer your opponent to double the damage for this round";
 
     public static bool TUTORIAL_MODE = false;
+    public static bool HP_GAME = false;
     public static bool BOT_MODE = false;
     public static bool IL2CPP_MOD = false;
     public static bool TemproryUnclickable = false;

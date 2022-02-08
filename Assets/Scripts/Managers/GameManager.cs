@@ -21,6 +21,8 @@ namespace Managers
         private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> newDeckListener;
         private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> currentPowerupListener;
         private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> currentEmojiListener;
+        private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> localPlayerBetListener;
+
 
         public void GetCurrentGameInfo(string gameId, string localPlayerId, Action<GameInfo> callback,
             Action<AggregateException> fallback)
@@ -176,7 +178,7 @@ namespace Managers
                             },
                            fallback);
         }
-        internal void ListenForEmoji(string currentPlayerId,Action<int> callbackEmoji,
+        internal void ListenForEmoji(string currentPlayerId, Action<int> callbackEmoji,
             Action<AggregateException> fallback)
         {
             currentEmojiListener =
@@ -187,7 +189,7 @@ namespace Managers
                                 var emoji =
                                     StringSerializationAPI.Deserialize(typeof(EmojiInfo), args.Snapshot.GetRawJsonValue()) as
                                         EmojiInfo;
-                               // currentGameInfo.powerup = powerup;
+                                // currentGameInfo.powerup = powerup;
                                 if (!emoji.playerId.Equals(currentPlayerId))
                                 {
                                     callbackEmoji(emoji.emojiId);
@@ -262,7 +264,7 @@ namespace Managers
 
             DatabaseAPI.PostObject($"games/{currentGameInfo.gameId}/gameInfo/powerup", newPowerUp,
                    callback
-                   ,fallback);
+                   , fallback);
         }
 
 
@@ -279,5 +281,61 @@ namespace Managers
                                     callback,
                                     fallback);
         }
+
+        public void SetBetOffer(string betInfo, Action callback, Action<AggregateException> fallback)
+        {
+
+            DatabaseAPI.PostObject(
+                $"games/{currentGameInfo.gameId}/gameInfo/bet", betInfo, callback, fallback);
+        }
+        public void ListenForOtherPlayerBet(Action OtherPlayerAccept, Action OtherPlayerRefuse, Action onEnemyOfferBet, Action<AggregateException> fallback)
+        {
+            //  localPlayerSTPorFTP = playerFTPorSTP(oppFTPorSTP);
+            localPlayerBetListener =
+                DatabaseAPI.ListenForValueChanged($"games/{currentGameInfo.gameId}/gameInfo/bet", args =>
+                {
+                    // bool isPlayerTurn = intToBool(PlayerPrefs.GetInt("turn"));
+                    //   bool isPlayerTurn = PlayerPrefs.GetString("turn").Equals(currentGameInfo.localPlayerId); // TODO make it better
+                    string betInfo = (string)args.Snapshot.GetValue(true);
+                    if ( betInfo.Equals(currentGameInfo.EnemyId))
+                    {
+                        onEnemyOfferBet();
+                    }
+                    if (betInfo.Equals("yes"))
+                    {
+                        OtherPlayerAccept();
+                    }
+                    else if (betInfo.Equals("no"))
+                    {
+                        OtherPlayerRefuse();
+                    }
+
+                    /*   switch (betInfo)
+                   {
+                       case 0:
+                           Debug.LogError("bet" + betInfo);
+                           break;
+                       case 1:
+                           onOpponentOfferBet();
+                           Debug.LogError("bet" + betInfo);
+                           break;
+                       case 2:
+                           OtherPlayerAccept();
+                           Debug.LogError("bet" + betInfo);
+                           break;
+                       case 3:
+                           OtherPlayerRefuse();
+                           Debug.LogError("bet" + betInfo);
+                           break;
+                   }*/
+                    /* if (opponentBet.Equals("Yes")) OtherPlayerAccept();
+                     else if (opponentBet.Equals("No")) OtherPlayerRefuse();// OTHER ARCHITECTURE
+                     else if (opponentBet.Equals("0")) ;
+                     else onOpponentOfferBet();*/
+                }, fallback);
+        }
+        public void StopListeningForOtherPlayerBet() =>
+          DatabaseAPI.StopListeningForValueChanged(localPlayerBetListener);
+
     }
 }

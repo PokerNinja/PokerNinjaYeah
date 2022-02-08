@@ -25,6 +25,9 @@ public class GameMenuHandler : MonoBehaviour
 
     [GUIColor(0.3f, 0.8f, 0.8f)]
     public bool TEST_MODE;
+    [GUIColor(0.1f, 0.3f, 0.8f)]
+    public bool HP_GAME;
+   
     private bool tutorialVisible = false;
 
     public void Awake()
@@ -33,6 +36,7 @@ public class GameMenuHandler : MonoBehaviour
     }
     void Start()
     {
+        Constants.HP_GAME = HP_GAME;
         appVersion.text = "version: " + Application.version;
         DatabaseAPI.InitializeDatabase();
 

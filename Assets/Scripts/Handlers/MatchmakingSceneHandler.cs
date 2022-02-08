@@ -39,6 +39,7 @@ namespace Handlers
 
         private void Start()
         {
+
             readyingUp = false;
             gameFound = false;
             searchingText.text = "Looking for opponent...";
@@ -151,7 +152,9 @@ namespace Handlers
                             LocalTurnSystem.Instance.Init(dbrefOfGameRoom, gameInfo.playersIds, MainManager.Instance.currentLocalPlayerId);
 
                             // Initilize Turn Manager here! Destroy when leave
+
                             SceneManager.LoadScene("GameScene2");
+
                         }, Debug.Log);
                 }, Debug.Log);
             searchingText.text = "Game found!";
@@ -163,13 +166,13 @@ namespace Handlers
             if (cancelGame)
             {
                 MainManager.Instance.gameManager.StopListeningForAllPlayersReady();
-                DeleteGame(()=>Debug.Log("YEAH DELETEEE"),Debug.LogError);
+                DeleteGame(() => Debug.Log("YEAH DELETEEE"), Debug.LogError);
                 LeaveQueue();
                 yield return new WaitForSeconds(3f);
                 SceneManager.LoadScene("GameMenuScene");
             }
         }
-        public  void DeleteGame( Action callback, Action<AggregateException> fallback)
+        public void DeleteGame(Action callback, Action<AggregateException> fallback)
         {
             var dbrefOfGameRoom = DataBaseAPI.DatabaseAPI.GetReferenceFromPath($"games/{gameId}");
             dbrefOfGameRoom.RemoveValueAsync().ContinueWith(task =>

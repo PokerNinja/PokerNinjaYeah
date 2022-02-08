@@ -2,19 +2,28 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
 
     public UnityEvent onClick = new UnityEvent();
     public UnityEvent onLongPress = new UnityEvent();
     private float holdTime = 0.3f;
     public SpriteRenderer spriteRenderer;
-    public Animator animator;
+    public TextMeshProUGUI txtMultiplayer;
     private bool held = false;
+    public bool btnBetClickable = false;
+    public Animation anim;
+
+    private void Start()
+    {
+        anim.Stop();
+    }
+
     /*public void OnClick()
     {
         // TODO move this to battleSystem
@@ -72,22 +81,25 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         // TODO move this to battleSystem
         // BattleSystem battleSystem = GameObject.Find("BattleSystem").GetComponent<BattleSystem>();
         //Maybe Better One
-        if (!Constants.TUTORIAL_MODE)
+        /*  if (!Constants.TUTORIAL_MODE)
+          {
+              if (BattleSystem.Instance.infoShow)
+              {
+                  BattleSystem.Instance.HideDialog();
+              }
+              BattleSystem.Instance.EnableReplaceDialog(false, false);
+          }
+          else
+          {*/
+        if (BattleSystem.Instance.infoShow)
         {
-            if (BattleSystem.Instance.infoShow)
-            {
-                BattleSystem.Instance.HideDialog();
-            }
-            BattleSystem.Instance.EnableReplaceDialog(false, false);
+            BattleSystem.Instance.HideDialog();
         }
-        else
-        {
-            if (BattleSystemTuto.Instance.infoShow)
-            {
-                BattleSystemTuto.Instance.HideDialog();
-            }
-            BattleSystemTuto.Instance.EnableReplaceDialog(false, false);
-        }
+
+        onClick.Invoke();
+
+        //BattleSystem.Instance.EnableBetDialog(true);
+        /*}*/
     }
     public void OnPointerUp(PointerEventData eventData)
     {
@@ -98,20 +110,8 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         {
             onClick.Invoke();
         }
-        else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
-        {
-            BattleSystem.Instance.HideDialog();
-        }
-        else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
-        {
-            BattleSystemTuto.Instance.HideDialog();
-        }
-
+        BattleSystem.Instance.HideDialog();
     }
-
-
-
-
 
 
     public void OnPointerDown(PointerEventData eventData)
@@ -124,28 +124,39 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     }
     private void LoadSpriteBtn(bool press)
     {
-        animator.SetBool("enable", !press);
-        /* string imgName;
-         if (press)
-         {
-             imgName = "draw_press";
-         }
-         else
-         {
-             imgName = "draw1";
-         }
-         spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + imgName, typeof(Sprite)) as Sprite;*/
+        string path = "bet";
+        if (press)
+        {
+            path += "_p";
+        }
+        spriteRenderer.sprite = Resources.Load("Sprites/GameScene/" + path, typeof(Sprite)) as Sprite;
+    }
+
+  
+    public void DisplayDoubleDamage(float damageMultiplayer)
+    {
+        spriteRenderer.sprite = Resources.Load("Sprites/GameScene/bet_empty", typeof(Sprite)) as Sprite;
+        txtMultiplayer.gameObject.SetActive(true);
+        txtMultiplayer.text = "x" + damageMultiplayer;
+        anim.Play();
+    }
+
+    public void ResetBtn()
+    {
+        txtMultiplayer.gameObject.SetActive(false);
+        LoadSpriteBtn(false);
+        anim.Stop();
     }
 
     public void OND()
     {
         if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, false, "replace", Constants.ReplacePuInfo);
+            BattleSystem.Instance.ShowPuInfo(transform.position, false, "bet", Constants.ReplacePuInfo);
         }
         else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
         {
-            BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, "replace", Constants.ReplacePuInfo);
+            BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, "bet", Constants.ReplacePuInfo);
         }
     }
 
@@ -156,5 +167,23 @@ public class ClickHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         onLongPress.Invoke();
     }
 
+    public void EnableBetBtn(bool enable)
+    {
+        Action btnEnable = () => btnBetClickable = enable;
+        btnEnable.Invoke();
 
+        /*  float value = 0.65f;
+          if (enable)
+          {
+              value = 0;
+          }
+          else
+          {
+              btnEnable.Invoke();
+              btnEnable = null;
+          }
+          // Make IT more stable
+          StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, spriteRenderer.material, value, btnEnable));
+  */
+    }
 }

@@ -23,6 +23,7 @@ public class GameOver : State
 
     public override IEnumerator Start()
     {
+        //battleSystem.disab
         SoundManager.Instance.StopMusic();
         yield return new WaitForSeconds(4f);
         battleSystem.Interface.ShowGameOverPanel(isPlayerWin);

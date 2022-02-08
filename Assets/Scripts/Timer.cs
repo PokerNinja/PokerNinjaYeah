@@ -10,6 +10,8 @@ public class Timer : MonoBehaviour
     [SerializeField] private Image countdownCircleTimer;
     [SerializeField] private float countTimer ;
     private bool endTurnByPlayer;
+    public SpriteRenderer turnArrowSpriteRenderer;
+    public Animation turnArrowAnimation;
 
     //  [SerializeField] private float countTimer;
     private bool updateTime;
@@ -29,9 +31,40 @@ public class Timer : MonoBehaviour
         countTimer = -10f;
         countdownCircleTimer.fillAmount = 1.0f;
         thereCanBeOnlyOne = null;
+        ApplyIndicatorArrow(false, false);
+
     }
+
+    private void ApplyIndicatorArrow(bool enable, bool isPlayerTurn)
+    {
+        turnArrowSpriteRenderer.gameObject.SetActive(enable);
+        turnArrowSpriteRenderer.gameObject.SetActive(enable);
+        if (enable)
+        {
+            FlipImage(isPlayerTurn);
+            turnArrowAnimation.Play();
+        }
+        else
+        {
+            turnArrowAnimation.Stop();
+        }
+    }
+
+    private void FlipImage(bool isPlayer)
+    {
+        Vector3 parentArrowScale = turnArrowSpriteRenderer.transform.parent.transform.localScale;
+        float addition = 1; // enemyTurn
+        if (isPlayer)
+        {
+            addition = -1;
+        }
+        Vector3 newScale = new Vector3(parentArrowScale.x,  addition);
+        turnArrowSpriteRenderer.transform.parent.transform.localScale = newScale;
+    }
+
     public IEnumerator StartTimer(float timerDuration)
     {
+        SetCounterColor(false);
         yield return new WaitForSeconds(Values.Instance.delayTimerStart);
         endTurnByPlayer = false;
         updateTime = true;
@@ -47,10 +80,9 @@ public class Timer : MonoBehaviour
         }
 
     }
-    public IEnumerator ActiveTimer(bool enable, bool isPlayer)
+    /*public IEnumerator ActiveTimer(bool enable, bool isPlayer)
     {
         this.isPlayer = isPlayer;
-
         if (enable)
         {
             if (updateTime)
@@ -73,11 +105,12 @@ public class Timer : MonoBehaviour
             StopCoroutine(CountDown());
         }
 
-    }
+    }*/
 
     private IEnumerator CountDown()
     {
         bool isPlayerTurn = BattleSystem.Instance.IsPlayerTurn();
+        ApplyIndicatorArrow(true, isPlayerTurn);
         bool isLastSeconds = false;
         while (countTimer > 0 && updateTime)
         {
@@ -86,6 +119,7 @@ public class Timer : MonoBehaviour
             {
                 isLastSeconds = true;
                 SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, true);
+                SetCounterColor(true);
             }
             countTimer -= Time.deltaTime;
             float normalizedValue = Mathf.Clamp(
@@ -119,6 +153,18 @@ public class Timer : MonoBehaviour
         yield break;
     }
 
-
- 
+    private void SetCounterColor(bool enable)
+    {
+        Color targetColor ;
+        if (enable)
+        {
+            targetColor = new Color(0.921f, 0.235f, 0.219f);
+        }
+        else
+        {
+            targetColor = new Color(1f, 1f, 1f);
+        }
+        countdownCircleTimer.color = targetColor;
+        turnArrowSpriteRenderer.color = targetColor;
+    }
 }

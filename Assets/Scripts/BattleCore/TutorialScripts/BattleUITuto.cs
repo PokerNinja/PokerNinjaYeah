@@ -32,9 +32,9 @@ public class BattleUITuto : MonoBehaviour
     [SerializeField] public GameObject handRankInfo;
     [SerializeField] public TextMeshProUGUI handRankText;
 
-    [SerializeField] public Transform infoDialog;
-    [SerializeField] public SpriteRenderer dialogSprite;
-    [SerializeField] public Transform targetDialogTransform;
+    //[SerializeField] public Transform infoDialog;
+    //[SerializeField] private Transform infoDialog;
+    [SerializeField] private CanvasGroup infoCanvas;
 
     [SerializeField] public GameObject rankingImg;
     [SerializeField] public SpriteRenderer darkScreenRenderer;
@@ -361,8 +361,8 @@ public class BattleUITuto : MonoBehaviour
         }
         if (isEnable)
         {
-            infoDialog.position = new Vector2(0, -7f);
-            infoDialog.localScale = new Vector2(0.1f, 0.1f);
+            infoCanvas.transform.position = new Vector2(0, -7f);
+            infoCanvas.transform.localScale = new Vector2(0.1f, 0.1f);
             if (puName.Equals("replace"))
             {
                 InitDialog(puDisplayName, Constants.ReplacePuInfo, isBtnOn);
@@ -380,16 +380,18 @@ public class BattleUITuto : MonoBehaviour
                 OnEnd += () => AnimationManager.Instance.AlphaFade(true, btnTutorial, 1f, null/* ()=>infoDialog.gameObject.SetActive(false)*/);
             }
 
-            StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialog, OnEnd));
-            //StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoDialog, dialogSprite, startingPosition, targetDialogTransform, OnEnd));
-            StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, true, Values.Instance.showDialogMoveDuration, null));
+            StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoCanvas.transform, startingPosition, targetDialog, OnEnd));
+            StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(infoCanvas, true, Values.Instance.infoDialogFadeOutDuration, null));
+            // StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, true, Values.Instance.showDialogMoveDuration, null));
         }
         else
         {
-            if (dialogSprite.color.a > 0)
+            if (infoCanvas.alpha > 0)
             {
-                StartCoroutine(AnimationManager.Instance.AlphaAnimation(dialogSprite, false, Values.Instance.infoDialogFadeOutDuration, OnEnd));
-                StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, false, Values.Instance.infoDialogFadeOutDuration, null));
+                StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(infoCanvas, false, Values.Instance.infoDialogFadeOutDuration, OnEnd));
+
+                /* StartCoroutine(AnimationManager.Instance.AlphaAnimation(dialogSprite, false, Values.Instance.infoDialogFadeOutDuration, OnEnd));
+                 StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, false, Values.Instance.infoDialogFadeOutDuration, null));*/
             }
         }
 

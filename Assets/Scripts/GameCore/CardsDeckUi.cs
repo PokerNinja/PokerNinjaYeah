@@ -435,9 +435,10 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         GetListByTag(cardToDestroy.tag).Remove(cardToDestroy);
     }
 
-    private void RestAfterDestroy(CardUi cardToDestroy, Action OnEnd)
+    public void RestAfterDestroy(CardUi cardToDestroy, Action OnEnd)
     {
         ResetCardUI(cardToDestroy);
+        cardToDestroy.Activate(false);
         OnEnd?.Invoke();
     }
     public void ResetCardUI(CardUi cardToReset)
@@ -448,7 +449,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardToReset.freeze = false;
             cardToReset.spriteRenderer.material.SetColor("_FadeBurnColor", Color.yellow);
         }
-
+        cardToReset.cardPlace = "pool";
         cardToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
         cardToReset.spriteRenderer.material.SetFloat("_ShakeUvSpeed", 0f);
         cardToReset.transform.position = cardTransform.position;
@@ -1925,7 +1926,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 cardToDestroy.cardMark.SetActive(false);
             }
-            StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => ResetCardUI(cardToDestroy)));
+            StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => RestAfterDestroy(cardToDestroy,null)));
         }
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve, true);
         DealHands();

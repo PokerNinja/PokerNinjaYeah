@@ -269,14 +269,14 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
         //  material.SetTextureScale("_FadeTex", new Vector2(offset, 0.07f));
 
-        while (dissolveAmount < 1)
+        while (dissolveAmount <= 1)
         {
             yield return new WaitForFixedUpdate();
             dissolveAmount += Time.deltaTime / dissolveDuration;
             spriteRenderer.material.SetFloat("_FadeAmount", dissolveAmount);
             if (dissolveAmount >= 1)
             {
-                Activate(false);
+               // Activate(false);
                 onFinishDissolve?.Invoke();
                 break;
             }
@@ -423,14 +423,14 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_FadeBurnWidth", dissolveAmount, spriteRenderer.material, 0,
                 () => spriteRenderer.material.SetFloat("_FadeBurnWidth", 0.088f)));
         }
-        while (dissolveAmount < 1)
+        while (dissolveAmount <= 1)
         {
             dissolveAmount += Time.deltaTime;
             spriteRenderer.material.SetFloat("_FadeAmount", dissolveAmount);
             yield return new WaitForFixedUpdate();
             if (dissolveAmount >= 1)
             {
-                Activate(false);
+               // Activate(false);
                 onFinishDissolve();
                 break;
             }

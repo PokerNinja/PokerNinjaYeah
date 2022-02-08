@@ -11,7 +11,7 @@ public class EnemyTurn : State
        battleSystem.isPlayerBotModeTurn = false;
         isFinalTurn = false;
         this.turnCounter = turnCounter;
-        if (turnCounter == 1)
+        if (turnCounter == 1 || turnCounter == 2)
         {
             isFinalTurn = true;
         }
@@ -31,7 +31,8 @@ public class EnemyTurn : State
          {
              // battleSystem.Interface.enemyNameText.text = "afterDeal";
              battleSystem.Interface.SetTurnIndicator(false, true);
-             battleSystem.Interface.WhosTurnAnimation(false, false, isFinalTurn, () => battleSystem.turnInitInProgress = false);
+             //battleSystem.Interface.WhosTurnAnimation(false,  isFinalTurn);
+             battleSystem.turnInitInProgress = false; // Maybe with delay?
              battleSystem.NewTimerStarter(false);
              if (battleSystem.BOT_MODE)
              {

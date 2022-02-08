@@ -289,7 +289,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
                     pu = enemyPusUi[1];
                 }
 
-                DestroyPu(pu, () => RemovePuFromList(isPlayer, 1), () => PushPuPosition(isPlayer, DealPu));
+                DestroyPu(pu, () => RemovePuFromList(isPlayer, 1), () => PushPuPosition(isPlayer, DealPu)); // MAYBE BUG NULL PUSHED
                 break;
         }
     }

@@ -106,6 +106,22 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
         }
     }
 
+    public void SyncStarterAfterEnd()
+    {
+        if (IsPlayerStartRound() == IsPlayerTurn())
+        {
+            TurnCounter.Value = 7;
+            if (IsPlayerTurn())
+            {
+                CurrentPlayerID.Value = OtherPlayerID;
+            }
+            else
+            {
+                CurrentPlayerID.Value = PlayerID.Value;
+            }
+        }
+    }
+
     public bool IsPlayerStartRound()
     {
         if (RoundCounter.Value % 2 == 0)

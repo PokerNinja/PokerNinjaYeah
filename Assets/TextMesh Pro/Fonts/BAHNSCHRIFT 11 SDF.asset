@@ -89,6 +89,34 @@ MonoBehaviour:
     m_StrikethroughThickness: 2.1972656
     m_TabWidth: 15
   m_GlyphTable:
+  - m_Index: 630
+    m_Metrics:
+      m_Width: 36.46875
+      m_Height: 65.34375
+      m_HorizontalBearingX: 6.59375
+      m_HorizontalBearingY: 64.6875
+      m_HorizontalAdvance: 49.65625
+    m_GlyphRect:
+      m_X: 10
+      m_Y: 121
+      m_Width: 38
+      m_Height: 66
+    m_Scale: 1
+    m_AtlasIndex: 0
+  - m_Index: 631
+    m_Metrics:
+      m_Width: 18.0625
+      m_Height: 63.890625
+      m_HorizontalBearingX: 3.953125
+      m_HorizontalBearingY: 63.890625
+      m_HorizontalAdvance: 29.921875
+    m_GlyphRect:
+      m_X: 10
+      m_Y: 38
+      m_Width: 20
+      m_Height: 64
+    m_Scale: 1
+    m_AtlasIndex: 0
   - m_Index: 654
     m_Metrics:
       m_Width: 41.03125
@@ -117,50 +145,22 @@ MonoBehaviour:
       m_Height: 10
     m_Scale: 1
     m_AtlasIndex: 0
-  - m_Index: 631
-    m_Metrics:
-      m_Width: 18.0625
-      m_Height: 63.890625
-      m_HorizontalBearingX: 3.953125
-      m_HorizontalBearingY: 63.890625
-      m_HorizontalAdvance: 29.921875
-    m_GlyphRect:
-      m_X: 10
-      m_Y: 38
-      m_Width: 20
-      m_Height: 64
-    m_Scale: 1
-    m_AtlasIndex: 0
-  - m_Index: 630
-    m_Metrics:
-      m_Width: 36.46875
-      m_Height: 65.34375
-      m_HorizontalBearingX: 6.59375
-      m_HorizontalBearingY: 64.6875
-      m_HorizontalAdvance: 49.65625
-    m_GlyphRect:
-      m_X: 10
-      m_Y: 121
-      m_Width: 38
-      m_Height: 66
-    m_Scale: 1
-    m_AtlasIndex: 0
   m_CharacterTable:
   - m_ElementType: 1
-    m_Unicode: 8230
-    m_GlyphIndex: 654
-    m_Scale: 1
-  - m_ElementType: 1
-    m_Unicode: 95
-    m_GlyphIndex: 665
+    m_Unicode: 48
+    m_GlyphIndex: 630
     m_Scale: 1
   - m_ElementType: 1
     m_Unicode: 49
     m_GlyphIndex: 631
     m_Scale: 1
   - m_ElementType: 1
-    m_Unicode: 48
-    m_GlyphIndex: 630
+    m_Unicode: 95
+    m_GlyphIndex: 665
+    m_Scale: 1
+  - m_ElementType: 1
+    m_Unicode: 8230
+    m_GlyphIndex: 654
     m_Scale: 1
   m_AtlasTextures:
   - {fileID: -463107821941639172}
@@ -297,7 +297,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: BAHNSCHRIFT 11 Atlas Material
   m_Shader: {fileID: 4800000, guid: 68e6db2ebdc24f95958faec2be5558d6, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: UNDERLAY_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -389,5 +389,5 @@ Material:
     - _ReflectFaceColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
-    - _UnderlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+    - _UnderlayColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

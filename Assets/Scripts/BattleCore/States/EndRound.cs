@@ -10,12 +10,15 @@ using UnityEngine;
 public class EndRound : State
 {
     private bool isTimedOut;
+    private bool endByCards;
+    private bool isPlayerPreWin;
     bool startNewRound = false;
 
-    public EndRound(BattleSystem battleSystem,  bool isTimedOut) : base(battleSystem)
+    public EndRound(BattleSystem battleSystem, bool endByCards, bool isPlayerPreWin) : base(battleSystem)
     {
         Debug.Log("eniding ROund ()()()()()");
-        this.isTimedOut = isTimedOut;
+        this.endByCards = endByCards;
+        this.isPlayerPreWin = isPlayerPreWin;
     }
 
     public override IEnumerator Start()
@@ -36,11 +39,38 @@ public class EndRound : State
         battleSystem.RevealBoardCards();
         yield return new WaitForSeconds(1.5f);
 
-        if (!isTimedOut)
+        if (endByCards)
         {
             winningText = WinnerCalculator();
         }
+        else
+        {
+            winningText = EndByBetCalculator();
+        }
         battleSystem.DisplayWinner(winningText);
+    }
+
+    private string EndByBetCalculator()
+    {
+        string text;
+        string enemyId = battleSystem.enemy.id;
+        if (isPlayerPreWin)
+        {
+            text = enemyId + " Refuse your bet. You Win!";
+        }
+        else
+        {
+            text = "You refuse " + enemyId + " bet. " + enemyId + " win!";
+        }
+
+        startNewRound = !battleSystem.DealHpDamage(!isPlayerPreWin, true);
+        battleSystem.EndRoundVisual(isPlayerPreWin);
+        if (LocalTurnSystem.Instance.IsPlayerTurn())
+        {
+            LocalTurnSystem.Instance.SyncStarterAfterEnd();
+        }
+        StartNewRoundAction(true);
+        return text;
     }
 
     public string WinnerCalculator()
@@ -302,7 +332,7 @@ public class EndRound : State
         List<CardUi> arangedCards = new List<CardUi>();
 
         winningHand = winningHand.OrderByDescending(h => Card.StringValueToInt(h.cardDescription[0].ToString())).ToList<CardUi>();
-        foreach(CardUi cardUi in winningHand)
+        foreach (CardUi cardUi in winningHand)
         {
             cardUi.EnableSelecetPositionZ(true);
         }

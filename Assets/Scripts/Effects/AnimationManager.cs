@@ -227,6 +227,49 @@ public class AnimationManager : Singleton<AnimationManager>
             }
         }
     }
+    public IEnumerator AlphaCanvasGruop(CanvasGroup canvas, bool fadeIn, float duration, Action OnFinish)
+    {
+
+        float alphaAmount = 1;
+        float alphaTarget = 0;
+        if (fadeIn)
+        {
+            alphaAmount = 0;
+            alphaTarget = 1;
+        }
+        /*if (canvas.alpha == alphaTarget)
+        {
+            OnFinish?.Invoke();
+            Debug.LogError("IM ALREADY ALPHAING");
+        }
+        else
+        {*/
+        canvas.alpha = alphaAmount;
+        //FIXIT
+        while (alphaAmount != alphaTarget)
+        {
+            //yield return new WaitForFixedUpdate();
+            yield return null;
+            if (fadeIn)
+            {
+                alphaAmount += Time.deltaTime / duration;
+            }
+            else
+            {
+                alphaAmount -= Time.deltaTime / duration;
+            }
+
+            canvas.alpha = alphaAmount = Mathf.Lerp(0f, 1f, alphaAmount);
+            if (alphaAmount >= 1 || alphaAmount <= 0)
+            {
+
+                canvas.alpha = alphaAmount;
+                OnFinish?.Invoke();
+                break;
+            }
+        }
+
+    }
 
     public void AlphaFade(bool fadeIn, SpriteRenderer spriteRenderer, float duration, Action OnFinish)
     {
@@ -604,6 +647,34 @@ public class AnimationManager : Singleton<AnimationManager>
         yield break;
     }
 
+    public IEnumerator ScaleHp(Transform selector, float damage, Action shakeCamera)
+    {
+        shakeCamera?.Invoke();
+        float movementDuration = Values.Instance.hpScaleDuration;
+        float startTime = Time.time;
+        float t = 0;
+        Vector3 targetPosition = new Vector3(0, selector.localPosition.y - damage, selector.localPosition.z);
+        // Vector3 targetPosition = selector.position -= new Vector3(0, damage, 0);
+        Vector3 targetScale = new Vector3(1, selector.localScale.y - damage, 1);
+        if (targetScale.y < 0)
+        {
+            targetScale = new Vector3(1, 0, 1);
+        }
+        while (selector.position != targetPosition)
+        {
+            t = (Time.time - startTime) / movementDuration;
+            selector.localPosition = new Vector3(0, Mathf.SmoothStep(selector.localPosition.y, targetPosition.y, t), selector.localPosition.z);
+            selector.localScale = new Vector3(1, Mathf.SmoothStep(selector.localScale.y, targetScale.y, t), 1f);
+            yield return null;
+            if (selector.localPosition == targetPosition)
+            {
+              //  endAction?.Invoke();
+                break;
+            }
+        }
+        yield break;
+    }
+
 
 
     public IEnumerator SmoothMoveCardProjectile(bool isPlayerWin, bool isRight, Transform selector, Vector2 targetScale, float movementDuration, Action LoseLife, Action Unactive)
@@ -753,14 +824,13 @@ public class AnimationManager : Singleton<AnimationManager>
         }
         yield break;
     }
-    public IEnumerator ShowDialogFromPu(Transform selector, SpriteRenderer dialogSprite, Vector2 startingPosition, Vector2 targetTransform, Action EndAction)
+    public IEnumerator ShowDialogFromPu(Transform selector, /*SpriteRenderer dialogSprite,*/ Vector2 startingPosition, Vector2 targetTransform, Action EndAction)
     {
         float startTime = Time.time;
         float t;
         float interval = 1.5f;
         float movementDuration = Values.Instance.showDialogMoveDuration;
         Vector2 targetScale = new Vector2(1, 1);
-        SetAlpha(dialogSprite, 1f);
 
         while ((Vector2)selector.position != targetTransform || (Vector2)selector.localScale != targetScale)
         {
@@ -1293,7 +1363,7 @@ public class AnimationManager : Singleton<AnimationManager>
         foreach (CardUi card in losingBoardCards)
         {
             // MUST MAKE BETTER
-            StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, () => battleSystem.cardsDeckUi.ResetCardUI(card)));
+            StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, () => battleSystem.cardsDeckUi.RestAfterDestroy(card, null)));
         }
         VisionEffect(winningPlayerCards, cardToGlow, true);
         for (int i = 0; i < 5; i++)
@@ -1536,10 +1606,12 @@ public class AnimationManager : Singleton<AnimationManager>
 
     internal IEnumerator DoubleFreezeEffect(SpriteRenderer spriteRenderer, Action ShutterIceEffect, Action ResetCard, Action DrawCard)
     {
-        float freezeDuration = Values.Instance.FreezeDuration;
+        float freezeDuration = Values.Instance.FreezeDuration / 2;
         float fadeAmount = spriteRenderer.material.GetFloat("_FadeAmount");
         float fadeWidth = spriteRenderer.material.GetFloat("_FadeBurnWidth");
-        bool activateShutterEffect = true;
+        //  bool activateShutterEffect = true;
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.ShutterIce, false);
+        ShutterIceEffect?.Invoke();
         while (fadeWidth >= 0)
         {
             fadeAmount += Time.deltaTime / freezeDuration;
@@ -1547,12 +1619,12 @@ public class AnimationManager : Singleton<AnimationManager>
 
             spriteRenderer.material.SetFloat("_FadeAmount", fadeAmount);
             spriteRenderer.material.SetFloat("_FadeBurnWidth", fadeWidth);
-            if (activateShutterEffect && fadeAmount >= 0.8)
-            {
-                activateShutterEffect = false;
-                SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.ShutterIce, false);
-                ShutterIceEffect?.Invoke();
-            }
+            /* if (activateShutterEffect && fadeAmount >= 0.8)
+             {
+                 activateShutterEffect = false;
+                 SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.ShutterIce, false);
+                 ShutterIceEffect?.Invoke();
+             }*/
             if (fadeWidth <= 0)
             {
                 ResetCard?.Invoke();

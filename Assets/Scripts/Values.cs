@@ -68,6 +68,15 @@ public class Values : Singleton<Values>
     public Color spaceFrameColor;
 
 
+    [Title("PUvision")]
+    [Title("Frames", bold: false)]
+    public Color fireVision;
+    public Color iceVision;
+    public Color windVision;
+    public Color shadowVision;
+    public Color electricVision;
+
+
 
     [GUIColor(1, 1, 0)]
     [Title("Animation")]
@@ -80,6 +89,7 @@ public class Values : Singleton<Values>
     public int coinShineEvery = 3;
     public float infoDialogFadeOutDuration = 0.2f;
     public float showDialogMoveDuration = 0.5f;
+    public float hpScaleDuration = 1f;
 
     [Title("Emojis", bold: false)]
     public float holdTimeForEmojiSelector = 0.25f;

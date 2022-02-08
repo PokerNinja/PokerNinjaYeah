@@ -14,8 +14,13 @@ public class MatchMakingManager : MonoBehaviour
     public void JoinQueue(string playerId, Action<string> onGameFound, Action<AggregateException> fallback)
     {
         Debug.Log("MMM JOINF");
-
-        DatabaseAPI.PostObject($"matchmaking/{playerId}", "placeholder",
+        string gameMode = "placeholder";
+       /* string gameMode = "c_game";
+        if (Constants.HP_GAME)
+        {
+            gameMode = "h_game";
+        }*/
+        DatabaseAPI.PostObject($"matchmaking/{playerId}", gameMode,
             () => queueListener = DatabaseAPI.ListenForValueChanged($"matchmaking/{playerId}",
                 args =>
                 {
@@ -23,7 +28,7 @@ public class MatchMakingManager : MonoBehaviour
                     var gameId =
                         StringSerializationAPI.Deserialize(typeof(string), args.Snapshot.GetRawJsonValue()) as
                             string;
-                    if (gameId == "placeholder") return;
+                    if (gameId == gameMode) return;
                     LeaveQueue(playerId, () => onGameFound(
                         gameId), fallback);
                 }, fallback), fallback);
