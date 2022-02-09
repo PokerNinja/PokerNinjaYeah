@@ -106,9 +106,18 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
 
 
-    public void CANCELWAHT()
+    public void CANCELWAHT(bool enable)
     {
-        player
+        if (enable)
+        {
+
+            playerPusUi[0].spriteRenderer.material.EnableKeyword("_FadeOn");
+        }
+        else
+        {
+
+            playerPusUi[0].spriteRenderer.material.DisableKeyword("_FadeOn");
+        }
     }
 
     private int ConvertCardPlaceToIndex(string puPlace)
