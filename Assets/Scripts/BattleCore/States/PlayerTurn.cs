@@ -52,6 +52,10 @@ public class PlayerTurn : State
         {
             battleSystem.skillUseLeft = Values.Instance.skillUseLimit;
         }
+        if (turnCounter != 6)
+        {
+            battleSystem.Interface.ApplyTurnVisual(true);
+        }
         battleSystem.DealPu(true, () =>
         {
             battleSystem.isPlayerBotModeTurn = true;

@@ -37,6 +37,8 @@ public class GameMenuHandler : MonoBehaviour
     void Start()
     {
         Constants.HP_GAME = HP_GAME;
+        Constants.BOT_MODE = false;
+
         appVersion.text = "version: " + Application.version;
         DatabaseAPI.InitializeDatabase();
 

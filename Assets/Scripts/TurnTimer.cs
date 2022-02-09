@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ public class TurnTimer : MonoBehaviour
 {
 
     [SerializeField] private Image countdownCircleTimer;
-    [SerializeField] private float countTimer ;
+    [SerializeField] private float countTimer;
     private bool endTurnByPlayer;
     public SpriteRenderer turnArrowSpriteRenderer;
     public Animation turnArrowAnimation;
@@ -27,6 +28,9 @@ public class TurnTimer : MonoBehaviour
 
     public void StopTimer()
     {
+        turnArrowAnimation.Rewind();
+
+        turnArrowSpriteRenderer.material.SetFloat("_GradBoostX", 0.1f);
         SetCounterColor(false);
         endTurnByPlayer = true;
         updateTime = false;
@@ -39,11 +43,12 @@ public class TurnTimer : MonoBehaviour
 
     private void ApplyIndicatorArrow(bool enable, bool isPlayerTurn)
     {
-        turnArrowSpriteRenderer.gameObject.SetActive(enable);
-        turnArrowSpriteRenderer.gameObject.SetActive(enable);
+        //turnArrowSpriteRenderer.gameObject.SetActive(enable);
+        turnArrowAnimation.Rewind();
+        turnArrowSpriteRenderer.material.SetFloat("_GradBoostX", 0.1f);
         if (enable)
         {
-            FlipImage(isPlayerTurn);
+            //  FlipImage(isPlayerTurn);
             turnArrowAnimation.Play();
         }
         else
@@ -52,7 +57,7 @@ public class TurnTimer : MonoBehaviour
         }
     }
 
-    private void FlipImage(bool isPlayer)
+    public void FlipImage(bool isPlayer)
     {
         Vector3 parentArrowScale = turnArrowSpriteRenderer.transform.parent.transform.localScale;
         float addition = 1; // enemyTurn
@@ -60,7 +65,7 @@ public class TurnTimer : MonoBehaviour
         {
             addition = -1;
         }
-        Vector3 newScale = new Vector3(parentArrowScale.x,  addition);
+        Vector3 newScale = new Vector3(parentArrowScale.x, addition);
         turnArrowSpriteRenderer.transform.parent.transform.localScale = newScale;
     }
 
@@ -125,10 +130,10 @@ public class TurnTimer : MonoBehaviour
             }
             if (!pause)
             {
-            countTimer -= Time.deltaTime;
-            float normalizedValue = Mathf.Clamp(
-            countTimer / totalTime, 0.0f, 1.0f);
-            countdownCircleTimer.fillAmount = normalizedValue;
+                countTimer -= Time.deltaTime;
+                float normalizedValue = Mathf.Clamp(
+                countTimer / totalTime, 0.0f, 1.0f);
+                countdownCircleTimer.fillAmount = normalizedValue;
             }
             /*if (countTimer <= 0 || !updateTime)
             {
@@ -152,7 +157,7 @@ public class TurnTimer : MonoBehaviour
             }
             if (!endTurnByPlayer)
             {
-               StartCoroutine(BattleSystem.Instance.OnTimeOut());
+                StartCoroutine(BattleSystem.Instance.OnTimeOut());
             }
         }
         yield break;
@@ -160,7 +165,7 @@ public class TurnTimer : MonoBehaviour
 
     private void SetCounterColor(bool enable)
     {
-        Color targetColor ;
+        Color targetColor;
         if (enable)
         {
             targetColor = new Color(0.921f, 0.235f, 0.219f);
@@ -176,5 +181,11 @@ public class TurnTimer : MonoBehaviour
     internal void PauseTimer(bool enable)
     {
         pause = enable;
+    }
+
+    [Button]
+    internal void Activate(bool enable)
+    {
+        gameObject.SetActive(enable);
     }
 }

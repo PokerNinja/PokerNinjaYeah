@@ -1,10 +1,11 @@
 
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 public class CoinFlipScript : MonoBehaviour
 {
-   public  Animator animator;
-   // public AnimationClip spin;
+    public Animator animator;
+    // public AnimationClip spin;
     public SpriteRenderer sp;
 
     private void Start()
@@ -13,23 +14,36 @@ public class CoinFlipScript : MonoBehaviour
     }
     public void RevealCoinFlip()
     {
-      //  animator.anima = false;
+        //  animator.anima = false;
 
     }
 
-   
+
     public void FlipCoinAnimation()
     {
-        animator.SetTrigger("spin");
-       // animator.Play("spin_coin");
-       // animation.clip = spin;
+        // animator.SetTrigger("spin");
+        animator.Play("coin_big");
+        // animation.clip = spin;
     }
+    
+  
+    public void FlipForTurn(bool playerTurn)
+    {
+        SetDirection(playerTurn);
+        animator.Play("coin_small");
+    }
+
 
     public void SetDirection(bool isPlayerFirst)
     {
-        if (isPlayerFirst)
+        if (!isPlayerFirst)
         {
             sp.flipY = true;
+        }
+        else
+        {
+            sp.flipY = false;
+
         }
     }
 }

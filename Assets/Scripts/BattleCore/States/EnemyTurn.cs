@@ -29,6 +29,10 @@ public class EnemyTurn : State
        // battleSystem.Interface.EnableBgColor(false);
         battleSystem.Interface.EnablePlayerButtons(false);
         battleSystem.DisablePlayerPus();
+        if (turnCounter != 6)
+        {
+            battleSystem.Interface.ApplyTurnVisual(false);
+        }
         battleSystem.DealPu(false, () =>
          {
              // battleSystem.Interface.enemyNameText.text = "afterDeal";

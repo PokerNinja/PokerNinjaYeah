@@ -57,7 +57,6 @@ public class BattleSystem : StateMachine
     public int currentTurn = 6;
     public bool firstRound = true;
     private bool gameEndByBet = false;
-    public TurnTimer turnTimer;
     public bool enemyPuIsRunning;
     internal bool readyToPlay = false;
     private bool playerPuFreeze = false;
@@ -233,8 +232,9 @@ public class BattleSystem : StateMachine
         }
         if (!TEST_MODE && !BOT_MODE)
         {
-            StartCoroutine(ui.CoinFlipStartGame(currentGameInfo.playersIds[0].ToString().Equals(player.id), () => ui.SlidePuSlots()));
+            StartCoroutine(ui.CoinFlipStartGame(currentGameInfo.playersIds[0].ToString().Equals(player.id), () => { ui.SlidePuSlots(); 
             LocalTurnSystem.Instance.Inito(() => StartCoroutine(InitGameListeners()));
+            }));
         }
         else
         {
@@ -580,31 +580,6 @@ public class BattleSystem : StateMachine
     }
 
 
-    private void TurnEvents(int currentTurn)
-    {
-        switch (currentTurn)
-        {
-            case 4:
-                // firstDeck = false;
-                //  waitForDrawerAnimationToEnd = true;
-                //  yield return new WaitForSeconds(0.7f);
-                //cardsDeckUi.DealCardsForBoard(true, () => waitForDrawerAnimationToEnd = false, () => UpdateHandRank(false));
-                break;
-            case 2:
-                // cardsDeckUi.DealCardsForBoard(true, () => waitForDrawerAnimationToEnd = false, () => UpdateHandRank(false));
-                break;
-            case 1:
-                break;
-            case 0:
-            case -1:
-                //  isRoundReady = false;
-                SetState(new EndRound(this, true, false));
-                break;
-        }
-    }
-
-
-
     public void StartNewRoundRoutine(bool delay)
     {
         StartCoroutine(StartNewRoundRoutineWithDelay(delay));
@@ -657,13 +632,12 @@ public class BattleSystem : StateMachine
 
     public void ResetTimers()
     {
-        turnTimer.StopTimer();
+        ui.turnTimer.StopTimer();
     }
 
 
     public void EndTurn()
     {
-        Debug.LogError("CurrentT " + currentTurn);
         if (endClickable && !endTurnInProcess && !ReplaceInProgress)
         {
             endTurnInProcess = true;
@@ -781,7 +755,7 @@ public class BattleSystem : StateMachine
     internal void NewTimerStarter(bool isPlayer)
     {
         //  Interface.FlipTurnIndicator(isPlayer);
-        StartCoroutine(turnTimer.StartTimer(Values.Instance.turnTimerDuration));
+        StartCoroutine(ui.turnTimer.StartTimer(Values.Instance.turnTimerDuration));
     }
     #endregion
 
@@ -937,14 +911,17 @@ public class BattleSystem : StateMachine
         ui.SetTurnIndicator(false, false);
         ResetTimers();
         //mAYBE FIX IT
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnTimer.turnArrowSpriteRenderer.GetComponent<SpriteRenderer>(),
+
+        EndAction?.Invoke();
+        StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
+       /* StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnTimer.turnArrowSpriteRenderer.GetComponent<SpriteRenderer>(),
             false, Values.Instance.textTurnFadeOutDuration, () =>
             {
                 // ui.playerNameText.text = "start " + currentTurn;
                 EndAction?.Invoke();
                 StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
             }));
-        ;
+        */
     }
 
 
@@ -957,7 +934,7 @@ public class BattleSystem : StateMachine
             StartCoroutine(StartPlayerTurn(true, () =>
             {        //mAYBE FIX IT
 
-                StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnTimer.turnArrowSpriteRenderer, true, Values.Instance.turnBtnAlphaDuration, null));
+                //StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnTimer.turnArrowSpriteRenderer, true, Values.Instance.turnBtnAlphaDuration, null));
             }));
         }
         else if (currentTurn == 0)
@@ -1773,13 +1750,7 @@ public class BattleSystem : StateMachine
 
     private IEnumerator AutoEndTurn()
     {
-        if (END_TURN_AFTER_PU)
-        {
-            yield return new WaitForSeconds(0.5f);
-            EndTurn();
-        }
-
-        else if (timedOut || energyCounter == 0 /*|| energyCounter == 1 && puDeckUi.GetPuListCount(true) == 0 && !skillUsed*/)
+      if (timedOut || energyCounter == 0 /*|| energyCounter == 1 && puDeckUi.GetPuListCount(true) == 0 && !skillUsed*/)
         {
             Debug.LogError("ending");
             timedOut = false;
@@ -1788,6 +1759,7 @@ public class BattleSystem : StateMachine
             {
                 yield return new WaitForSeconds(2.5f);
             }
+            endClickable = true;
             EndTurn();
         }
         else
@@ -2455,7 +2427,7 @@ public class BattleSystem : StateMachine
             if (isAccept)
             {
                 UpdateRaise();
-                turnTimer.PauseTimer(false);
+               ui.turnTimer.PauseTimer(false);
                 Debug.Log("DamageIsNow: " + currentDamageThisRound);
             }
             else
@@ -2505,7 +2477,7 @@ public class BattleSystem : StateMachine
         {
             ui.betBtn.btnBetClickable = false;
             raiseOffer = true;
-            turnTimer.PauseTimer(true);
+            ui.turnTimer.PauseTimer(true);
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
             EnableWaitDialog(true);
             UpdateBetDB(currentGameInfo.localPlayerId);

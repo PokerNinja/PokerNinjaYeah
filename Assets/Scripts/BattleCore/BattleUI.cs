@@ -173,6 +173,7 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private SpriteRenderer acceptRaiseArrow;
     [SerializeField] private SpriteRenderer declineRaiseArrow;
     public GameObject waitingDialog;
+    public TurnTimer turnTimer;
 
 
 
@@ -349,12 +350,9 @@ public class BattleUI : MonoBehaviour
     {
         //  coinFlipTurn.RevealCoinFlip();
         yield return new WaitForSeconds(1);
-        float yPosition = 7f;
-        if (isPlayerStart)
-        {
-            yPosition = -7;
-        }
-        Vector3 targetPosition = new Vector3(0, yPosition, 0);
+
+        Vector3 targetPosition = new Vector3(turnTimer.transform.position.x, turnTimer.transform.position.y, coinFlipTurn.transform.position.z);
+
         coinFlipTurn.SetDirection(isPlayerStart);
         coinFlipTurn.FlipCoinAnimation();
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinFlipStart, true);
@@ -362,8 +360,16 @@ public class BattleUI : MonoBehaviour
              () => coinFlipTurn.SetDirection(isPlayerStart), () => coinFlipTurn.FlipCoinAnimation()));*/
         yield return new WaitForSeconds(3);
         EndAction?.Invoke();
+        Debug.LogError("pos" + coinFlipTurn.transform);
+        Debug.LogError("pos" + targetPosition);
         //Todo dont stop
-        StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, targetPosition, new Vector3(1, 1, 1), Values.Instance.coinFlipEndMoveDuration, null, () => coinFlipTurn.gameObject.SetActive(false), null, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, targetPosition, new Vector3(1, 1, 1), Values.Instance.coinFlipEndMoveDuration,
+            null, () =>
+            {
+                turnTimer.FlipImage(isPlayerStart);
+                turnTimer.Activate(true);
+                coinFlipTurn.gameObject.SetActive(false);
+            }/*() => coinFlipTurn.gameObject.SetActive(false)*/, null, null));
     }
     internal void InitAvatars()
     {
@@ -403,18 +409,34 @@ public class BattleUI : MonoBehaviour
 
     public void EnableEndTurnBtn(bool enable)
     {
-        if (enable)
-        {
-            StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnArrowSprite, true, Values.Instance.turnBtnAlphaDuration,
-                () => BattleSystem.Instance.endClickable = true
-/* turnBtn.GetComponent<Button>().interactable = true*/));
-        }
-        else
-        {
-            BattleSystem.Instance.endClickable = false;
-            /*turnBtn.GetComponent<Button>().interactable = false;*/
-            StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnArrowSprite, false, Values.Instance.turnBtnAlphaDuration, null));
-        }
+        BattleSystem.Instance.endClickable = enable;
+        /*  if (enable)
+          {
+              StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnArrowSprite, true, Values.Instance.turnBtnAlphaDuration,
+                  () => BattleSystem.Instance.endClickable = true
+  *//* turnBtn.GetComponent<Button>().interactable = true*//*));
+          }
+          else
+          {
+              BattleSystem.Instance.endClickable = false;
+              *//*turnBtn.GetComponent<Button>().interactable = false;*//*
+              StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnArrowSprite, false, Values.Instance.turnBtnAlphaDuration, null));
+          }*/
+    }
+    private IEnumerator ApplyTurnArrowFlip(bool isPlayer)
+    {
+        turnTimer.Activate(false);
+        coinFlipTurn.gameObject.SetActive(true);
+        coinFlipTurn.FlipForTurn(isPlayer);
+        yield return new WaitForSeconds(1f);
+        turnTimer.FlipImage(isPlayer);
+        coinFlipTurn.gameObject.SetActive(false);
+        turnTimer.Activate(true);
+    }
+
+    public void ApplyTurnVisual(bool isPlayer)
+    {
+        StartCoroutine(ApplyTurnArrowFlip(isPlayer));
     }
 
     internal void HitEffect(bool isPlayerHit)
@@ -1610,7 +1632,7 @@ public class BattleUI : MonoBehaviour
     {
         SpriteRenderer targetArrow = acceptRaiseArrow;
         Vector3 targetPosition;
-        Vector3 startingPosition = new Vector3(-0.069f, -1.5f,targetArrow.gameObject.transform.position.z);
+        Vector3 startingPosition = new Vector3(-0.069f, -1.5f, targetArrow.gameObject.transform.position.z);
         Vector3 previousPos = new Vector3(targetArrow.transform.position.x, targetArrow.transform.position.y, targetArrow.transform.position.z);
         float additionY = 1.2f;
         if (!isAccept)
