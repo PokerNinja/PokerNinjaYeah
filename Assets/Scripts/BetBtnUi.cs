@@ -18,88 +18,24 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private bool held = false;
     public bool btnBetClickable = false;
     public Animation anim;
+    public CanvasGroup raiseInfoDialog;
+    public TextMeshProUGUI currentDmgText;
+    public TextMeshProUGUI dmgPenelty;
 
     private void Start()
     {
         anim.Stop();
     }
 
-    /*public void OnClick()
-    {
-        // TODO move this to battleSystem
-        // BattleSystem battleSystem = GameObject.Find("BattleSystem").GetComponent<BattleSystem>();
-        //Maybe Better One
-       
-            BattleSystem.Instance.EnableReplaceDialog(false);
-        Debug.LogError("OND aa" + infoShow);
-
-
-    }*/
-
-
-    /*  public void OnPointerUp(PointerEventData eventData)
-      {
-
-          Debug.LogError("OnUp " + infoShow);
-
-         // CancelInvoke("OnLongPress");
-          BattleSystem.Instance.HideDialog(() => infoShow = false);
-
-      }*/
-
-    /* public void OnPointerDown(PointerEventData eventData)
-     {
-       //  BattleSystem.Instance.ShowPuInfo(transform.position, " ", Constants.ReplacePuInfo);
-         Debug.LogError("OnDown " + infoShow);
-         held = false;
-            Invoke("OnLongPress", holdTime);
- *//*
-         if (!infoShow)
-         {
-             infoShow = true;
-             BattleSystem.Instance.ShowPuInfo(transform.position, " ", Constants.ReplacePuInfo);
-         }*//*
-
-     }*/
-    /*   public void OND()
-       {
-           Debug.LogError("OND " + infoShow);
-
-           if (!infoShow)
-           {
-               infoShow = true;
-               BattleSystem.Instance.ShowPuInfo(transform.position, " ", Constants.ReplacePuInfo);
-           }
-
-       }*/
 
 
 
 
     public void OnClick()
     {
-        // TODO move this to battleSystem
-        // BattleSystem battleSystem = GameObject.Find("BattleSystem").GetComponent<BattleSystem>();
-        //Maybe Better One
-        /*  if (!Constants.TUTORIAL_MODE)
-          {
-              if (BattleSystem.Instance.infoShow)
-              {
-                  BattleSystem.Instance.HideDialog();
-              }
-              BattleSystem.Instance.EnableReplaceDialog(false, false);
-          }
-          else
-          {*/
-        if (BattleSystem.Instance.infoShow)
-        {
-            BattleSystem.Instance.HideDialog();
-        }
 
         onClick.Invoke();
 
-        //BattleSystem.Instance.EnableBetDialog(true);
-        /*}*/
     }
     public void OnPointerUp(PointerEventData eventData)
     {
@@ -110,7 +46,7 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             onClick.Invoke();
         }
-        BattleSystem.Instance.HideDialog();
+        HideRaiseInfo();
     }
 
 
@@ -124,15 +60,18 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
     private void LoadSpriteBtn(bool press)
     {
-        string path = "bet";
-        if (press)
+        if (!txtMultiplayer.gameObject.activeSelf)
         {
-            path += "_p";
+            string path = "bet";
+            if (press)
+            {
+                path += "_p";
+            }
+            spriteRenderer.sprite = Resources.Load("Sprites/GameScene/" + path, typeof(Sprite)) as Sprite;
         }
-        spriteRenderer.sprite = Resources.Load("Sprites/GameScene/" + path, typeof(Sprite)) as Sprite;
     }
 
-  
+
     public void DisplayDoubleDamage(float damageMultiplayer)
     {
         spriteRenderer.sprite = Resources.Load("Sprites/GameScene/bet_empty", typeof(Sprite)) as Sprite;
@@ -146,20 +85,34 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         txtMultiplayer.gameObject.SetActive(false);
         LoadSpriteBtn(false);
         anim.Stop();
+        anim.Rewind();
     }
 
     public void OND()
     {
         if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, false, "bet", Constants.ReplacePuInfo);
+            ShowRaiseInfo();
         }
         else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
         {
-            BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, "bet", Constants.ReplacePuInfo);
+            //BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, "bet", Constants.ReplacePuInfo);
         }
     }
 
+    private void ShowRaiseInfo()
+    {
+        float currentDmg = BattleSystem.Instance.currentDamageThisRound; // Store it differently
+        raiseInfoDialog.gameObject.SetActive(true);
+        StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(raiseInfoDialog, true, Values.Instance.infoDialogFadeOutDuration, null));
+        currentDmgText.text = currentDmg + " to " + (currentDmg * 1.5);
+        dmgPenelty.text = "-"+ (currentDmg/2) + " HP ";
+    }
+    private void HideRaiseInfo()
+    {
+        StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(raiseInfoDialog,
+            false, Values.Instance.infoDialogFadeOutDuration, ()=> raiseInfoDialog.gameObject.SetActive(false)));
+    }
 
     private void OnLongPress()
     {

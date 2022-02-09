@@ -19,12 +19,14 @@ public class EnemyTurn : State
         {
             battleSystem.DealBoardCard();
         }
+        
+            battleSystem.Interface.EnableBgColor(isFinalTurn);
 
     }
     public override IEnumerator Start()
     {
         battleSystem.turnInitInProgress = true;
-        battleSystem.Interface.EnableBgColor(false);
+       // battleSystem.Interface.EnableBgColor(false);
         battleSystem.Interface.EnablePlayerButtons(false);
         battleSystem.DisablePlayerPus();
         battleSystem.DealPu(false, () =>

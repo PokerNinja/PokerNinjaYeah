@@ -30,7 +30,7 @@ public class BeginRound : State
     private void StartTurn()
     {
         battleSystem.PlayMusic(true);
-        battleSystem.Interface.EnableBgColor(false);
+        //battleSystem.Interface.EnableBgColor(false);
         battleSystem.isPlayerActivatePu = false;
         battleSystem.readyToPlay = true;
         battleSystem.Interface.EnableVisionClick(true);

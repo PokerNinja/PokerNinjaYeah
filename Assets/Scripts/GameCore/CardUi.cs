@@ -15,9 +15,8 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     // public Material burnMaterial;
     // public Material dissolveMaterial;
     public SpriteRenderer spriteRenderer;
-    public SpriteRenderer cardSelectionRenderer;
+    //public SpriteRenderer cardSelectionRenderer;
     public GameObject cardMark;
-    public GameObject cardSelection;
     public bool freeze;
     public bool isGhost;
     public Constants.CardsOwener whosCards = Constants.CardsOwener.Pool;
@@ -105,10 +104,10 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         yield return new WaitForSeconds(0.1f);
         if (!Constants.TemproryUnclickable && clickbleForPU && !flipInProgress && Constants.cardsToSelectCounter > 0)
         {
-            Debug.LogWarning("onClickHand");
             Constants.TemproryUnclickable = true;
             --Constants.cardsToSelectCounter;
             clickbleForPU = false;
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CardSelectClick, false);
             SetSelection(false, "", "");
             Vector2 posTarget = transform.position;
             if (gameObject.name.Contains("Deck"))
@@ -191,11 +190,11 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             }*/
             clickbleForPU = selectionEnable;
 
-            cardSelection.SetActive(selectionEnable);
+            //cardSelection.SetActive(selectionEnable);
             if (selectionEnable)
             {
-                cardSelectionRenderer.color = Values.Instance.cardSelectionColor;
-                StartCoroutine(CardSelectionPulse(cardSelectionRenderer));
+               /* cardSelectionRenderer.color = Values.Instance.cardSelectionColor;
+                StartCoroutine(CardSelectionPulse(cardSelectionRenderer));*/
             }
         }
     }

@@ -60,6 +60,11 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip iceagedon;
     public AudioClip armageddon2;
     public AudioClip shutterIce;
+    public AudioClip cardSelectClick;
+    public AudioClip hpDrop;
+    public AudioClip btnClick;
+    public AudioClip damageSound1;
+    public AudioClip damageSound2;
 
 
 
@@ -223,8 +228,13 @@ public class SoundManager : Singleton<SoundManager>
         constantsSounds[audioSourceIndex].clip = GetConstantSoundClip(sound);
         if (enable)
         {
+            float volume = GLOBAL_SFX_VOLUME;
+            if (sound == ConstantSoundsEnum.Music)
+            {
+                volume = MUSIC_VOLUME;
+            }
             constantsSounds[audioSourceIndex].Play();
-            StartCoroutine(FadeIn(constantsSounds[audioSourceIndex], MUSIC_VOLUME));
+            StartCoroutine(FadeIn(constantsSounds[audioSourceIndex], volume));
             if (sound == ConstantSoundsEnum.Music)
             {
 
@@ -547,6 +557,31 @@ public class SoundManager : Singleton<SoundManager>
                     soundToPlay = shutterIce;
                     break;
                 }
+            case SoundName.CardSelectClick:
+                {
+                    soundToPlay = cardSelectClick;
+                    break;
+                }
+            case SoundName.HpDrop:
+                {
+                    soundToPlay = hpDrop;
+                    break;
+                }
+            case SoundName.BtnClick:
+                {
+                    soundToPlay = btnClick;
+                    break;
+                }
+            case SoundName.DamageSound1:
+                {
+                    soundToPlay = damageSound1;
+                    break;
+                }
+            case SoundName.DamageSound2:
+                {
+                    soundToPlay = damageSound2;
+                    break;
+                }
         }
 
         await PlayAsync(soundToPlay, normalPitch);
@@ -598,5 +633,10 @@ public class SoundManager : Singleton<SoundManager>
         Iceagedon,
         Armagedon2,
         ShutterIce,
+        CardSelectClick,
+        HpDrop,
+        BtnClick,
+        DamageSound1,
+        DamageSound2,
     }
 }

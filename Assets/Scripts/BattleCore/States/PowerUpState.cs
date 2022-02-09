@@ -156,14 +156,23 @@ public class PowerUpState : State
 
     private void ActivateSelectMode(int cardsToSelect, string powerUpName)
     {
-        Debug.LogError("DODRAWERACTION" + powerUpName);
-
         battleSystem.SetCardsSelectionAndDisplayInfo(cardsToSelect, powerUpName);
         ActivateCardSelection(PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true));
+        ActivateSelectionPointer(powerUpName);
+    }
+
+    private void ActivateSelectionPointer(string powerUpName)
+    {
+       string[] releventCards = PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true);
+        battleSystem.Interface.ApplyPointers(releventCards, powerUpName[0].ToString());
     }
 
     private void IgnitePowerUp(string powerUpName, string cardTarget1, string cardTarget2)
     {
+        if (isPlayerActivate)
+        {
+            battleSystem.Interface.ResetCardSelection();
+        }
         battleSystem.Interface.InitNinjaAttackAnimation(isPlayerActivate, puElement);
         if (puIndex != -1)
         {

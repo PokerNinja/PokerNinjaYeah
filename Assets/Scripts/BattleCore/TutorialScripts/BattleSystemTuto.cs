@@ -483,7 +483,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     public async void FakeEnemyPuUse(int puIndex, string cardPlace1, string cardPlace2, bool endTurn)
     {
         Debug.LogWarning("FAking it");
-        PowerUpInfo puInfo = new PowerUpInfo("Alex", puDeckUi.GetPuFromList(false, puIndex).puName, cardPlace2, cardPlace1, puIndex, 12345);
+        PowerUpInfo puInfo = new PowerUpInfo("Alex", puDeckUi.GetPu(false, puIndex).puName, cardPlace2, cardPlace1, puIndex, 12345);
         EnemyPuUse(puInfo);
         if (endTurn)
         {
@@ -598,7 +598,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
 
     public void DissolvePuAfterUse(bool isPlayer, int index)
     {
-        puDeckUi.GetPuFromList(isPlayer, index).DissolvePu(2f, Values.Instance.puDissolveDuration, null, () => ResetPuUi(isPlayer, index));
+        puDeckUi.GetPu(isPlayer, index).DissolvePu(2f, Values.Instance.puDissolveDuration, null, () => ResetPuUi(isPlayer, index));
     }
 
 

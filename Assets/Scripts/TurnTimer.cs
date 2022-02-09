@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Timer : MonoBehaviour
+public class TurnTimer : MonoBehaviour
 {
 
     [SerializeField] private Image countdownCircleTimer;
@@ -17,6 +17,7 @@ public class Timer : MonoBehaviour
     private bool updateTime;
     private bool countDownRunning;
     private bool isPlayer;
+    private bool pause;
     private float totalTime;
     private int starting;
     private Coroutine thereCanBeOnlyOne;
@@ -26,6 +27,7 @@ public class Timer : MonoBehaviour
 
     public void StopTimer()
     {
+        SetCounterColor(false);
         endTurnByPlayer = true;
         updateTime = false;
         countTimer = -10f;
@@ -64,8 +66,8 @@ public class Timer : MonoBehaviour
 
     public IEnumerator StartTimer(float timerDuration)
     {
-        SetCounterColor(false);
         yield return new WaitForSeconds(Values.Instance.delayTimerStart);
+        pause = false;
         endTurnByPlayer = false;
         updateTime = true;
         totalTime = timerDuration;
@@ -121,10 +123,13 @@ public class Timer : MonoBehaviour
                 SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, true);
                 SetCounterColor(true);
             }
+            if (!pause)
+            {
             countTimer -= Time.deltaTime;
             float normalizedValue = Mathf.Clamp(
             countTimer / totalTime, 0.0f, 1.0f);
             countdownCircleTimer.fillAmount = normalizedValue;
+            }
             /*if (countTimer <= 0 || !updateTime)
             {
                 if (isLastSeconds)
@@ -166,5 +171,10 @@ public class Timer : MonoBehaviour
         }
         countdownCircleTimer.color = targetColor;
         turnArrowSpriteRenderer.color = targetColor;
+    }
+
+    internal void PauseTimer(bool enable)
+    {
+        pause = enable;
     }
 }

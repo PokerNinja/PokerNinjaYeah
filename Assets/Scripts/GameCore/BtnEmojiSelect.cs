@@ -105,12 +105,25 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
     {
         if (drag)
         {
-            if (!collision.name.Equals("BtnRanking"))
+            if (IsCollisionNameEqualEmoji(collision.name))
             {
-            Debug.LogError("myname" + collision.name);
-            currentEmojiId = ConvertNameToId(collision.name);
+                Debug.LogError("myname" + collision.name);
+                currentEmojiId = ConvertNameToId(collision.name);
             }
         }
+    }
+
+    private bool IsCollisionNameEqualEmoji(string name)
+    {
+        switch (name)
+        {
+            case "Eangry":
+            case "Esmug":
+            case "Esurprised":
+            case "EthumbUp":
+                return true;
+        }
+        return false;
     }
 
     private int ConvertNameToId(string name)
@@ -133,7 +146,10 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        currentEmojiId = -1;
+        if (IsCollisionNameEqualEmoji(collision.name))
+        {
+            currentEmojiId = -1;
+        }
     }
 
 }

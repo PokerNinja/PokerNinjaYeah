@@ -27,6 +27,7 @@ public class Values : Singleton<Values>
     public float tutoObjsFadeDuration = 0.7f;
     public float fontAppearance = 0.7f;
     public int ChanceForBotEmoji = 3;
+    public float raiseTimerDuration = 30f;
 
     // public int replaceUseLimit = 1;
     //    public GamePhase resetReplaceEvery = GamePhase.Turn;
@@ -58,6 +59,8 @@ public class Values : Singleton<Values>
     public float coinFlipEndMoveDuration = 1f;
     public float tutoMaskFadeLoopDuration = 0.75f;
     public float delayBetweenProjectiles = 0.25f;
+    public float defaultFadeD = 1f;
+    public float inAndOutAnimation = 2f;
 
 
     [Title("Ninja")]

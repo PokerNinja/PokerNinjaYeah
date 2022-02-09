@@ -79,7 +79,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     internal void DestroyPu(PowerUpUi pu, Action RemoveFromList, Action OnEnd)
     {
         pu.DissolvePu(0f, Values.Instance.puDissolveDuration, RemoveFromList, () => ResetPuUI(pu, OnEnd));
-      //  StartCoroutine(AnimationManager.Instance.FadeBurnPU(pu.spriteRenderer.material, 0f , false, 4f, null, RemoveFromList, () => ResetPuUI(pu, OnEnd)));
+        //  StartCoroutine(AnimationManager.Instance.FadeBurnPU(pu.spriteRenderer.material, 0f , false, 4f, null, RemoveFromList, () => ResetPuUI(pu, OnEnd)));
     }
 
 
@@ -89,6 +89,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         puToReset.Activate(false);
         puToReset.spriteRenderer.material.SetFloat("_ShineLocation", 0f);
         puToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0f);
+        puToReset.spriteRenderer.material.SetFloat("_WaveSpeed", 0f);
         puToReset.name = "ReadyToUsePU";
         puToReset.puName = "X";
         puToReset.puDisplayName = "NN";
@@ -101,6 +102,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         objectPooler.ReturnPu(puToReset);
         OnEnd?.Invoke();
     }
+
 
 
 
@@ -233,7 +235,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         enemyPusUi[1] = null;
     }
 
-  
+
 
 
     public void DealRoutine(bool isPlayer, Action OnEnd)
@@ -317,12 +319,12 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         float targetX;
         if (open)
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer,false);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
             targetX = 5.2f;
         }
         else
         {
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CloseDrawer,false);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CloseDrawer, false);
             targetX = 3.2f;
         }
 
@@ -404,7 +406,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
 
 
- 
+
 
     internal PowerUpUi GetPu(bool isPlayer, int puIndex)
     {
@@ -442,15 +444,26 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
             return enemyPuSlots[puIndex].transform.position;
         }
     }
-    internal PowerUpUi GetPuFromList(bool isPlayer, int puIndex)
+    /*  internal PowerUpUi GetPuFromList(bool isPlayer, int puIndex)
+      {
+          if (isPlayer)
+          {
+              return playerPusUi[puIndex];
+          }
+          else
+          {
+              return enemyPusUi[puIndex];
+          }
+      }*/
+
+    internal void ResetOutstandPus()
     {
-        if (isPlayer)
+        foreach (PowerUpUi pu in GetPuList(true))
         {
-            return playerPusUi[puIndex];
-        }
-        else
-        {
-            return enemyPusUi[puIndex];
+            if (pu != null && pu.outStand)
+            {
+                pu.EnableValuesForSelect(false);
+            }
         }
     }
 

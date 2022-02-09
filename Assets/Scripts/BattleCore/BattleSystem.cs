@@ -57,7 +57,7 @@ public class BattleSystem : StateMachine
     public int currentTurn = 6;
     public bool firstRound = true;
     private bool gameEndByBet = false;
-    public Timer turnTimer;
+    public TurnTimer turnTimer;
     public bool enemyPuIsRunning;
     internal bool readyToPlay = false;
     private bool playerPuFreeze = false;
@@ -75,6 +75,7 @@ public class BattleSystem : StateMachine
     private bool manualPuDeck = false;
     internal bool resetAllCardsSelectionWhenCardClicked;
 
+    public bool endClickable;
     public bool selectMode;
     public bool playerPuInProcess;
     public bool ReplaceInProgress;
@@ -114,8 +115,6 @@ public class BattleSystem : StateMachine
     public bool visionUnavailable = false;
     public bool turnInitInProgress = false;
     public GameObject canvasExitDialog;
-    public GameObject canvasBetDialog;
-    public GameObject waitingDialog;
 
     public float fullHp;
     public float startingDamageForRound;
@@ -123,6 +122,7 @@ public class BattleSystem : StateMachine
     public float playerHp;
     public float enemyHp;
     private float extraDamage;
+    public bool raiseOffer;
 
 
     public bool enemyBotSkillUsed;
@@ -176,7 +176,8 @@ public class BattleSystem : StateMachine
         Debug.Log("starter" + LocalTurnSystem.Instance.isPlayerFirstPlayer);
         Debug.Log("start eound" + LocalTurnSystem.Instance.IsPlayerStartRound());
 */
-        ui.EnablePlayerButtons(enable);
+        ui.EnableVisionClick(enable);
+
     }
 
     private void Start()
@@ -191,7 +192,7 @@ public class BattleSystem : StateMachine
         TEST_MODE = Values.Instance.TEST_MODE;
         Constants.HP_GAME = true;
         HP_GAME = Constants.HP_GAME;
-        Constants.BOT_MODE = false;
+        //Constants.BOT_MODE = false;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
@@ -389,6 +390,9 @@ public class BattleSystem : StateMachine
             ui.InitLargeText(false, "");
             firstCardTargetPU = "";
             firstPosTargetPU = new Vector2(0, 0);
+            puDeckUi.ResetOutstandPus();
+            ui.ResetPointers();
+            ui.ResetCardSelection();
             ui.EnableDarkScreen(true, false, () =>
              {
                  DisableVision();
@@ -660,11 +664,11 @@ public class BattleSystem : StateMachine
     public void EndTurn()
     {
         Debug.LogError("CurrentT " + currentTurn);
-        if (!endTurnInProcess && !ReplaceInProgress)
+        if (endClickable && !endTurnInProcess && !ReplaceInProgress)
         {
             endTurnInProcess = true;
             DisableSelectMode(true);
-            ui.EnableBgColor(false);
+            ui.EnableBgColor(false); //MAYBE UNECECERY
             //StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
             DisablePlayerPus();
             ui.SetTurnIndicator(false, false);
@@ -690,6 +694,7 @@ public class BattleSystem : StateMachine
         }
         else
         {
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinHit, false);
             Debug.LogError("endingProcees");
         }
     }
@@ -973,7 +978,7 @@ public class BattleSystem : StateMachine
         else
         {
             finishPuDissolve = false;
-            puName = puDeckUi.GetPuFromList(false, puIndex).puName;
+            puName = puDeckUi.GetPu(false, puIndex).puName;
         }
         PowerUpInfo puInfo = new PowerUpInfo(currentGameInfo.EnemyId, puName, cardPlace2, cardPlace1, puIndex, 12345);
         EnemyPuUse(puInfo);
@@ -1040,6 +1045,7 @@ public class BattleSystem : StateMachine
         {
             ui.betBtn.ResetBtn();
             currentDamageThisRound = startingDamageForRound;
+            raiseOffer = false;
             Debug.LogError("damageThisRound:" + currentDamageThisRound);
         }
         ResetFlusherStrighter();
@@ -1101,7 +1107,7 @@ public class BattleSystem : StateMachine
     {
         if (Constants.HP_GAME)
         {
-            return DealHpDamage(isPlayer,false);
+            return DealHpDamage(isPlayer, false);
         }
         else
         {
@@ -1204,7 +1210,7 @@ public class BattleSystem : StateMachine
 
     public void DissolvePuAfterUse(bool isPlayer, int index)
     {
-        puDeckUi.GetPuFromList(isPlayer, index).DissolvePu(2f, Values.Instance.puDissolveDuration, null, () => StartCoroutine(ResetPuUi(isPlayer, index)));
+        puDeckUi.GetPu(isPlayer, index).DissolvePu(2f, Values.Instance.puDissolveDuration, null, () => StartCoroutine(ResetPuUi(isPlayer, index)));
     }
 
     private void ListenForPowerupUse()
@@ -1251,8 +1257,11 @@ public class BattleSystem : StateMachine
 
     public IEnumerator OnCardsSelectedForPU(string cardPlace, Vector2 position)
     {
+
         if (Constants.cardsToSelectCounter == 0)
         {
+            ui.ResetPointers();
+            ui.SetCardSelection(1, newPowerUpName[0].ToString(), position, IsLargeCard(cardPlace), true);
             //  playerPuInProcess = true;
             if (newPowerUpName.Equals("fm1"))
             {
@@ -1268,6 +1277,7 @@ public class BattleSystem : StateMachine
         }
         else if (Constants.cardsToSelectCounter == 1)
         {
+            ui.SetCardSelection(2, newPowerUpName[0].ToString(), position, IsLargeCard(cardPlace), true);
             firstCardTargetPU = cardPlace;
             firstPosTargetPU = position;
             yield return new WaitForSeconds(0.1f);
@@ -1280,6 +1290,11 @@ public class BattleSystem : StateMachine
                 sameCardsSelection = false;
             }
         }
+    }
+
+    private bool IsLargeCard(string cardPlace)
+    {
+        return cardPlace.Contains("Player") || cardPlace.Contains("Enemy");
     }
 
     private void ResetValuesAfterCardSelection(string cardPlace)
@@ -1996,6 +2011,7 @@ public class BattleSystem : StateMachine
             ReduceEnergy(Values.Instance.energyCostForDraw);
             ui.EnablePlayerButtons(false);
             DisablePlayerPus();
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
             DealPu(true, () =>
             {
                 StartCoroutine(AutoEndTurn());
@@ -2096,7 +2112,7 @@ public class BattleSystem : StateMachine
                 }
             }
             ui.UpdateCardRank(handRank);
-            ui.UpdateRankTextInfo(true, handRank);
+            ui.UpdateRankTextInfo(true, handRank, ConvertWinenerRankToDamage(true));
             //TODO make it more efficient
             SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.Vision, true);
 
@@ -2110,7 +2126,7 @@ public class BattleSystem : StateMachine
             AnimationManager.Instance.VisionEffect(cardsDeckUi.GetBoardAndPlayerHandList(), cardsDeckUi.GetBoardAndPlayerHandList().Count, false);
         }
         SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.Vision, false);
-        ui.UpdateRankTextInfo(false, 0);
+        ui.UpdateRankTextInfo(false, 0, 0);
     }
 
     private void DisableVision()
@@ -2119,7 +2135,7 @@ public class BattleSystem : StateMachine
         {
             AnimationManager.Instance.VisionEffect(cardsDeckUi.GetListByTag(Constants.AllCardsTag), cardsDeckUi.GetListByTag(Constants.AllCardsTag).Count, false);
             SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.Vision, false);
-            ui.UpdateRankTextInfo(false, 0);
+            ui.UpdateRankTextInfo(false, 0, 0);
         }
     }
 
@@ -2291,9 +2307,11 @@ public class BattleSystem : StateMachine
             Interface.EnablePlayerButtons(false);
             DisablePlayerPus();
             Interface.EnableDarkScreen(powerUpUi.isPlayer, true, () => DisableVision());
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
             if (powerUpUi.puIndex != -1)
             {
                 powerUpUi.AnimatePuUse(() => OnPowerUpPress(powerUpUi.puName, powerUpUi.puIndex, powerUpUi.energyCost), null);
+
             }
             else
             {
@@ -2319,7 +2337,11 @@ public class BattleSystem : StateMachine
 
             if (Input.GetKeyDown("escape"))
             {
-                if (!ui.IsSliderOpen())
+                if (ui.gameOverPanel.activeSelf)
+                {
+                    LoadMenuScene(false);
+                }
+                else if (!ui.IsSliderOpen())
                 {
                     EnableExitDialog(true);
                 }
@@ -2429,10 +2451,11 @@ public class BattleSystem : StateMachine
         if (LocalTurnSystem.Instance.IsPlayerTurn())
         {
             EnableWaitDialog(false);
+            ui.AnimateRaiseArrow(isAccept);
             if (isAccept)
             {
                 UpdateRaise();
-
+                turnTimer.PauseTimer(false);
                 Debug.Log("DamageIsNow: " + currentDamageThisRound);
             }
             else
@@ -2456,7 +2479,6 @@ public class BattleSystem : StateMachine
 
     private void EnemyBetPopUp()
     {
-        // gameManager.StopListeningForOtherPlayerBet();
         EnableBetDialog(true);
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BetAsk, true);
     }
@@ -2479,30 +2501,48 @@ public class BattleSystem : StateMachine
 
     public void OfferABet()
     {
-        if (ui.betBtn.btnBetClickable)
+        if (!raiseOffer && ui.betBtn.btnBetClickable)
         {
-            //pause timer
             ui.betBtn.btnBetClickable = false;
+            raiseOffer = true;
+            turnTimer.PauseTimer(true);
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
             EnableWaitDialog(true);
             UpdateBetDB(currentGameInfo.localPlayerId);
+        }
+        else
+        {
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
     }
 
     private void UpdateBetDB(string info)
     {
+        if(!TEST_MODE)
+        {
         gameManager.SetBetOffer(info, () =>
                     Debug.Log("You setbet Offer" + info)
                 ,
                Debug.Log);
+        }
     }
     public void EnableBetDialog(bool enable)
     {
-        canvasBetDialog.SetActive(enable);
+        //canvasBetDialog.SetActive(enable);
+        if (enable)
+        {
+            ui.ShowRaiseDialog(currentGameInfo.EnemyId);
+        }
+        else
+        {
+            ui.HideRaiseDialog();
+        }
         ui.EnableDarkScreen(false, enable, () => DisableVision());
     }
     public void EnableWaitDialog(bool enable)
     {
-        waitingDialog.SetActive(enable);
+        // waitingDialog.SetActive(enable);
+        ui.ShowWaitingDialog(enable);
         ui.EnableDarkScreen(false, enable, () => DisableVision());
     }
 

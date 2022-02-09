@@ -649,6 +649,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
     public IEnumerator ScaleHp(Transform selector, float damage, Action shakeCamera)
     {
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.HpDrop, true);
         shakeCamera?.Invoke();
         float movementDuration = Values.Instance.hpScaleDuration;
         float startTime = Time.time;
@@ -659,6 +660,7 @@ public class AnimationManager : Singleton<AnimationManager>
         if (targetScale.y < 0)
         {
             targetScale = new Vector3(1, 0, 1);
+            targetPosition = new Vector3(0, -1f, selector.localPosition.z);
         }
         while (selector.position != targetPosition)
         {
@@ -1634,6 +1636,25 @@ public class AnimationManager : Singleton<AnimationManager>
             yield return new WaitForFixedUpdate();
         }
         yield return new WaitForFixedUpdate();
+    }
+
+    internal IEnumerator MoveFadeInAndOut(SpriteRenderer spriteTarget, Vector3 positionStarter, Vector3 positionTarget, float duration, Action OnEnd)
+    {
+        spriteTarget.transform.position = positionStarter;
+        AlphaFade(true, spriteTarget, 0.5f, null);
+        float startTime = Time.time;
+        float t = 0;
+        while (spriteTarget.gameObject.transform.position != positionTarget )
+        {
+            t += Time.deltaTime / duration;
+            spriteTarget.gameObject.transform.position = new Vector3(Mathf.SmoothStep(spriteTarget.gameObject.transform.position.x, positionTarget.x, t ), Mathf.SmoothStep(spriteTarget.gameObject.transform.position.y, positionTarget.y, t ), positionTarget.z);
+            yield return null;
+            if (spriteTarget.transform.position == positionTarget /*&&selector.localScale == targetScale*/)
+            {
+                AlphaFade(false, spriteTarget, 0.5f, OnEnd);
+                break;
+            }
+        }
     }
 
     /*public static async void OutlineInit(Material targetObj, bool enable)

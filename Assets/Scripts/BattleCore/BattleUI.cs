@@ -110,6 +110,7 @@ public class BattleUI : MonoBehaviour
     public SpriteRenderer emojiToDisplayRendererEnemy;
     public EmojiToDisplay emojiToDisplayPlayer;
     public EmojiToDisplay emojiToDisplayEnemy;
+    public SpriteRenderer emojiBg;
 
     public ParticleSystem hideSmokeBoard;
     public ParticleSystem hideSmokeHand;
@@ -144,6 +145,10 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI extraDamageText;
 
 
+    [SerializeField] private SpriteRenderer cardSelection1Renderer;
+    [SerializeField] private SpriteRenderer cardSelection2Renderer;
+
+
 
     [SerializeField] private Animation cameraShakeAnimation;
 
@@ -156,6 +161,19 @@ public class BattleUI : MonoBehaviour
     public SpriteRenderer ninjaFrameP, ninjaFrameE;
     private string[] ninjaThemeSprites = { "wood", "green", "dojo", "space" };
     private Color[] ninjaFrameColors;
+
+    public Animation pointerAnimation1;
+    public SpriteRenderer pointerSprite1;
+    public Animation pointerAnimation2;
+    public SpriteRenderer pointerSprite2;
+
+    public GameObject raiseDialog;
+    [SerializeField] private TextMeshProUGUI enemyIdOfferRaise;
+    [SerializeField] private RaiseTimer raiseTimer;
+    [SerializeField] private SpriteRenderer acceptRaiseArrow;
+    [SerializeField] private SpriteRenderer declineRaiseArrow;
+    public GameObject waitingDialog;
+
 
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy, bool HP_GAME, float totalHp)
@@ -197,6 +215,7 @@ public class BattleUI : MonoBehaviour
     }
 
 
+
     public void FreezeObject(SpriteRenderer spriteTarget, bool isToFreeze, bool isFaceDown, Action onReset, bool enableSound)
     {
 
@@ -227,14 +246,14 @@ public class BattleUI : MonoBehaviour
             rightCard.transform.position = Values.Instance.winCardRightEnd.position;
             leftCard.transform.position = Values.Instance.winCardLeftEnd.position;
         }
-        StartCoroutine(VisualDamage(HitEffect,LoseCoin));
+        StartCoroutine(VisualDamage(HitEffect, LoseCoin));
         yield return new WaitForSeconds(0.25f);
         rightCard.SetActive(true);
         leftCard.SetActive(true);
         StartCoroutine(AnimationManager.Instance.SpinRotateValue(rightCardChildSprite, () =>
         {
-           /* HitEffect?.Invoke();
-            LoseCoin?.Invoke();*/
+            /* HitEffect?.Invoke();
+             LoseCoin?.Invoke();*/
         }));
         StartCoroutine(AnimationManager.Instance.SmoothMoveCardProjectile(isPlayerWin, true, rightCard.transform, rightCard.transform.localScale, Values.Instance.winningCardProjectileMoveDuration,
             () =>
@@ -386,11 +405,14 @@ public class BattleUI : MonoBehaviour
     {
         if (enable)
         {
-            StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnArrowSprite, true, Values.Instance.turnBtnAlphaDuration, () => turnBtn.GetComponent<Button>().interactable = true));
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnArrowSprite, true, Values.Instance.turnBtnAlphaDuration,
+                () => BattleSystem.Instance.endClickable = true
+/* turnBtn.GetComponent<Button>().interactable = true*/));
         }
         else
         {
-            turnBtn.GetComponent<Button>().interactable = false;
+            BattleSystem.Instance.endClickable = false;
+            /*turnBtn.GetComponent<Button>().interactable = false;*/
             StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnArrowSprite, false, Values.Instance.turnBtnAlphaDuration, null));
         }
     }
@@ -464,7 +486,7 @@ public class BattleUI : MonoBehaviour
 
     internal IEnumerator DisplayDamageText(bool isPlayerWin, float currentDamageThisRound, float extraDamage)
     {
-        damageText.text ="-"+ currentDamageThisRound.ToString();
+        damageText.text = "-" + currentDamageThisRound.ToString();
         extraDamageText.text = "-" + extraDamage.ToString();
         string anim = "hit_player";
         if (!isPlayerWin)
@@ -474,9 +496,11 @@ public class BattleUI : MonoBehaviour
         damageText.gameObject.SetActive(true);
         extraDamageText.gameObject.SetActive(extraDamage != 0);
         damageAnimationController.Play(anim);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.DamageSound1, false);
         yield return new WaitForSeconds(0.2f);
         if (extraDamage != 0)
         {
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.DamageSound2, false);
             extraDamageAnimationController.Play(anim);
         }
         yield return new WaitForSeconds(2f);
@@ -942,11 +966,16 @@ public class BattleUI : MonoBehaviour
     }
 
 
-    internal void UpdateRankTextInfo(bool enable, int rank)
+    internal void UpdateRankTextInfo(bool enable, int rank, float extraDamageF)
     {
         if (enable)
         {
-            handRankText.text = ConvertHandRankToTextDescription(rank) + " +" /*ConvertWinenerRankToDamage(!dealToPlayer)*/;
+            string extraDamageTxt = "";
+            if (extraDamageF != 0)
+            {
+                extraDamageTxt = " +" + extraDamageF;
+            }
+            handRankText.text = ConvertHandRankToTextDescription(rank) + extraDamageTxt;
         }
         handRankInfo.SetActive(enable);
     }
@@ -1044,6 +1073,8 @@ public class BattleUI : MonoBehaviour
             StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojis[i], enable, Values.Instance.emojiMenuFadeDuration, null));
         }
         StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiSelector, enable, Values.Instance.emojiMenuFadeDuration, null));
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(emojiBg, enable, Values.Instance.emojiMenuFadeDuration, null));
+
     }
 
     internal IEnumerator DisplayEmoji(bool isPlayer, int id, Action coolDownEmoji)
@@ -1363,7 +1394,7 @@ public class BattleUI : MonoBehaviour
         {/*
         playerHpUi.position -= new Vector3(0, damage,0);
         playerHpUi.localScale -= new Vector3(0, damage,0);*/
-            StartCoroutine(AnimationManager.Instance.ScaleHp(playerHpUi, damage, ()=>ShakeCamera()));
+            StartCoroutine(AnimationManager.Instance.ScaleHp(playerHpUi, damage, () => ShakeCamera()));
             playerHpUi.GetComponent<Animation>().Play();
         }
         else
@@ -1419,12 +1450,184 @@ public class BattleUI : MonoBehaviour
         winningEyes.transform.position = new Vector2(8f, winningEyes.transform.position.y);
         StartCoroutine(AnimationManager.SmoothMoveEyes(winningEyes.transform, 6f, null, () => StartCoroutine(SlashEffect())));
     }*/
+    public void SetCardSelection(int index, string element, Vector2 position, bool isLarge, bool enable)
+    {
+        SpriteRenderer cardSelectionTarget = cardSelection1Renderer;
+        if (index == 2)
+        {
+            cardSelectionTarget = cardSelection2Renderer;
+        }
+        cardSelectionTarget.gameObject.SetActive(enable);
+        if (enable)
+        {
+            Vector3 cardScale = new Vector3(1f, 1f, 1f);
+            if (!isLarge)
+            {
+                cardScale = new Vector3(0.75f, 0.75f, 0.75f);
+            }
+            cardSelectionTarget.transform.localScale = cardScale;
+            cardSelectionTarget.transform.position = position;
 
-    
+            cardSelectionTarget.color = GetColorFromElement(element);
+        }
+    }
+
+    private Color GetColorFromElement(string element)
+    {
+        Color targetColor = Values.Instance.fireVision;
+        switch (element)
+        {
+            case "f":
+                targetColor = Values.Instance.fireVision;
+                break;
+            case "i":
+                targetColor = Values.Instance.iceVision;
+                break;
+            case "w":
+                targetColor = Values.Instance.windVision;
+                break;
+            case "s":
+                targetColor = Values.Instance.shadowVision;
+                break;
+            case "e":
+                targetColor = Values.Instance.electricVision;
+                break;
+        }
+        return targetColor;
+    }
+
+    public void ResetCardSelection()
+    {
+        cardSelection1Renderer.gameObject.SetActive(false);
+        cardSelection2Renderer.gameObject.SetActive(false);
+    }
+
     public void ShakeCamera()
     {
         cameraShakeAnimation.Play();
     }
+    internal void ApplyPointers(string[] releventCards, string element)
+    {
+        SetPointer(1, releventCards[0], element);
+        if (releventCards[0] != releventCards[1])
+        {
+            SetPointer(2, releventCards[1], element);
+        }
 
+    }
+
+    private void SetPointer(int index, string cardsTag, string element)
+    {
+        SpriteRenderer pointer = pointerSprite1;
+        Animation pointerAnim = pointerAnimation1;
+        Vector2 position = new Vector2(0, 0);
+        Vector2 addition = new Vector2(0, 0);
+        Color color = GetColorFromElement(element);
+        bool enable = false;
+        if (index == 2)
+        {
+            pointer = pointerSprite2;
+            pointerAnim = pointerAnimation2;
+        }
+        switch (cardsTag)
+        {
+            case Constants.AllCardsTag:
+            case Constants.PoolCardTag:
+                break;
+            case Constants.PlayerCardsTag:
+                position = new Vector2(-3.5f, -3.28f);
+                enable = true;
+                break;
+            case Constants.EnemyCardsTag:
+                position = new Vector2(-3.5f, 3.28f);
+                enable = true;
+                break;
+            case Constants.BoardCardsTag:
+                position = new Vector2(-5.3f, 0.27f);
+                enable = true;
+                break;
+            case Constants.DeckCardsTag:
+                position = new Vector2(-4.87f, 2.73f);
+                enable = true;
+                break;
+        }
+        if (enable)
+        {
+            pointer.color = color;
+            pointer.transform.parent.transform.position = position + addition;
+            pointerAnim.Play();
+        }
+        pointer.transform.parent.gameObject.SetActive(enable);
+    }
+
+    public void ResetPointers()
+    {
+        pointerAnimation1.Stop();
+        pointerAnimation2.Stop();
+        pointerSprite1.transform.parent.gameObject.SetActive(false);
+        pointerSprite2.transform.parent.gameObject.SetActive(false);
+    }
+
+    internal void ShowRaiseDialog(string enemyId)
+    {
+        enemyIdOfferRaise.text = enemyId;
+        raiseDialog.SetActive(true);
+        EnableRaiseTimer(true);
+        acceptRaiseArrow.gameObject.SetActive(true);
+        declineRaiseArrow.gameObject.SetActive(true);
+        AnimationManager.Instance.AlphaFade(true, acceptRaiseArrow, Values.Instance.defaultFadeD, null);
+        AnimationManager.Instance.AlphaFade(true, declineRaiseArrow, Values.Instance.defaultFadeD, null);
+    }
+    internal void HideRaiseDialog()
+    {
+        raiseDialog.SetActive(false);
+        EnableRaiseTimer(false);
+        acceptRaiseArrow.gameObject.SetActive(false);
+        declineRaiseArrow.gameObject.SetActive(false);
+        //AnimationManager.Instance.AlphaFade(true, acceptRaiseArrow, Values.Instance.defaultFadeD, null);
+        //AnimationManager.Instance.AlphaFade(true, declineRaiseArrow, Values.Instance.defaultFadeD, null);
+    }
+    internal void ShowWaitingDialog(bool enable)
+    {
+        waitingDialog.SetActive(enable);
+        EnableRaiseTimer(enable);
+    }
+    private void EnableRaiseTimer(bool enable)
+    {
+        raiseTimer.gameObject.SetActive(enable);
+        if (enable)
+        {
+            StartCoroutine(raiseTimer.StartTimer(Values.Instance.raiseTimerDuration));
+        }
+        else
+        {
+            raiseTimer.StopTimer();
+        }
+    }
+
+    [Button]
+    internal void AnimateRaiseArrow(bool isAccept)
+    {
+        SpriteRenderer targetArrow = acceptRaiseArrow;
+        Vector3 targetPosition;
+        Vector3 startingPosition = new Vector3(-0.069f, -1.5f,targetArrow.gameObject.transform.position.z);
+        Vector3 previousPos = new Vector3(targetArrow.transform.position.x, targetArrow.transform.position.y, targetArrow.transform.position.z);
+        float additionY = 1.2f;
+        if (!isAccept)
+        {
+            targetArrow = declineRaiseArrow;
+            additionY = -1.2f;
+        }
+        targetPosition = new Vector3(0, startingPosition.y + additionY, startingPosition.z);
+        targetArrow.gameObject.SetActive(true);
+        // AnimationManager.Instance.AlphaFade(true, targetArrow, 0.5f, null);
+        StartCoroutine(AnimationManager.Instance.MoveFadeInAndOut(targetArrow, startingPosition, targetPosition, Values.Instance.inAndOutAnimation,
+            () =>
+            {
+                targetArrow.gameObject.SetActive(false);
+                targetArrow.gameObject.transform.position = previousPos;
+            }
+            ));
+    }
 }
 

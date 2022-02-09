@@ -29,6 +29,8 @@ public class PlayerTurn : State
         {
             battleSystem.DealBoardCard();
         }
+        battleSystem.Interface.EnableBgColor(finalTurn);
+
         /* if(turnCounter == 6 || turnCounter == 5)
          {
              cancaleTimer = true;

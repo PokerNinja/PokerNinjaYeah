@@ -23,6 +23,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public bool freeze = false;
     public bool isClickable = false;
     public bool replaceMode = false;
+    public bool outStand = false;
 
 
 
@@ -45,7 +46,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             LoopShine(true);
         }
-     
+
     }
 
     public void Activate(bool enable)
@@ -67,6 +68,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         energyCost = SetEnergyCost();
         replaceMode = false;
         aboutToDestroy = false;
+        outStand = false;
     }
 
     private int SetEnergyCost()
@@ -127,7 +129,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
     public void OnPointerUp(PointerEventData eventData)
     {
-   
+
         CancelInvoke("OnLongPress");
         if (isPlayer || isSkill)
         {
@@ -159,7 +161,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void PressSprite(bool pressed)
     {
-        if(puIndex == -1 && isPlayer)
+        if (puIndex == -1 && isPlayer)
         {
             string spritePath = "skill_white";
             if (pressed)
@@ -172,12 +174,13 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OND()
     {
-        if(!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
+        if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, puIndex==1, puName, puDisplayName);
-        }else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
+            BattleSystem.Instance.ShowPuInfo(transform.position, puIndex == 1, puName, puDisplayName);
+        }
+        else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
         {
-            BattleSystemTuto.Instance.ShowPuInfo(transform.position, puIndex==1, puName, puDisplayName);
+            BattleSystemTuto.Instance.ShowPuInfo(transform.position, puIndex == 1, puName, puDisplayName);
         }
     }
 
@@ -276,13 +279,16 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void AnimatePuUse(Action OnStart, Action OnEndRoutine3)
     {
         OnStart?.Invoke();
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuUse,false);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuUse, false);
         EnableSelecetPositionZ(true);
         // transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, -25f);
         if (isPlayer)
         {
-            StartCoroutine(AnimationManager.Instance.PulseSize(true, transform, 1.15f, 0.4f, true,
-            () => StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3))));
+            /*StartCoroutine(AnimationManager.Instance.PulseSize(true, transform, 1.15f, 0.4f, true,
+            () => StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3))));*/
+            StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(transform.localScale.x * 1.2f, transform.localScale.y * 1.2f), 0.5f,
+                () => EnableValuesForSelect(true)));
+             StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3)) ;
         }
         else
         {
@@ -293,6 +299,24 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
 
+    public void EnableValuesForSelect(bool enable)
+    {
+        outStand = enable;
+        float waveAmount = 0;
+        float outlineAlpha = 0;
+        if (enable)
+        {
+            waveAmount = 1.8f;
+            outlineAlpha = 1f;
+            spriteRenderer.material.SetColor("_OutlineColor", GetColorFromElement(puElement));
+        }
+        else
+        {
+            StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(1f, 1f), 0.5f, null));
+        }
+        spriteRenderer.material.SetFloat("_OutlineAlpha", outlineAlpha);
+        spriteRenderer.material.SetFloat("_WaveSpeed", waveAmount);
+    }
 
     public void DissolvePu(float delayBefor, float duration, Action End, Action End2)
     {
@@ -350,7 +374,29 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         transform.parent.localPosition = new Vector3(transform.parent.localPosition.x, transform.parent.localPosition.y, interval - puIndex);
     }
-
+    private Color GetColorFromElement(string element)
+    {
+        Color targetColor = Values.Instance.fireVision;
+        switch (element)
+        {
+            case "f":
+                targetColor = Values.Instance.fireVision;
+                break;
+            case "i":
+                targetColor = Values.Instance.iceVision;
+                break;
+            case "w":
+                targetColor = Values.Instance.windVision;
+                break;
+            case "s":
+                targetColor = Values.Instance.shadowVision;
+                break;
+            case "e":
+                targetColor = Values.Instance.electricVision;
+                break;
+        }
+        return targetColor;
+    }
     #endregion
 }
 
