@@ -106,6 +106,11 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
 
 
+    public void CANCELWAHT()
+    {
+        player
+    }
+
     private int ConvertCardPlaceToIndex(string puPlace)
     {
         if (puPlace.Equals(playerPu1Plcae) || puPlace.Equals(enemyPu1Place))
