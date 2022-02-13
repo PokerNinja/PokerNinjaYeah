@@ -31,6 +31,7 @@ public class CoinFlipScript : MonoBehaviour
     {
         SetDirection(playerTurn);
         animator.Play("coin_small");
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinFlipTurn, true);
     }
 
 

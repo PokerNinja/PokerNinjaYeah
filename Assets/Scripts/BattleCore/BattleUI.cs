@@ -37,6 +37,7 @@ public class BattleUI : MonoBehaviour
     [SerializeField] public TextMeshProUGUI handRankText;
 
     [SerializeField] private CanvasGroup infoCanvas;
+    [SerializeField] private CanvasGroup puCanvasDialog;
 
     [SerializeField] public GameObject rankImageParent;
     [SerializeField] public SpriteRenderer darkScreenRenderer;
@@ -76,7 +77,8 @@ public class BattleUI : MonoBehaviour
 
     public GameObject youWin;
     public GameObject youLose;
-    public GameObject hitGO;
+    public SpriteRenderer blurrColorWin;
+   // public GameObject hitGO;
     public GameObject tieTitle;
 
 
@@ -88,7 +90,6 @@ public class BattleUI : MonoBehaviour
     public Animator playerAvatarAnimator;
     public Animator enemyAvatarAnimator;
 
-    public ParticleSystem rightSlash, leftSlash;
     public ParticleSystem winParticle;
     public GameObject rightCard, leftCard;
 
@@ -104,6 +105,9 @@ public class BattleUI : MonoBehaviour
     public Material freezeMaterial;
     public TextMeshProUGUI dialogTitleUi;
     public TextMeshProUGUI dialogContentUi;
+    public TextMeshProUGUI puDialogFirstContentUi;
+    public TextMeshProUGUI puDialogRestContentUi;
+    public Image puDialogBg;
     public SpriteRenderer[] emojis;
     public SpriteRenderer emojiSelector;
     public SpriteRenderer emojiToDisplayRendererPlayer;
@@ -136,9 +140,12 @@ public class BattleUI : MonoBehaviour
     public GameObject psParent;
     public Transform playerHpUi;
     public Transform enemyHpUi;
-    [SerializeField] private TextMeshProUGUI totalHpText;
-    [SerializeField] private TextMeshProUGUI currentHpText;
-    [SerializeField] private CanvasGroup hpInfoCanvas;
+    [SerializeField] private TextMeshProUGUI playerTotalHpText;
+    [SerializeField] private TextMeshProUGUI enemyTotalHpText;
+    [SerializeField] private TextMeshProUGUI playerCurrentHpText;
+    [SerializeField] private TextMeshProUGUI enemyCurrentHpText;
+    [SerializeField] private CanvasGroup playerHpInfoCanvas;
+    [SerializeField] private CanvasGroup enemyHpInfoCanvas;
     [SerializeField] private Animator damageAnimationController;
     [SerializeField] private Animator extraDamageAnimationController;
     [SerializeField] private TextMeshProUGUI damageText;
@@ -163,9 +170,9 @@ public class BattleUI : MonoBehaviour
     private Color[] ninjaFrameColors;
 
     public Animation pointerAnimation1;
-    public SpriteRenderer pointerSprite1;
+   // public SpriteRenderer pointerSprite1;
     public Animation pointerAnimation2;
-    public SpriteRenderer pointerSprite2;
+    //public SpriteRenderer pointerSprite2;
 
     public GameObject raiseDialog;
     [SerializeField] private TextMeshProUGUI enemyIdOfferRaise;
@@ -183,12 +190,19 @@ public class BattleUI : MonoBehaviour
         InitializeEnemy(enemy);
         if (HP_GAME)
         {
-            totalHpText.text = "/ " + totalHp;
+            playerTotalHpText.text = "/ " + totalHp;
+            enemyTotalHpText.text = "/ " + totalHp;
         }
         else
         {
             InitializeAnimations();
         }
+    }
+
+    internal void FillHp()
+    {
+        StartCoroutine(AnimationManager.Instance.FillHp(playerHpUi));
+        StartCoroutine(AnimationManager.Instance.FillHp(enemyHpUi));
     }
 
     private void InitializeAnimations()
@@ -313,14 +327,7 @@ public class BattleUI : MonoBehaviour
         target.sprite = Resources.Load("Sprites/Ninja/NinjaBg/" + randomTheme + endPath, typeof(Sprite)) as Sprite;
     }
 
-    public IEnumerator SlashEffect()
-    {
-        rightSlash.Play();
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash1, true);
-        yield return new WaitForSeconds(0.1f);
-        leftSlash.Play();
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Slash2, true);
-    }
+  
     public void WinParticleEffect()
     {
         Instantiate(winParticle.gameObject);
@@ -358,15 +365,13 @@ public class BattleUI : MonoBehaviour
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinFlipStart, true);
         /* StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, new Vector3(0,0,0), coinFlipTurn.transform.localScale, Values.Instance.coinFlipEndMoveDuration, null, null, 
              () => coinFlipTurn.SetDirection(isPlayerStart), () => coinFlipTurn.FlipCoinAnimation()));*/
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(1.85f);
         EndAction?.Invoke();
-        Debug.LogError("pos" + coinFlipTurn.transform);
-        Debug.LogError("pos" + targetPosition);
         //Todo dont stop
         StartCoroutine(AnimationManager.Instance.SmoothMove(coinFlipTurn.transform, targetPosition, new Vector3(1, 1, 1), Values.Instance.coinFlipEndMoveDuration,
             null, () =>
             {
-                turnTimer.FlipImage(isPlayerStart);
+                turnTimer.turnArrowUi.FlipImage(isPlayerStart);
                 turnTimer.Activate(true);
                 coinFlipTurn.gameObject.SetActive(false);
             }/*() => coinFlipTurn.gameObject.SetActive(false)*/, null, null));
@@ -429,7 +434,7 @@ public class BattleUI : MonoBehaviour
         coinFlipTurn.gameObject.SetActive(true);
         coinFlipTurn.FlipForTurn(isPlayer);
         yield return new WaitForSeconds(1f);
-        turnTimer.FlipImage(isPlayer);
+        turnTimer.turnArrowUi.FlipImage(isPlayer);
         coinFlipTurn.gameObject.SetActive(false);
         turnTimer.Activate(true);
     }
@@ -439,7 +444,7 @@ public class BattleUI : MonoBehaviour
         StartCoroutine(ApplyTurnArrowFlip(isPlayer));
     }
 
-    internal void HitEffect(bool isPlayerHit)
+    /*internal void HitEffect(bool isPlayerHit)
     {
         {
             hitGO.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
@@ -460,10 +465,15 @@ public class BattleUI : MonoBehaviour
 
 
         }
-    }
-    public void ShowPuInfoDialog(Vector2 startingPosition, bool paddingRight, string puName, string puDisplayName, bool isEnable, bool isBtnOn, Action OnEnd)
+    }*/
+    public void ShowPuInfoDialog(Vector2 startingPosition, bool isPu, bool paddingRight, string puName, string puDisplayName, bool isEnable, bool isBtnOn, Action OnEnd)
     {
         Vector2 targetDialog;
+        CanvasGroup dialog = infoCanvas;
+        if (isPu)
+        {
+            dialog = puCanvasDialog;
+        }
         if (paddingRight)
         {
             targetDialog = new Vector2(startingPosition.x + 1f, startingPosition.y + 2.5f);
@@ -474,8 +484,6 @@ public class BattleUI : MonoBehaviour
         }
         if (isEnable)
         {
-            infoCanvas.transform.position = new Vector2(0, -7f);
-            infoCanvas.transform.localScale = new Vector2(0.1f, 0.1f);
             if (puName.Equals("replace"))
             {
                 InitDialog(puDisplayName, Constants.ReplacePuInfo, isBtnOn);
@@ -484,26 +492,80 @@ public class BattleUI : MonoBehaviour
             {
                 InitDialog(puDisplayName, Constants.BetInfo, isBtnOn);
             }
+            else if (puName.Equals("end"))
+            {
+                InitDialog(puDisplayName, Constants.EndInfo, isBtnOn);
+            }
             else
             {
-                InitDialog(puDisplayName, PowerUpStruct.Instance.GetPuInfoByName(puName), isBtnOn);
+                InitDialogPu(puName, PowerUpStruct.Instance.GetPuInfoByName(puName));
             }
+            dialog.transform.position = new Vector2(0, -7f);
+            dialog.transform.localScale = new Vector2(0.1f, 0.1f);
             // infoCanvas.alpha = 1f;
-            StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(infoCanvas.transform, startingPosition, targetDialog, OnEnd));
-            StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(infoCanvas, true, Values.Instance.infoDialogFadeOutDuration, null));
+            StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(dialog.transform, startingPosition, targetDialog, OnEnd));
+            StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(dialog, true, Values.Instance.infoDialogFadeOutDuration, null));
             // StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, true, Values.Instance.showDialogMoveDuration, null));
         }
         else
         {
-            if (infoCanvas.alpha > 0)
+            if (dialog.alpha > 0)
             {
-                StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(infoCanvas, false, Values.Instance.infoDialogFadeOutDuration, OnEnd));
+                StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(dialog, false, Values.Instance.infoDialogFadeOutDuration, OnEnd));
 
                 /* StartCoroutine(AnimationManager.Instance.AlphaAnimation(dialogSprite, false, Values.Instance.infoDialogFadeOutDuration, OnEnd));
                  StartCoroutine(AnimationManager.Instance.AlphaFontAnimation(dialogContentUi, false, Values.Instance.infoDialogFadeOutDuration, null));*/
             }
         }
 
+    }
+
+    private void InitDialogPu(string puName, string puInfo)
+    {
+        string firstWord = puInfo.Substring(0, puInfo.IndexOf(" "));
+        puDialogFirstContentUi.text = firstWord;
+        puDialogRestContentUi.text = "        " + puInfo.Substring(firstWord.Length);
+        string element = puName[0].ToString();
+        puDialogFirstContentUi.color = GetColorFromElement(element);
+        puDialogBg.sprite = GetPuDialogSpritePath(puName);
+
+    }
+
+    private Sprite GetPuDialogSpritePath(string puName)
+    {
+        string spritePath = "";
+        switch (puName)
+        {
+
+            case "f1":
+            case "f2":
+            case "f3":
+                spritePath = "nc_fire";
+                break;
+            case "i1":
+            case "i2":
+            case "i3":
+                spritePath = "nc_ice";
+                break;
+            case "w1":
+            case "w2":
+            case "w3":
+                spritePath = "nc_wind";
+                break;
+            case "fm1":
+            case "fm2":
+                spritePath = "dc_fire";
+                break;
+            case "im1":
+            case "im2":
+                spritePath = "dc_ice";
+                break;
+            case "wm1":
+            case "wm2":
+                spritePath = "dc_wind";
+                break;
+        }
+        return Resources.Load("Sprites/GameScene/Info/" + spritePath, typeof(Sprite)) as Sprite;
     }
 
     internal IEnumerator DisplayDamageText(bool isPlayerWin, float currentDamageThisRound, float extraDamage)
@@ -549,6 +611,9 @@ public class BattleUI : MonoBehaviour
 
     internal void ShowGameOverPanel(bool isPlayerWin)
     {
+        textWinLabel.transform.parent.gameObject.SetActive(false);
+        EnableDarkScreen(false, true,null);
+        SetBlurColor(isPlayerWin);
         gameOverPanel.SetActive(true);
         if (isPlayerWin)
         {
@@ -558,6 +623,16 @@ public class BattleUI : MonoBehaviour
         {
             youLose.SetActive(true);
         }
+    }
+
+    private void SetBlurColor(bool isPlayerWin)
+    {
+        Color color = Values.Instance.brightRed;
+        if (isPlayerWin)
+        {
+            color = Values.Instance.yellow;
+        }
+        blurrColorWin.color = color;
     }
 
     internal void ResetHandRank()
@@ -893,12 +968,12 @@ public class BattleUI : MonoBehaviour
         {
             if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.wm2)))
             {
-                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, isPlayerActivate, false, windEffect, null));
-                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, isPlayerActivate, true, windEffect2, PuIgnite));
+                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, isPlayerActivate, false, windEffect, null, null));
+                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, isPlayerActivate, true, windEffect2,()=>ShakeCamera(), PuIgnite));
             }
             else
             {
-                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, isPlayerActivate, false, windEffect, PuIgnite));
+                StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName, isPlayerActivate, false, windEffect, null, PuIgnite));
             }
         }
     }
@@ -1045,7 +1120,7 @@ public class BattleUI : MonoBehaviour
 
     internal void DisableClickBtnReplace()
     {
-        StartCoroutine(AnimationManager.Instance.Shake(btnReplaceRenderer.material, Values.Instance.disableClickShakeDuration));
+       // StartCoroutine(AnimationManager.Instance.Shake(btnReplaceRenderer.material, Values.Instance.disableClickShakeDuration));
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
     }
     public void ClickCoinEffect(int index)
@@ -1068,7 +1143,8 @@ public class BattleUI : MonoBehaviour
             btnEnable = null;
         }
         // Make IT more stable
-        StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, btnReplaceRenderer.material, value, btnEnable));
+        //StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, btnReplaceRenderer.material, value, btnEnable));
+        StartCoroutine(AnimationManager.Instance.DarkerAnimation(btnReplaceRenderer,!enable, Values.Instance.puChangeColorDisableDuration, btnEnable));
     }
 
     public void BgFadeInColor()
@@ -1369,7 +1445,9 @@ public class BattleUI : MonoBehaviour
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Iceagedon, true);
         // icenadoPS.Play();
         GameObject ps = Instantiate(icenadoPS.gameObject);
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1.5f);
+        ShakeCamera();
+        yield return new WaitForSeconds(1.5f);
         var main = ps.GetComponent<ParticleSystem>().main;
         main.startLifetime = 0;
         //yield return new WaitForSeconds(5f);
@@ -1383,7 +1461,9 @@ public class BattleUI : MonoBehaviour
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Armagedon2, true);
         GameObject ps = Instantiate(armageddonPS.gameObject);
         // armageddonPS.Play();
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1.5f);
+        ShakeCamera();
+        yield return new WaitForSeconds(1.5f);
         var main = ps.GetComponent<ParticleSystem>().main;
         main.startLifetime = 0;
         // yield return new WaitForSeconds(5f);
@@ -1442,10 +1522,14 @@ public class BattleUI : MonoBehaviour
 
     internal void ShowHpDialog(float currentHp, bool isPlayer)
     {
+        CanvasGroup hpInfoCanvas = playerHpInfoCanvas;
+        TextMeshProUGUI currentHpText = playerCurrentHpText;
         float posY = -2.6f;
         if (!isPlayer)
         {
             posY = 2.6f;
+            hpInfoCanvas = enemyHpInfoCanvas;
+            currentHpText = enemyCurrentHpText;
         }
         hpInfoCanvas.transform.position = new Vector3(hpInfoCanvas.transform.position.x, posY, hpInfoCanvas.transform.position.z);
         currentHpText.text = " " + currentHp;
@@ -1453,7 +1537,8 @@ public class BattleUI : MonoBehaviour
     }
     public void HideHpDialog()
     {
-        StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(hpInfoCanvas, false, Values.Instance.infoDialogFadeOutDuration, null));
+        StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(playerHpInfoCanvas, false, Values.Instance.infoDialogFadeOutDuration, null));
+        StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(enemyHpInfoCanvas, false, Values.Instance.infoDialogFadeOutDuration, null));
     }
 
     /* internal void WhosTurnAnimation(bool isPlayer, bool yourLastTurn)
@@ -1524,6 +1609,7 @@ public class BattleUI : MonoBehaviour
         cardSelection2Renderer.gameObject.SetActive(false);
     }
 
+  
     public void ShakeCamera()
     {
         cameraShakeAnimation.Play();
@@ -1540,15 +1626,15 @@ public class BattleUI : MonoBehaviour
 
     private void SetPointer(int index, string cardsTag, string element)
     {
-        SpriteRenderer pointer = pointerSprite1;
+     //   SpriteRenderer pointer = pointerSprite1;
         Animation pointerAnim = pointerAnimation1;
         Vector2 position = new Vector2(0, 0);
-        Vector2 addition = new Vector2(0, 0);
+      //  Vector2 addition = new Vector2(0, 0);
         Color color = GetColorFromElement(element);
         bool enable = false;
         if (index == 2)
         {
-            pointer = pointerSprite2;
+          //  pointer = pointerSprite2;
             pointerAnim = pointerAnimation2;
         }
         switch (cardsTag)
@@ -1557,37 +1643,37 @@ public class BattleUI : MonoBehaviour
             case Constants.PoolCardTag:
                 break;
             case Constants.PlayerCardsTag:
-                position = new Vector2(-3.5f, -3.28f);
+                position = new Vector2(-2.76f, -3.37f);
                 enable = true;
                 break;
             case Constants.EnemyCardsTag:
-                position = new Vector2(-3.5f, 3.28f);
+                position = new Vector2(-2.76f, 3.37f);
                 enable = true;
                 break;
             case Constants.BoardCardsTag:
-                position = new Vector2(-5.3f, 0.27f);
+                position = new Vector2(-4.54f, 0f);
                 enable = true;
                 break;
             case Constants.DeckCardsTag:
-                position = new Vector2(-4.87f, 2.73f);
+                position = new Vector2(-4.54f, 2.78f);
                 enable = true;
                 break;
         }
         if (enable)
         {
-            pointer.color = color;
-            pointer.transform.parent.transform.position = position + addition;
+            // pointer.color = color;
+            pointerAnim.transform.parent.transform.position = position /*+ addition*/;
             pointerAnim.Play();
         }
-        pointer.transform.parent.gameObject.SetActive(enable);
+        pointerAnim.transform.parent.gameObject.SetActive(enable);
     }
 
     public void ResetPointers()
     {
         pointerAnimation1.Stop();
         pointerAnimation2.Stop();
-        pointerSprite1.transform.parent.gameObject.SetActive(false);
-        pointerSprite2.transform.parent.gameObject.SetActive(false);
+        pointerAnimation1.transform.parent.gameObject.SetActive(false);
+        pointerAnimation2.transform.parent.gameObject.SetActive(false);
     }
 
     internal void ShowRaiseDialog(string enemyId)
@@ -1650,6 +1736,17 @@ public class BattleUI : MonoBehaviour
                 targetArrow.gameObject.transform.position = previousPos;
             }
             ));
+    }
+
+    internal void UpdateHpZ(bool enable)
+    {
+        float newZ = 85f;
+        if (!enable)
+        {
+            newZ = 25f;
+        }
+        playerHpUi.transform.parent.position = new Vector3(playerHpUi.transform.parent.position.x, playerHpUi.transform.parent.position.y, newZ);
+        enemyHpUi.transform.parent.position = new Vector3(enemyHpUi.transform.parent.position.x, enemyHpUi.transform.parent.position.y, newZ);
     }
 }
 

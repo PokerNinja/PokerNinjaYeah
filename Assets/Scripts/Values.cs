@@ -61,6 +61,8 @@ public class Values : Singleton<Values>
     public float delayBetweenProjectiles = 0.25f;
     public float defaultFadeD = 1f;
     public float inAndOutAnimation = 2f;
+    public Color brightRed ;
+    public Color yellow;
 
 
     [Title("Ninja")]

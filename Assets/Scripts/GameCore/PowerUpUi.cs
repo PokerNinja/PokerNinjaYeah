@@ -143,7 +143,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
             else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
             {
-                BattleSystem.Instance.HideDialog();
+                BattleSystem.Instance.HideDialog(true);
             }
         }
         PressSprite(false);
@@ -176,7 +176,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, puIndex == 1, puName, puDisplayName);
+            BattleSystem.Instance.ShowPuInfo(transform.position,true, puIndex == 1, puName, puDisplayName);
         }
         else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
         {
@@ -241,17 +241,18 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [Button]
     public void EnablePu(bool enable)
     {
-        float value = 0.65f;
+        /*float value = 0.65f;
         if (enable)
         {
             value = 0;
-        }
+        }*/
         if (!isSkill)
         {
             EnableShake(enable);
         }
+        StartCoroutine(AnimationManager.Instance.DarkerAnimation(spriteRenderer, !enable, Values.Instance.puChangeColorDisableDuration, () => isClickable = enable));
 
-        StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, spriteRenderer.material, value, () => isClickable = enable));
+        //StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, spriteRenderer.material, value, () => isClickable = enable));
     }
 
     public void EnableShake(bool enable)
@@ -286,8 +287,11 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             /*StartCoroutine(AnimationManager.Instance.PulseSize(true, transform, 1.15f, 0.4f, true,
             () => StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3))));*/
-            StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(transform.localScale.x * 1.2f, transform.localScale.y * 1.2f), 0.5f,
-                () => EnableValuesForSelect(true)));
+            StartCoroutine(AnimationManager.Instance.SmoothMove(transform, new Vector3(transform.parent.position.x, transform.parent.position.y + 0.2f, transform.position.z),
+                new Vector3(transform.localScale.x * 1.05f, transform.localScale.y * 1.05f,1f), 0.5f, null, () => EnableValuesForSelect(true), null, null));
+
+            /*StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(transform.localScale.x * 1.1f, transform.localScale.y * 1.1f), 0.5f,
+                () => EnableValuesForSelect(true)));*/
              StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3)) ;
         }
         else
@@ -302,20 +306,22 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void EnableValuesForSelect(bool enable)
     {
         outStand = enable;
-        float waveAmount = 0;
+        float distortAmount = 0;
         float outlineAlpha = 0;
         if (enable)
         {
-            waveAmount = 1.8f;
+            distortAmount = 0.17f;
             outlineAlpha = 1f;
             spriteRenderer.material.SetColor("_OutlineColor", GetColorFromElement(puElement));
         }
         else
         {
-            StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(1f, 1f), 0.5f, null));
+           // StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(1f, 1f), 0.5f, null));
+            StartCoroutine(AnimationManager.Instance.SmoothMove(transform, new Vector3(transform.parent.position.x, transform.parent.position.y, transform.position.z)
+                ,new Vector3(1f, 1f,1f), 0.5f, null, null, null, null));
         }
         spriteRenderer.material.SetFloat("_OutlineAlpha", outlineAlpha);
-        spriteRenderer.material.SetFloat("_WaveSpeed", waveAmount);
+        spriteRenderer.material.SetFloat("_DistortAmount", distortAmount);
     }
 
     public void DissolvePu(float delayBefor, float duration, Action End, Action End2)

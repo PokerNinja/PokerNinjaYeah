@@ -208,9 +208,9 @@ public class BattleSystem : StateMachine
             fullHp = 3000;
             playerHp = fullHp;
             enemyHp = fullHp;
-            startingDamageForRound = 1000;
+            startingDamageForRound = 2500;
             currentDamageThisRound = startingDamageForRound;
-            ui.ActivateHpObjects();
+            //   ui.ActivateHpObjects();
         }
         else
         {
@@ -226,14 +226,17 @@ public class BattleSystem : StateMachine
         startNewRound = true;
         ui.LoadNinjaBG();
         ui.InitAvatars();
+        ui.FillHp();
         if (!Debug.isDebugBuild)
         {
             Constants.IL2CPP_MOD = true;
         }
         if (!TEST_MODE && !BOT_MODE)
         {
-            StartCoroutine(ui.CoinFlipStartGame(currentGameInfo.playersIds[0].ToString().Equals(player.id), () => { ui.SlidePuSlots(); 
-            LocalTurnSystem.Instance.Inito(() => StartCoroutine(InitGameListeners()));
+            StartCoroutine(ui.CoinFlipStartGame(currentGameInfo.playersIds[0].ToString().Equals(player.id), () =>
+            {
+                ui.SlidePuSlots();
+                LocalTurnSystem.Instance.Inito(() => StartCoroutine(InitGameListeners()));
             }));
         }
         else
@@ -541,7 +544,7 @@ public class BattleSystem : StateMachine
         }
         else
         {
-            StartCoroutine(ui.CardProjectileEffect(isPlayerWin, () => ui.HitEffect(isPlayerWin), () => ui.LoseLifeUi(!isPlayerWin, lifeLeft)));
+            // StartCoroutine(ui.CardProjectileEffect(isPlayerWin, () => ui.HitEffect(isPlayerWin), () => ui.LoseLifeUi(!isPlayerWin, lifeLeft)));
         }
     }
 
@@ -716,6 +719,7 @@ public class BattleSystem : StateMachine
             }
             else
             {
+                endClickable = true;
                 StartCoroutine(WaitForPuToEndLoop());
             }
 
@@ -730,6 +734,7 @@ public class BattleSystem : StateMachine
             playerPuInProcess = false;
 
             yield return new WaitForSeconds(4f);
+            endClickable = true;
         }
         EndTurn();
 
@@ -914,14 +919,14 @@ public class BattleSystem : StateMachine
 
         EndAction?.Invoke();
         StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
-       /* StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnTimer.turnArrowSpriteRenderer.GetComponent<SpriteRenderer>(),
-            false, Values.Instance.textTurnFadeOutDuration, () =>
-            {
-                // ui.playerNameText.text = "start " + currentTurn;
-                EndAction?.Invoke();
-                StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
-            }));
-        */
+        /* StartCoroutine(AnimationManager.Instance.AlphaAnimation(turnTimer.turnArrowSpriteRenderer.GetComponent<SpriteRenderer>(),
+             false, Values.Instance.textTurnFadeOutDuration, () =>
+             {
+                 // ui.playerNameText.text = "start " + currentTurn;
+                 EndAction?.Invoke();
+                 StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
+             }));
+         */
     }
 
 
@@ -1289,14 +1294,14 @@ public class BattleSystem : StateMachine
         ui.InitLargeText(false, puDisplayName);
     }
 
-    public void ShowPuInfo(Vector2 startingPosition, bool paddingRight, string puName, string puDisplayName)
+    public void ShowPuInfo(Vector2 startingPosition, bool isPu, bool paddingRight, string puName, string puDisplayName)
     {
         infoShow = true;
-        ui.ShowPuInfoDialog(startingPosition, paddingRight, puName, puDisplayName, true, false, null);
+        ui.ShowPuInfoDialog(startingPosition, isPu, paddingRight, puName, puDisplayName, true, false, null);
     }
-    public void HideDialog()
+    public void HideDialog(bool isPu)
     {
-        ui.ShowPuInfoDialog(new Vector2(0, 0), false, " ", " ", false, false, () => infoShow = false);
+        ui.ShowPuInfoDialog(new Vector2(0, 0), isPu, false, " ", " ", false, false, () => infoShow = false);
     }
 
     internal IEnumerator ResetPuUi(bool isPlayer, int puIndex)
@@ -1750,7 +1755,8 @@ public class BattleSystem : StateMachine
 
     private IEnumerator AutoEndTurn()
     {
-      if (timedOut || energyCounter == 0 /*|| energyCounter == 1 && puDeckUi.GetPuListCount(true) == 0 && !skillUsed*/)
+        Debug.LogError("AutoEnd");
+        if (timedOut || energyCounter == 0 /*|| energyCounter == 1 && puDeckUi.GetPuListCount(true) == 0 && !skillUsed*/)
         {
             Debug.LogError("ending");
             timedOut = false;
@@ -2270,7 +2276,7 @@ public class BattleSystem : StateMachine
     {
         if (infoShow)
         {
-            HideDialog();
+            HideDialog(true);
         }
         else if (!ReplaceInProgress && !Constants.TemproryUnclickable && powerUpUi.isPlayer && !powerUpUi.freeze && powerUpUi.isClickable)
         {
@@ -2296,7 +2302,10 @@ public class BattleSystem : StateMachine
         }
         else if (powerUpUi.isPlayer || !powerUpUi.isPlayer)
         {
-            StartCoroutine(AnimationManager.Instance.Shake(powerUpUi.spriteRenderer.material, Values.Instance.disableClickShakeDuration));
+            if (powerUpUi.puIndex != -1)
+            {
+                StartCoroutine(AnimationManager.Instance.Shake(powerUpUi.spriteRenderer.material, Values.Instance.disableClickShakeDuration));
+            }
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
     }
@@ -2381,6 +2390,12 @@ public class BattleSystem : StateMachine
     internal void DealBoardCard()
     {
         //   waitForDrawerAnimationToEnd = false;
+        StartCoroutine(DealBoardCardCorutine());
+    }
+    internal IEnumerator DealBoardCardCorutine()
+    {
+        //   waitForDrawerAnimationToEnd = false;
+        yield return new WaitForSeconds(1f);
         cardsDeckUi.DealCardsForBoard(true, null /*() => waitForDrawerAnimationToEnd = false*/, () => UpdateHandRank(false));
     }
 
@@ -2427,7 +2442,7 @@ public class BattleSystem : StateMachine
             if (isAccept)
             {
                 UpdateRaise();
-               ui.turnTimer.PauseTimer(false);
+                ui.turnTimer.PauseTimer(false);
                 Debug.Log("DamageIsNow: " + currentDamageThisRound);
             }
             else
@@ -2490,12 +2505,12 @@ public class BattleSystem : StateMachine
 
     private void UpdateBetDB(string info)
     {
-        if(!TEST_MODE)
+        if (!TEST_MODE)
         {
-        gameManager.SetBetOffer(info, () =>
-                    Debug.Log("You setbet Offer" + info)
-                ,
-               Debug.Log);
+            gameManager.SetBetOffer(info, () =>
+                        Debug.Log("You setbet Offer" + info)
+                    ,
+                   Debug.Log);
         }
     }
     public void EnableBetDialog(bool enable)
@@ -2504,11 +2519,14 @@ public class BattleSystem : StateMachine
         if (enable)
         {
             ui.ShowRaiseDialog(currentGameInfo.EnemyId);
+            ShowHpInfo();
         }
         else
         {
             ui.HideRaiseDialog();
+            ui.HideHpDialog();
         }
+        ui.UpdateHpZ(enable);
         ui.EnableDarkScreen(false, enable, () => DisableVision());
     }
     public void EnableWaitDialog(bool enable)
@@ -2516,6 +2534,7 @@ public class BattleSystem : StateMachine
         // waitingDialog.SetActive(enable);
         ui.ShowWaitingDialog(enable);
         ui.EnableDarkScreen(false, enable, () => DisableVision());
+        ui.UpdateHpZ(enable);
     }
 
     [Button]
@@ -2581,16 +2600,10 @@ public class BattleSystem : StateMachine
         return 0f;
     }
 
-    public void ShowHpInfo(bool isPlayer)
+    public void ShowHpInfo()
     {
-        if (isPlayer)
-        {
-            ui.ShowHpDialog(playerHp, true);
-        }
-        else
-        {
-            ui.ShowHpDialog(enemyHp, false);
-        }
+        ui.ShowHpDialog(playerHp, true);
+        ui.ShowHpDialog(enemyHp, false);
     }
     private void OnApplicationPause(bool pause)
     {

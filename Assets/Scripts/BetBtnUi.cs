@@ -49,6 +49,7 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         HideRaiseInfo();
     }
 
+   
 
     public void OnPointerDown(PointerEventData eventData)
     {
@@ -80,12 +81,16 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         anim.Play();
     }
 
+    [Button]
     public void ResetBtn()
     {
         txtMultiplayer.gameObject.SetActive(false);
         LoadSpriteBtn(false);
-        anim.Stop();
         anim.Rewind();
+        anim.Play();
+        anim.Sample();
+        anim.Stop();
+        spriteRenderer.material.SetFloat("_Glow", 0f);
     }
 
     public void OND()

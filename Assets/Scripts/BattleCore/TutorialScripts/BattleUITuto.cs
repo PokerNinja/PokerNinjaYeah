@@ -709,7 +709,7 @@ public class BattleUITuto : MonoBehaviour
         }
         else
         {
-            StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,true, false,windEffect, PuIgnite));
+            StartCoroutine(AnimationManager.Instance.AnimateWind(powerUpName,true, false,windEffect, null,PuIgnite));
         }
     }
 

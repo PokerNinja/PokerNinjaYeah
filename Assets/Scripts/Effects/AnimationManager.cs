@@ -227,6 +227,55 @@ public class AnimationManager : Singleton<AnimationManager>
             }
         }
     }
+
+    public IEnumerator DarkerAnimation(SpriteRenderer spriteRenderer, bool darker, float duration, Action OnFinish)
+    {
+        float r = spriteRenderer.color.r;
+        float g = spriteRenderer.color.g;
+        float b = spriteRenderer.color.b;
+        float startingAlpha = spriteRenderer.color.a;
+        float dissolveAmount = 1;
+        float colorTarget = 0.66f;
+        if (!darker)
+        {
+            dissolveAmount = 0.66f;
+            colorTarget = 1;
+        }
+        if (r == colorTarget)
+        {
+            OnFinish?.Invoke();
+        }
+        else
+        {
+
+            spriteRenderer.color = new Color(dissolveAmount, dissolveAmount, dissolveAmount, startingAlpha);
+            //FIXIT
+            while (dissolveAmount != colorTarget)
+            {
+                //yield return new WaitForFixedUpdate();
+                yield return null;
+                if (!darker)
+                {
+                    dissolveAmount += Time.deltaTime / duration;
+                }
+                else
+                {
+                    dissolveAmount -= Time.deltaTime / duration;
+                }
+
+                spriteRenderer.color = new Color(dissolveAmount, dissolveAmount, dissolveAmount, startingAlpha/* Mathf.Lerp(0f, 1f, dissolveAmount)*/);
+                if (dissolveAmount >= 1f || dissolveAmount <= 0.66f)
+                {
+                    // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
+                    // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
+
+                    spriteRenderer.color = new Color(dissolveAmount, dissolveAmount, dissolveAmount, startingAlpha);
+                    OnFinish?.Invoke();
+                    break;
+                }
+            }
+        }
+    }
     public IEnumerator AlphaCanvasGruop(CanvasGroup canvas, bool fadeIn, float duration, Action OnFinish)
     {
 
@@ -246,29 +295,36 @@ public class AnimationManager : Singleton<AnimationManager>
         {*/
         canvas.alpha = alphaAmount;
         //FIXIT
-        while (alphaAmount != alphaTarget)
+        if (alphaAmount == alphaTarget)
         {
-            //yield return new WaitForFixedUpdate();
-            yield return null;
-            if (fadeIn)
-            {
-                alphaAmount += Time.deltaTime / duration;
-            }
-            else
-            {
-                alphaAmount -= Time.deltaTime / duration;
-            }
+            OnFinish?.Invoke();
+        }
+        else
+        {
 
-            canvas.alpha = alphaAmount = Mathf.Lerp(0f, 1f, alphaAmount);
-            if (alphaAmount >= 1 || alphaAmount <= 0)
+            while (alphaAmount != alphaTarget)
             {
+                //yield return new WaitForFixedUpdate();
+                yield return null;
+                if (fadeIn)
+                {
+                    alphaAmount += Time.deltaTime / duration;
+                }
+                else
+                {
+                    alphaAmount -= Time.deltaTime / duration;
+                }
 
-                canvas.alpha = alphaAmount;
-                OnFinish?.Invoke();
-                break;
+                canvas.alpha = alphaAmount = Mathf.Lerp(0f, 1f, alphaAmount);
+                if (alphaAmount >= 1 || alphaAmount <= 0)
+                {
+
+                    canvas.alpha = alphaAmount;
+                    OnFinish?.Invoke();
+                    break;
+                }
             }
         }
-
     }
 
     public void AlphaFade(bool fadeIn, SpriteRenderer spriteRenderer, float duration, Action OnFinish)
@@ -625,18 +681,20 @@ public class AnimationManager : Singleton<AnimationManager>
         float startTime = Time.time;
         float t;
         bool endLoop = false;
-        float speed = 1.5f;
+        float speed = 1f;
         while (selector.position != targetPosition || selector.localScale != targetScale)
         {
             t = (Time.time - startTime) / movementDuration;
-            selector.position = new Vector3(Mathf.SmoothStep(selector.position.x, targetPosition.x, t * speed), Mathf.SmoothStep(selector.position.y, targetPosition.y, t * speed), targetPosition.z);
+            selector.position = new Vector3(Mathf.Lerp(selector.position.x, targetPosition.x, t * speed), Mathf.Lerp(selector.position.y, targetPosition.y, t * speed), targetPosition.z);
             if (selector.localScale.x != targetScale.x)
             {
-                selector.localScale = new Vector3(Mathf.SmoothStep(selector.localScale.x, targetScale.x, t * speed), Mathf.SmoothStep(selector.localScale.y, targetScale.y, t * speed), 1f);
+                selector.localScale = new Vector3(Mathf.Lerp(selector.localScale.x, targetScale.x, t * speed), Mathf.Lerp(selector.localScale.y, targetScale.y, t * speed), 1f);
             }
-            yield return new WaitForEndOfFrame();
+            yield return null;
             if (!endLoop && selector.position == targetPosition /*&&selector.localScale == targetScale*/)
             {
+                /*selector.position = targetPosition;
+                selector.localScale = targetScale;*/
                 endLoop = true;
                 endAction?.Invoke();
                 Reset?.Invoke();
@@ -665,12 +723,33 @@ public class AnimationManager : Singleton<AnimationManager>
         while (selector.position != targetPosition)
         {
             t = (Time.time - startTime) / movementDuration;
-            selector.localPosition = new Vector3(0, Mathf.SmoothStep(selector.localPosition.y, targetPosition.y, t), selector.localPosition.z);
-            selector.localScale = new Vector3(1, Mathf.SmoothStep(selector.localScale.y, targetScale.y, t), 1f);
+            selector.localPosition = new Vector3(0, Mathf.Lerp(selector.localPosition.y, targetPosition.y, t), selector.localPosition.z);
+            selector.localScale = new Vector3(1, Mathf.Lerp(selector.localScale.y, targetScale.y, t), 1f);
             yield return null;
             if (selector.localPosition == targetPosition)
             {
-              //  endAction?.Invoke();
+                //  endAction?.Invoke();
+                break;
+            }
+        }
+        yield break;
+    }
+    public IEnumerator FillHp(Transform selector)
+    {
+        float movementDuration = 20f;
+        float startTime = Time.time;
+        float t =0;
+      
+        while (selector.localScale.y != 1f)
+        {
+
+            t += (Time.time - startTime) / movementDuration;
+            selector.localPosition = new Vector3(0, Mathf.SmoothStep(-1f,0, t), selector.localPosition.z);
+            selector.localScale = new Vector3(1, Mathf.SmoothStep(0, 1f, t), 1f);
+            yield return null;
+            if (selector.localScale.y == 1f)
+            {
+                //  endAction?.Invoke();
                 break;
             }
         }
@@ -1143,7 +1222,7 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
-    public IEnumerator AnimateWind(string puName, bool isPlayerActivate, bool extraWind, GameObject wind, Action PuIgnite)
+    public IEnumerator AnimateWind(string puName, bool isPlayerActivate, bool extraWind, GameObject wind, Action ShakeCamera, Action PuIgnite)
     {
         float newScale = 1f;
         float newYcenter = 0;
@@ -1169,6 +1248,7 @@ public class AnimationManager : Singleton<AnimationManager>
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Tornado, true);
             yield return new WaitForSeconds(0.3f);
+            ShakeCamera?.Invoke();
         }
         wind.SetActive(true);
         wind.transform.parent.transform.position = new Vector3(0, newYcenter, 6);
@@ -1644,10 +1724,10 @@ public class AnimationManager : Singleton<AnimationManager>
         AlphaFade(true, spriteTarget, 0.5f, null);
         float startTime = Time.time;
         float t = 0;
-        while (spriteTarget.gameObject.transform.position != positionTarget )
+        while (spriteTarget.gameObject.transform.position != positionTarget)
         {
             t += Time.deltaTime / duration;
-            spriteTarget.gameObject.transform.position = new Vector3(Mathf.SmoothStep(spriteTarget.gameObject.transform.position.x, positionTarget.x, t ), Mathf.SmoothStep(spriteTarget.gameObject.transform.position.y, positionTarget.y, t ), positionTarget.z);
+            spriteTarget.gameObject.transform.position = new Vector3(Mathf.SmoothStep(spriteTarget.gameObject.transform.position.x, positionTarget.x, t), Mathf.SmoothStep(spriteTarget.gameObject.transform.position.y, positionTarget.y, t), positionTarget.z);
             yield return null;
             if (spriteTarget.transform.position == positionTarget /*&&selector.localScale == targetScale*/)
             {

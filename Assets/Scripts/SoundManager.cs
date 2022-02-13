@@ -65,6 +65,7 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip btnClick;
     public AudioClip damageSound1;
     public AudioClip damageSound2;
+    public AudioClip coinFlipTurn;
 
 
 
@@ -582,6 +583,11 @@ public class SoundManager : Singleton<SoundManager>
                     soundToPlay = damageSound2;
                     break;
                 }
+            case SoundName.CoinFlipTurn:
+                {
+                    soundToPlay = coinFlipTurn;
+                    break;
+                }
         }
 
         await PlayAsync(soundToPlay, normalPitch);
@@ -638,5 +644,6 @@ public class SoundManager : Singleton<SoundManager>
         BtnClick,
         DamageSound1,
         DamageSound2,
+        CoinFlipTurn,
     }
 }

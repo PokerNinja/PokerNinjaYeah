@@ -1,7 +1,4 @@
-using Sirenix.OdinInspector;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -78,7 +75,7 @@ public class ClickHandlerDraw : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             if (BattleSystem.Instance.infoShow)
             {
-                BattleSystem.Instance.HideDialog();
+                BattleSystem.Instance.HideDialog(false);
             }
             BattleSystem.Instance.EnableReplaceDialog(false, false);
         }
@@ -102,7 +99,7 @@ public class ClickHandlerDraw : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
         else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.HideDialog();
+            BattleSystem.Instance.HideDialog(false);
         }
         else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
         {
@@ -137,7 +134,7 @@ public class ClickHandlerDraw : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, false, "replace", Constants.ReplacePuInfo);
+            BattleSystem.Instance.ShowPuInfo(transform.position, false, false, "replace", Constants.ReplacePuInfo);
         }
         else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
         {

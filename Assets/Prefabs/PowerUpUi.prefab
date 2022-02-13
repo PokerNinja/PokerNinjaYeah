@@ -116,6 +116,7 @@ MonoBehaviour:
   freeze: 0
   isClickable: 0
   replaceMode: 0
+  outStand: 0
   energyCost: 0
   spriteRenderer: {fileID: 1403474650399774638}
   holdTime: 0.3
@@ -187,7 +188,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee158225ee1e59f4791627785501d950, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shaderTypes: 2
+  shaderTypes: 0
   normalStrenght: 5
   normalSmoothing: 1
   computingNormal: 0

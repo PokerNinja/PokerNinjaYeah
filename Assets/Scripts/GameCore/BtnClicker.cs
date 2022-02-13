@@ -36,7 +36,7 @@ public class BtnClicker : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         else
         {
-            BattleSystem.Instance.HideDialog();
+            BattleSystem.Instance.HideDialog(false);
         }
         held = false;
     }
@@ -45,7 +45,7 @@ public class BtnClicker : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         Debug.LogError("OND;");
 
-        BattleSystem.Instance.ShowPuInfo(transform.position, false, btnName, Constants.ReplacePuInfo);
+        BattleSystem.Instance.ShowPuInfo(transform.position, false, false, btnName, Constants.ReplacePuInfo);
     }
 
 

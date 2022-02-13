@@ -86,15 +86,18 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     public void ResetPuUI(PowerUpUi puToReset, Action OnEnd)
     {
+        Debug.LogWarning("RESET NC: " + puToReset.puName);
         puToReset.Activate(false);
         puToReset.spriteRenderer.material.SetFloat("_ShineLocation", 0f);
         puToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0f);
         puToReset.spriteRenderer.material.SetFloat("_WaveSpeed", 0f);
+        puToReset.spriteRenderer.material.SetFloat("_DistortAmount", 0f);
+        puToReset.spriteRenderer.color = new Color(1, 1, 1);
         puToReset.name = "ReadyToUsePU";
         puToReset.puName = "X";
         puToReset.puDisplayName = "NN";
         puToReset.puIndex = -10;
-        puToReset.freeze = false;
+       // puToReset.freeze = false;
         puToReset.tag = "PowerUp";
         puToReset.transform.position = puTransform.position;
         puToReset.transform.localScale = puTransform.localScale;
