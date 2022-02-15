@@ -88,6 +88,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     {
         Debug.LogWarning("RESET NC: " + puToReset.puName);
         puToReset.Activate(false);
+        puToReset.EnableSelecetPositionZ(false);
         puToReset.spriteRenderer.material.SetFloat("_ShineLocation", 0f);
         puToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0f);
         puToReset.spriteRenderer.material.SetFloat("_WaveSpeed", 0f);
@@ -97,6 +98,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         puToReset.puName = "X";
         puToReset.puDisplayName = "NN";
         puToReset.puIndex = -10;
+        puToReset.outStand = false;
        // puToReset.freeze = false;
         puToReset.tag = "PowerUp";
         puToReset.transform.position = puTransform.position;

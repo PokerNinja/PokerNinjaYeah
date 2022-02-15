@@ -33,8 +33,6 @@ public class ButtonLongPress : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Debug.LogError("E");
-
         CancelInvoke("OnLongPress");
     }
 

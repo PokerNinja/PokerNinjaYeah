@@ -26,6 +26,7 @@ public class GameOver : State
         //battleSystem.disab
         SoundManager.Instance.StopMusic();
         battleSystem.Interface.EnableVisionClick(false);
+        battleSystem.Interface.betBtn.ResetBtn();
         yield return new WaitForSeconds(4f);
         battleSystem.Interface.ShowGameOverPanel(isPlayerWin);
         if (isPlayerWin)

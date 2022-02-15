@@ -9,28 +9,28 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
 
     /*0*/
         public PuStructInfo draw_player = new PuStructInfo
-        (PowerUpNamesEnum.f1.ToString(), "DRAW PLAYER", "Burn one of your cards and replace with a new one.", "Choose one card to redraw", 1,Constants.PlayerCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.f1.ToString(), "DRAW PLAYER", "<b><color=#F03B37>Burn</color></b> one of your cards and replace with a new one.", "Choose one card to redraw", 1,Constants.PlayerCardsTag, Constants.PoolCardTag);
     /*1*/
     public PuStructInfo draw_enemy = new PuStructInfo
-        (PowerUpNamesEnum.f3.ToString(), "DRAW ENEMY", "Burn one of the opponent's cards and replace with a new one.", "Choose one card to redraw", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.f3.ToString(), "DRAW ENEMY", "<b><color=#F03B37>Burn</color></b> one of the opponent's cards and replace with a new one.", "Choose one card to redraw", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
     /*2*/
     public PuStructInfo draw_board = new PuStructInfo
-        (PowerUpNamesEnum.f2.ToString(), "DRAW 2 BOARD", "Burn two cards on the field and replace with a new ones.", "Choose two cards to redraw", 2, Constants.BoardCardsTag, Constants.BoardCardsTag);
+        (PowerUpNamesEnum.f2.ToString(), "DRAW 2 BOARD", "<b><color=#F03B37>Burn</color></b> two cards on the field and replace with a new ones.", "Choose two cards to redraw", 2, Constants.BoardCardsTag, Constants.BoardCardsTag);
     /*3*/
     public PuStructInfo draw_all = new PuStructInfo
         (PowerUpNamesEnum.draw_all.ToString(), "DRAW ALL", "Draw 1 card & replace it with 1 card from your hand / enemy hand / board", "Choose one card to redraw", 1, Constants.AllCardsTag, Constants.PoolCardTag);
     /*4*/
     public PuStructInfo swap_player_board = new PuStructInfo
-        (PowerUpNamesEnum.w2.ToString(), "STEAL PLAYER BOARD", "Swap one card from your hand with one card from the field.", "Choose two cards to swap between them", 2, Constants.PlayerCardsTag, Constants.BoardCardsTag);
+        (PowerUpNamesEnum.w2.ToString(), "STEAL PLAYER BOARD", "<b><color=#FEC45F>Swap</color></b> one card from your hand with one card from the field.", "Choose two cards to swap between them", 2, Constants.PlayerCardsTag, Constants.BoardCardsTag);
     /*5*/
     public PuStructInfo swap_enemy_board = new PuStructInfo
-        (PowerUpNamesEnum.w3.ToString(), "STEAL ENEMY BOARD", "Swap one card from the field with one card from the opponent's hand.", "Choose two cards to swap between them", 2, Constants.EnemyCardsTag, Constants.BoardCardsTag);
+        (PowerUpNamesEnum.w3.ToString(), "STEAL ENEMY BOARD", "<b><color=#FEC45F>Swap</color></b> one card from the field with one card from the opponent's hand.", "Choose two cards to swap between them", 2, Constants.EnemyCardsTag, Constants.BoardCardsTag);
     /*6*/
     public PuStructInfo swap_player_enemy = new PuStructInfo
-        (PowerUpNamesEnum.w1.ToString(), "STEAL ENEMY PLAYER", "Swap one card from your hand with one card from the opponent's hand.", "Choose two cards to swap between them", 2, Constants.PlayerCardsTag, Constants.EnemyCardsTag);
+        (PowerUpNamesEnum.w1.ToString(), "STEAL ENEMY PLAYER", "<b><color=#FEC45F>Swap</color></b> one card from your hand with one card from the opponent's hand.", "Choose two cards to swap between them", 2, Constants.PlayerCardsTag, Constants.EnemyCardsTag);
     /*7*/
     public PuStructInfo swap_hands = new PuStructInfo
-        (PowerUpNamesEnum.wm1.ToString(), "SWAP HANDS", "Swap your hand with the opponent's hand.", "", 0, Constants.PlayerCardsTag, Constants.EnemyCardsTag);
+        (PowerUpNamesEnum.wm1.ToString(), "SWAP HANDS", "<b><color=#FEC45F>Swapper\nSwap</color></b> your hand with the opponent's hand.", "", 0, Constants.PlayerCardsTag, Constants.EnemyCardsTag);
     /*8*/
     public PuStructInfo draw_two_player = new PuStructInfo
         (PowerUpNamesEnum.fm1.ToString(), "DRAW 2 CARDS", "Draw two cards from the deck, Burn and replace one with one of yours.", "Choose one card and replace with one of yours", 2, Constants.PlayerCardsTag, Constants.DeckCardsTag);
@@ -39,19 +39,19 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         (PowerUpNamesEnum.sflip.ToString(), "FLIP", "Flip 1 card", "Choose one card to flip", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
     /*17*/
     public PuStructInfo armagedon = new PuStructInfo
-        (PowerUpNamesEnum.fm2.ToString(), "ARMAGEDON", "Burn all the cards in play and replace them with new ones.", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.fm2.ToString(), "ARMAGEDDON", "<b><color=#F03B37>ARMAGEDDON\nBurn</color></b> all the cards in play and replace them with new ones.", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
     /*18*/
     public PuStructInfo block_enemy_card = new PuStructInfo
-        (PowerUpNamesEnum.i1.ToString(), "FREEZE ENEMY CARD", "Freeze one of the opponent's cards, making it un-targetable.", "Choose one card to block", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.i1.ToString(), "FREEZE ENEMY CARD", "<b><color=#0489B0>Freeze</color></b> one of the opponent's cards, making it un-targetable.", "Choose one card to block", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
     /*19*/
     public PuStructInfo block_board = new PuStructInfo
-        (PowerUpNamesEnum.i2.ToString(), "FREEZE 2 BOARD", "Freeze two of cards from the field, making them un-targetable.", "Choose one card to block", 2, Constants.BoardCardsTag, Constants.BoardCardsTag);
+        (PowerUpNamesEnum.i2.ToString(), "FREEZE 2 BOARD", "<b><color=#0489B0>Freeze</color></b> two of cards from the field, making them un-targetable.", "Choose one card to block", 2, Constants.BoardCardsTag, Constants.BoardCardsTag);
     /*20*/
     public PuStructInfo block_player_card = new PuStructInfo
-        (PowerUpNamesEnum.i3.ToString(), "FREEZE PLAYER CARD", "Freeze one of your cards, making it un-targetable.", "Choose one card to block", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.i3.ToString(), "FREEZE PLAYER CARD", "<b><color=#0489B0>Freeze</color></b> one of your cards, making it un-targetable.", "Choose one card to block", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
     /*21*/
     public PuStructInfo block_player_hand = new PuStructInfo
-        (PowerUpNamesEnum.im1.ToString(), "FREEZE PLAYER HAND", "Freeze your hand, making it un-targetable.", "", 0, Constants.PlayerCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.im1.ToString(), "FREEZE PLAYER HAND", "<b><color=#0489B0>Igloo\nFreeze</color></b> your hand, making it un-targetable.", "", 0, Constants.PlayerCardsTag, Constants.PoolCardTag);
 
      /*22*/
     public PuStructInfo strighter = new PuStructInfo
@@ -93,10 +93,10 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         (PowerUpNamesEnum.sm4.ToString(), "Smoke", "Smoke the turn and the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them","", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
      /*33*/
     public PuStructInfo iceagedon = new PuStructInfo
-        (PowerUpNamesEnum.im2.ToString(), "Iceagedon", "Freeze random cards","", 0, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.im2.ToString(), "Iceagedon", "<b><color=#0489B0>Iceagedon\nFreeze</color></b> random cards", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
      /*34*/
     public PuStructInfo tornado = new PuStructInfo
-        (PowerUpNamesEnum.wm2.ToString(), "Tornado", "Swap random cards","", 0, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.wm2.ToString(), "Tornado", "<b><color=#FEC45F>Tornado\nSwap</color></b> random cards", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
 
     /*9*/
     public PuStructInfo shuffle_board = new PuStructInfo
@@ -210,6 +210,10 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
     public string GetPuInfoByName(string powerUpName)
     {
         return GetPowerUpStruct(powerUpName).info;
+    }
+    public string GetPuInstructionsByName(string powerUpName)
+    {
+        return GetPowerUpStruct(powerUpName).instructions;
     }
 
     public enum PowerUpNamesEnum

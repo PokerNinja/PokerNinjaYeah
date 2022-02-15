@@ -6,6 +6,7 @@ using UnityEngine;
 public class BeginRound : State
 {
     private bool isPlayerTurn;
+    private bool isFirstRound;
     private float delayForStart;
     private int startingTurnCounter = 6;
     public BeginRound(BattleSystem battleSystem, bool isPlayerTurn, bool isFirstRound) : base(battleSystem)
@@ -16,6 +17,7 @@ public class BeginRound : State
         {
             delayForStart = Values.Instance.delayBeforeStartFirstRound;
         }
+        this.isFirstRound = isFirstRound;
     }
 
     public override IEnumerator Start()
@@ -33,6 +35,10 @@ public class BeginRound : State
         //battleSystem.Interface.EnableBgColor(false);
         battleSystem.isPlayerActivatePu = false;
         battleSystem.readyToPlay = true;
+        if (!isFirstRound)
+        {
+            battleSystem.Interface.MoveDealerBtn(false, !isPlayerTurn);
+        }
         battleSystem.Interface.EnableVisionClick(true);
         /*  if (Values.Instance.resetReplaceEvery == Values.GamePhase.Round)
           {

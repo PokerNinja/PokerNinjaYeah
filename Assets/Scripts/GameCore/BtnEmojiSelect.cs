@@ -120,7 +120,8 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
             case "Eangry":
             case "Esmug":
             case "Esurprised":
-            case "EthumbUp":
+            case "Esmile":
+            case "Ecry":
                 return true;
         }
         return false;
@@ -136,8 +137,10 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
                 return 1;
             case "Esurprised":
                 return 2;
-            case "EthumbUp":
+            case "Esmile":
                 return 3;
+            case "Ecry":
+                return 4;
             default:
                 break;
         }

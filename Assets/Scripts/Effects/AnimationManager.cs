@@ -37,13 +37,13 @@ public class AnimationManager : Singleton<AnimationManager>
             }
         }
     }
-    public IEnumerator ShineCard(Material material, Action OnFinnish)
+    public IEnumerator ShineCard(Material material, float shineGlow, Color shineColor, Action OnFinnish)
     {
-        float shineDuration = Values.Instance.shineDuration;
+        float shineDuration = Values.Instance.shineDuration * 1.5f;
         float shineLocation = 0f;
 
-        material.SetColor("_ShineColor", Values.Instance.currentVisionColor);
-        material.SetFloat("_ShineGlow", 1.5f);
+        material.SetColor("_ShineColor", shineColor);
+        material.SetFloat("_ShineGlow", shineGlow);
 
         while (shineLocation < 1)
         {
@@ -695,12 +695,33 @@ public class AnimationManager : Singleton<AnimationManager>
             {
                 /*selector.position = targetPosition;
                 selector.localScale = targetScale;*/
+
                 endLoop = true;
                 endAction?.Invoke();
                 Reset?.Invoke();
                 CloseDrawer?.Invoke();
                 break;
             }
+        }
+        yield break;
+    }
+    public IEnumerator SimpleSmoothMove(Transform selector, float delay, Vector3 targetPosition, float movementDuration, Action beginAction, Action endAction)
+    {
+        yield return new WaitForSeconds(delay);
+        beginAction?.Invoke();
+        float startTime = Time.time;
+        float t;
+        float speed = 1f;
+        while (selector.position != targetPosition)
+        {
+            t = (Time.time - startTime) / movementDuration;
+            selector.position = new Vector3(Mathf.Lerp(selector.position.x, targetPosition.x, t * speed), Mathf.Lerp(selector.position.y, targetPosition.y, t * speed), targetPosition.z);
+            if (selector.position == targetPosition)
+            {
+                endAction?.Invoke();
+                break;
+            }
+            yield return null;
         }
         yield break;
     }
@@ -738,13 +759,13 @@ public class AnimationManager : Singleton<AnimationManager>
     {
         float movementDuration = 20f;
         float startTime = Time.time;
-        float t =0;
-      
+        float t = 0;
+
         while (selector.localScale.y != 1f)
         {
 
             t += (Time.time - startTime) / movementDuration;
-            selector.localPosition = new Vector3(0, Mathf.SmoothStep(-1f,0, t), selector.localPosition.z);
+            selector.localPosition = new Vector3(0, Mathf.SmoothStep(-1f, 0, t), selector.localPosition.z);
             selector.localScale = new Vector3(1, Mathf.SmoothStep(0, 1f, t), 1f);
             yield return null;
             if (selector.localScale.y == 1f)
@@ -1466,7 +1487,7 @@ public class AnimationManager : Singleton<AnimationManager>
     {
         for (int i = 0; i < cardsToGlow; i++)
         {
-            StartCoroutine(ShineCard(winningPlayerCards[i].spriteRenderer.material, null));
+            StartCoroutine(ShineCard(winningPlayerCards[i].spriteRenderer.material, 1.5f, Values.Instance.currentVisionColor, null));
         }
     }
 

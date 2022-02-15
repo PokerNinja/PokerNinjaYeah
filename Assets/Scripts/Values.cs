@@ -62,6 +62,7 @@ public class Values : Singleton<Values>
     public float defaultFadeD = 1f;
     public float inAndOutAnimation = 2f;
     public Color brightRed ;
+    public Color darkRed ;
     public Color yellow;
 
 

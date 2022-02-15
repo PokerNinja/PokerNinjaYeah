@@ -399,12 +399,37 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         yield break;
     }
-    public CardUi GetCardUiByName(string cardTarget2)
+    public CardUi GetCardUiByName(string cardTarget)
     {
+                Debug.Log("FoundTB " + cardTarget);
+      /*  List<CardUi> listTarget;
+        switch (cardTarget[0])
+        {
+            case 'P':
+                listTarget = playerCardsUi;
+                break;
+            case 'E':
+                listTarget = enemyCardsUi;
+                break;
+            case 'D':
+                listTarget = extraDeckCardsUi;
+                break;
+            default:
+                listTarget = boardCardsUi;
+                break;
+        }
+        for (int i = 0; i < listTarget.Count; i++)
+        {
+            if (listTarget[i].cardPlace.Equals(cardTarget))
+            {
+                Debug.Log("Found");
+                return listTarget[i];
+            }
+        }*/
         List<CardUi> allCardsUi = playerCardsUi.Concat(enemyCardsUi).Concat(boardCardsUi).Concat(extraDeckCardsUi).ToList();
         for (int i = 0; i < allCardsUi.Count; i++)
         {
-            if (allCardsUi[i].cardPlace.Equals(cardTarget2))
+            if (allCardsUi[i].cardPlace.Equals(cardTarget))
             {
                 return allCardsUi[i];
             }
@@ -1807,8 +1832,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Transform tempTransform1 = cardFromDeckUI.transform;
         Transform tempTransform2 = playerCardUI.transform;
         SwapCardUiList(cardFromDeckUI, playerCardUI);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(cardFromDeckUI.transform, tempTransform2.position, tempTransform2.localScale, Values.Instance.cardSwapMoveDuration,
-            () => ResetExtraDeckCards(), null, DisableDarkScreen, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(cardFromDeckUI.transform, tempTransform2.position, tempTransform2.localScale, Values.Instance.cardSwapMoveDuration
+            , null, () => ResetExtraDeckCards(), DisableDarkScreen, null));
         Card tempCard1 = Card.StringToCard(cardFromDeckUI.cardDescription);
         Card tempCard2 = Card.StringToCard(playerCardUI.cardDescription);
         UpdateCardsList(playerCard, tempCard1, true);

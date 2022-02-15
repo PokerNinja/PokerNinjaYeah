@@ -143,7 +143,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
             else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
             {
-                BattleSystem.Instance.HideDialog(true);
+                BattleSystem.Instance.HideDialog(puIndex != -1);
             }
         }
         PressSprite(false);
@@ -176,7 +176,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position,true, puIndex == 1, puName, puDisplayName);
+            BattleSystem.Instance.ShowPuInfo(transform.position, puIndex != -1, puIndex == 1, puName, puDisplayName);
         }
         else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
         {
@@ -370,6 +370,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, spriteRenderer.material, 0f, null));
         }
     }
+
 
     public void EnableSelecetPositionZ(bool aboveDarkScreen)
     {

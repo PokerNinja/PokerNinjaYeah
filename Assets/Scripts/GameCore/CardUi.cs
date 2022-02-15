@@ -129,7 +129,10 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
             }));
         }
-
+        else if(Constants.cardsToSelectCounter > 0 && freeze)
+        {
+            BattleSystem.Instance.Interface.FreezeSign(transform.position);
+        }
         else
         {
             StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material, Values.Instance.disableClickShakeDuration));

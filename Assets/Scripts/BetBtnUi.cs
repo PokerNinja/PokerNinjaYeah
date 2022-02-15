@@ -73,11 +73,11 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
 
-    public void DisplayDoubleDamage(float damageMultiplayer)
+    public void DisplayDoubleDamage(string currentDmg)
     {
         spriteRenderer.sprite = Resources.Load("Sprites/GameScene/bet_empty", typeof(Sprite)) as Sprite;
         txtMultiplayer.gameObject.SetActive(true);
-        txtMultiplayer.text = "x" + damageMultiplayer;
+        txtMultiplayer.text =  currentDmg;
         anim.Play();
     }
 
@@ -110,8 +110,8 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         float currentDmg = BattleSystem.Instance.currentDamageThisRound; // Store it differently
         raiseInfoDialog.gameObject.SetActive(true);
         StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(raiseInfoDialog, true, Values.Instance.infoDialogFadeOutDuration, null));
-        currentDmgText.text = currentDmg + " to " + (currentDmg * 1.5);
-        dmgPenelty.text = "-"+ (currentDmg/2) + " HP ";
+        currentDmgText.text = currentDmg + " to " + (currentDmg +250);
+        dmgPenelty.text = "-"+ (currentDmg-BattleSystem.Instance.GetDmgPenelty()) + " HP ";
     }
     private void HideRaiseInfo()
     {

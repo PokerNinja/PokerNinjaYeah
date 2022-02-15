@@ -26,13 +26,13 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private float holdTime = 0.3f;
     private bool held = false;
-
+    private bool isLastSeconds;
     // public ITimeOut iTimeOut { get; set; }
 
 
     private void Start()
     {
-        
+
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -62,8 +62,8 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         Invoke("OnLongPress", holdTime);
     }
 
-    
-  
+
+
 
     public void OND()
     {
@@ -90,6 +90,11 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         thereCanBeOnlyOne = null;
         turnArrowUi.ApplyIndicatorArrow(false);
 
+        if (isLastSeconds)
+        {
+            Debug.LogError("coubter" + countTimer);
+            SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
+        }
     }
 
     /*    private void ApplyIndicatorArrow(bool enable, bool isPlayerTurn)
@@ -147,7 +152,7 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             t = (Time.time - startTime) / movementDuration;
             countdownCircleTimer.fillAmount = Mathf.Lerp(0, 1, t);
             yield return null;
-            if(countdownCircleTimer.fillAmount >= 1f)
+            if (countdownCircleTimer.fillAmount >= 1f)
             {
                 break;
             }
@@ -199,13 +204,13 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                    }
                }*/
 
- 
+
     private IEnumerator CountDown()
     {
         bool isPlayerTurn = BattleSystem.Instance.IsPlayerTurn();
         turnArrowUi.ApplyIndicatorArrow(true);
-        bool isLastSeconds = false;
-        while (countTimer > 0 && updateTime)
+         isLastSeconds = false;
+        while ( updateTime)
         {
 
             if (isPlayerTurn && !isLastSeconds && countTimer < 10)
@@ -234,22 +239,27 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 }
                 break;
             }*/
+            if (countTimer < 0)
+            {
+                updateTime = false;
+            }
+            
             yield return null; //Don't freeze Unity
         }
-        if (countTimer <= 0 || !updateTime)
+        if (countTimer <= 0)
         {
-            if (isLastSeconds)
-            {
-                SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
-            }
             if (!endTurnByPlayer)
             {
                 StartCoroutine(BattleSystem.Instance.OnTimeOut());
             }
         }
-        yield break;
     }
+    [Button]
+public void chushiliema()
+    {
+        SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
 
+    }
     /* private void SetArrowColor(bool toRed)
      {
          Color color = new Color(1f, 1f, 1f);

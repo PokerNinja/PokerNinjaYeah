@@ -121,6 +121,17 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
             }
         }
     }
+    public bool ShouldFlipArrowAfterRaiseDeclined()
+    {
+        Debug.LogError("PlayerStart: " + IsPlayerStartRound());
+        Debug.LogError("IsPlayerTurn: " + IsPlayerTurn());
+
+        if ((IsPlayerStartRound() && IsPlayerTurn()) || (!IsPlayerStartRound() && !IsPlayerTurn()) )
+        {
+            return false;
+        }
+        return true;
+    }
 
     public bool IsPlayerStartRound()
     {
@@ -194,7 +205,7 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
                 startRound.Invoke();
             }
         }
-       
+
         // SceneManager.LoadScene("GameScene2");
 
         /* TurnCounter.onValueChanged += x =>
@@ -259,5 +270,5 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
     {
         CurrentPlayerID.Value = PlayerID.Value.ToString() + "(#Exit#)";
     }
- 
+
 }

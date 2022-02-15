@@ -34,13 +34,14 @@ public class EndRound : State
 
         string winningText = "ERROR";
         //  yield return new WaitForSeconds(1f);
-        battleSystem.RevealEnemyCards();
-        //  yield return new WaitForSeconds(0.7f);
-        battleSystem.RevealBoardCards();
-        yield return new WaitForSeconds(1.5f);
+        
 
         if (endByCards)
         {
+            battleSystem.RevealEnemyCards();
+            //  yield return new WaitForSeconds(0.7f);
+            battleSystem.RevealBoardCards();
+            yield return new WaitForSeconds(1.5f);
             winningText = WinnerCalculator();
         }
         else
@@ -68,7 +69,9 @@ public class EndRound : State
         if (LocalTurnSystem.Instance.IsPlayerTurn())
         {
             LocalTurnSystem.Instance.SyncStarterAfterEnd();
+           
         }
+       
         StartNewRoundAction(true);
         return text;
     }
