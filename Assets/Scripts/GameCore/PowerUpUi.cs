@@ -223,7 +223,12 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             sprite = "pu_back";
         }
+        else
+        {
+            spriteRenderer.color = new Color(0.66f, 0.66f, 0.66f, 1f);
+        }
         spriteRenderer.sprite = Resources.Load("Sprites/PU/" + sprite, typeof(Sprite)) as Sprite;
+
     }
 
     public void OnObjectSpawn()
@@ -288,11 +293,11 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             /*StartCoroutine(AnimationManager.Instance.PulseSize(true, transform, 1.15f, 0.4f, true,
             () => StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3))));*/
             StartCoroutine(AnimationManager.Instance.SmoothMove(transform, new Vector3(transform.parent.position.x, transform.parent.position.y + 0.2f, transform.position.z),
-                new Vector3(transform.localScale.x * 1.05f, transform.localScale.y * 1.05f,1f), 0.5f, null, () => EnableValuesForSelect(true), null, null));
+                new Vector3(transform.localScale.x * 1.05f, transform.localScale.y * 1.05f, 1f), 0.5f, null, () => EnableValuesForSelect(true), null, null));
 
             /*StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(transform.localScale.x * 1.1f, transform.localScale.y * 1.1f), 0.5f,
                 () => EnableValuesForSelect(true)));*/
-             StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3)) ;
+            StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3));
         }
         else
         {
@@ -316,9 +321,9 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         else
         {
-           // StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(1f, 1f), 0.5f, null));
+            // StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(1f, 1f), 0.5f, null));
             StartCoroutine(AnimationManager.Instance.SmoothMove(transform, new Vector3(transform.parent.position.x, transform.parent.position.y, transform.position.z)
-                ,new Vector3(1f, 1f,1f), 0.5f, null, null, null, null));
+                , new Vector3(1f, 1f, 1f), 0.5f, null, null, null, null));
         }
         spriteRenderer.material.SetFloat("_OutlineAlpha", outlineAlpha);
         spriteRenderer.material.SetFloat("_DistortAmount", distortAmount);

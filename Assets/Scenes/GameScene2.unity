@@ -4977,7 +4977,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 0
   m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!224 &409904050
 RectTransform:
@@ -4998,7 +4998,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3.88, y: -2.6}
+  m_AnchoredPosition: {x: 3.88, y: -3.09}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &421855731
@@ -7755,7 +7755,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 0
   m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &617833653
 GameObject:
@@ -8309,7 +8309,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 0
   m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!224 &648552188
 RectTransform:
@@ -8330,7 +8330,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 3.88, y: 3.06}
+  m_AnchoredPosition: {x: 3.88, y: 3.23}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &652979256
@@ -9433,8 +9433,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <b><color=#F03B37>Burn</color></b> one of your cards and replace with a
-    new one."
+  m_text: <b><color=#FFC35E>Freeze</color></b> one of your cards and replace with
+    a new one."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 4dd0c804e3241424d9bf10abb96cd2be, type: 2}
   m_sharedMaterial: {fileID: -8890212676135332449, guid: 4dd0c804e3241424d9bf10abb96cd2be, type: 2}
@@ -15872,7 +15872,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a934bbb3dfa0ea2459bbd8b63db5499d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dc18c86e49f35f046b4b98d6bea2ae3c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -19172,7 +19172,6 @@ MonoBehaviour:
   icenadoPS: {fileID: 1802644043305413069, guid: a365c67b00a0d56448ec49cb8e2b0143, type: 3}
   armageddonPS: {fileID: 5987234027720867167, guid: 6bc79ccf37095674e8b988a8407b43f1, type: 3}
   shutterIce: {fileID: 3627225460389826505, guid: c773da1f89c789545b78af7fc5d9503d, type: 3}
-  turnBtn: {fileID: 333540117}
   turnArrowSprite: {fileID: 1880726429}
   betBtn: {fileID: 1115513447}
   currentRankText: {fileID: 172212462}
@@ -22785,7 +22784,7 @@ CanvasGroup:
   m_Enabled: 1
   m_Alpha: 0
   m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!1 &1761893530
 GameObject:
@@ -24346,6 +24345,7 @@ Animation:
   m_Animation: {fileID: 7400000, guid: 83313e4b83843894ebba5d6e5325b5b0, type: 2}
   m_Animations:
   - {fileID: 7400000, guid: 83313e4b83843894ebba5d6e5325b5b0, type: 2}
+  - {fileID: 7400000, guid: 8510271bf3437124d8ffd69ffe950b23, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 0
   m_AnimatePhysics: 0

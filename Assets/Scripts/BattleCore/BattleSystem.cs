@@ -164,6 +164,8 @@ public class BattleSystem : StateMachine
     public bool finishPuDissolve;
     public bool isPlayerBotModeTurn;
 
+    public bool FlipTurnAfterDecline;
+
     public event Action onGameStarted;
 
 
@@ -194,7 +196,7 @@ public class BattleSystem : StateMachine
         TEST_MODE = Values.Instance.TEST_MODE;
         Constants.HP_GAME = true;
         HP_GAME = Constants.HP_GAME;
-        Constants.BOT_MODE = true;
+        //  Constants.BOT_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
@@ -423,7 +425,7 @@ public class BattleSystem : StateMachine
                  ActivatePlayerButtons(!endTurn, false);
              });
         }
-        if (!ReplaceInProgress &&  replaceMode && !Constants.TemproryUnclickable)
+        if (!ReplaceInProgress && replaceMode && !Constants.TemproryUnclickable)
         {
             Debug.LogError("Disabling");
             EnableReplaceDialog(true, endTurn);
@@ -533,11 +535,12 @@ public class BattleSystem : StateMachine
         if (isRoundReady)
         {
             ui.winLabel.SetActive(false);
-            if (!LocalTurnSystem.Instance.ShouldFlipArrowAfterRaiseDeclined())
+            if (FlipTurnAfterDecline)
             {
-                Debug.LogError("ShouldFlipArrpw");
-                ui.ApplyTurnVisual(LocalTurnSystem.Instance.IsPlayerTurn());
-                ui.MoveDealerBtn(false, !LocalTurnSystem.Instance.IsPlayerTurn());
+                ui.ApplyTurnVisual(LocalTurnSystem.Instance.IsPlayerStartRound());
+                FlipTurnAfterDecline = false;
+                Debug.LogError("ShouldFlipArrpw");/*
+                ui.MoveDealerBtn(false, !LocalTurnSystem.Instance.IsPlayerTurn());*/
             }
             SetState(new BeginRound(this, LocalTurnSystem.Instance.IsPlayerStartRound(), false));
         }
@@ -634,7 +637,7 @@ public class BattleSystem : StateMachine
     private IEnumerator CheckIfEnemyPuRunningAndStartPlayerTurn()
     {
         Debug.Log("et " + enemyPuIsRunning + " " + turnInitInProgress);
-        if (!enemyPuIsRunning && !turnInitInProgress)
+        if (!enemyPuIsRunning && !turnInitInProgress && !ReplaceInProgress)
         {
             Debug.Log("et ABOUT");
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndTurnGong, true);
@@ -642,12 +645,13 @@ public class BattleSystem : StateMachine
         }
         else
         {
-            while (enemyPuIsRunning || turnInitInProgress)
+            while (enemyPuIsRunning || turnInitInProgress || ReplaceInProgress)
             {
                 yield return new WaitForSeconds(0.6f);
                 Debug.Log("e " + enemyPuIsRunning);
                 Debug.Log("t " + turnInitInProgress);
-                if (!enemyPuIsRunning && !turnInitInProgress)
+                Debug.Log("r " + ReplaceInProgress);
+                if (!enemyPuIsRunning && !turnInitInProgress && !ReplaceInProgress)
                 {
                     StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
                 }
@@ -960,7 +964,7 @@ public class BattleSystem : StateMachine
     }
 
 
-    public void FakeEnemyEndTurn()
+    public async void FakeEnemyEndTurn()
     {
         Debug.LogError("CurrentT " + currentTurn);
 
@@ -974,6 +978,7 @@ public class BattleSystem : StateMachine
         }
         else if (currentTurn == 0)
         {
+            await Task.Delay(1700);  
             SetState(new EndRound(this, true, false));
         }
     }
@@ -1222,7 +1227,7 @@ public class BattleSystem : StateMachine
 
     public void DissolvePuAfterUse(bool isPlayer, int index)
     {
-        ResetPuAction = ()=>  puDeckUi.GetPu(isPlayer, index).DissolvePu(0f, Values.Instance.puDissolveDuration, null, () =>
+        ResetPuAction = () => puDeckUi.GetPu(isPlayer, index).DissolvePu(0f, Values.Instance.puDissolveDuration, null, () =>
         {
             StartCoroutine(ResetPuUi(isPlayer, index));
             ResetPuAction = null;
@@ -1235,28 +1240,55 @@ public class BattleSystem : StateMachine
         {
             if (!powerUpInfo.playerId.Equals(player.id))
             {
-                EnemyPuUse(powerUpInfo);
+                StartCoroutine(HandleEnemyPuUse(powerUpInfo));
             }
         }, powerUpInfo =>
         {
             if (!powerUpInfo.playerId.Equals(player.id))
             {
-                if (powerUpInfo.slot == -1)
-                {
-                    DealPu(false, null);
-                }
-                else
-                {
-                    ReplacePu(false, powerUpInfo.slot);
-                }
+                StartCoroutine(HandleEnemyPuDraw(powerUpInfo.slot));
+
             }
         }, Debug.Log);
     }
 
+    private IEnumerator HandleEnemyPuUse(PowerUpInfo puInfo)
+    {
+        if (ReplaceInProgress)
+        {
+            yield return new WaitForSeconds(0.6f);
+            StartCoroutine(HandleEnemyPuUse(puInfo));
+        }
+        else
+        {
+            EnemyPuUse(puInfo);
+        }
+    }
+    private IEnumerator HandleEnemyPuDraw(int slot)
+    {
+        if (enemyPuIsRunning)
+        {
+            yield return new WaitForSeconds(0.6f);
+            StartCoroutine(HandleEnemyPuDraw(slot));
+        }
+        else
+        {
+            if (slot == -1)
+            {
+                ReplaceInProgress = true;
+                DealPu(false, () => ReplaceInProgress = false);
+            }
+            else
+            {
+                ReplacePu(false, slot);
+            }
+        }
+    }
+
     private void EnemyPuUse(PowerUpInfo powerUpInfo)
     {
-        isPlayerActivatePu = false;
         enemyPuIsRunning = true;
+        isPlayerActivatePu = false;
         ui.EnableDarkScreen(false, true, () => DisableVision());
         currentGameInfo.powerup = powerUpInfo;
         if (powerUpInfo.slot != -1)
@@ -1351,6 +1383,9 @@ public class BattleSystem : StateMachine
         else
         {
             finishPuDissolve = true;
+            yield return new WaitForSeconds(1f);
+            enemyPuIsRunning = false;
+            Debug.LogError("ImresetingPU");
         }
         if (BOT_MODE)
         {
@@ -1400,10 +1435,10 @@ public class BattleSystem : StateMachine
     }
     internal void ReplacePu(bool isPlayer, int puIndex)
     {
+        ReplaceInProgress = true;
         if (isPlayer)
         {
             Constants.TemproryUnclickable = true;
-            ReplaceInProgress = true;
             DisablePlayerPus();
             ReduceEnergy(Values.Instance.energyCostForDraw);
             /* if (--replacePuLeft == 0)
@@ -1415,31 +1450,34 @@ public class BattleSystem : StateMachine
             // EnableReplaceDialog();
             //  ActivatePlayerPus();
         }
+        ui.EnableDarkScreen(false, false, null);
+        puDeckUi.EnablePusSlotZ(true, false);
+
         puDeckUi.ReplacePu(isPlayer, puIndex, () =>
-        {
-            if (isPlayer)
-            {
-                Debug.Log("doneProgress");
-                ReplaceInProgress = false;
-                EnableReplaceDialog(true, false);
-                if (energyCounter == 0)
-                {
-                    StartCoroutine(AutoEndTurn());
-                }
-                else
-                {
-                    Constants.TemproryUnclickable = false;
-                }
-            }
-            /*  if (isPlayer && energyCounter == 0)
-              {
-                  EndTurn();
-              }
-              else if (isPlayer)
-              {
-                  ActivatePlayerPus();
-              }*/
-        });
+         {
+             ReplaceInProgress = false;
+             if (isPlayer)
+             {
+                 Debug.Log("doneProgress");
+                 EnableReplaceDialog(true, false);
+                 if (energyCounter == 0)
+                 {
+                     StartCoroutine(AutoEndTurn());
+                 }
+                 else
+                 {
+                     Constants.TemproryUnclickable = false;
+                 }
+             }
+             /*  if (isPlayer && energyCounter == 0)
+               {
+                   EndTurn();
+               }
+               else if (isPlayer)
+               {
+                   ActivatePlayerPus();
+               }*/
+         });
     }
 
 
@@ -1769,8 +1807,9 @@ public class BattleSystem : StateMachine
         // yield return new WaitForFixedUpdate();
         if (!enable)
         {
-            enemyPuIsRunning = false;
+           // enemyPuIsRunning = false;
             playerPuInProcess = false;
+            Debug.LogError("Imreseting");
             foreach (CardUi card in cardsDeckUi.GetListByTag("All"))
             {
                 yield return new WaitForEndOfFrame();
@@ -1790,11 +1829,12 @@ public class BattleSystem : StateMachine
         {
             Debug.LogError("ending");
             timedOut = false;
+            ui.turnTimer.PauseTimer(true);
             yield return new WaitForSeconds(1.5f);
             if (newPowerUpName.Contains("m2") || ReplaceInProgress)
             {
                 yield return new WaitForSeconds(2.5f);
-            }
+            }//MakeItBetter
             endClickable = true;
             EndTurn();
         }
@@ -1887,6 +1927,7 @@ public class BattleSystem : StateMachine
         cardsDeckUi.FlipCardPu(cardTarget2, isPlayerActivate, () =>
         {
             EnableDarkAndSorting(false);
+            enemyPuIsRunning = false;
             if (isPlayerActivate)
             {
                 StartCoroutine(AutoEndTurn());
@@ -2015,6 +2056,7 @@ public class BattleSystem : StateMachine
         if (btnReplaceClickable && energyCounter > 0 && !disable && puDeckUi.GetPuListCount(true) < 2)
         {
             btnReplaceClickable = false;
+            ReplaceInProgress = true;
             UpdateReplacePuInDb(-1);
             ReduceEnergy(Values.Instance.energyCostForDraw);
             ui.EnablePlayerButtons(false);
@@ -2022,7 +2064,7 @@ public class BattleSystem : StateMachine
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
             DealPu(true, () =>
             {
-    
+                ReplaceInProgress = false;
                 StartCoroutine(AutoEndTurn());
             });
         }
@@ -2035,9 +2077,11 @@ public class BattleSystem : StateMachine
                 if (playerPus[0] != null || playerPus[1] != null)
                 {
                     replaceMode = !replaceMode;
+                    // MAKE IT DIFFERENT
 
                     if (replaceMode)
                     {
+                        ui.InitLargeText(true, Constants.DrawInstructions);
                         puDeckUi.EnablePusSlotZ(true, true);
                         ui.EnableDarkScreen(isPlayerActivatePu, true, () => StartCoroutine(SetClickableWithDelay(0.5f)));
                     }
@@ -2330,6 +2374,7 @@ public class BattleSystem : StateMachine
         else if (!ReplaceInProgress && powerUpUi.isPlayer && powerUpUi.replaceMode)
         {
             ReplacePu(true, powerUpUi.puIndex);
+            ui.InitLargeText(false, Constants.DrawInstructions);
         }
         else if (powerUpUi.isPlayer || !powerUpUi.isPlayer)
         {
@@ -2491,7 +2536,7 @@ public class BattleSystem : StateMachine
     public float GetDmgPenelty()
     {
         float dmg = 0;
-        if(currentTurn == 6 || currentTurn == 5)
+        if (currentTurn == 6 || currentTurn == 5)
         {
             dmg = 500;
         }

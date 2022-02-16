@@ -207,6 +207,7 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private IEnumerator CountDown()
     {
+        turnArrowUi.animation.Play("arrow_turn");
         bool isPlayerTurn = BattleSystem.Instance.IsPlayerTurn();
         turnArrowUi.ApplyIndicatorArrow(true);
          isLastSeconds = false;
@@ -218,7 +219,7 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 isLastSeconds = true;
                 SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, true);
                 SetCounterColor(true);
-
+                turnArrowUi.animation.Play("arrow_turn_fast");
             }
             if (!pause)
             {
@@ -276,6 +277,7 @@ public void chushiliema()
         if (enable)
         {
             targetColor = new Color(0.921f, 0.235f, 0.219f);
+
         }
         else
         {

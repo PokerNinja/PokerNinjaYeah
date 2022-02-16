@@ -34,7 +34,7 @@ public class EndRound : State
 
         string winningText = "ERROR";
         //  yield return new WaitForSeconds(1f);
-        
+
 
         if (endByCards)
         {
@@ -66,12 +66,15 @@ public class EndRound : State
 
         startNewRound = !battleSystem.DealHpDamage(!isPlayerPreWin, true);
         battleSystem.EndRoundVisual(isPlayerPreWin);
-        if (LocalTurnSystem.Instance.IsPlayerTurn())
+        if (LocalTurnSystem.Instance.ShouldFlipArrowAfterRaiseDeclined())
         {
-            LocalTurnSystem.Instance.SyncStarterAfterEnd();
-           
+            battleSystem.FlipTurnAfterDecline = true;
+            if (battleSystem.IsPlayerTurn())
+            {
+                LocalTurnSystem.Instance.SyncStarterAfterEnd();
+            }
         }
-       
+
         StartNewRoundAction(true);
         return text;
     }

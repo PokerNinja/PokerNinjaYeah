@@ -21,6 +21,7 @@ public class TurnArrowUi : MonoBehaviour
             color = Values.Instance.brightRed;
         }
         spriteRenderer.material.SetColor("_GradBotLeftCol", color);
+        // Try To Call Only Once
     }
 
     public void FlipImage(bool isPlayer)

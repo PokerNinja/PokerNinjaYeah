@@ -115,10 +115,6 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
             {
                 CurrentPlayerID.Value = OtherPlayerID;
             }
-            else
-            {
-                CurrentPlayerID.Value = PlayerID.Value;
-            }
         }
     }
     public bool ShouldFlipArrowAfterRaiseDeclined()
@@ -128,9 +124,9 @@ public class LocalTurnSystem : Singleton<LocalTurnSystem>
 
         if ((IsPlayerStartRound() && IsPlayerTurn()) || (!IsPlayerStartRound() && !IsPlayerTurn()) )
         {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public bool IsPlayerStartRound()

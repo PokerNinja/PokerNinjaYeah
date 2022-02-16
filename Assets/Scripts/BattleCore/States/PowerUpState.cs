@@ -156,6 +156,7 @@ public class PowerUpState : State
 
     private void ActivateSelectMode(int cardsToSelect, string powerUpName)
     {
+        Debug.Log("ActivateSelectMode =" + powerUpName);
         battleSystem.SetCardsSelectionAndDisplayInfo(cardsToSelect, powerUpName);
         ActivateCardSelection(PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true));
         ActivateSelectionPointer(powerUpName);

@@ -123,7 +123,6 @@ public class BattleUI : MonoBehaviour
     public ParticleSystem armageddonPS;
     public ParticleSystem shutterIce;
 
-    [SerializeField] private GameObject turnBtn;
     [SerializeField] public SpriteRenderer turnArrowSprite;// MAYBE in Timer
     [SerializeField] public BetBtnUi betBtn;
     [SerializeField] public TextMeshProUGUI currentRankText;
@@ -391,12 +390,7 @@ public class BattleUI : MonoBehaviour
     }
 
 
-    [Button]
-    public void MoveA(bool isENemt)
-    {
-        MoveDealerBtn(false, isENemt);
-    }
-
+  
     public void MoveDealerBtn(bool firstRound, bool isEnemy)
     {
         Action clickSound = () => SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, true);
@@ -440,7 +434,7 @@ public class BattleUI : MonoBehaviour
 
     public void EnablePlayerButtons(bool enable)
     {
-        EnableEndTurnBtn(enable);
+        StartCoroutine(EnableEndTurnBtn(enable));
         EnableBtnReplace(enable);
         if (Constants.HP_GAME)
         {
@@ -454,8 +448,12 @@ public class BattleUI : MonoBehaviour
 
 
 
-    public void EnableEndTurnBtn(bool enable)
+    public IEnumerator  EnableEndTurnBtn(bool enable)
     {
+        if (enable)
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
         BattleSystem.Instance.endClickable = enable;
         /*  if (enable)
           {
@@ -529,10 +527,6 @@ public class BattleUI : MonoBehaviour
             if (puName.Equals("replace"))
             {
                 InitDialog(puDisplayName, Constants.ReplacePuInfo, isBtnOn);
-            }
-            else if (puName.Equals("bet"))
-            {
-                InitDialog(puDisplayName, Constants.BetInfo, isBtnOn);
             }
             else if (puName.Equals("end"))
             {
@@ -1571,14 +1565,14 @@ public class BattleUI : MonoBehaviour
     {
         CanvasGroup hpInfoCanvas = playerHpInfoCanvas;
         TextMeshProUGUI currentHpText = playerCurrentHpText;
-        float posY = -2.6f;
+       // float posY = -2.6f;
         if (!isPlayer)
         {
-            posY = 2.6f;
+            //posY = 2.6f;
             hpInfoCanvas = enemyHpInfoCanvas;
             currentHpText = enemyCurrentHpText;
         }
-        hpInfoCanvas.transform.position = new Vector3(hpInfoCanvas.transform.position.x, posY, hpInfoCanvas.transform.position.z);
+        /* hpInfoCanvas.transform.position = new Vector3(hpInfoCanvas.transform.position.x, posY, hpInfoCanvas.transform.position.z);*/
         currentHpText.text = " " + currentHp;
         StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(hpInfoCanvas, true, Values.Instance.infoDialogFadeOutDuration, null));
     }

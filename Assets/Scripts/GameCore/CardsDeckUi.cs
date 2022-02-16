@@ -401,8 +401,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     }
     public CardUi GetCardUiByName(string cardTarget)
     {
-                Debug.Log("FoundTB " + cardTarget);
-      /*  List<CardUi> listTarget;
+        Debug.Log("FoundTB " + cardTarget);
+/*        List<CardUi> listTarget;
         switch (cardTarget[0])
         {
             case 'P':
@@ -425,7 +425,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 Debug.Log("Found");
                 return listTarget[i];
             }
-        }*/
+        }*/ //MAKE IT BETTER
         List<CardUi> allCardsUi = playerCardsUi.Concat(enemyCardsUi).Concat(boardCardsUi).Concat(extraDeckCardsUi).ToList();
         for (int i = 0; i < allCardsUi.Count; i++)
         {
@@ -455,7 +455,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
 
 
-    public void RemoveFromList( CardUi cardToDestroy)
+    public void RemoveFromList(CardUi cardToDestroy)
     {
         GetListByTag(cardToDestroy.tag).Remove(cardToDestroy);
     }
@@ -1531,6 +1531,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             extraDeckCardsUi[0].SetSelection(true, "", "");
             extraDeckCardsUi[1].SetSelection(true, "", "");
         }
+        yield return new WaitForSecondsRealtime(0.85f);
+        Debug.Log("EndOFDraw@ =" );
+
         endAction?.Invoke();
     }
 
@@ -1580,13 +1583,13 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void DestroyCardObjectIce(string cardPlace, Action OnEnd)
     {
-      //  RemoveFromList(GetListByTag(cardToDestroy.tag), cardToDestroy);
+        //  RemoveFromList(GetListByTag(cardToDestroy.tag), cardToDestroy);
     }
 
     private void DestroyWithDelay(string cardPlace, Action OnEnd)
     {
         CardUi cardToDestroy = GetCardUiByName(cardPlace);
-        RemoveFromList( cardToDestroy);
+        RemoveFromList(cardToDestroy);
         //boardCardsUi.Remove(cardToDestroy); //TODO why this
         if (cardToDestroy == null)
         {
@@ -1704,7 +1707,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         targetMaterial.SetFloat("_FlickerPercent", flickerAmount);
     }
 
-    internal  void SwapTwoCards(string cardToSwap, string cardTarget, Action DisableDarkScreen)
+    internal void SwapTwoCards(string cardToSwap, string cardTarget, Action DisableDarkScreen)
     {
         Debug.LogError("swaping");
         CardUi cardUiToSwap = GetCardUiByName(cardToSwap);
@@ -1722,18 +1725,20 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
         //await Task.Delay(1000);
 
-        /*StartCoroutine(*/AnimationManager.Instance.FollowArc(cardUiToSwap.transform, temp1Position, temp2Position,
-           1f, Values.Instance.circularMoveDuration, () =>
-        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiToSwap.transform, tempTransform2,
-        Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiToSwap,
-        card1ToFlip, CardPlaceToTag(cardToSwap), CardPlaceToTag(cardTarget))), null, null);
+        /*StartCoroutine(*/
+        AnimationManager.Instance.FollowArc(cardUiToSwap.transform, temp1Position, temp2Position,
+1f, Values.Instance.circularMoveDuration, () =>
+AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiToSwap.transform, tempTransform2,
+Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiToSwap,
+card1ToFlip, CardPlaceToTag(cardToSwap), CardPlaceToTag(cardTarget))), null, null);
 
-      //  await Task.Delay(2000);
-        /*StartCoroutine(*/AnimationManager.Instance.FollowArc(cardUiTarget.transform, temp2Position, temp1Position,
-            1f, Values.Instance.circularMoveDuration, () =>
-        AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiTarget.transform, tempTransform1,
-        Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiTarget,
-        card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, DisableDarkScreen);
+        //  await Task.Delay(2000);
+        /*StartCoroutine(*/
+        AnimationManager.Instance.FollowArc(cardUiTarget.transform, temp2Position, temp1Position,
+1f, Values.Instance.circularMoveDuration, () =>
+AnimationManager.Instance.ScaleMultipleTime(Values.Instance.circualScaleMultiplication, cardUiTarget.transform, tempTransform1,
+Values.Instance.circularMoveDuration, () => FlipAfterSwap(cardUiTarget,
+card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, DisableDarkScreen);
         //Lehalif
 
         Card tempCard1 = Card.StringToCard(cardUiToSwap.cardDescription);
@@ -1833,7 +1838,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Transform tempTransform2 = playerCardUI.transform;
         SwapCardUiList(cardFromDeckUI, playerCardUI);
         StartCoroutine(AnimationManager.Instance.SmoothMove(cardFromDeckUI.transform, tempTransform2.position, tempTransform2.localScale, Values.Instance.cardSwapMoveDuration
-            , null, () => ResetExtraDeckCards(), DisableDarkScreen, null));
+            , () => ResetExtraDeckCards(), null, DisableDarkScreen, null));
         Card tempCard1 = Card.StringToCard(cardFromDeckUI.cardDescription);
         Card tempCard2 = Card.StringToCard(playerCardUI.cardDescription);
         UpdateCardsList(playerCard, tempCard1, true);
@@ -1951,7 +1956,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             {
                 cardToDestroy.cardMark.SetActive(false);
             }
-            StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => RestAfterDestroy(cardToDestroy,null)));
+            StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => RestAfterDestroy(cardToDestroy, null)));
         }
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve, true);
         DealHands();
