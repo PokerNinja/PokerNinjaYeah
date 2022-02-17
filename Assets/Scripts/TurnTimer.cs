@@ -210,16 +210,19 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         turnArrowUi.animation.Play("arrow_turn");
         bool isPlayerTurn = BattleSystem.Instance.IsPlayerTurn();
         turnArrowUi.ApplyIndicatorArrow(true);
-         isLastSeconds = false;
-        while ( updateTime)
+        isLastSeconds = false;
+        while (updateTime)
         {
 
-            if (isPlayerTurn && !isLastSeconds && countTimer < 10)
+            if (!isLastSeconds && countTimer < 10)
             {
                 isLastSeconds = true;
-                SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, true);
                 SetCounterColor(true);
                 turnArrowUi.animation.Play("arrow_turn_fast");
+                if (isPlayerTurn)
+                {
+                    SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, true);
+                }
             }
             if (!pause)
             {
@@ -244,7 +247,7 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             {
                 updateTime = false;
             }
-            
+
             yield return null; //Don't freeze Unity
         }
         if (countTimer <= 0)
@@ -256,7 +259,7 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
     [Button]
-public void chushiliema()
+    public void chushiliema()
     {
         SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
 
@@ -290,6 +293,10 @@ public void chushiliema()
     internal void PauseTimer(bool enable)
     {
         pause = enable;
+        if (enable)
+        {
+            SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
+        }
     }
 
     internal void Activate(bool enable)

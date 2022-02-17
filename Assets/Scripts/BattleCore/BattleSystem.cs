@@ -19,6 +19,9 @@ public class BattleSystem : StateMachine
 
     private bool TEST_MODE;
     private bool HP_GAME;
+
+
+
     public bool BOT_MODE;
     [SerializeField] public bool END_TURN_AFTER_PU;
 
@@ -128,6 +131,9 @@ public class BattleSystem : StateMachine
     private bool readyToStart = false;
     private Action ResetPuAction;
     public bool enemyBotSkillUsed;
+    public float choosenRaise;
+
+    [SerializeField] int[] raiseOptions = { 200, 500, 1000 };
     [SerializeField]
     public bool isRoundReady
     {
@@ -215,6 +221,7 @@ public class BattleSystem : StateMachine
             enemyHp = fullHp;
             startingDamageForRound = 1000;
             currentDamageThisRound = startingDamageForRound;
+            ui.hpForThisRoundText.text = currentDamageThisRound.ToString();
             //   ui.ActivateHpObjects();
         }
         else
@@ -422,7 +429,7 @@ public class BattleSystem : StateMachine
                  StartCoroutine(ResetSortingOrder(false));
                  puDeckUi.EnablePusZ(true, false);
                  cardsDeckUi.DisableCardsSelection(Constants.AllCardsTag);
-                 ActivatePlayerButtons(!endTurn, false);
+                 StartCoroutine(ActivatePlayerButtons(!endTurn, false));
              });
         }
         if (!ReplaceInProgress && replaceMode && !Constants.TemproryUnclickable)
@@ -674,7 +681,7 @@ public class BattleSystem : StateMachine
             DisableSelectMode(true);
             ui.EnableBgColor(false); //MAYBE UNECECERY
             //StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
-            DisablePlayerPus();
+            StartCoroutine(ActivatePlayerButtons(false, false));
             ui.SetTurnIndicator(false, false);
             ResetTimers();
             if (!TEST_MODE && !BOT_MODE)
@@ -931,7 +938,7 @@ public class BattleSystem : StateMachine
                 }
                 else if (s.Contains("(#Exit#)"))
                 {
-                    ActivatePlayerButtons(false, false);
+                    StartCoroutine(ActivatePlayerButtons(false, false));
                     ui.WinPanelAfterEnemyLeaveGame(currentGameInfo.EnemyId);
                     SetState(new GameOver(this, true));
                 }
@@ -978,7 +985,7 @@ public class BattleSystem : StateMachine
         }
         else if (currentTurn == 0)
         {
-            await Task.Delay(1700);  
+            await Task.Delay(1700);
             SetState(new EndRound(this, true, false));
         }
     }
@@ -1060,8 +1067,8 @@ public class BattleSystem : StateMachine
     {
         if (HP_GAME)
         {
-            ui.betBtn.ResetBtn();
             currentDamageThisRound = startingDamageForRound;
+            ui.hpForThisRoundText.text = currentDamageThisRound.ToString();
             raiseOffer = false;
             Debug.LogError("damageThisRound:" + currentDamageThisRound);
         }
@@ -1807,7 +1814,7 @@ public class BattleSystem : StateMachine
         // yield return new WaitForFixedUpdate();
         if (!enable)
         {
-           // enemyPuIsRunning = false;
+            // enemyPuIsRunning = false;
             playerPuInProcess = false;
             Debug.LogError("Imreseting");
             foreach (CardUi card in cardsDeckUi.GetListByTag("All"))
@@ -1840,10 +1847,25 @@ public class BattleSystem : StateMachine
         }
         else
         {
-            ui.EnablePlayerButtons(true);
-            ActivatePlayerPus();
+            StartCoroutine(ActivatePlayerButtons(true, false));
+
         }
     }
+
+
+    /*   public void EnablePlayerButtons(bool enable)
+       {
+           ui.EnablePlayerButtons(enable);
+           ui.betBtn.EnableBetBtn(HaveEnoughToRaise());
+           if (enable)
+           {
+               ActivatePlayerPus();
+           }
+           else
+           {
+               DisablePlayerPus();
+           }
+       }*/
 
     [Button]
     public void ClickForInfo()
@@ -2059,8 +2081,7 @@ public class BattleSystem : StateMachine
             ReplaceInProgress = true;
             UpdateReplacePuInDb(-1);
             ReduceEnergy(Values.Instance.energyCostForDraw);
-            ui.EnablePlayerButtons(false);
-            DisablePlayerPus();
+            StartCoroutine(ActivatePlayerButtons(false, false));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
             DealPu(true, () =>
             {
@@ -2091,7 +2112,7 @@ public class BattleSystem : StateMachine
                          {
                              StartCoroutine(SetClickableWithDelay(0.5f));
                              puDeckUi.EnablePusSlotZ(true, false);
-                             ActivatePlayerButtons(!endTurn, false);
+                             StartCoroutine(ActivatePlayerButtons(!endTurn, false));
                          });
                     }
                     if (playerPus[0] != null)
@@ -2110,7 +2131,7 @@ public class BattleSystem : StateMachine
                 ui.EnableDarkScreen(isPlayerActivatePu, false, () =>
                 {
                     puDeckUi.EnablePusSlotZ(true, false);
-                    ActivatePlayerButtons(!endTurn, false);
+                    StartCoroutine(ActivatePlayerButtons(!endTurn, false));
                 });
             }
         }
@@ -2220,35 +2241,33 @@ public class BattleSystem : StateMachine
         ui.RevealCards(cardsDeckUi.boardCardsUi);
     }
 
+    public void ActivatePlayerButtonsOut(bool enable, bool delay)
+    {
+        StartCoroutine(ActivatePlayerButtons(enable, delay));
+    }
 
-    internal void ActivatePlayerButtons(bool enable, bool delay)
+    internal IEnumerator ActivatePlayerButtons(bool enable, bool delay)
     {
         if (delay)
         {
-            StartCoroutine(ActivePlayerButtonWithDelay());
+            yield return new WaitForSeconds(Values.Instance.delayTimerStart);
         }
-        else
+        if (enable && !endTurnInProcess)
         {
-            if (enable && !endTurnInProcess)
-            {
-                Constants.TemproryUnclickable = false;
-                ui.EnablePlayerButtons(true);
-                ActivatePlayerPus();
-            }
-            else if (!enable)
-            {
-                ui.EnablePlayerButtons(false);
-                DisablePlayerPus();
-            }
+            Constants.TemproryUnclickable = false;
+            ui.EnablePlayerButtons(true);
+            ActivatePlayerPus();
+            ui.betBtn.EnableBetBtn(HaveEnoughToRaise());
+        }
+        else if (!enable)
+        {
+            ui.EnablePlayerButtons(false);
+            DisablePlayerPus();
+            ui.betBtn.EnableBetBtn(false);
         }
     }
 
-    private IEnumerator ActivePlayerButtonWithDelay()
-    {
-        yield return new WaitForSeconds(Values.Instance.delayTimerStart);
-        ui.EnablePlayerButtons(true);
-        ActivatePlayerPus();
-    }
+
 
     #endregion
 
@@ -2357,8 +2376,7 @@ public class BattleSystem : StateMachine
         {
             powerUpUi.isClickable = false;
             powerUpUi.aboutToDestroy = true;
-            Interface.EnablePlayerButtons(false);
-            DisablePlayerPus();
+            StartCoroutine(ActivatePlayerButtons(false, false));
             Interface.EnableDarkScreen(powerUpUi.isPlayer, true, () => DisableVision());
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
             if (powerUpUi.puIndex != -1)
@@ -2505,8 +2523,8 @@ public class BattleSystem : StateMachine
         () =>
         OtherPlayerBetResponse(false)
         ,
-        () =>
-            EnemyBetPopUp()
+       dmg =>
+            EnemyBetPopUp(dmg)
         , Debug.Log);
     }
     private void OtherPlayerBetResponse(bool isAccept)
@@ -2535,14 +2553,14 @@ public class BattleSystem : StateMachine
 
     public float GetDmgPenelty()
     {
-        float dmg = 0;
+        float dmg = 100;
         if (currentTurn == 6 || currentTurn == 5)
         {
             dmg = 500;
         }
         else if (currentTurn == 4 || currentTurn == 3)
         {
-            dmg = 250;
+            dmg = 300;
         }
         return dmg;
     }
@@ -2550,14 +2568,15 @@ public class BattleSystem : StateMachine
     private void UpdateRaise()
     {
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BetYes, true);
-        currentDamageThisRound += 250;
-        ui.DoubleDamageVisual(currentDamageThisRound.ToString());
+        currentDamageThisRound += choosenRaise;
+        ui.hpForThisRoundText.text = currentDamageThisRound.ToString() ;
     }
 
     [Button]
-    private void EnemyBetPopUp()
+    private void EnemyBetPopUp(int dmg)
     {
-        EnableBetDialog(true);
+        choosenRaise = dmg;
+        EnableBetDialog(dmg, true);
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BetAsk, true);
     }
 
@@ -2565,7 +2584,7 @@ public class BattleSystem : StateMachine
     {
         UpdateRaise();
         UpdateBetDB("yes");
-        EnableBetDialog(false);
+        EnableBetDialog(0, false);
         ui.AnimateRaiseArrow(true);
     }
 
@@ -2575,7 +2594,7 @@ public class BattleSystem : StateMachine
         currentDamageThisRound -= GetDmgPenelty();
         SetState(new EndRound(this, false, false));
         UpdateBetDB("no");
-        EnableBetDialog(false);
+        EnableBetDialog(0, false);
         ui.AnimateRaiseArrow(false);
     }
 
@@ -2584,16 +2603,25 @@ public class BattleSystem : StateMachine
         if (!raiseOffer && ui.betBtn.btnBetClickable)
         {
             ui.betBtn.btnBetClickable = false;
-            raiseOffer = true;
-            ui.turnTimer.PauseTimer(true);
-            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
-            EnableWaitDialog(true);
-            UpdateBetDB(currentGameInfo.localPlayerId);
+            ui.SetOfferChooseRaiseDialog(true,currentDamageThisRound-GetDmgPenelty());
+            
         }
         else
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
+    }
+
+    public void PlayerChooseRaise(int dmg)
+    {
+        choosenRaise = raiseOptions[dmg];
+        ui.SetOfferChooseRaiseDialog(false, 0);
+        raiseOffer = true;
+        ui.betBtn.EnableBetBtn(false);
+        ui.turnTimer.PauseTimer(true);
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
+        EnableWaitDialog(true);
+        UpdateBetDB(currentGameInfo.localPlayerId + choosenRaise);
     }
 
     private void UpdateBetDB(string info)
@@ -2606,12 +2634,12 @@ public class BattleSystem : StateMachine
                    Debug.Log);
         }
     }
-    public void EnableBetDialog(bool enable)
+    public void EnableBetDialog(int dmgRaise, bool enable)
     {
         //canvasBetDialog.SetActive(enable);
         if (enable)
         {
-            ui.ShowRaiseDialog(currentGameInfo.EnemyId, currentDamageThisRound - GetDmgPenelty());
+            ui.ShowRaiseDialog(currentGameInfo.EnemyId, dmgRaise + currentDamageThisRound, currentDamageThisRound - GetDmgPenelty());
             ShowHpInfo();
         }
         else
@@ -2705,6 +2733,11 @@ public class BattleSystem : StateMachine
     {
         ui.ShowHpDialog(playerHp, true);
         ui.ShowHpDialog(enemyHp, false);
+    }
+    internal bool HaveEnoughToRaise()
+    {
+        return (playerHp >= (currentDamageThisRound + raiseOptions[0]))
+            && (enemyHp >= (currentDamageThisRound + raiseOptions[0])) && !raiseOffer;
     }
     private void OnApplicationPause(bool pause)
     {

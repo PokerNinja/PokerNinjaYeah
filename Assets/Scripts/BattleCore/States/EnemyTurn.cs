@@ -26,9 +26,9 @@ public class EnemyTurn : State
     public override IEnumerator Start()
     {
         battleSystem.turnInitInProgress = true;
-       // battleSystem.Interface.EnableBgColor(false);
-        battleSystem.Interface.EnablePlayerButtons(false);
-        battleSystem.DisablePlayerPus();
+        // battleSystem.Interface.EnableBgColor(false);
+       // battleSystem.StartCoroutine(battleSystem.ActivatePlayerButtons(false, false));
+        //MAybe not necesery
         if (turnCounter != 6)
         {
             battleSystem.Interface.ApplyTurnVisual(false);

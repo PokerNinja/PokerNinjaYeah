@@ -25,7 +25,7 @@ public class EndRound : State
     {
         battleSystem.PlayMusic(false);
         battleSystem.ResetTimers();
-        battleSystem.Interface.EnablePlayerButtons(false);
+        battleSystem.ActivatePlayerButtonsOut(false, false);
         battleSystem.Interface.SetTurnIndicator(false, false);
         battleSystem.Interface.EnableVisionClick(false);
         battleSystem.DeactivateSmoke();

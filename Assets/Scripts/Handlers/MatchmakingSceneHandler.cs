@@ -165,13 +165,19 @@ namespace Handlers
             yield return new WaitForSeconds(20f);
             if (cancelGame)
             {
-                MainManager.Instance.gameManager.StopListeningForAllPlayersReady();
-                DeleteGame(() => Debug.Log("YEAH DELETEEE"), Debug.LogError);
-                LeaveQueue();
-                yield return new WaitForSeconds(3f);
-                SceneManager.LoadScene("GameMenuScene");
+                StartCoroutine(LeaveSearchRoutine());
             }
         }
+
+        private IEnumerator LeaveSearchRoutine()
+        {
+            MainManager.Instance.gameManager.StopListeningForAllPlayersReady();
+            DeleteGame(() => Debug.Log("YEAH DELETEEE"), Debug.LogError);
+            LeaveQueue();
+            yield return new WaitForSeconds(1.5f);
+            SceneManager.LoadScene("GameMenuScene");
+        }
+
         public void DeleteGame(Action callback, Action<AggregateException> fallback)
         {
             var dbrefOfGameRoom = DataBaseAPI.DatabaseAPI.GetReferenceFromPath($"games/{gameId}");
@@ -321,10 +327,15 @@ namespace Handlers
             }
         }
 
+        private void OnGUI()
+        {
+            if (Event.current.type == EventType.KeyDown)
+            {
+                StartCoroutine(LeaveSearchRoutine());
+            }
+        }
+
         public void Ready() =>
             MainManager.Instance.gameManager.SetLocalPlayerReady(true, () => Debug.Log("You are now ready!"), Debug.Log);
     }
-
-
-
 }

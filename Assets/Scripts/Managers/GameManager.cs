@@ -288,7 +288,7 @@ namespace Managers
             DatabaseAPI.PostObject(
                 $"games/{currentGameInfo.gameId}/gameInfo/bet", betInfo, callback, fallback);
         }
-        public void ListenForOtherPlayerBet(Action OtherPlayerAccept, Action OtherPlayerRefuse, Action onEnemyOfferBet, Action<AggregateException> fallback)
+        public void ListenForOtherPlayerBet(Action OtherPlayerAccept, Action OtherPlayerRefuse, Action<int> onEnemyOfferBet, Action<AggregateException> fallback)
         {
             //  localPlayerSTPorFTP = playerFTPorSTP(oppFTPorSTP);
             localPlayerBetListener =
@@ -297,9 +297,10 @@ namespace Managers
                     // bool isPlayerTurn = intToBool(PlayerPrefs.GetInt("turn"));
                     //   bool isPlayerTurn = PlayerPrefs.GetString("turn").Equals(currentGameInfo.localPlayerId); // TODO make it better
                     string betInfo = (string)args.Snapshot.GetValue(true);
-                    if ( betInfo.Equals(currentGameInfo.EnemyId))
+                    if ( betInfo.Contains(currentGameInfo.EnemyId))
                     {
-                        onEnemyOfferBet();
+                        int dmg =int.Parse(betInfo.Substring(currentGameInfo.EnemyId.Length));
+                        onEnemyOfferBet(dmg);
                     }
                     if (betInfo.Equals("yes"))
                     {

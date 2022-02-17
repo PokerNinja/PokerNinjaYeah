@@ -103,7 +103,6 @@ public class BattleUI : MonoBehaviour
     //Buttons
 
     public Material freezeMaterial;
-    public TextMeshProUGUI dialogTitleUi;
     public TextMeshProUGUI dialogContentUi;
     public TextMeshProUGUI puDialogRestContentUi;
     public Image puDialogBg;
@@ -180,6 +179,11 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private SpriteRenderer declineRaiseArrow;
     public GameObject waitingDialog;
     public TurnTimer turnTimer;
+
+    public GameObject raiseChooseDialog;
+    [SerializeField] private TextMeshProUGUI raiseChooseText;
+
+   public TextMeshProUGUI hpForThisRoundText;
 
     public GameObject frozenIndicator;
 
@@ -436,10 +440,10 @@ public class BattleUI : MonoBehaviour
     {
         StartCoroutine(EnableEndTurnBtn(enable));
         EnableBtnReplace(enable);
-        if (Constants.HP_GAME)
+        /*if (Constants.HP_GAME)
         {
             betBtn.EnableBetBtn(enable);
-        }
+        }*/
         /* if (BattleSystem.Instance.replacePuLeft > 0)
          {
              EnableBtnReplace(enable);
@@ -1556,10 +1560,6 @@ public class BattleUI : MonoBehaviour
         enemyLifeUi[1].SetActive(true);
     }
 
-    internal void DoubleDamageVisual(string damage)
-    {
-        betBtn.DisplayDoubleDamage(damage);
-    }
 
     internal void ShowHpDialog(float currentHp, bool isPlayer)
     {
@@ -1717,10 +1717,10 @@ public class BattleUI : MonoBehaviour
         pointerAnimation2.transform.parent.gameObject.SetActive(false);
     }
 
-    internal void ShowRaiseDialog(string enemyId, float dmg)
+    internal void ShowRaiseDialog(string enemyId, float dmgToBe, float penelty)
     {
-        enemyIdOfferRaise.text = enemyId;
-        declineRaiseText.text = "Decline -" + dmg;
+        enemyIdOfferRaise.text = "<b><color=#FFC35E>"+ enemyId + "</color></b> offers to raise to <b><color=#F03B37>"+ dmgToBe + "</color></b>";
+        declineRaiseText.text = "Decline -" + penelty;
         raiseDialog.SetActive(true);
         EnableRaiseTimer(true);
     }
@@ -1793,6 +1793,12 @@ public class BattleUI : MonoBehaviour
     {
         GameObject frozenPrefab = Instantiate(frozenIndicator, position, Quaternion.identity);
         Destroy(frozenPrefab, 1.5f);
+    }
+
+    internal void SetOfferChooseRaiseDialog(bool enable, float penelty)
+    {
+        raiseChooseDialog.SetActive(enable);
+        raiseChooseText.text = "Offer Your opponent a <b><color=#F03B37>DMG</color></b> raise\n<b><color=#F03B37>-" + penelty + " DMG </color></b>to the opponent when declined";
     }
 }
 

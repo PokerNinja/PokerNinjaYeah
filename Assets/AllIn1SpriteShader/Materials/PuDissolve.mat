@@ -218,9 +218,9 @@ Material:
     - _ShakeUvX: 0.57
     - _ShakeUvY: 0.1
     - _ShineGlow: 0
-    - _ShineLocation: 1
-    - _ShineRotate: 2.1
-    - _ShineWidth: 0.5
+    - _ShineLocation: 0
+    - _ShineRotate: 2.69
+    - _ShineWidth: 0.26
     - _Stencil: 0
     - _StencilComp: 8
     - _StencilOp: 0
@@ -267,5 +267,5 @@ Material:
     - _OutlineColor: {r: 0.8901961, g: 0.08627451, b: 0.06666667, a: 1}
     - _OverlayColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 0.6156863}
-    - _ShineColor: {r: 0.9529412, g: 0.6743022, b: 0.27450982, a: 1}
+    - _ShineColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

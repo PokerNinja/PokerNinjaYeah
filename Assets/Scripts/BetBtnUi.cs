@@ -17,15 +17,9 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public TextMeshProUGUI txtMultiplayer;
     private bool held = false;
     public bool btnBetClickable = false;
-    public Animation anim;
     public CanvasGroup raiseInfoDialog;
-    public TextMeshProUGUI currentDmgText;
-    public TextMeshProUGUI dmgPenelty;
+   
 
-    private void Start()
-    {
-        anim.Stop();
-    }
 
 
 
@@ -61,27 +55,26 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
     private void LoadSpriteBtn(bool press)
     {
-        if (!txtMultiplayer.gameObject.activeSelf)
-        {
+        
             string path = "bet";
             if (press)
             {
                 path += "_p";
             }
             spriteRenderer.sprite = Resources.Load("Sprites/GameScene/" + path, typeof(Sprite)) as Sprite;
-        }
+        
     }
 
 
-    public void DisplayDoubleDamage(string currentDmg)
+ /*   public void DisplayDoubleDamage(string currentDmg)
     {
         spriteRenderer.sprite = Resources.Load("Sprites/GameScene/bet_empty", typeof(Sprite)) as Sprite;
         txtMultiplayer.gameObject.SetActive(true);
         txtMultiplayer.text =  currentDmg;
         anim.Play();
-    }
+    }*/
 
-    [Button]
+   /* [Button]
     public void ResetBtn()
     {
         txtMultiplayer.gameObject.SetActive(false);
@@ -91,7 +84,7 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         anim.Sample();
         anim.Stop();
         spriteRenderer.material.SetFloat("_Glow", 0f);
-    }
+    }*/
 
     public void OND()
     {
@@ -110,8 +103,7 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         float currentDmg = BattleSystem.Instance.currentDamageThisRound; // Store it differently
         raiseInfoDialog.gameObject.SetActive(true);
         StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(raiseInfoDialog, true, Values.Instance.infoDialogFadeOutDuration, null));
-        currentDmgText.text = currentDmg + " to " + (currentDmg +250);
-        dmgPenelty.text = "-"+ (currentDmg-BattleSystem.Instance.GetDmgPenelty()) + " HP ";
+        
     }
     private void HideRaiseInfo()
     {
@@ -128,8 +120,13 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void EnableBetBtn(bool enable)
     {
         Action btnEnable = () => btnBetClickable = enable;
-        btnEnable.Invoke();
-
+        //btnEnable.Invoke();
+        if (!enable)
+        {
+            btnEnable = null;
+            btnBetClickable = false;
+        }
+          StartCoroutine(AnimationManager.Instance.DarkerAnimation(spriteRenderer, !enable, Values.Instance.puChangeColorDisableDuration, btnEnable));
         /*  float value = 0.65f;
           if (enable)
           {
@@ -141,7 +138,6 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
               btnEnable = null;
           }
           // Make IT more stable
-          StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, spriteRenderer.material, value, btnEnable));
   */
     }
 }

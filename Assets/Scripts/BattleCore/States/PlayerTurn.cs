@@ -61,11 +61,11 @@ public class PlayerTurn : State
             battleSystem.isPlayerBotModeTurn = true;
            // Action tutorialAction = null;
             battleSystem.NewTimerStarter(true);
-            battleSystem.ActivatePlayerButtons(true, true);
-           // battleSystem.WhosTurnAnimation(true, yourLastTurn);
+           // BattleSystem.Instance.StartCoroutine(battleSystem.ActivatePlayerButtons(true, false));
+            // battleSystem.WhosTurnAnimation(true, yourLastTurn);
             battleSystem.ChargeEnergyCounter(energyChargeCount);
             battleSystem.Interface.SetTurnIndicator(true, true);
-
+            battleSystem.ActivatePlayerButtonsOut(true,false);
         }
         );
         yield break;

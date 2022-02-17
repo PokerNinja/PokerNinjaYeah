@@ -223,7 +223,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             sprite = "pu_back";
         }
-        else
+        else if(isPlayer)
         {
             spriteRenderer.color = new Color(0.66f, 0.66f, 0.66f, 1f);
         }
