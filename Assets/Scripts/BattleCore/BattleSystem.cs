@@ -249,7 +249,7 @@ public class BattleSystem : StateMachine
             StartCoroutine(ui.CoinFlipStartGame(currentGameInfo.playersIds[0].ToString().Equals(player.id), () =>
             {
                 StartCoroutine(ReadyToStart());
-                ui.SlidePuSlots();
+              //  ui.SlidePuSlots();
             }));
         }
         else
@@ -259,7 +259,7 @@ public class BattleSystem : StateMachine
             firstToPlayBotMode = GetRandomFirstTurn();
             StartCoroutine(ui.CoinFlipStartGame(firstToPlayBotMode, () =>
              {
-                 ui.SlidePuSlots();
+               //  ui.SlidePuSlots();
                  if (firstDeck)
                  {
                      firstDeck = false;

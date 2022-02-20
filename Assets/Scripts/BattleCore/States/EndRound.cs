@@ -115,13 +115,13 @@ public class EndRound : State
             {
                 //battleSystem.gameOver = false;
                 startNewRound = false;
-                winnerMsg = battleSystem.enemy.id + " Wins The Game With ";
+                winnerMsg = battleSystem.Interface.RichText(battleSystem.enemy.id, Values.Instance.yellowText, true) + " Wins The Game With ";
                 battleSystem.SetState(new GameOver(battleSystem, false));
             }
             else
             {
                 startNewRound = true;
-                winnerMsg = battleSystem.enemy.id + " Wins With ";
+                winnerMsg = battleSystem.Interface.RichText(battleSystem.enemy.id, Values.Instance.yellowText, true) + " Wins With ";
             }
             if (battleSystem.cardsDeckUi.enemyShadowCard.Equals("x"))
             {
@@ -142,14 +142,14 @@ public class EndRound : State
             if (battleSystem.DealDamage(false))
             {
                 startNewRound = false;
-                winnerMsg = battleSystem.player.id + " Wins The Game With ";
+                winnerMsg = battleSystem.Interface.RichText(battleSystem.player.id, Values.Instance.yellowText, true) + " Wins The Game With ";
                 battleSystem.SetState(new GameOver(battleSystem, true));
             }
             else
             {
                 startNewRound = true;
 
-                winnerMsg = battleSystem.player.id + " Wins With ";
+                winnerMsg = battleSystem.Interface.RichText(battleSystem.player.id, Values.Instance.yellowText, true) + " Wins With ";
             }
             if (battleSystem.cardsDeckUi.playerShadowCard.Equals("x"))
             {
@@ -166,7 +166,7 @@ public class EndRound : State
         {
             battleSystem.Interface.tieTitle.SetActive(true);
             startNewRound = true;
-            winnerMsg = " Tie " + bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
+            winnerMsg = battleSystem.Interface.RichText("TIE ", Values.Instance.yellowText, true) + bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
             StartNewRoundAction(true);
         }
 

@@ -1932,6 +1932,7 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         if (open)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
+           //s targetX = -0.22f;
             targetX = -1.15f;
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
             new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, action));

@@ -74,13 +74,20 @@ public class Values : Singleton<Values>
     public Color spaceFrameColor;
 
 
-    [Title("PUvision")]
-    [Title("Frames", bold: false)]
+    [Title("NCvision")]
+    [Title("Elements", bold: false)]
     public Color fireVision;
     public Color iceVision;
     public Color windVision;
     public Color shadowVision;
     public Color electricVision;
+
+
+    [Title("Text")]
+    [Title("Colors", bold: false)]
+    public string redText = "#F03B37";
+    public string blueText = "#02C8FF";
+    public string yellowText = "#FFC35E";
 
 
 

@@ -35,7 +35,7 @@ public class Constants : Singleton<Constants>
     public static readonly string[] BoardCards = { BFlop1, BFlop2, BFlop3, BTurn4, BRiver5 };
     public static readonly string[] deckCardsNames = { Deck1, Deck2 };
     public static readonly string[] ghostCardsNames = { PlayerGhost, EnemyGhost, BoardGhost };
-    public static string ReplacePuInfo = "Draw a Ninja Card. When no slot available, choose one Ninja Card to destroy";
+    public static string ReplacePuInfo = "Draw a Ninja Card. When no slot is available, choose a Ninja Card to destroy.";
     public static string BetInfo = "Offer your opponent to double the damage for this round";
     public static string EndInfo = "Click to end your turn";
     public static string DrawInstructions = "Choose a Ninja Card to replace";
@@ -46,6 +46,7 @@ public class Constants : Singleton<Constants>
     public static bool IL2CPP_MOD = false;
     public static bool TemproryUnclickable = false;
     public static int cardsToSelectCounter = 0;
+    public static string MatchId;
 
     public string ConvertCardPlaceForEnemy(string cardPlace)
     {

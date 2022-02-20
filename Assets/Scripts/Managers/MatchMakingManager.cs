@@ -11,16 +11,11 @@ public class MatchMakingManager : MonoBehaviour
 
         private KeyValuePair<DatabaseReference, EventHandler<ValueChangedEventArgs>> queueListener;
 
-    public void JoinQueue(string playerId, Action<string> onGameFound, Action<AggregateException> fallback)
+    public void JoinQueue(string playerId,string matchId, Action<string> onGameFound, Action<AggregateException> fallback)
     {
         Debug.Log("MMM JOINF");
-        string gameMode = "placeholder";
-       /* string gameMode = "c_game";
-        if (Constants.HP_GAME)
-        {
-            gameMode = "h_game";
-        }*/
-        DatabaseAPI.PostObject($"matchmaking/{playerId}", gameMode,
+            
+        DatabaseAPI.PostObject($"matchmaking/{playerId}", matchId,
             () => queueListener = DatabaseAPI.ListenForValueChanged($"matchmaking/{playerId}",
                 args =>
                 {
@@ -28,7 +23,7 @@ public class MatchMakingManager : MonoBehaviour
                     var gameId =
                         StringSerializationAPI.Deserialize(typeof(string), args.Snapshot.GetRawJsonValue()) as
                             string;
-                    if (gameId == gameMode) return;
+                    if (gameId == matchId) return;
                     LeaveQueue(playerId, () => onGameFound(
                         gameId), fallback);
                 }, fallback), fallback);

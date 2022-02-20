@@ -137,10 +137,8 @@ public class BattleUI : MonoBehaviour
     public GameObject psParent;
     public Transform playerHpUi;
     public Transform enemyHpUi;
-    [SerializeField] private TextMeshProUGUI playerTotalHpText;
-    [SerializeField] private TextMeshProUGUI enemyTotalHpText;
-    [SerializeField] private TextMeshProUGUI playerCurrentHpText;
-    [SerializeField] private TextMeshProUGUI enemyCurrentHpText;
+    [SerializeField] private TextMeshProUGUI playerHpText;
+    [SerializeField] private TextMeshProUGUI enemyHpText;
     [SerializeField] private CanvasGroup playerHpInfoCanvas;
     [SerializeField] private CanvasGroup enemyHpInfoCanvas;
     [SerializeField] private Animator damageAnimationController;
@@ -183,7 +181,7 @@ public class BattleUI : MonoBehaviour
     public GameObject raiseChooseDialog;
     [SerializeField] private TextMeshProUGUI raiseChooseText;
 
-   public TextMeshProUGUI hpForThisRoundText;
+    public TextMeshProUGUI hpForThisRoundText;
 
     public GameObject frozenIndicator;
 
@@ -193,7 +191,7 @@ public class BattleUI : MonoBehaviour
     private Vector3 dealerStarter;
 
     public Image infoPuBg;
-
+    private float totalHp;
 
 
 
@@ -204,8 +202,7 @@ public class BattleUI : MonoBehaviour
         InitializeEnemy(enemy);
         if (HP_GAME)
         {
-            playerTotalHpText.text = "/ " + totalHp;
-            enemyTotalHpText.text = "/ " + totalHp;
+            this.totalHp = totalHp;
         }
         else
         {
@@ -394,7 +391,7 @@ public class BattleUI : MonoBehaviour
     }
 
 
-  
+
     public void MoveDealerBtn(bool firstRound, bool isEnemy)
     {
         Action clickSound = () => SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, true);
@@ -432,8 +429,16 @@ public class BattleUI : MonoBehaviour
 
     public void WinPanelAfterEnemyLeaveGame(string otherPlayer)
     {
-        textWinLabel.text = otherPlayer + " left the game. You Win!";
+        textWinLabel.text = RichText(otherPlayer,Values.Instance.yellowText,true) + " left the game. You Win!";
         winLabel.SetActive(true);
+    }
+
+    public string RichText(string textToChange, string color, bool bold)
+    {
+        if (bold)
+            return "<b><color=" + color + ">" + textToChange + "</color></b>";
+        else
+            return "<color=" + color + ">" + textToChange + "</color>";
     }
 
     public void EnablePlayerButtons(bool enable)
@@ -452,7 +457,7 @@ public class BattleUI : MonoBehaviour
 
 
 
-    public IEnumerator  EnableEndTurnBtn(bool enable)
+    public IEnumerator EnableEndTurnBtn(bool enable)
     {
         if (enable)
         {
@@ -612,6 +617,11 @@ public class BattleUI : MonoBehaviour
         return Resources.Load("Sprites/GameScene/Info/" + spritePath, typeof(Sprite)) as Sprite;
     }
 
+    [Button]
+    public void Displaa(bool isplAyer)
+    {
+        StartCoroutine(DisplayDamageText(isplAyer, 500f, 400f));
+    }
     internal IEnumerator DisplayDamageText(bool isPlayerWin, float currentDamageThisRound, float extraDamage)
     {
         damageText.text = "-" + currentDamageThisRound.ToString();
@@ -622,13 +632,13 @@ public class BattleUI : MonoBehaviour
             anim = "hit_enemy";
         }
         damageText.gameObject.SetActive(true);
-        extraDamageText.gameObject.SetActive(extraDamage != 0);
         damageAnimationController.Play(anim);
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.DamageSound1, false);
         yield return new WaitForSeconds(0.2f);
         if (extraDamage != 0)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.DamageSound2, false);
+            extraDamageText.gameObject.SetActive(extraDamage != 0);
             extraDamageAnimationController.Play(anim);
         }
         yield return new WaitForSeconds(2f);
@@ -1564,16 +1574,16 @@ public class BattleUI : MonoBehaviour
     internal void ShowHpDialog(float currentHp, bool isPlayer)
     {
         CanvasGroup hpInfoCanvas = playerHpInfoCanvas;
-        TextMeshProUGUI currentHpText = playerCurrentHpText;
-       // float posY = -2.6f;
+        TextMeshProUGUI currentHpText = playerHpText;
+        // float posY = -2.6f;
         if (!isPlayer)
         {
             //posY = 2.6f;
             hpInfoCanvas = enemyHpInfoCanvas;
-            currentHpText = enemyCurrentHpText;
+            currentHpText = enemyHpText;
         }
         /* hpInfoCanvas.transform.position = new Vector3(hpInfoCanvas.transform.position.x, posY, hpInfoCanvas.transform.position.z);*/
-        currentHpText.text = " " + currentHp;
+        currentHpText.text = RichText(currentHp + " ", Values.Instance.yellowText, true) + RichText("/ " + totalHp, Values.Instance.redText, false);
         StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(hpInfoCanvas, true, Values.Instance.infoDialogFadeOutDuration, null));
     }
     public void HideHpDialog()
@@ -1719,7 +1729,7 @@ public class BattleUI : MonoBehaviour
 
     internal void ShowRaiseDialog(string enemyId, float dmgToBe, float penelty)
     {
-        enemyIdOfferRaise.text = "<b><color=#FFC35E>"+ enemyId + "</color></b> offers to raise to <b><color=#F03B37>"+ dmgToBe + "</color></b>";
+        enemyIdOfferRaise.text = "<b><color=#FFC35E>" + enemyId + "</color></b> offers to raise to <b><color=#F03B37>" + dmgToBe + "</color></b>";
         declineRaiseText.text = "Decline -" + penelty;
         raiseDialog.SetActive(true);
         EnableRaiseTimer(true);

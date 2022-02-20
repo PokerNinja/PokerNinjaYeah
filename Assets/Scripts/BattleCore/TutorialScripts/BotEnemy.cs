@@ -522,19 +522,19 @@ public class BotEnemy : State
                 }
             }
         }
-        return GetFirstCard(cards,differentCard,canTargetFreeze);
-      /*  if (cards[0].cardPlace.Equals(differentCard))
-        {
-            Debug.Log("toYse " + cards[0].cardPlace);
-            Debug.Log("differentThan " + differentCard);
-            return GetFirstCard(cards, 1, canTargetFreeze);
-            //  return cards[1].cardPlace;
-        }
-        else
-        {
-            Debug.Log("ChoseFirst " + cards[0].cardPlace);
-            return GetFirstCard(cards, 0, canTargetFreeze);
-        }*/
+        return GetFirstCard(cards, differentCard, canTargetFreeze);
+        /*  if (cards[0].cardPlace.Equals(differentCard))
+          {
+              Debug.Log("toYse " + cards[0].cardPlace);
+              Debug.Log("differentThan " + differentCard);
+              return GetFirstCard(cards, 1, canTargetFreeze);
+              //  return cards[1].cardPlace;
+          }
+          else
+          {
+              Debug.Log("ChoseFirst " + cards[0].cardPlace);
+              return GetFirstCard(cards, 0, canTargetFreeze);
+          }*/
     }
 
     private string GetFirstCard(List<CardUi> cards, string differetnThan, bool canTargetFreeze)
@@ -550,7 +550,7 @@ public class BotEnemy : State
                 }
             }
         }
-                    return cards[0].cardPlace;
+        return cards[0].cardPlace;
     }
 
     private int GetRankFromCardDesc(string cardDescription)
@@ -907,6 +907,7 @@ public class BotEnemy : State
         {
             amount = 0;
         }
+        amount = 0;
         return GenerateListProbability(EnemyActions.SkillUse, amount);
     }
 

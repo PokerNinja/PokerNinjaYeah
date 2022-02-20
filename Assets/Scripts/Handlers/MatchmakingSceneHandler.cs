@@ -22,6 +22,7 @@ namespace Handlers
         private string gameId;
         private bool isReady = false;
 
+        //MOVE IT
         private readonly string tip1 = "The ninja's last turn gets you only 1 energy instead of 2. STRATEGIZE!";
         private readonly string tip2 = "There's only 1 flip per round! USE IT WISELY!";
         private readonly string tip3 = "You can always HOLD your finger on a card or button to read what it does.";
@@ -43,7 +44,7 @@ namespace Handlers
             readyingUp = false;
             gameFound = false;
             searchingText.text = "Looking for opponent...";
-            JoinQueue();
+            JoinQueue(Constants.MatchId);
             tips = new string[] { tip1, tip2, tip3, tip4, tip5, tip6, tip7, tip8, tip9, tip10, tip11, tip12, tip13 };
             StartCoroutine(DisplayRandomTip());
             StartCoroutine(StartBotGame());
@@ -100,13 +101,13 @@ namespace Handlers
                 LeaveQueue();
             }
         }
-        private void JoinQueue()
+        private void JoinQueue(string matchId)
         {
             if (MainManager.Instance == null)
             {
                 Debug.LogError("instance null :(");
             }
-            MainManager.Instance.matchmakingManager.JoinQueue(MainManager.Instance.currentLocalPlayerId, gameId =>
+            MainManager.Instance.matchmakingManager.JoinQueue( MainManager.Instance.currentLocalPlayerId, matchId, gameId =>
             {
                 this.gameId = gameId;
                 gameFound = true;
