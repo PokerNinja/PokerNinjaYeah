@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: skilltext
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
-  m_ShaderKeywords: CLIPPING_ON CUSTOMBLENDING_ON GRADIENT2COL_ON GRADIENT_ON ONLYINNEROUTLINE_ON
+  m_ShaderKeywords: CUSTOMBLENDING_ON GRADIENT2COL_ON GRADIENT_ON ONLYINNEROUTLINE_ON
     TEXTURESCROLL_ON WAVEUV_ON _ONLYINNEROUTLINE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -116,7 +116,7 @@ Material:
     - _GlitchSize: 1
     - _Glow: 10
     - _GlowTexUsed: 0
-    - _GradBlend: 1
+    - _GradBlend: 0.6
     - _GradBoostX: 1.2
     - _GradBoostY: 3.92
     - _GradIsRadial: 0
@@ -150,7 +150,7 @@ Material:
     - _MinYUV: 0
     - _MotionBlurAngle: 0.1
     - _MotionBlurDist: 1.25
-    - _MyDstMode: 7
+    - _MyDstMode: 10
     - _MySrcMode: 5
     - _NegativeAmount: 1
     - _OffsetUvX: 0

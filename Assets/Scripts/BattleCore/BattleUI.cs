@@ -193,13 +193,14 @@ public class BattleUI : MonoBehaviour
     public Image infoPuBg;
     private float totalHp;
 
-
+    public ElementalSkillUi pEs;
 
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy, bool HP_GAME, float totalHp)
     {
         InitializePlayer(player);
         InitializeEnemy(enemy);
+        pEs.InitializeES("i");
         if (HP_GAME)
         {
             this.totalHp = totalHp;
@@ -210,6 +211,11 @@ public class BattleUI : MonoBehaviour
         }
         dealerStarter = dealerTransform.position;
     }
+
+   
+    
+
+  
 
     internal void FillHp()
     {
@@ -429,7 +435,7 @@ public class BattleUI : MonoBehaviour
 
     public void WinPanelAfterEnemyLeaveGame(string otherPlayer)
     {
-        textWinLabel.text = RichText(otherPlayer,Values.Instance.yellowText,true) + " left the game. You Win!";
+        textWinLabel.text = RichText(otherPlayer, Values.Instance.yellowText, true) + " left the game. You Win!";
         winLabel.SetActive(true);
     }
 
@@ -445,6 +451,7 @@ public class BattleUI : MonoBehaviour
     {
         StartCoroutine(EnableEndTurnBtn(enable));
         EnableBtnReplace(enable);
+        pEs.Enable(enable);
         /*if (Constants.HP_GAME)
         {
             betBtn.EnableBetBtn(enable);
@@ -455,6 +462,19 @@ public class BattleUI : MonoBehaviour
          }*/
     }
 
+    public void ResetEs(bool isPlayer)
+    {
+        if (isPlayer)
+        {
+            pEs.FillElemental(0);
+            pEs.ncCounterUse = 0;
+        }
+        else
+        {
+           // eEs.FillElemental(0);
+           // eEs.ncCounterUse = 0;
+        }
+    }
 
 
     public IEnumerator EnableEndTurnBtn(bool enable)
@@ -582,6 +602,7 @@ public class BattleUI : MonoBehaviour
 
     private Sprite GetPuDialogSpritePath(string puName)
     {
+        Debug.LogWarning("puName " + puName);
         string spritePath = "";
         switch (puName)
         {
@@ -589,16 +610,19 @@ public class BattleUI : MonoBehaviour
             case "f1":
             case "f2":
             case "f3":
+            case "esf":
                 spritePath = "nc_fire";
                 break;
             case "i1":
             case "i2":
             case "i3":
+            case "esi":
                 spritePath = "nc_ice";
                 break;
             case "w1":
             case "w2":
             case "w3":
+            case "esw":
                 spritePath = "nc_wind";
                 break;
             case "fm1":
@@ -1186,10 +1210,8 @@ public class BattleUI : MonoBehaviour
     internal void EnableBtnReplace(bool enable)
     {
         Action btnEnable = () => BattleSystem.Instance.btnReplaceClickable = enable; ;
-        float value = 0.65f;
         if (enable)
         {
-            value = 0;
         }
         else
         {

@@ -159,7 +159,10 @@ public class PowerUpState : State
         Debug.Log("ActivateSelectMode =" + powerUpName);
         battleSystem.SetCardsSelectionAndDisplayInfo(cardsToSelect, powerUpName);
         ActivateCardSelection(PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true));
+        if(!PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true)[0].Equals(Constants.AllCardsTag))
+        {
         ActivateSelectionPointer(powerUpName);
+        }
     }
 
     private void ActivateSelectionPointer(string powerUpName)
@@ -177,11 +180,16 @@ public class PowerUpState : State
         battleSystem.Interface.InitNinjaAttackAnimation(isPlayerActivate, puElement);
         if (puIndex != -1)
         {
+            battleSystem.UpdateEsAfterNcUse(isPlayerActivate, puElement);
             battleSystem.DissolvePuAfterUse(isPlayerActivate, puIndex);
         }
         else if (puIndex == -1 && isPlayerActivate)
         {
             battleSystem.ReduceSkillUse();
+        }
+        if( puIndex == -1)
+        {
+            battleSystem.Interface.ResetEs(isPlayerActivate);
         }
         if (isPlayerActivate)
         {
@@ -198,6 +206,7 @@ public class PowerUpState : State
                     break;
                 }
             case nameof(PowerUpNamesEnum.f2): // draw_board
+            case nameof(PowerUpNamesEnum.fp): // draw_board
                 {
                     bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
                     battleSystem.DestroyAndDrawCard(cardTarget1, 0f,  true, false);
@@ -207,6 +216,7 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.w2)://swap_player_board = w2
             case nameof(PowerUpNamesEnum.w3): //swap_enemy_board = w3
             case nameof(PowerUpNamesEnum.w1): //swap_player_enemy = w1
+            case nameof(PowerUpNamesEnum.wp): //swap_player_enemy = w1
                 {
 
                     battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[0]);
@@ -250,6 +260,7 @@ public class PowerUpState : State
                     break;
                 }
             case nameof(PowerUpNamesEnum.i2): //block_board_card = i2
+            case nameof(PowerUpNamesEnum.ip): //block_board_card = i2
                 {
                     bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
                     battleSystem.FreezePlayingCard(cardTarget1,0, true,true, false);

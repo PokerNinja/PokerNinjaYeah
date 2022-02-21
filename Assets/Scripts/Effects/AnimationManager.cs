@@ -710,8 +710,9 @@ public class AnimationManager : Singleton<AnimationManager>
         yield return new WaitForSeconds(delay);
         beginAction?.Invoke();
         float startTime = Time.time;
-        float t;
+        float t =0;
         float speed = 1f;
+        float time = Time.time;
         while (selector.position != targetPosition)
         {
             t = (Time.time - startTime) / movementDuration;

@@ -61,6 +61,7 @@ public class Values : Singleton<Values>
     public float delayBetweenProjectiles = 0.25f;
     public float defaultFadeD = 1f;
     public float inAndOutAnimation = 2f;
+    public float elementalSkillFillDuration = 2f;
     public Color brightRed ;
     public Color darkRed ;
     public Color yellow;
@@ -75,12 +76,17 @@ public class Values : Singleton<Values>
 
 
     [Title("NCvision")]
-    [Title("Elements", bold: false)]
+    [Title("ElementsVision", bold: false)]
     public Color fireVision;
     public Color iceVision;
     public Color windVision;
     public Color shadowVision;
     public Color electricVision;
+
+    [Title("ElementSkill", bold: false)]
+    public Color fireElement;
+    public Color iceElement;
+    public Color windElement;
 
 
     [Title("Text")]

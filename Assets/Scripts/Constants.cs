@@ -48,6 +48,9 @@ public class Constants : Singleton<Constants>
     public static int cardsToSelectCounter = 0;
     public static string MatchId;
 
+    public static int playerES;
+    public static int enemyES;
+
     public string ConvertCardPlaceForEnemy(string cardPlace)
     {
         switch (cardPlace)
@@ -92,6 +95,12 @@ public class Constants : Singleton<Constants>
 
         board = 30,
 
+    }
+    public enum ElementalSkill
+    {
+        fire = 0,
+        ice = 1,
+        wind = 2,
     }
     /*  public const string BoardCardSlutFlop1 = "BFlop1";
       public const string BoardCardSlutFlop2 = "CardB";

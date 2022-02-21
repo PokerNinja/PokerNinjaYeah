@@ -133,6 +133,8 @@ public class BattleSystem : StateMachine
     public bool enemyBotSkillUsed;
     public float choosenRaise;
 
+
+
     [SerializeField] int[] raiseOptions = { 200, 500, 1000 };
     [SerializeField]
     public bool isRoundReady
@@ -202,7 +204,7 @@ public class BattleSystem : StateMachine
         TEST_MODE = Values.Instance.TEST_MODE;
         Constants.HP_GAME = true;
         HP_GAME = Constants.HP_GAME;
-        //  Constants.BOT_MODE = true;
+        Constants.BOT_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
@@ -249,7 +251,7 @@ public class BattleSystem : StateMachine
             StartCoroutine(ui.CoinFlipStartGame(currentGameInfo.playersIds[0].ToString().Equals(player.id), () =>
             {
                 StartCoroutine(ReadyToStart());
-              //  ui.SlidePuSlots();
+                //  ui.SlidePuSlots();
             }));
         }
         else
@@ -259,7 +261,7 @@ public class BattleSystem : StateMachine
             firstToPlayBotMode = GetRandomFirstTurn();
             StartCoroutine(ui.CoinFlipStartGame(firstToPlayBotMode, () =>
              {
-               //  ui.SlidePuSlots();
+                 //  ui.SlidePuSlots();
                  if (firstDeck)
                  {
                      firstDeck = false;
@@ -1241,6 +1243,18 @@ public class BattleSystem : StateMachine
         });
     }
 
+    public void UpdateEsAfterNcUse(bool isPlayer, string element)
+    {
+        if (isPlayer)
+        {
+            ui.pEs.UpdateEsAfterNcUse(element);
+        }
+        else
+        {
+            // ui.pEs.UpdateEsAfterNcUse(element);
+        }
+    }
+
     private void ListenForPowerupUse()
     {
         gameManager.ListenForPowerupUse(powerUpInfo =>
@@ -1498,7 +1512,7 @@ public class BattleSystem : StateMachine
                 CheckIfPuAvailable(puUi);
             }
         }
-        CheckIfPuAvailable(skillBtn);
+        //CheckIfPuAvailable(skillBtn);
     }
 
     public void DisablePlayerPus()
@@ -1518,7 +1532,7 @@ public class BattleSystem : StateMachine
                 }
             }
         }
-        skillBtn.EnablePu(false);
+        // skillBtn.EnablePu(false);
     }
     public void CheckIfPuAvailable(PowerUpUi puUi)
     {
@@ -1798,9 +1812,12 @@ public class BattleSystem : StateMachine
 
     public void UpdateZPos(bool aboveDarkScreen, string tag)
     {
-        foreach (CardUi card in cardsDeckUi.GetListByTag(tag))
+        if (!tag.Equals(Constants.PoolCardTag))
         {
-            card.EnableSelecetPositionZ(aboveDarkScreen);
+            foreach (CardUi card in cardsDeckUi.GetListByTag(tag))
+            {
+                card.EnableSelecetPositionZ(aboveDarkScreen);
+            }
         }
     }
 
@@ -2403,6 +2420,21 @@ public class BattleSystem : StateMachine
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
     }
+    internal void OnEsClick(ElementalSkillUi es)
+    {
+        if (infoShow)
+        {
+            HideDialog(true);
+        }
+        else if (!ReplaceInProgress && !Constants.TemproryUnclickable)
+        {
+            es.isClickable = false;
+            StartCoroutine(ActivatePlayerButtons(false, false));
+            Interface.EnableDarkScreen(es.isPlayer, true, () => DisableVision());
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
+            OnPowerUpPress("es" + es.element, -1, 1);
+        }
+    }
 
     private void OnGUI()
     {
@@ -2569,7 +2601,7 @@ public class BattleSystem : StateMachine
     {
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BetYes, true);
         currentDamageThisRound += choosenRaise;
-        ui.hpForThisRoundText.text = currentDamageThisRound.ToString() ;
+        ui.hpForThisRoundText.text = currentDamageThisRound.ToString();
     }
 
     [Button]
@@ -2603,8 +2635,8 @@ public class BattleSystem : StateMachine
         if (!raiseOffer && ui.betBtn.btnBetClickable)
         {
             ui.betBtn.btnBetClickable = false;
-            ui.SetOfferChooseRaiseDialog(true,currentDamageThisRound-GetDmgPenelty());
-            
+            ui.SetOfferChooseRaiseDialog(true, currentDamageThisRound - GetDmgPenelty());
+
         }
         else
         {
