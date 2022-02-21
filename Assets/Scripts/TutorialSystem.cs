@@ -97,7 +97,7 @@ public class TutorialSystem : StateTuto
                 break;
             case 12: //flip skill chooose 
                 ui.MoveCardsMaskEnemy(true, false, null);
-                battleSystem.puDeckUi.playerSkillUi.spriteRenderer.sortingOrder = 1;
+               // battleSystem.puDeckUi.playerSkillUi.spriteRenderer.sortingOrder = 1;
                 battleSystem.cardsDeckUi.enemyCardsUi[1].spriteRenderer.sortingOrder = 35;
                 battleSystem.cardsDeckUi.enemyCardsUi[0].spriteRenderer.sortingOrder = 1;
                 break;
@@ -328,7 +328,7 @@ public class TutorialSystem : StateTuto
             case 10:
                 return ui.handRankMenu;
             case 11:
-                return battleSystem.puDeckUi.playerSkillUi.spriteRenderer;
+                return /*battleSystem.puDeckUi.playerSkillUi.spriteRenderer;*/ null;
             case 12:
                 return battleSystem.cardsDeckUi.enemyCardsUi[1].spriteRenderer;
             case 13:

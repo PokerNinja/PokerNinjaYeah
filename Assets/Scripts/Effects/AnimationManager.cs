@@ -1222,17 +1222,21 @@ public class AnimationManager : Singleton<AnimationManager>
             yield return new WaitForFixedUpdate();
             if (activateFade/* && t > 0.5f*/ )
             {
+                //MAYBE faster
                 float dist = Vector3.Distance(projectile.position, posTarget);
-                if (dist < 1.5f)
+                //Debug.LogWarning("dist:" + dist);
+                if (activateFade && dist < 1.5f)
                 {
-
                     activateFade = false;
                     FadeOut?.Invoke();
                     endAction?.Invoke();
+                    break;
                 }
             }
             else if (projectile.position == posTarget)
             {
+                Debug.LogWarning("END:");
+
                 FadeOut?.Invoke();
                 endAction?.Invoke();
             }

@@ -204,7 +204,7 @@ public class BattleSystem : StateMachine
         TEST_MODE = Values.Instance.TEST_MODE;
         Constants.HP_GAME = true;
         HP_GAME = Constants.HP_GAME;
-        Constants.BOT_MODE = true;
+        // Constants.BOT_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
@@ -345,7 +345,7 @@ public class BattleSystem : StateMachine
                  "fm1","fm1","fm1",
                  "fm1","fm1","im2",
               "w2","wm1","w1","wm2","wm2","wm2","w1","w2","wm2",
-              "w1","w3","w2","w1","i2","fm1"};
+              "w1","w3","w2","w1","i1","f3"};
         }
         return deck;
     }
@@ -1243,11 +1243,11 @@ public class BattleSystem : StateMachine
         });
     }
 
-    public void UpdateEsAfterNcUse(bool isPlayer, string element)
+    public void UpdateEsAfterNcUse(bool isPlayer, string puName)
     {
         if (isPlayer)
         {
-            ui.pEs.UpdateEsAfterNcUse(element);
+            ui.pEs.UpdateEsAfterNcUse(puName[0].ToString(),puName.Contains("m"));
         }
         else
         {
@@ -1393,10 +1393,20 @@ public class BattleSystem : StateMachine
 
     internal IEnumerator ResetPuUi(bool isPlayer, int puIndex)
     {
-        PowerUpUi pu = puDeckUi.GetPu(isPlayer, puIndex);
-        puDeckUi.RemovePuFromList(isPlayer, puIndex);
-        Debug.LogWarning("RESETING");
-        puDeckUi.ResetPuUI(pu, () => UpdateHandRank(false));
+
+        if (puIndex == -1)
+        {
+            yield return new WaitForSeconds(2f);
+            UpdateHandRank(false);
+            enemyPuIsRunning = false;
+        }
+        else
+        {
+            PowerUpUi pu = puDeckUi.GetPu(isPlayer, puIndex);
+            puDeckUi.RemovePuFromList(isPlayer, puIndex);
+            Debug.LogWarning("RESETING");
+            puDeckUi.ResetPuUI(pu, () => UpdateHandRank(false));
+        }
         if (isPlayer)
         {
             StartCoroutine(AutoEndTurn());
@@ -1805,6 +1815,7 @@ public class BattleSystem : StateMachine
         }
         ui.EnableDarkScreen(isPlayerActivatePu, enable, () =>
         {
+            ResetPuAction = null;
             StartCoroutine(ResetSortingOrder(enable));
             DisableVision();
         });
@@ -1849,7 +1860,7 @@ public class BattleSystem : StateMachine
     private IEnumerator AutoEndTurn()
     {
         Debug.LogError("AutoEnd");
-        if (timedOut || energyCounter == 0 /*|| energyCounter == 1 && puDeckUi.GetPuListCount(true) == 0 && !skillUsed*/)
+        if (timedOut || (energyCounter == 0 && ui.pEs.ncCounterUse < 3) /*|| energyCounter == 1 && puDeckUi.GetPuListCount(true) == 0 && !skillUsed*/)
         {
             Debug.LogError("ending");
             timedOut = false;
@@ -2432,7 +2443,7 @@ public class BattleSystem : StateMachine
             StartCoroutine(ActivatePlayerButtons(false, false));
             Interface.EnableDarkScreen(es.isPlayer, true, () => DisableVision());
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
-            OnPowerUpPress("es" + es.element, -1, 1);
+            OnPowerUpPress(es.element + "p", -1, 0);
         }
     }
 
@@ -2774,6 +2785,12 @@ public class BattleSystem : StateMachine
     private void OnApplicationPause(bool pause)
     {
         //  ExitGame();
+    }
+
+    public void ResetEs(bool isPlayer)
+    {
+        ui.ResetEs(isPlayer);
+        ResetPuAction = () => StartCoroutine(ResetPuUi(isPlayer, -1));
     }
 
     /* internal void FreezePu(string puTarget, bool isToFreeze)
