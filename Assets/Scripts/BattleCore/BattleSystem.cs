@@ -204,7 +204,7 @@ public class BattleSystem : StateMachine
         TEST_MODE = Values.Instance.TEST_MODE;
         Constants.HP_GAME = true;
         HP_GAME = Constants.HP_GAME;
-        // Constants.BOT_MODE = true;
+         Constants.BOT_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
@@ -344,8 +344,8 @@ public class BattleSystem : StateMachine
                  "fm2","wm2","fm2",
                  "fm1","fm1","fm1",
                  "fm1","fm1","im2",
-              "w2","wm1","w1","wm2","wm2","wm2","w1","w2","wm2",
-              "w1","w3","w2","w1","i1","f3"};
+              "w2","wm1","w1","wm2","wm2","wm2","w1","fm1","fm1",
+              "i2","i3","f2","f3","i2","f1"};
         }
         return deck;
     }
@@ -680,10 +680,10 @@ public class BattleSystem : StateMachine
         if (endClickable && !endTurnInProcess && !ReplaceInProgress)
         {
             endTurnInProcess = true;
+            StartCoroutine(ActivatePlayerButtons(false, false));
             DisableSelectMode(true);
             ui.EnableBgColor(false); //MAYBE UNECECERY
             //StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(), false, Values.Instance.textTurnFadeOutDuration, null));
-            StartCoroutine(ActivatePlayerButtons(false, false));
             ui.SetTurnIndicator(false, false);
             ResetTimers();
             if (!TEST_MODE && !BOT_MODE)
@@ -941,7 +941,7 @@ public class BattleSystem : StateMachine
                 else if (s.Contains("(#Exit#)"))
                 {
                     StartCoroutine(ActivatePlayerButtons(false, false));
-                    ui.WinPanelAfterEnemyLeaveGame(currentGameInfo.EnemyId);
+                    ui.WinPanelAfterEnemyLeaveGame(currentGameInfo.EnemyId.Substring(1));
                     SetState(new GameOver(this, true));
                 }
             }
@@ -1320,7 +1320,7 @@ public class BattleSystem : StateMachine
         }
         else // SKILL
         {
-            SetState(new PowerUpState(this, false, 0, powerUpInfo.powerupName, powerUpInfo.cardPlace1, powerUpInfo.cardPlace2, new Vector2(0, 0), new Vector2(0, 0), powerUpInfo.slot));
+            SetState(new PowerUpState(this, false, 0, powerUpInfo.powerupName, powerUpInfo.cardPlace1, powerUpInfo.cardPlace2, cardsDeckUi.GetCardPosition(powerUpInfo.cardPlace1), cardsDeckUi.GetCardPosition(powerUpInfo.cardPlace2), powerUpInfo.slot));
         }
     }
 
@@ -1368,6 +1368,7 @@ public class BattleSystem : StateMachine
 
     private void ResetValuesAfterCardSelection(string cardPlace)
     {
+        AnimationManager.Instance.SetAlpha(ui.darkScreenRenderer, 0);
         selectMode = false;
         if (resetAllCardsSelectionWhenCardClicked)
         {
@@ -1904,6 +1905,8 @@ public class BattleSystem : StateMachine
 
     public void SetCardsSelectionAndDisplayInfo(int cardsToSelectCounter, string newPuName)
     {
+        AnimationManager.Instance.SetAlpha(ui.darkScreenRenderer, 0.56f);
+       
         if (!newPuName.Equals("fm1"))
         {
             selectMode = true;
@@ -2067,6 +2070,7 @@ public class BattleSystem : StateMachine
 
     internal void InitProjectile(bool isPlayerActivate, int puIndex, string powerUpName, Vector2 posTarget1, Vector2 posTarget2, Action IgnitePowerUp)
     {
+    
         if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.im2)))
         {
             StartCoroutine(ui.StartIcenado());
@@ -2621,6 +2625,7 @@ public class BattleSystem : StateMachine
         choosenRaise = dmg;
         EnableBetDialog(dmg, true);
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BetAsk, true);
+        ui.turnTimer.PauseTimer(true);
     }
 
     public void AcceptBet()
@@ -2629,6 +2634,7 @@ public class BattleSystem : StateMachine
         UpdateBetDB("yes");
         EnableBetDialog(0, false);
         ui.AnimateRaiseArrow(true);
+        ui.turnTimer.PauseTimer(false);
     }
 
     public void RefuseBet()
@@ -2646,7 +2652,7 @@ public class BattleSystem : StateMachine
         if (!raiseOffer && ui.betBtn.btnBetClickable)
         {
             ui.betBtn.btnBetClickable = false;
-            ui.SetOfferChooseRaiseDialog(true, currentDamageThisRound - GetDmgPenelty());
+            ui.SetOfferChooseRaiseDialog(true, currentDamageThisRound - GetDmgPenelty(),EnoughHpToRaise(1),EnoughHpToRaise(2));
 
         }
         else
@@ -2658,7 +2664,7 @@ public class BattleSystem : StateMachine
     public void PlayerChooseRaise(int dmg)
     {
         choosenRaise = raiseOptions[dmg];
-        ui.SetOfferChooseRaiseDialog(false, 0);
+        ui.SetOfferChooseRaiseDialog(false, 0,false,false);
         raiseOffer = true;
         ui.betBtn.EnableBetBtn(false);
         ui.turnTimer.PauseTimer(true);
@@ -2779,9 +2785,15 @@ public class BattleSystem : StateMachine
     }
     internal bool HaveEnoughToRaise()
     {
-        return (playerHp >= (currentDamageThisRound + raiseOptions[0]))
-            && (enemyHp >= (currentDamageThisRound + raiseOptions[0])) && !raiseOffer;
+        return EnoughHpToRaise(0) && !raiseOffer;
     }
+
+    private bool EnoughHpToRaise(int option)
+    {
+         return (playerHp >= (currentDamageThisRound + raiseOptions[option]))
+               && (enemyHp >= (currentDamageThisRound + raiseOptions[option]));
+    }
+
     private void OnApplicationPause(bool pause)
     {
         //  ExitGame();

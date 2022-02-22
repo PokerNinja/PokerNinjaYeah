@@ -35,6 +35,7 @@ public class GameMenuHandler : MonoBehaviour
     private bool clickBlocker;
 
     private bool tutorialVisible = false;
+    public AudioSource auidioSource;
 
     public void Awake()
     {
@@ -445,8 +446,8 @@ public class GameMenuHandler : MonoBehaviour
         {*/
         elementChoicerRenderer.color = new Color(1, 1, 1, 0);
         elementChoicerRenderer.transform.position = new Vector3(elementChoiceTransforms[index].position.x, elementChoiceTransforms[index].position.y, elementChoicerRenderer.transform.position.z);
-        StartCoroutine(AlphaAnimation(elementChoicerRenderer, true, 0.25f, () => clickBlocker = false));
-
+        StartCoroutine(AlphaAnimation(elementChoicerRenderer, true, 0.17f, () => clickBlocker = false));
+        auidioSource.Play();
     }
 
     public IEnumerator AlphaAnimation(SpriteRenderer spriteRenderer, bool fadeIn, float duration, Action OnFinish)

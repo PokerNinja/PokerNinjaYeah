@@ -269,7 +269,7 @@ public class AnimationManager : Singleton<AnimationManager>
                     // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
                     // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
 
-                    spriteRenderer.color = new Color(dissolveAmount, dissolveAmount, dissolveAmount, startingAlpha);
+                    spriteRenderer.color = new Color(colorTarget, colorTarget, colorTarget, startingAlpha);
                     OnFinish?.Invoke();
                     break;
                 }
@@ -1327,7 +1327,7 @@ public class AnimationManager : Singleton<AnimationManager>
 
     public void SetAlpha(SpriteRenderer targetSprite, float alpha)
     {
-        targetSprite.color = new Color(targetSprite.material.color.r, targetSprite.material.color.g, targetSprite.material.color.b, alpha);
+        targetSprite.color = new Color(targetSprite.color.r, targetSprite.color.g, targetSprite.color.b, alpha);
     }
 
     public IEnumerator ScaleAndFadeEye(Transform selector, bool disableImage, Action ImateReplace, Action disableDarkScreen)

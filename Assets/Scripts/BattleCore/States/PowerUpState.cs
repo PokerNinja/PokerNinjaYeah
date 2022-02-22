@@ -20,6 +20,8 @@ public class PowerUpState : State
     private string puElement;
     public PowerUpState(BattleSystem battleSystem, bool isPlayerActivate, int energyCost, string powerUpName, string cardTarget1, string cardTarget2, Vector2 posTarget1, Vector2 posTarget2, int puIndex) : base(battleSystem)
     {
+        Debug.LogError("pos: " + posTarget1);
+        Debug.LogError("pos: " + posTarget2);
         this.isPlayerActivate = isPlayerActivate;
         this.powerUpName = powerUpName;
         this.cardTarget1 = cardTarget1;
@@ -499,6 +501,7 @@ public class PowerUpState : State
         }
         else if ((cardsToActivate[0] == cardsToActivate[1]) || powerUpName.Equals("fp") || powerUpName.Equals("ip"))
         {
+
             battleSystem.sameCardsSelection = true;
         }
         battleSystem.Interface.FadeCancelSelectModeScreen(true);

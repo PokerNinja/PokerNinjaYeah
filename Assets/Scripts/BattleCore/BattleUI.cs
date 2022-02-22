@@ -196,9 +196,18 @@ public class BattleUI : MonoBehaviour
     public ElementalSkillUi pEs;
     public ElementalSkillUi eEs;
 
+    public GameObject raiseOption2;
+    public GameObject raiseOption3;
+
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy, bool HP_GAME, float totalHp)
     {
+        if(Constants.BOT_MODE || Values.Instance.TEST_MODE)
+        {
+            player.id = "i" + player.id;
+            enemy.id = "f" + enemy.id;
+        }
+        
         pEs.InitializeES(player.id[0].ToString());
         eEs.InitializeES(enemy.id[0].ToString());
         InitializePlayer(player);
@@ -431,7 +440,7 @@ public class BattleUI : MonoBehaviour
     public IEnumerator ShowWinner(string winnerMsg)
     {
         yield return new WaitForSeconds(winnerPanelInterval);
-        textWinLabel.text = winnerMsg;
+        textWinLabel.text = winnerMsg.Substring(1);
         winLabel.SetActive(true);
     }
 
@@ -1526,7 +1535,7 @@ public class BattleUI : MonoBehaviour
     [Button]
     public void ICE()
     {
-        WinParticleEffect();
+        StartCoroutine(StartIcenado());
 
     }
     internal IEnumerator StartIcenado()
@@ -1820,7 +1829,7 @@ public class BattleUI : MonoBehaviour
             ));
     }
 
-    [Button]
+ 
     internal void UpdateHpZ(bool enable)
     {
         float newZ = 85f;
@@ -1839,10 +1848,14 @@ public class BattleUI : MonoBehaviour
         Destroy(frozenPrefab, 1.5f);
     }
 
-    internal void SetOfferChooseRaiseDialog(bool enable, float penelty)
+    internal void SetOfferChooseRaiseDialog(bool enable, float penelty, bool option2Availabe, bool option3Available)
     {
+        raiseOption2.SetActive(option2Availabe);
+        raiseOption3.SetActive(option3Available);
         raiseChooseDialog.SetActive(enable);
         raiseChooseText.text = "Offer Your opponent a <b><color=#F03B37>DMG</color></b> raise\n<b><color=#F03B37>-" + penelty + " DMG </color></b>to the opponent when declined";
     }
+
+  
 }
 
