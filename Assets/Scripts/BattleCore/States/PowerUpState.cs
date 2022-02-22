@@ -44,7 +44,7 @@ public class PowerUpState : State
         }
         if (!isPlayerActivate)
         {
-           // battleSystem.Interface.InitNinjaAttackAnimation(false, puElement);
+            // battleSystem.Interface.InitNinjaAttackAnimation(false, puElement);
 
             if (waitForAction) // DRAW_2_CARDS
             {
@@ -54,22 +54,20 @@ public class PowerUpState : State
             }
             else
             {
-                if (puIndex != -1)
-                {
-                    yield return new WaitForSecondsRealtime(1f);
-                    if (puElement.Equals("s"))
-                    {
-                        IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
-                    }
-                    else
-                    {
-                        battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
-                    }
-                }
-                else
+                yield return new WaitForSecondsRealtime(1f);
+                if (puElement.Equals("s"))
                 {
                     IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
                 }
+                else
+                {
+                    battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
+                }
+
+                /*else
+                {
+                    IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
+                }*/
             }
         }
         else // PLAYER ACTIVATE
@@ -77,35 +75,34 @@ public class PowerUpState : State
             int cardsToSelect = PowerUpStruct.Instance.GetPowerUpCardsToSelect(powerUpName);
             if (cardsToSelect == 0 || cardTarget2.Length > 0)
             {// Shove IT somewhereElse
-              //  battleSystem.Interface.InitNinjaAttackAnimation(true, puElement);
-                if (puIndex != -1)
-                {
-                    battleSystem.skillUsed = false;
+             //  battleSystem.Interface.InitNinjaAttackAnimation(true, puElement);
 
-                    if (cardTarget1.Contains("Deck"))
-                    {
-                        posTarget1 = new Vector2(0, 0);
-                    }
-                    if (cardTarget2.Contains("Deck"))
-                    {
-                        posTarget2 = new Vector2(0, 0);
-                    }
-                    if (puElement.Equals("s"))
-                    {
-                        IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
-                    }
-                    else
-                    {
-                        cardTarget2 = GetListOfRandomCardsForMonster();
-                        cardTarget1 = GetRandomAmountForMonster();
-                        battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
-                    }
+                battleSystem.skillUsed = false;
+
+                if (cardTarget1.Contains("Deck"))
+                {
+                    posTarget1 = new Vector2(0, 0);
+                }
+                if (cardTarget2.Contains("Deck"))
+                {
+                    posTarget2 = new Vector2(0, 0);
+                }
+                if (puElement.Equals("s"))
+                {
+                    IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
                 }
                 else
                 {
+                    cardTarget2 = GetListOfRandomCardsForMonster();
+                    cardTarget1 = GetRandomAmountForMonster();
+                    battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
+                }
+
+                /*else
+                {
                     battleSystem.skillUsed = true;
                     IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
-                }
+                }*/
                 battleSystem.UpdatePuInDb(cardTarget1, cardTarget2, puIndex);
             }
             else
@@ -147,7 +144,8 @@ public class PowerUpState : State
         if (powerUpName.Equals("im2") || powerUpName.Equals("fm2"))
         {
             return string.Join(",", battleSystem.GetRandomAvailableCardsNames(false));
-        }else if (powerUpName.Equals("wm2"))
+        }
+        else if (powerUpName.Equals("wm2"))
         {
             return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true));
         }
@@ -159,15 +157,15 @@ public class PowerUpState : State
         Debug.Log("ActivateSelectMode =" + powerUpName);
         battleSystem.SetCardsSelectionAndDisplayInfo(cardsToSelect, powerUpName);
         ActivateCardSelection(PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true));
-        if(!PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true)[0].Equals(Constants.AllCardsTag))
+        if (!PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true)[0].Equals(Constants.AllCardsTag))
         {
-        ActivateSelectionPointer(powerUpName);
+            ActivateSelectionPointer(powerUpName);
         }
     }
 
     private void ActivateSelectionPointer(string powerUpName)
     {
-       string[] releventCards = PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true);
+        string[] releventCards = PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true);
         battleSystem.Interface.ApplyPointers(releventCards, powerUpName[0].ToString());
     }
 
@@ -180,16 +178,16 @@ public class PowerUpState : State
         battleSystem.Interface.InitNinjaAttackAnimation(isPlayerActivate, puElement);
         if (puIndex != -1)
         {
-            battleSystem.UpdateEsAfterNcUse(isPlayerActivate, puElement);
+            battleSystem.UpdateEsAfterNcUse(isPlayerActivate, powerUpName);
             battleSystem.DissolvePuAfterUse(isPlayerActivate, puIndex);
         }
         else if (puIndex == -1 && isPlayerActivate)
         {
             battleSystem.ReduceSkillUse();
         }
-        if( puIndex == -1)
+        if (puIndex == -1)
         {
-            battleSystem.Interface.ResetEs(isPlayerActivate);
+            battleSystem.ResetEs(isPlayerActivate);
         }
         if (isPlayerActivate)
         {
@@ -202,14 +200,14 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.f1): //draw_player
             case nameof(PowerUpNamesEnum.f3): //enemy_player
                 {
-                    battleSystem.DestroyAndDrawCard(cardTarget2, 0.100f,  true, true);
+                    battleSystem.DestroyAndDrawCard(cardTarget2, 0.100f, true, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.f2): // draw_board
             case nameof(PowerUpNamesEnum.fp): // draw_board
                 {
                     bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
-                    battleSystem.DestroyAndDrawCard(cardTarget1, 0f,  true, false);
+                    battleSystem.DestroyAndDrawCard(cardTarget1, 0f, true, false);
                     battleSystem.DestroyAndDrawCard(cardTarget2, Values.Instance.delayBetweenProjectiles, isFirstTargetFreeze, true);
                     break;
                 }
@@ -238,7 +236,7 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.enemy_pu_freeze): //enemy_pu_freeze
                 {
-                    battleSystem.FreezePlayingCard(cardTarget2,0, true, true,true);
+                    battleSystem.FreezePlayingCard(cardTarget2, 0, true, true, true);
                     // battleSystem.FreezePu(isPlayerTurn);
                     break;
                 }
@@ -256,22 +254,22 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.i1): //block_enemy_card = i1
             case nameof(PowerUpNamesEnum.i3): //block_player_card = i3
                 {
-                    battleSystem.FreezePlayingCard(cardTarget2,0, true, true,true);
+                    battleSystem.FreezePlayingCard(cardTarget2, 0, true, true, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.i2): //block_board_card = i2
             case nameof(PowerUpNamesEnum.ip): //block_board_card = i2
                 {
                     bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
-                    battleSystem.FreezePlayingCard(cardTarget1,0, true,true, false);
-                    battleSystem.FreezePlayingCard(cardTarget2,200, true, !isFirstTargetFreeze, true);
+                    battleSystem.FreezePlayingCard(cardTarget1, 0, true, true, false);
+                    battleSystem.FreezePlayingCard(cardTarget2, 200, true, !isFirstTargetFreeze, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.im1): //block_player_2_cards = im1
                 {
                     bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(ConvertFixedCardPlace(Constants.PlayerCard1)).freeze;
-                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard1),0, true,true, false);
-                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2),200, true,!isFirstTargetFreeze, true);
+                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard1), 0, true, true, false);
+                    battleSystem.FreezePlayingCard(ConvertFixedCardPlace(Constants.PlayerCard2), 200, true, !isFirstTargetFreeze, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.sm2): //sm2 = 22, //strighter
@@ -340,7 +338,7 @@ public class PowerUpState : State
 
     }
 
-    private async void SwapRandomCards(string listOfCards )
+    private async void SwapRandomCards(string listOfCards)
     {
         //  List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
         List<string> cardsNames = new List<string>(listOfCards.Split(','));
@@ -350,7 +348,7 @@ public class PowerUpState : State
         await Task.Delay(150);
         battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), IsResetTornado(count - i));
 
-        if (count >3)
+        if (count > 3)
         {
             await Task.Delay(320);
             battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), IsResetTornado(count - i));
@@ -360,7 +358,7 @@ public class PowerUpState : State
             await Task.Delay(210);
             battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), IsResetTornado(count - i));
         }
-        if (count >7)
+        if (count > 7)
         {
             await Task.Delay(150);
             battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), IsResetTornado(count - i));
@@ -391,7 +389,7 @@ public class PowerUpState : State
                 isLast = true;
             }
             await Task.Delay(battleSystem.GenerateRandom(400, 700));
-            battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(cardsNames[i]), 0.1f,  isFirst, isLast);
+            battleSystem.DestroyAndDrawCard(ConvertFixedCardPlace(cardsNames[i]), 0.1f, isFirst, isLast);
             isFirst = false;
         }
     }
@@ -414,7 +412,7 @@ public class PowerUpState : State
             {
                 isLast = true;
             }
-            battleSystem.FreezePlayingCard(ConvertFixedCardPlace(cardsNames[i]), battleSystem.GenerateRandom(400, 800), true,isFirstFrozen, isLast);
+            battleSystem.FreezePlayingCard(ConvertFixedCardPlace(cardsNames[i]), battleSystem.GenerateRandom(400, 800), true, isFirstFrozen, isLast);
             isFirstFrozen = false;
         }
     }
@@ -499,7 +497,7 @@ public class PowerUpState : State
         {
             EnableSelectForCardsList(battleSystem.cardsDeckUi.GetListByTag(cardsToActivate[1]), true);
         }
-        else if (cardsToActivate[0] == cardsToActivate[1])
+        else if ((cardsToActivate[0] == cardsToActivate[1]) || powerUpName.Equals("fp") || powerUpName.Equals("ip"))
         {
             battleSystem.sameCardsSelection = true;
         }

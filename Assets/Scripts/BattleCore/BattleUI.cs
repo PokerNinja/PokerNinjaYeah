@@ -194,13 +194,15 @@ public class BattleUI : MonoBehaviour
     private float totalHp;
 
     public ElementalSkillUi pEs;
+    public ElementalSkillUi eEs;
 
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy, bool HP_GAME, float totalHp)
     {
+        pEs.InitializeES(player.id[0].ToString());
+        eEs.InitializeES(enemy.id[0].ToString());
         InitializePlayer(player);
         InitializeEnemy(enemy);
-        pEs.InitializeES("i");
         if (HP_GAME)
         {
             this.totalHp = totalHp;
@@ -238,12 +240,12 @@ public class BattleUI : MonoBehaviour
 
     private void InitializePlayer(PlayerInfo player)
     {
-        playerName = player.id;
+        playerName = player.id.Substring(1);
         playerNameText.text = playerName;
     }
     private void InitializeEnemy(PlayerInfo enemy)
     {
-        enemyName = enemy.id;
+        enemyName = enemy.id.Substring(1);
         enemyNameText.text = enemyName;
     }
 
@@ -610,19 +612,16 @@ public class BattleUI : MonoBehaviour
             case "f1":
             case "f2":
             case "f3":
-            case "esf":
                 spritePath = "nc_fire";
                 break;
             case "i1":
             case "i2":
             case "i3":
-            case "esi":
                 spritePath = "nc_ice";
                 break;
             case "w1":
             case "w2":
             case "w3":
-            case "esw":
                 spritePath = "nc_wind";
                 break;
             case "fm1":
@@ -636,6 +635,15 @@ public class BattleUI : MonoBehaviour
             case "wm1":
             case "wm2":
                 spritePath = "dc_wind";
+                break;
+            case "wp":
+                spritePath = "wp_info";
+                break;
+            case "fp":
+                spritePath = "fp_info";
+                break;
+            case "ip":
+                spritePath = "ip_info";
                 break;
         }
         return Resources.Load("Sprites/GameScene/Info/" + spritePath, typeof(Sprite)) as Sprite;
@@ -1073,7 +1081,11 @@ public class BattleUI : MonoBehaviour
             yield return new WaitForSeconds(Values.Instance.delayBetweenProjectiles);
         }
         StartCoroutine(AnimationManager.Instance.AnimateShootProjectile(false, projectile.transform, new Vector3(posTarget.x, posTarget.y, projectile.transform.position.z),
-        () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(headRenderer, false, Values.Instance.puProjectileFadeOutDuration, () => projectile.SetActive(false))), EndAction));
+        () =>
+        {
+            EndAction?.Invoke();
+            StartCoroutine(AnimationManager.Instance.AlphaAnimation(headRenderer, false, Values.Instance.puProjectileFadeOutDuration, () => projectile.SetActive(false)));
+        }, null));
         //   () => projectile.SetActive(false), EndAction));
 
     }
@@ -1605,7 +1617,7 @@ public class BattleUI : MonoBehaviour
             currentHpText = enemyHpText;
         }
         /* hpInfoCanvas.transform.position = new Vector3(hpInfoCanvas.transform.position.x, posY, hpInfoCanvas.transform.position.z);*/
-        currentHpText.text = RichText(currentHp + " ", Values.Instance.yellowText, true) + RichText("/ " + totalHp, Values.Instance.redText, false);
+        currentHpText.text = "<b>"+RichText(currentHp + " ", Values.Instance.yellowText, true) + RichText("/ " + totalHp, Values.Instance.redText, false) + "HP</b>";
         StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(hpInfoCanvas, true, Values.Instance.infoDialogFadeOutDuration, null));
     }
     public void HideHpDialog()

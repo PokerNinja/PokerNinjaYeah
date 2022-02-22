@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +22,14 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public UnityEvent onClick = new UnityEvent();
     public UnityEvent onLongPress = new UnityEvent();
 
+    public Animation animation;
 
+
+    [Button]
+    public void FullEffect()
+    {
+        animation.Play();
+    }
     public void FillElemental(int amount)
     {
         float targetY = 0f;
@@ -40,14 +48,27 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 targetY = -4.2f;
                 break;
         }
+        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFill ,true);
         StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(pElementSkillLiquid.transform, 0,
-            new Vector3(pElementSkillLiquid.transform.position.x, targetY, pElementSkillLiquid.transform.position.z), Values.Instance.elementalSkillFillDuration, null, null));
+            new Vector3(pElementSkillLiquid.transform.position.x, targetY, pElementSkillLiquid.transform.position.z), Values.Instance.elementalSkillFillDuration, null, ()=>
+            {
+                if(ncCounterUse == 3)
+                {
+                    SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFull, true);
+                    FullEffect();
+                }
+            }));
     }
 
-    public void UpdateEsAfterNcUse(string element)
+    [Button]
+    public void UpdateEsAfterNcUse(string element, bool isMonster)
     {
         if (this.element == element)
         {
+            if (isMonster)
+            {
+                ncCounterUse++;
+            }
             if (++ncCounterUse >= 3)
             {
                 ncCounterUse = 3;
@@ -82,13 +103,17 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     break;
                 }
         }
-        pElementalSkillLiquid.color = liquidColor;
+        if (isPlayer)
+        {
+            pElementalSkillLiquid.color = liquidColor;
+        }
         pElementalSkillIcon.sprite = Resources.Load("Sprites/GameScene/ElementalSkill/" + iconPath, typeof(Sprite)) as Sprite;
     }
 
     public void Enable(bool enable)
     {
-        Action btnEnable = () => isClickable = enable; ;
+        isClickable = enable;
+        /*Action btnEnable = () => isClickable = enable;
         if (enable)
         {
         }
@@ -96,23 +121,23 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             btnEnable.Invoke();
             btnEnable = null;
-        }
+        }*/
         // Make IT more stable
         //StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, btnReplaceRenderer.material, value, btnEnable));
-        StartCoroutine(AnimationManager.Instance.DarkerAnimation(pElementalSkillIcon, !enable, Values.Instance.puChangeColorDisableDuration, btnEnable));
+        // StartCoroutine(AnimationManager.Instance.DarkerAnimation(pElementalSkillIcon, !enable, Values.Instance.puChangeColorDisableDuration, btnEnable));
     }
     public void OnClick()
     {
 
         if (Constants.TUTORIAL_MODE)
         {
-           // BattleSystemTuto.Instance.OnPuClick(this);
+            // BattleSystemTuto.Instance.OnPuClick(this);
         }
         else
         {
-            if(isPlayer && ncCounterUse == 3 && isClickable)
+            if (isPlayer && ncCounterUse == 3 && isClickable)
             {
-            BattleSystem.Instance.OnEsClick(this);
+                BattleSystem.Instance.OnEsClick(this);
             }
             else
             {
@@ -124,50 +149,50 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
 
         CancelInvoke("OnLongPress");
-        
-            if (!held)
-            {
-                onClick.Invoke();
-            }
-            else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
-            {
-                BattleSystemTuto.Instance.HideDialog();
-            }
-            else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
-            {
-                BattleSystem.Instance.HideDialog(true);
-            }
-        
+
+        if (!held)
+        {
+            onClick.Invoke();
+        }
+        else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
+        {
+            BattleSystemTuto.Instance.HideDialog();
+        }
+        else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
+        {
+            BattleSystem.Instance.HideDialog(true);
+        }
+
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-            held = false;
-            Invoke("OnLongPress", holdTime);
+        held = false;
+        Invoke("OnLongPress", holdTime);
     }
 
-   /* private void PressSprite(bool pressed)
-    {
-        if (puIndex == -1 && isPlayer)
-        {
-            string spritePath = "skill_white";
-            if (pressed)
-            {
-                spritePath = "skill_press";
-            }
-            spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + spritePath, typeof(Sprite)) as Sprite;
-        }
-    }
-*/
+    /* private void PressSprite(bool pressed)
+     {
+         if (puIndex == -1 && isPlayer)
+         {
+             string spritePath = "skill_white";
+             if (pressed)
+             {
+                 spritePath = "skill_press";
+             }
+             spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + spritePath, typeof(Sprite)) as Sprite;
+         }
+     }
+ */
     public void OND()
     {
         if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position,true,false, "es"+element, "");
+            BattleSystem.Instance.ShowPuInfo(transform.position, true, false, element + "p" , "");
         }
         else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
         {
-            BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, "es" + element, "");
+            BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, element + "p", "");
         }
     }
 

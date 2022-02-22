@@ -36,7 +36,9 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     public PowerUpUi[] playerPusUi;
     public PowerUpUi[] enemyPusUi;
-    public PowerUpUi playerSkillUi;
+    public Transform playerSkill;
+    public Transform enemySkill;
+   // public PowerUpUi playerSkillUi;
 
 
     public static PuDeckUi Instance()
@@ -444,10 +446,18 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     {
         if (isPlayer)
         {
+            if(puIndex == -1)
+            {
+                return playerSkill.position;
+            }
             return playerPuSlots[puIndex].transform.position;
         }
         else
         {
+            if (puIndex == -1)
+            {
+                return enemySkill.position;
+            }
             return enemyPuSlots[puIndex].transform.position;
         }
     }
@@ -476,6 +486,6 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void EnablePlayerSkill(bool enable)
     {
-        playerSkillUi.EnablePu(enable);
+       // playerSkillUi.EnablePu(enable);
     }
 }

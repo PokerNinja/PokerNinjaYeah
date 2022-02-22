@@ -27,7 +27,13 @@ public class GameMenuHandler : MonoBehaviour
     public bool TEST_MODE;
     [GUIColor(0.1f, 0.3f, 0.8f)]
     public bool HP_GAME;
-   
+
+    public Transform[] elementChoiceTransforms;
+    public SpriteRenderer elementChoicerRenderer;
+    private string elementChoiseString;
+    private int currentElementIndex;
+    private bool clickBlocker;
+
     private bool tutorialVisible = false;
 
     public void Awake()
@@ -43,7 +49,8 @@ public class GameMenuHandler : MonoBehaviour
         DatabaseAPI.InitializeDatabase();
 
         playerName.text = LoadPlayerNickName();
-
+        currentElementIndex = -1;
+        OnElementPick(LoadPlayerElement());
         if (LoadIsAutoPlay().Equals("True"))
         {
             PlayerPrefs.SetString("PlayAgain", "false");
@@ -56,7 +63,7 @@ public class GameMenuHandler : MonoBehaviour
         {
             if (Application.version.ToString().Equals(targetVersion))
             {
-               // Debug.LogError("You are updated");
+                // Debug.LogError("You are updated");
             }
             else
             {
@@ -74,12 +81,12 @@ public class GameMenuHandler : MonoBehaviour
     }
     public void SendUserToDriveApk()
     {
-       // dialogUpdateText.text = linkToDrive;
+        // dialogUpdateText.text = linkToDrive;
         //dialogUpdateText.text ="< link ="+ linkToDrive+"/> </ link >";
         string newUrl = linkToDrive.Trim('"');
         Application.OpenURL(newUrl);
 
-        
+
     }
     public void SendUserToStore()
     {
@@ -92,11 +99,11 @@ public class GameMenuHandler : MonoBehaviour
 
             if (Input.GetKeyDown("escape"))
             {
-                if ( !isRankOpen && !sliding)
+                if (!isRankOpen && !sliding)
                 {
                     EnableExitDialog(true);
                 }
-                else if ( isRankOpen)
+                else if (isRankOpen)
                 {
                     SlideImgRank();
                 }
@@ -105,7 +112,7 @@ public class GameMenuHandler : MonoBehaviour
     }
     public void EnableExitDialog(bool enable)
     {
-       
+
         canvasExitDialog.SetActive(enable);
     }
     public void BtnExit()
@@ -154,13 +161,13 @@ public class GameMenuHandler : MonoBehaviour
     [Button]
     public static void yalla()
     {
-
         DatabaseAPI.CheckIfVersionUpdated(Application.version.ToString(),
           () => Debug.Log("Version Updated"), () => Debug.LogError("Update is required"));
     }
 
     public void StartMultiplayer()
     {
+        Constants.MatchId = "placeholder";
         if (TEST_MODE)
         {
             SceneManager.LoadScene("GameScene2");
@@ -169,7 +176,7 @@ public class GameMenuHandler : MonoBehaviour
         {
             SavePlayerNickName(playerName.text.ToString());
             //  DatabaseAPI.InitializeDatabase();
-            MainManager.Instance.currentLocalPlayerId = playerName.text + UnityEngine.Random.Range(1, 999).ToString();
+            MainManager.Instance.currentLocalPlayerId = elementChoiseString + playerName.text + UnityEngine.Random.Range(1, 999).ToString();
             SceneManager.LoadScene("MatchMakingScene");
         }
         else
@@ -195,6 +202,14 @@ public class GameMenuHandler : MonoBehaviour
     private string LoadPlayerNickName()
     {
         return PlayerPrefs.GetString("player_name", "Ninja");
+    }
+    private void SavePlayerElement(int element)
+    {
+        PlayerPrefs.SetInt("player_element", element);
+    }
+    private int LoadPlayerElement()
+    {
+        return PlayerPrefs.GetInt("player_element", 0);
     }
 
     public void StartPractice()
@@ -399,6 +414,88 @@ public class GameMenuHandler : MonoBehaviour
     string MyEscapeURL(string url)
     {
         return WWW.EscapeURL(url).Replace("+", "%20");
+    }
+
+    public void OnElementPick(int index)
+    {
+        if (currentElementIndex != index && !clickBlocker)
+        {
+            currentElementIndex = index;
+            switch (index)
+            {
+                case 0:
+                    elementChoiseString = "f";
+                    break;
+                case 1:
+                    elementChoiseString = "i";
+                    break;
+                case 2:
+                    elementChoiseString = "w";
+                    break;
+            }
+            SavePlayerElement(index);
+            UpdatePickedElement(index);
+        }
+    }
+
+    private void UpdatePickedElement(int index)
+    {
+        clickBlocker = true;
+        /*StartCoroutine(AlphaAnimation(elementChoicerRenderer, false, 0.25f, () =>
+        {*/
+        elementChoicerRenderer.color = new Color(1, 1, 1, 0);
+        elementChoicerRenderer.transform.position = new Vector3(elementChoiceTransforms[index].position.x, elementChoiceTransforms[index].position.y, elementChoicerRenderer.transform.position.z);
+        StartCoroutine(AlphaAnimation(elementChoicerRenderer, true, 0.25f, () => clickBlocker = false));
+
+    }
+
+    public IEnumerator AlphaAnimation(SpriteRenderer spriteRenderer, bool fadeIn, float duration, Action OnFinish)
+    {
+        float r = spriteRenderer.color.r;
+        float g = spriteRenderer.color.g;
+        float b = spriteRenderer.color.b;
+        float startingAlpha = spriteRenderer.color.a;
+        float dissolveAmount = 1;
+        float alphaTarget = 0;
+        if (fadeIn)
+        {
+            dissolveAmount = 0;
+            alphaTarget = 1;
+        }
+        if (startingAlpha == alphaTarget)
+        {
+            OnFinish?.Invoke();
+        }
+        else
+        {
+
+            spriteRenderer.color = new Color(r, g, b, dissolveAmount);
+            //FIXIT
+            while (dissolveAmount != alphaTarget)
+            {
+                //yield return new WaitForFixedUpdate();
+                yield return null;
+                if (fadeIn)
+                {
+                    dissolveAmount += Time.deltaTime / duration;
+                }
+                else
+                {
+                    dissolveAmount -= Time.deltaTime / duration;
+                }
+
+                spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
+                if (dissolveAmount >= 1 || dissolveAmount <= 0)
+                {
+                    // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
+                    // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
+
+                    spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaTarget));
+                    OnFinish?.Invoke();
+                    break;
+                }
+            }
+        }
     }
 }
 
