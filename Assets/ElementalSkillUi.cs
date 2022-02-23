@@ -48,14 +48,17 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 targetY = -4.2f;
                 break;
         }
-        SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFill ,true);
+        if (amount != 0)
+        {
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFill, true);
+        }
         StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(pElementSkillLiquid.transform, 0,
-            new Vector3(pElementSkillLiquid.transform.position.x, targetY, pElementSkillLiquid.transform.position.z), Values.Instance.elementalSkillFillDuration, null, ()=>
+            new Vector3(pElementSkillLiquid.transform.position.x, targetY, pElementSkillLiquid.transform.position.z), Values.Instance.elementalSkillFillDuration, null, () =>
             {
-                if(ncCounterUse == 3)
+                if (ncCounterUse == 3)
                 {
-                    SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFull, true);
                     FullEffect();
+                    SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFull, true);
                 }
             }));
     }
@@ -188,11 +191,11 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, true, false, element + "p" , "");
+            BattleSystem.Instance.ShowPuInfo(transform.position, true, false, element + "p", "");
         }
         else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
         {
-            BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, element + "p", "");
+            // BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, element + "p", "");
         }
     }
 

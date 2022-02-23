@@ -38,6 +38,7 @@ public class Constants : Singleton<Constants>
     public static string ReplacePuInfo = "Draw a Ninja Card. When no slot is available, choose a Ninja Card to destroy.";
     public static string BetInfo = "Offer your opponent to double the damage for this round";
     public static string EndInfo = "Click to end your turn";
+    public static string DealerInfo = "The dealer has the last move, and gets 1 energy in the last round";
     public static string DrawInstructions = "Choose a Ninja Card to replace";
 
     public static bool TUTORIAL_MODE = false;

@@ -99,13 +99,13 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         (PowerUpNamesEnum.wm2.ToString(), "Tornado", "<b><color=#FFC35E>Tornado\nSwap</color></b> random cards", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
     /*35*/
     public PuStructInfo esFire = new PuStructInfo
-        (PowerUpNamesEnum.fp.ToString(), "fp", "<b><color=#F03B37>Burn</color></b> two cards of your choise use 3 Fire Ninja Card to unlock", "Choose two cards to <color=#F03B37>burn</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.fp.ToString(), "fp", "<size=110%><b><color=#F03B37>Burn</color> two cards of your choise.</b>\n<size=50%>\n<b><size=90%>*use 3 <color=#F03B37>Fire</color> Ninja Card to unlock", "Choose two cards to <color=#F03B37>burn</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
     /*36*/
     public PuStructInfo esIce = new PuStructInfo
-        (PowerUpNamesEnum.ip.ToString(), "ip", "<b><color=#02C8FF>Freeze</color></b> two cards of your choise use 3 Ice Ninja Card to unlock", "Choose two cards to <color=#02C8FF>freeze</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.ip.ToString(), "ip", "<size=110%><b><color=#02C8FF>Freeze</color> two cards of your choise.</b>\n<size=50%>\n<b><size=90%>*use 3 <color=#02C8FF>Ice</color> Ninja Card to unlock", "Choose two cards to <color=#02C8FF>freeze</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
     /*37*/
     public PuStructInfo esWind = new PuStructInfo
-        (PowerUpNamesEnum.wp.ToString(), "wp", "<b><color=#FFC35E>SWAP</color></b> two cards of your choise use 3 WIND Ninja Card to unlock", "Choose two cards to <color=#FFC35E>swap</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.wp.ToString(), "wp", "<size=110%><b><color=#FFC35E>SWAP</color> two cards of your choise.</b>\n<size=50%>\n<b><size=90%>*use 3 <color=#FFC35E>Wind</color> Ninja Card to unlock", "Choose two cards to <color=#FFC35E>swap</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
 
     /*9*/
     public PuStructInfo shuffle_board = new PuStructInfo

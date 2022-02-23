@@ -204,7 +204,7 @@ public class BattleSystem : StateMachine
         TEST_MODE = Values.Instance.TEST_MODE;
         Constants.HP_GAME = true;
         HP_GAME = Constants.HP_GAME;
-         Constants.BOT_MODE = true;
+        Constants.BOT_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
@@ -1247,7 +1247,7 @@ public class BattleSystem : StateMachine
     {
         if (isPlayer)
         {
-            ui.pEs.UpdateEsAfterNcUse(puName[0].ToString(),puName.Contains("m"));
+            ui.pEs.UpdateEsAfterNcUse(puName[0].ToString(), puName.Contains("m"));
         }
         else
         {
@@ -1906,7 +1906,7 @@ public class BattleSystem : StateMachine
     public void SetCardsSelectionAndDisplayInfo(int cardsToSelectCounter, string newPuName)
     {
         AnimationManager.Instance.SetAlpha(ui.darkScreenRenderer, 0.56f);
-       
+
         if (!newPuName.Equals("fm1"))
         {
             selectMode = true;
@@ -2070,7 +2070,7 @@ public class BattleSystem : StateMachine
 
     internal void InitProjectile(bool isPlayerActivate, int puIndex, string powerUpName, Vector2 posTarget1, Vector2 posTarget2, Action IgnitePowerUp)
     {
-    
+
         if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.im2)))
         {
             StartCoroutine(ui.StartIcenado());
@@ -2136,6 +2136,7 @@ public class BattleSystem : StateMachine
                     {
                         ui.InitLargeText(true, Constants.DrawInstructions);
                         puDeckUi.EnablePusSlotZ(true, true);
+                        AnimationManager.Instance.SetAlpha(ui.darkScreenRenderer, 0.56f);
                         ui.EnableDarkScreen(isPlayerActivatePu, true, () => StartCoroutine(SetClickableWithDelay(0.5f)));
                     }
                     else
@@ -2423,6 +2424,7 @@ public class BattleSystem : StateMachine
         }
         else if (!ReplaceInProgress && powerUpUi.isPlayer && powerUpUi.replaceMode)
         {
+            AnimationManager.Instance.SetAlpha(ui.darkScreenRenderer, 0f);
             ReplacePu(true, powerUpUi.puIndex);
             ui.InitLargeText(false, Constants.DrawInstructions);
         }
@@ -2582,20 +2584,27 @@ public class BattleSystem : StateMachine
             ui.AnimateRaiseArrow(isAccept);
             if (isAccept)
             {
-                UpdateRaise();
-                ui.turnTimer.PauseTimer(false);
-                Debug.Log("DamageIsNow: " + currentDamageThisRound);
+                EnemyAcceptRaise();
+
             }
             else
             {
-                currentDamageThisRound -= GetDmgPenelty();
-                SetState(new EndRound(this, false, true));
-                // DeckGeneratorDB();
+                EnemyDeclineRaise();
             }
         }
-        /*gameManager.ResetBetDB(() =>
-        Debug.Log("reset bet succes"),
-        Debug.Log);*/
+    }
+
+    public void EnemyDeclineRaise()
+    {
+        currentDamageThisRound -= GetDmgPenelty();
+        SetState(new EndRound(this, false, true));
+    }
+
+    public void EnemyAcceptRaise()
+    {
+        UpdateRaise();
+        ui.turnTimer.PauseTimer(false);
+        Debug.Log("DamageIsNow: " + currentDamageThisRound);
     }
 
     public float GetDmgPenelty()
@@ -2652,7 +2661,7 @@ public class BattleSystem : StateMachine
         if (!raiseOffer && ui.betBtn.btnBetClickable)
         {
             ui.betBtn.btnBetClickable = false;
-            ui.SetOfferChooseRaiseDialog(true, currentDamageThisRound - GetDmgPenelty(),EnoughHpToRaise(1),EnoughHpToRaise(2));
+            ui.SetOfferChooseRaiseDialog(true, currentDamageThisRound - GetDmgPenelty(), EnoughHpToRaise(1), EnoughHpToRaise(2));
 
         }
         else
@@ -2664,13 +2673,20 @@ public class BattleSystem : StateMachine
     public void PlayerChooseRaise(int dmg)
     {
         choosenRaise = raiseOptions[dmg];
-        ui.SetOfferChooseRaiseDialog(false, 0,false,false);
+        ui.SetOfferChooseRaiseDialog(false, 0, false, false);
         raiseOffer = true;
         ui.betBtn.EnableBetBtn(false);
         ui.turnTimer.PauseTimer(true);
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
         EnableWaitDialog(true);
-        UpdateBetDB(currentGameInfo.localPlayerId + choosenRaise);
+        if (BOT_MODE)
+        {
+            SetState(new BotEnemy(this, currentTurn, true));
+        }
+        else
+        {
+            UpdateBetDB(currentGameInfo.localPlayerId + choosenRaise);
+        }
     }
 
     private void UpdateBetDB(string info)
@@ -2790,8 +2806,8 @@ public class BattleSystem : StateMachine
 
     private bool EnoughHpToRaise(int option)
     {
-         return (playerHp >= (currentDamageThisRound + raiseOptions[option]))
-               && (enemyHp >= (currentDamageThisRound + raiseOptions[option]));
+        return (playerHp >= (currentDamageThisRound + raiseOptions[option]))
+              && (enemyHp >= (currentDamageThisRound + raiseOptions[option]));
     }
 
     private void OnApplicationPause(bool pause)

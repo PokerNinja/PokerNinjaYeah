@@ -188,7 +188,6 @@ public class BattleUI : MonoBehaviour
     public Transform dealerTransform;
     public Transform dealerSlotP;
     public Transform dealerSlotE;
-    private Vector3 dealerStarter;
 
     public Image infoPuBg;
     private float totalHp;
@@ -220,7 +219,6 @@ public class BattleUI : MonoBehaviour
         {
             InitializeAnimations();
         }
-        dealerStarter = dealerTransform.position;
     }
 
    
@@ -403,13 +401,13 @@ public class BattleUI : MonoBehaviour
                 turnTimer.turnArrowUi.FlipImage(isPlayerStart);
                 turnTimer.Activate(true);
                 coinFlipTurn.gameObject.SetActive(false);
-                MoveDealerBtn(true, !isPlayerStart);
+                MoveDealerBtn( !isPlayerStart);
             }/*() => coinFlipTurn.gameObject.SetActive(false)*/, null, null));
     }
 
 
 
-    public void MoveDealerBtn(bool firstRound, bool isEnemy)
+    public void MoveDealerBtn( bool isEnemy)
     {
         Action clickSound = () => SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, true);
         Vector3 targetPosition = dealerSlotE.position;
@@ -418,16 +416,9 @@ public class BattleUI : MonoBehaviour
         {
             targetPosition = dealerSlotP.position;
         }
-        if (!firstRound)
-        {
-            StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(dealerTransform, 0, dealerStarter, duration, clickSound,
-                () => StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(dealerTransform, 0.2f, targetPosition, duration, clickSound, null))));
-
-        }
-        else
-        {
-            StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(dealerTransform, 0, targetPosition, duration, clickSound, null));
-        }
+       
+            StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(dealerTransform, 0.2f, targetPosition, duration, clickSound, null));
+        
     }
 
     internal void InitAvatars()
@@ -576,6 +567,10 @@ public class BattleUI : MonoBehaviour
             {
                 InitDialog(puDisplayName, PowerUpStruct.Instance.GetPuInfoByName(puName), isBtnOn);
             }
+            else if (puName.Equals("dealer"))
+            {
+                InitDialog(puDisplayName, Constants.DealerInfo, isBtnOn);
+            }
             else
             {
                 InitDialogPu(puName, PowerUpStruct.Instance.GetPuInfoByName(puName));
@@ -584,7 +579,7 @@ public class BattleUI : MonoBehaviour
             dialog.transform.localScale = new Vector2(0.1f, 0.1f);
             // infoCanvas.alpha = 1f;
             Action shineEffect = null;
-            if (puName.Contains("m"))
+            if (puName.Contains("m") || puName.Contains("p"))
             {
                 shineEffect = () => StartCoroutine(AnimationManager.Instance.ShineCard(infoPuBg.material, 0.6f, GetColorFromElement(puName[0].ToString()), null));
             }
@@ -737,7 +732,7 @@ public class BattleUI : MonoBehaviour
         Values.Instance.currentVisionColor = Values.Instance.visionColorsByRank[9];
     }
 
-    internal void SlideRankingImg()
+    public void SlideRankingImg()
     {
         if (!sliding)
         {
@@ -1626,7 +1621,7 @@ public class BattleUI : MonoBehaviour
             currentHpText = enemyHpText;
         }
         /* hpInfoCanvas.transform.position = new Vector3(hpInfoCanvas.transform.position.x, posY, hpInfoCanvas.transform.position.z);*/
-        currentHpText.text = "<b>"+RichText(currentHp + " ", Values.Instance.yellowText, true) + RichText("/ " + totalHp, Values.Instance.redText, false) + "HP</b>";
+        currentHpText.text = "<b>"+RichText(currentHp + " ", Values.Instance.yellowText, true) + RichText("/ " + totalHp, Values.Instance.redText, false) + " HP</b>";
         StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(hpInfoCanvas, true, Values.Instance.infoDialogFadeOutDuration, null));
     }
     public void HideHpDialog()

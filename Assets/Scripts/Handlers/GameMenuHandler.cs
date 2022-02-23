@@ -9,6 +9,7 @@ using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using Firebase.Database;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 public class GameMenuHandler : MonoBehaviour
 {
@@ -118,7 +119,6 @@ public class GameMenuHandler : MonoBehaviour
     }
     public void BtnExit()
     {
-        SlideImgRank();
         canvasExitDialog.SetActive(true);
     }
 
@@ -498,5 +498,6 @@ public class GameMenuHandler : MonoBehaviour
             }
         }
     }
+
 }
 

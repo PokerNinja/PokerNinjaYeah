@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class ButtonLongPress : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
+public class ButtonLongPress : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField]
     [Tooltip("How long must pointer be down on this object to trigger a long press")]
-    private float holdTime = 1f;
+    private float holdTime = 0.3f;
 
     // Remove all comment tags (except this one) to handle the onClick event!
     private bool held = false;
@@ -31,9 +31,15 @@ public class ButtonLongPress : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         onPointerUp.Invoke();
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public void OND()
     {
-        CancelInvoke("OnLongPress");
+        BattleSystem.Instance.ShowPuInfo(transform.position, false, false,"dealer","");
+    }
+
+    public void ONU()
+    {
+        BattleSystem.Instance.HideDialog(false);
+
     }
 
     private void OnLongPress()

@@ -37,7 +37,7 @@ public class BeginRound : State
         battleSystem.readyToPlay = true;
         if (!isFirstRound)
         {
-            battleSystem.Interface.MoveDealerBtn(false, !isPlayerTurn);
+            battleSystem.Interface.MoveDealerBtn( !isPlayerTurn);
         }
         battleSystem.Interface.EnableVisionClick(true);
         /*  if (Values.Instance.resetReplaceEvery == Values.GamePhase.Round)

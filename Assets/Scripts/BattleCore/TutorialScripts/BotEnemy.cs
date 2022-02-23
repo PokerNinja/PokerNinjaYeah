@@ -23,28 +23,77 @@ public class BotEnemy : State
 
     private int pu1Odds = 0;
     private int pu2Odds = 0;
-    public BotEnemy(BattleSystem battleSystem, int turnCounter) : base(battleSystem)
+    public BotEnemy(BattleSystem battleSystem, int turnCounter, bool betOffer) : base(battleSystem)
     {
         Debug.Log("BOTSTATER");
         this.battleSystem = battleSystem;
         this.turnCounter = turnCounter;
-        if (turnCounter > 4 && battleSystem.firstRound)
+        if (betOffer)
         {
-            energyLeft = 0;
+            DecideAcceptBet();
         }
         else
         {
-            energyLeft = GetLastEnergy();
+            if (turnCounter > 4 && battleSystem.firstRound)
+            {
+                energyLeft = 0;
+            }
+            else
+            {
+                energyLeft = GetLastEnergy();
+            }
+            ChargeEnergy();
+            InitBotTurn();
+            Debug.Log("BOT ENERGY:" + energyLeft);
         }
-        ChreageEnergy();
-        InitBotTurn();
-        Debug.Log("BOT ENERGY:" + energyLeft);
+    }
+
+    private async void DecideAcceptBet()
+    {
+        InitFieldSituation();
+        EnemyBotGotDuplicateCard();
+        if (battleSystem.puDeckUi.GetPu(false, 0) != null)
+        {
+            pu1 = battleSystem.puDeckUi.GetPu(false, 0).puName;
+            Debug.Log("pu1 " + pu1);
+        }
+        if (battleSystem.puDeckUi.GetPu(false, 1) != null)
+        {
+            pu2 = battleSystem.puDeckUi.GetPu(false, 1).puName;
+            Debug.Log("pu2 " + pu2);
+        }
+        pu1Odds = CalculatePu(pu1);
+        pu2Odds = CalculatePu(pu2);
+        int rankOdds = (10 - currentRank) * 2;
+        int turnOdds = (6 - turnCounter);
+        int totalAcceptOdds = pu1Odds + pu2Odds + rankOdds + turnOdds;
+        Debug.Log("AcceptOdds: " + totalAcceptOdds);
+        List<int> acceptOdds = GenerateListProbability(EnemyActions.AcceptRaise, totalAcceptOdds);
+        List<int> declineOdds = GenerateListProbability(EnemyActions.RefuseRaise, 5);
+        List<int> options = acceptOdds.Concat(declineOdds).ToList();
+        int act = options[battleSystem.GenerateRandom(0, options.Count)];
+        await Task.Delay(battleSystem.GenerateRandom(2200, 5500));
+
+        if (act == EnemyActions.AcceptRaise.GetHashCode())
+        {
+            battleSystem.EnemyAcceptRaise();
+        }
+        else
+        {
+            battleSystem.EnemyDeclineRaise();
+        }
     }
 
     private async void InitBotTurn()
     {
         await Task.Delay(1000);
         battleSystem.finishPuDissolve = true;
+        InitFieldSituation();
+        CheckMyOptions();
+    }
+
+    private void InitFieldSituation()
+    {
         pu1 = "";
         pu2 = "";
         card1 = GetEnemyCardRank(0);
@@ -52,7 +101,6 @@ public class BotEnemy : State
         currentRank = GetHandRank();
         playerRevealdCard = GetWhatPlayerCardValueRevealed();
         boardCardsUi = battleSystem.cardsDeckUi.boardCardsUi;
-        CheckMyOptions();
     }
 
     private int GetWhatPlayerCardValueRevealed()
@@ -87,7 +135,7 @@ public class BotEnemy : State
         return battleSystem.LoadPrefsInt(Constants.Instance.botEnergyKey.ToString());
     }
 
-    private void ChreageEnergy()
+    private void ChargeEnergy()
     {
         if (turnCounter > 1)
         {
@@ -155,7 +203,6 @@ public class BotEnemy : State
         }
         else
         {
-
             puness = CalculatePuUseProbability();
             skillness = CalculateSkillProbability(skillOdds);
             drawness = CalculateDrawProbability(drawOdds);
@@ -933,6 +980,8 @@ public class BotEnemy : State
         Pu2Use = 4,
         PuRandomUse = 6,
         SendEmoji = 5,
+        AcceptRaise = 7,
+        RefuseRaise = 8,
     }
 
 }
