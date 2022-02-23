@@ -35,7 +35,7 @@ public class Constants : Singleton<Constants>
     public static readonly string[] BoardCards = { BFlop1, BFlop2, BFlop3, BTurn4, BRiver5 };
     public static readonly string[] deckCardsNames = { Deck1, Deck2 };
     public static readonly string[] ghostCardsNames = { PlayerGhost, EnemyGhost, BoardGhost };
-    public static string ReplacePuInfo = "Draw a Ninja Card. When no slot is available, choose a Ninja Card to destroy.";
+    public static string ReplacePuInfo = "<b>Draw a Ninja Card</b>.\nWhen no slot available - choose one to replace.";
     public static string BetInfo = "Offer your opponent to double the damage for this round";
     public static string EndInfo = "Click to end your turn";
     public static string DealerInfo = "The dealer has the last move, and gets 1 energy in the last round";

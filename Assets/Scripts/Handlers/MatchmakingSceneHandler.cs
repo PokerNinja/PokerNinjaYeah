@@ -38,16 +38,19 @@ namespace Handlers
         private readonly string tip13 = "Ninja-cards are divided to 3 Elements- Fire, ice, Wind. Fire burns. Ice freezes. Wind swaps.";
         private string[] tips;
 
+        public GameObject dotPrefab;
+
         private void Start()
         {
 
             readyingUp = false;
             gameFound = false;
-            searchingText.text = "Looking for opponent...";
+            searchingText.text = "Looking for opponent";
             JoinQueue(Constants.MatchId);
             tips = new string[] { tip1, tip2, tip3, tip4, tip5, tip6, tip7, tip8, tip9, tip10, tip11, tip12, tip13 };
             StartCoroutine(DisplayRandomTip());
             StartCoroutine(StartBotGame());
+            DotsEffect();
         }
 
         private IEnumerator StartBotGame()
@@ -328,6 +331,13 @@ namespace Handlers
             }
         }
 
+
+        private  void DotsEffect()
+        {
+           Instantiate(dotPrefab);
+           /* await Task.Delay(390);
+           Instantiate(dotPrefab,new Vector3(1.1f, 1.23f, 1f), Quaternion.identity);*/
+        }
         private void OnGUI()
         {
             if (Event.current.type == EventType.KeyDown)

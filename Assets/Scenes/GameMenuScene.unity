@@ -8299,6 +8299,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2064663470}
   - component: {fileID: 2064663469}
+  - component: {fileID: 2064663471}
   m_Layer: 0
   m_Name: eyes
   m_TagString: Untagged
@@ -8366,11 +8367,27 @@ Transform:
   m_GameObject: {fileID: 2064663468}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 2.85, z: -59}
-  m_LocalScale: {x: 0.94, y: 0.94, z: 0.94}
+  m_LocalScale: {x: 0.94, y: 0.2234568, z: 0.94}
   m_Children: []
   m_Father: {fileID: 754561597}
   m_RootOrder: 21
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!111 &2064663471
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064663468}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: a92405bb1db1b214581da1e23cbd0db1, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: a92405bb1db1b214581da1e23cbd0db1, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &2115305296
 GameObject:
   m_ObjectHideFlags: 0

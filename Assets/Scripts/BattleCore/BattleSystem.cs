@@ -204,7 +204,7 @@ public class BattleSystem : StateMachine
         TEST_MODE = Values.Instance.TEST_MODE;
         Constants.HP_GAME = true;
         HP_GAME = Constants.HP_GAME;
-        Constants.BOT_MODE = true;
+        //Constants.BOT_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
