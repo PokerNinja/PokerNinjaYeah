@@ -45,7 +45,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 targetY = -4.6f;
                 break;
             case 3:
-                targetY = -4.2f;
+                targetY = -4.23f;
                 break;
         }
         if (amount != 0)
@@ -63,11 +63,14 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             }));
     }
 
-    [Button]
-    public void UpdateEsAfterNcUse(string element, bool isMonster)
+    public bool IsNcEqualsPesElement(string element)
     {
-        if (this.element == element)
-        {
+        return this.element == element;
+    }
+
+    [Button]
+    public void UpdateEsAfterNcUse(bool isMonster)
+    {
             if (isMonster)
             {
                 ncCounterUse++;
@@ -77,7 +80,6 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 ncCounterUse = 3;
             }
             FillElemental(ncCounterUse);
-        }
     }
 
     public void InitializeES(string elementalSkillType)
@@ -199,7 +201,15 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
     }
 
-
+    public void EnableSelecetPositionZ(bool aboveDarkScreen)
+    {
+        float interval = 88.5f;
+        if (aboveDarkScreen)
+        {
+            interval = 28f;
+        }
+        transform.position = new Vector3(transform.position.x, transform.position.y, interval);
+    }
     private void OnLongPress()
     {
         held = true;

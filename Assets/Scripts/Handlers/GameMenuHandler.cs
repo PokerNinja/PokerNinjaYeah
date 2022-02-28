@@ -208,6 +208,10 @@ public class GameMenuHandler : MonoBehaviour
     {
         PlayerPrefs.SetInt("player_element", element);
     }
+    private void SavePlayerElementString(string element)
+    {
+        PlayerPrefs.SetString("player_element_string", element);
+    }
     private int LoadPlayerElement()
     {
         return PlayerPrefs.GetInt("player_element", 0);
@@ -435,6 +439,7 @@ public class GameMenuHandler : MonoBehaviour
                     break;
             }
             SavePlayerElement(index);
+            SavePlayerElementString(elementChoiseString);
             UpdatePickedElement(index);
         }
     }

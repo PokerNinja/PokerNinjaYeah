@@ -24,7 +24,7 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private float totalTime;
     private Coroutine thereCanBeOnlyOne;
 
-    private float holdTime = 0.3f;
+    private float holdTime = 0.5f;
     private bool held = false;
     private bool isLastSeconds;
     // public ITimeOut iTimeOut { get; set; }

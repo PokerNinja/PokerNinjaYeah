@@ -1379,6 +1379,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         foreach (CardUi card in GetListByTag(CardPlaceToTag(cardPlace)))
         {
             card.SetSelection(false, "", "");
+            GetParentByPlace(card.cardPlace).EnableNcAction(false, Constants.NcAction.Nothing);
         }
     }
 
@@ -1972,7 +1973,24 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         }
         Debug.LogWarning(totalCards);
     }
+    public void EnableNcActionSlot(string cardPlace, string puElement)
+    {
+        Constants.NcAction ncAction = Constants.NcAction.Nothing;
+        if (puElement.Equals("f"))
+        {
+            ncAction = Constants.NcAction.Defrost;
+        }else if (puElement.Equals("i"))
+        {
+            ncAction = Constants.NcAction.Shatter;
+        }
+        GetParentByPlace(cardPlace).EnableNcAction(true, ncAction);
+    }
 
+    public void DisableNcAction(string cardPlace)
+    {
+        GetParentByPlace(cardPlace).EnableNcAction(false, Constants.NcAction.Nothing);
+
+    }
 }
 
 

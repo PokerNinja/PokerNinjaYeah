@@ -1,4 +1,5 @@
-﻿using StandardPokerHandEvaluator;
+﻿using Sirenix.OdinInspector;
+using StandardPokerHandEvaluator;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,6 +39,8 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     public PowerUpUi[] enemyPusUi;
     public Transform playerSkill;
     public Transform enemySkill;
+
+    public Transform pesTranform;
    // public PowerUpUi playerSkillUi;
 
 
@@ -329,7 +332,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
            // targetX = 4.39f;
-            targetX = 5.2f;
+            targetX = 5.35f;
         }
         else
         {
@@ -488,4 +491,11 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     {
        // playerSkillUi.EnablePu(enable);
     }
+
+    [Button]
+    public void DissolvePuToNc(int index , Action OnEnd)
+    {
+        GetPu(true, index).DissolvePuToNc(pesTranform.position, OnEnd);
+    }
+    
 }

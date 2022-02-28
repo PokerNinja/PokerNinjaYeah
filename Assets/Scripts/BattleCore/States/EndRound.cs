@@ -54,7 +54,7 @@ public class EndRound : State
     private string EndByBetCalculator()
     {
         string text;
-        string enemyId = battleSystem.enemy.id;
+        string enemyId = battleSystem.Interface.RichText(battleSystem.enemy.id.Substring(1), Values.Instance.yellowText, true);
         if (isPlayerPreWin)
         {
             text = enemyId + " Refuse your bet. You Win!";
@@ -66,10 +66,11 @@ public class EndRound : State
 
         startNewRound = !battleSystem.DealHpDamage(!isPlayerPreWin, true);
         battleSystem.EndRoundVisual(isPlayerPreWin);
-        if (LocalTurnSystem.Instance.ShouldFlipArrowAfterRaiseDeclined())
+        //TODO What abot alex
+        if (battleSystem.ShouldFlipTurnAfterBetDecline())
         {
             battleSystem.FlipTurnAfterDecline = true;
-            if (battleSystem.IsPlayerTurn())
+            if (battleSystem.IsPlayerTurn() && !battleSystem.BOT_MODE)
             {
                 LocalTurnSystem.Instance.SyncStarterAfterEnd();
             }
@@ -110,18 +111,19 @@ public class EndRound : State
         // Make it better
         if (bestPlayerHand.Rank.CompareTo(bestOpponentHand.Rank) == 1)
         {
+            string enemyId = battleSystem.Interface.RichText(battleSystem.enemy.id.Substring(1), Values.Instance.yellowText, true);
             // SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Lose, true);
             if (battleSystem.DealDamage(true))
             {
                 //battleSystem.gameOver = false;
                 startNewRound = false;
-                winnerMsg = battleSystem.Interface.RichText(battleSystem.enemy.id, Values.Instance.yellowText, true) + " Wins The Game With ";
+                winnerMsg = enemyId + " Wins The Game With ";
                 battleSystem.SetState(new GameOver(battleSystem, false));
             }
             else
             {
                 startNewRound = true;
-                winnerMsg = battleSystem.Interface.RichText(battleSystem.enemy.id, Values.Instance.yellowText, true) + " Wins With ";
+                winnerMsg = enemyId + " Wins With ";
             }
             if (battleSystem.cardsDeckUi.enemyShadowCard.Equals("x"))
             {
@@ -138,18 +140,19 @@ public class EndRound : State
         // Player win
         else if (bestPlayerHand.Rank.CompareTo(bestOpponentHand.Rank) == -1)
         {
+            string playerId = battleSystem.Interface.RichText(battleSystem.player.id.Substring(1), Values.Instance.yellowText, true);
             // SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Win, true);
             if (battleSystem.DealDamage(false))
             {
                 startNewRound = false;
-                winnerMsg = battleSystem.Interface.RichText(battleSystem.player.id, Values.Instance.yellowText, true) + " Wins The Game With ";
+                winnerMsg = playerId + " Wins The Game With ";
                 battleSystem.SetState(new GameOver(battleSystem, true));
             }
             else
             {
                 startNewRound = true;
 
-                winnerMsg = battleSystem.Interface.RichText(battleSystem.player.id, Values.Instance.yellowText, true) + " Wins With ";
+                winnerMsg = playerId + " Wins With ";
             }
             if (battleSystem.cardsDeckUi.playerShadowCard.Equals("x"))
             {

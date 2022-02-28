@@ -178,7 +178,7 @@ Material:
     - _OutlineDistortTexXSpeed: -1
     - _OutlineDistortTexYSpeed: -2
     - _OutlineDistortToggle: 1
-    - _OutlineGlow: 1
+    - _OutlineGlow: 2
     - _OutlineIsPixel: 0
     - _OutlinePixelWidth: 1
     - _OutlineTexGrey: 0
@@ -246,7 +246,7 @@ Material:
     - _HitEffectColor: {r: 1, g: 1, b: 1, a: 1}
     - _HologramStripeColor: {r: 0, g: 1, b: 1, a: 1}
     - _InnerOutlineColor: {r: 1, g: 0, b: 0, a: 1}
-    - _OutlineColor: {r: 1, g: 0.89411765, b: 0, a: 1}
+    - _OutlineColor: {r: 1, g: 0.5137255, b: 0.29803923, a: 1}
     - _OverlayColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 1}
     - _ShineColor: {r: 1, g: 1, b: 1, a: 1}

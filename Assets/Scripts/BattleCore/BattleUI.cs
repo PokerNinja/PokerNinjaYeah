@@ -201,12 +201,6 @@ public class BattleUI : MonoBehaviour
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy, bool HP_GAME, float totalHp)
     {
-        if(Constants.BOT_MODE || Values.Instance.TEST_MODE)
-        {
-            player.id = "i" + player.id;
-            enemy.id = "f" + enemy.id;
-        }
-        
         pEs.InitializeES(player.id[0].ToString());
         eEs.InitializeES(enemy.id[0].ToString());
         InitializePlayer(player);
@@ -431,7 +425,7 @@ public class BattleUI : MonoBehaviour
     public IEnumerator ShowWinner(string winnerMsg)
     {
         yield return new WaitForSeconds(winnerPanelInterval);
-        textWinLabel.text = winnerMsg.Substring(1);
+        textWinLabel.text = winnerMsg;
         winLabel.SetActive(true);
     }
 
@@ -751,6 +745,7 @@ public class BattleUI : MonoBehaviour
 
     public void EnableDarkScreen(bool isPlayerActivateSelectMode, bool enable, Action ResetSortingOrder)
     {
+        Debug.LogError("resetrin");
         darkScreenRenderer.GetComponent<BoxCollider2D>().enabled = enable;
         // BUG FM2 ResetSortingOrder
         AnimationManager.Instance.FadeBurnDarkScreen(darkScreenRenderer.material, enable, Values.Instance.darkScreenAlphaDuration, ResetSortingOrder);
@@ -1621,7 +1616,7 @@ public class BattleUI : MonoBehaviour
             currentHpText = enemyHpText;
         }
         /* hpInfoCanvas.transform.position = new Vector3(hpInfoCanvas.transform.position.x, posY, hpInfoCanvas.transform.position.z);*/
-        currentHpText.text = "<b>"+RichText(currentHp + " ", Values.Instance.yellowText, true) + RichText("/ " + totalHp, Values.Instance.redText, false) + " HP</b>";
+        currentHpText.text = RichText(currentHp + " ", Values.Instance.yellowText, true) + RichText("/ " + totalHp, Values.Instance.redText, false) + "<b>" + " HP</b>";
         StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(hpInfoCanvas, true, Values.Instance.infoDialogFadeOutDuration, null));
     }
     public void HideHpDialog()
@@ -1845,6 +1840,7 @@ public class BattleUI : MonoBehaviour
 
     internal void SetOfferChooseRaiseDialog(bool enable, float penelty, bool option2Availabe, bool option3Available)
     {
+        EnableDarkScreen(true, enable, null);
         raiseOption2.SetActive(option2Availabe);
         raiseOption3.SetActive(option3Available);
         raiseChooseDialog.SetActive(enable);

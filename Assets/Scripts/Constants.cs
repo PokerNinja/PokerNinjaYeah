@@ -17,6 +17,7 @@ public class Constants : Singleton<Constants>
     public const string AllCardsTag = "All";
     public const string PoolCardTag = "Pool";
     public enum CardsOwener { Player, Enemy, Board, Deck, Pool, }
+    public enum NcAction { Shatter, Defrost , Nothing}
 
     public const string PlayerCard1 = "PlayerCard1";
     public const string PlayerCard2 = "PlayerCard2";
