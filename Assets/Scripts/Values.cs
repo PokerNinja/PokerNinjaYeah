@@ -131,7 +131,7 @@ public class Values : Singleton<Values>
     public float delayBetweenDealBoardCards = 0.18f;
     public float freezeMaterialFadeBurnWidth = 0.56f;
 
-    [Title("PowerUpUi", bold: false)]
+    [Title("NC", bold: false)]
     public float pusDrawerMoveDuration = 2f;
     public float puPushNewSlotMoveDuration = 2f;
     public float puDrawMoveDuration = 2f;
@@ -142,6 +142,7 @@ public class Values : Singleton<Values>
     public float floatingShakeAnimationSpeed = 0.5f;
     public float floatingShakeAnimationX = 0.55f;
     public float floatingShakeAnimationY = 0.12f;
+    public float ncToEsDuration = 5f;
 
     [Title("Turn", bold: false)]
     public float turnBtnAlphaDuration = 1f;

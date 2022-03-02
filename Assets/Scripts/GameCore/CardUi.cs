@@ -59,7 +59,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     {
         spriteRenderer.material.SetFloat("_FadeAmount", -0.1f);
         spriteRenderer.material.SetFloat("_OutlineAlpha", 0f);
-        EnableSelecetPositionZ(false);
+        //EnableSelecetPositionZ(false);
         cardMark.SetActive(false);
         SoundManager.Instance.RandomSoundEffect(0);
     }
@@ -129,9 +129,13 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
             }));
         }
-        else if(Constants.cardsToSelectCounter > 0 && freeze)
+        else if(Constants.cardsToSelectCounter > 0  && freeze)
         {
             BattleSystem.Instance.Interface.FreezeSign(transform.position);
+        }
+        else if(!clickbleForPU && BattleSystem.Instance.firstCardTargetPU.Equals(cardPlace) && Constants.cardsToSelectCounter == 1)
+        {
+            BattleSystem.Instance.ResetNC();
         }
         else
         {

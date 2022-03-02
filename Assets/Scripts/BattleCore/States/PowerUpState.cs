@@ -36,93 +36,99 @@ public class PowerUpState : State
     public override IEnumerator Start()
     {
         bool waitForAction = false;
-        if (powerUpName.Equals(PowerUpNamesEnum.fm1.ToString())) // DRAW_2_CARDS
+        if (cardTarget1.Equals("reset"))
         {
-            waitForAction = true;
+            ActivateCardSelection(PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true));
         }
         else
         {
-            UpdateZpositionCardsList(powerUpName, true);
-        }
-        if (!isPlayerActivate)
-        {
-            // battleSystem.Interface.InitNinjaAttackAnimation(false, puElement);
-
-            if (waitForAction) // DRAW_2_CARDS
+            if (powerUpName.Equals(PowerUpNamesEnum.fm1.ToString())) // DRAW_2_CARDS
             {
-                EnableZpoitionForCardsList(battleSystem.cardsDeckUi.enemyCardsUi, true);
-                battleSystem.Draw2Cards(true, () => battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2)));
-                yield return new WaitForSecondsRealtime(0.5f);
+                waitForAction = true;
             }
             else
             {
-                yield return new WaitForSecondsRealtime(1f);
-                if (puElement.Equals("s"))
-                {
-                    IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
-                }
-                else
-                {
-                    battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
-                }
-
-                /*else
-                {
-                    IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
-                }*/
+                // UpdateZpositionCardsList(powerUpName, true);
             }
-        }
-        else // PLAYER ACTIVATE
-        {
-            int cardsToSelect = PowerUpStruct.Instance.GetPowerUpCardsToSelect(powerUpName);
-            if (cardsToSelect == 0 || cardTarget2.Length > 0)
-            {// Shove IT somewhereElse
-             //  battleSystem.Interface.InitNinjaAttackAnimation(true, puElement);
-
-                battleSystem.skillUsed = false;
-
-                if (cardTarget1.Contains("Deck"))
-                {
-                    posTarget1 = new Vector2(0, 0);
-                }
-                if (cardTarget2.Contains("Deck"))
-                {
-                    posTarget2 = new Vector2(0, 0);
-                }
-                if (puElement.Equals("s"))
-                {
-                    IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
-                }
-                else
-                {
-                    cardTarget2 = GetListOfRandomCardsForMonster();
-                    cardTarget1 = GetRandomAmountForMonster();
-                    battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
-                }
-
-                /*else
-                {
-                    battleSystem.skillUsed = true;
-                    IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
-                }*/
-                battleSystem.UpdatePuInDb(cardTarget1, cardTarget2, puIndex);
-            }
-            else
+            if (!isPlayerActivate)
             {
-                // battleSystem.selectCardsMode = true;
-                if (waitForAction)
-                { //DRAW 2 CARDS
-                    EnableZpoitionForCardsList(battleSystem.cardsDeckUi.playerCardsUi, true);
-                    battleSystem.Draw2Cards(false, () => ActivateSelectMode(cardsToSelect, powerUpName));
+                // battleSystem.Interface.InitNinjaAttackAnimation(false, puElement);
+
+                if (waitForAction) // DRAW_2_CARDS
+                {
+                    EnableZpoitionForCardsList(battleSystem.cardsDeckUi.enemyCardsUi, true);
+                    battleSystem.Draw2Cards(true, () => battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2)));
+                    yield return new WaitForSecondsRealtime(0.5f);
                 }
                 else
                 {
-                    ActivateSelectMode(cardsToSelect, powerUpName);
+                    yield return new WaitForSecondsRealtime(1f);
+                    if (puElement.Equals("s"))
+                    {
+                        IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
+                    }
+                    else
+                    {
+                        battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
+                    }
+
+                    /*else
+                    {
+                        IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
+                    }*/
                 }
             }
-        }
-        yield break;
+            else // PLAYER ACTIVATE
+            {
+                int cardsToSelect = PowerUpStruct.Instance.GetPowerUpCardsToSelect(powerUpName);
+                if (cardsToSelect == 0 || cardTarget2.Length > 0)
+                {// Shove IT somewhereElse
+                 //  battleSystem.Interface.InitNinjaAttackAnimation(true, puElement);
 
+                    battleSystem.skillUsed = false;
+
+                    if (cardTarget1.Contains("Deck"))
+                    {
+                        posTarget1 = new Vector2(0, 0);
+                    }
+                    if (cardTarget2.Contains("Deck"))
+                    {
+                        posTarget2 = new Vector2(0, 0);
+                    }
+                    if (puElement.Equals("s"))
+                    {
+                        IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
+                    }
+                    else
+                    {
+                        cardTarget2 = GetListOfRandomCardsForMonster();
+                        cardTarget1 = GetRandomAmountForMonster();
+                        battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
+                    }
+
+                    /*else
+                    {
+                        battleSystem.skillUsed = true;
+                        IgnitePowerUp(powerUpName, cardTarget1, cardTarget2);
+                    }*/
+                    battleSystem.UpdatePuInDb(cardTarget1, cardTarget2, puIndex);
+                }
+                else
+                {
+                    // battleSystem.selectCardsMode = true;
+                    if (waitForAction)
+                    { //DRAW 2 CARDS
+                      //EnableZpoitionForCardsList(battleSystem.cardsDeckUi.playerCardsUi, true);
+                        battleSystem.Draw2Cards(false, () => ActivateSelectMode(cardsToSelect, powerUpName));
+                    }
+                    else
+                    {
+                        ActivateSelectMode(cardsToSelect, powerUpName);
+                    }
+                }
+            }
+            yield break;
+        }
     }
 
     private string GetRandomAmountForMonster()
@@ -156,6 +162,7 @@ public class PowerUpState : State
 
     private void ActivateSelectMode(int cardsToSelect, string powerUpName)
     {
+        UpdateZpositionCardsList(powerUpName, true);
         Debug.Log("ActivateSelectMode =" + powerUpName);
         battleSystem.SetCardsSelectionAndDisplayInfo(cardsToSelect, powerUpName);
         ActivateCardSelection(PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true));

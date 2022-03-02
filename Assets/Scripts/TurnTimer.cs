@@ -297,6 +297,10 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
         }
+        else if(isLastSeconds)
+        {
+            SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, true);
+        }
     }
 
     internal void Activate(bool enable)

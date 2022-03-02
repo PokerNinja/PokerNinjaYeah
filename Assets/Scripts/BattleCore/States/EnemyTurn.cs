@@ -42,7 +42,7 @@ public class EnemyTurn : State
              battleSystem.NewTimerStarter(false);
              if (battleSystem.BOT_MODE)
              {
-                 battleSystem.SetState(new BotEnemy(battleSystem, turnCounter,false));
+                 battleSystem.SetState(new BotEnemy(battleSystem, turnCounter,false,false));
              }
 
          }

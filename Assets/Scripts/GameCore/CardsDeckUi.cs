@@ -1898,8 +1898,8 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         cardSwap2.cardPlace = tempPlace1;
         cardSwap1.InitCardsTag(cardSwap2.tag);
         cardSwap2.InitCardsTag(tempTag1);
-        cardSwap1.EnableSelecetPositionZ(false);
-        cardSwap2.EnableSelecetPositionZ(false);
+       cardSwap1.EnableSelecetPositionZ(false);
+       cardSwap2.EnableSelecetPositionZ(false);
     }
 
     private void GhostCardEffect(bool enable, CardUi cardObject)

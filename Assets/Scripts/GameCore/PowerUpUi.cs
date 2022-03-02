@@ -343,7 +343,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void DissolvePuToNc(Vector3 targetPosition, Action OnEnd)
     {
         Vector3 newTarget = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0, 0, 0), 7f, null, null, null, OnEnd));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0, 0, 0), Values.Instance.ncToEsDuration, null, null, null, OnEnd));
     }
 
     public void CardReveal(bool reveal, Action onFinish)

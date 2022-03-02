@@ -462,8 +462,8 @@ public class BattleUI : MonoBehaviour
     {
         if (isPlayer)
         {
-            pEs.FillElemental(0);
-            pEs.ncCounterUse = 0;
+
+            pEs.ResetEs();
         }
         else
         {
