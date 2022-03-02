@@ -231,7 +231,12 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, true, false, element + "p", "");
+            Vector3 pos = transform.position;
+            if (!isPlayer)
+            {
+                pos += new Vector3(0, -5, 0);
+            }
+            BattleSystem.Instance.ShowPuInfo(pos, true, false, element + "p", "");
         }
         else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
         {

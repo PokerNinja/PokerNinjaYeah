@@ -197,7 +197,7 @@ public class BattleUI : MonoBehaviour
 
     public GameObject raiseOption2;
     public GameObject raiseOption3;
-
+    public GameObject IglooPref;
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy, bool HP_GAME, float totalHp)
     {
@@ -215,10 +215,22 @@ public class BattleUI : MonoBehaviour
         }
     }
 
-   
-    
 
-  
+    public IEnumerator IglooFx(bool isPlayer,Action IgniteNc)
+    {
+        Vector2 position = new Vector2(0, -2.6f);
+        GameObject igloo = Instantiate(IglooPref);
+        if (!isPlayer)
+        {
+            position = new Vector2(0, 3.4f);
+            igloo.GetComponentInChildren<SpriteRenderer>().flipY = true;
+        }
+        igloo.transform.position = position;
+        yield return new WaitForSeconds(0.5f);
+        IgniteNc.Invoke();
+        yield return new WaitForSeconds(1f);
+        Destroy(igloo);
+    }
 
     internal void FillHp()
     {
@@ -395,13 +407,13 @@ public class BattleUI : MonoBehaviour
                 turnTimer.turnArrowUi.FlipImage(isPlayerStart);
                 turnTimer.Activate(true);
                 coinFlipTurn.gameObject.SetActive(false);
-                MoveDealerBtn( !isPlayerStart);
+                MoveDealerBtn(!isPlayerStart);
             }/*() => coinFlipTurn.gameObject.SetActive(false)*/, null, null));
     }
 
 
 
-    public void MoveDealerBtn( bool isEnemy)
+    public void MoveDealerBtn(bool isEnemy)
     {
         Action clickSound = () => SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, true);
         Vector3 targetPosition = dealerSlotE.position;
@@ -410,9 +422,9 @@ public class BattleUI : MonoBehaviour
         {
             targetPosition = dealerSlotP.position;
         }
-       
-            StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(dealerTransform, 0.2f, targetPosition, duration, clickSound, null));
-        
+
+        StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(dealerTransform, 0.2f, targetPosition, duration, clickSound, null));
+
     }
 
     internal void InitAvatars()
@@ -467,8 +479,8 @@ public class BattleUI : MonoBehaviour
         }
         else
         {
-           // eEs.FillElemental(0);
-           // eEs.ncCounterUse = 0;
+            // eEs.FillElemental(0);
+            // eEs.ncCounterUse = 0;
         }
     }
 
@@ -1819,7 +1831,7 @@ public class BattleUI : MonoBehaviour
             ));
     }
 
- 
+
     internal void UpdateHpZ(bool enable)
     {
         float newZ = 85f;
@@ -1847,6 +1859,6 @@ public class BattleUI : MonoBehaviour
         raiseChooseText.text = "Offer Your opponent a <b><color=#F03B37>DMG</color></b> raise\n<b><color=#F03B37>-" + penelty + " DMG </color></b>to the opponent when declined";
     }
 
-  
+
 }
 

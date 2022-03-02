@@ -202,7 +202,7 @@ public class GameMenuHandler : MonoBehaviour
     }
     private string LoadPlayerNickName()
     {
-        return PlayerPrefs.GetString("player_name", "Ninja");
+        return PlayerPrefs.GetString("player_name", "NinjaName");
     }
     private void SavePlayerElement(int element)
     {

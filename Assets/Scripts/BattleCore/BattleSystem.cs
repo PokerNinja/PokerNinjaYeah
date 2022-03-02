@@ -191,7 +191,7 @@ public class BattleSystem : StateMachine
         TEST_MODE = Values.Instance.TEST_MODE;
         Constants.HP_GAME = true;
         HP_GAME = Constants.HP_GAME;
-        Constants.BOT_MODE = true;
+       // Constants.BOT_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
         if (TEST_MODE || BOT_MODE)
@@ -1012,7 +1012,7 @@ public class BattleSystem : StateMachine
         string puName = "";
         if (puIndex == -1)
         {
-            puName = LoadPrefsString(Constants.Instance.botEsElementKey)+"p";
+            puName = LoadPrefsString(Constants.Instance.botEsElementKey) + "p";
         }
         else
         {
@@ -1342,7 +1342,7 @@ public class BattleSystem : StateMachine
         }
     }
 
-   
+
 
     public IEnumerator OnCardsSelectedForPU(string cardPlace, Vector2 position)
     {
@@ -2081,7 +2081,11 @@ public class BattleSystem : StateMachine
     internal void InitProjectile(bool isPlayerActivate, int puIndex, string powerUpName, Vector2 posTarget1, Vector2 posTarget2, Action IgnitePowerUp)
     {
 
-        if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.im2)))
+        if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.im1)))
+        {
+            StartCoroutine(ui.IglooFx(isPlayerActivate,() => IgnitePowerUp.Invoke()));
+        }
+        else if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.im2)))
         {
             StartCoroutine(ui.StartIcenado());
             IgnitePowerUp.Invoke();
