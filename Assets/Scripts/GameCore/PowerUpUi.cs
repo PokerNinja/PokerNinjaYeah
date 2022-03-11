@@ -128,7 +128,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }*/
     }
 
-    
+
     public void OnPointerUp(PointerEventData eventData)
     {
 
@@ -225,7 +225,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             sprite = "pu_back";
         }
-        else if(isPlayer)
+        else if (isPlayer)
         {
             spriteRenderer.color = new Color(0.66f, 0.66f, 0.66f, 1f);
         }
@@ -286,7 +286,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
 
- 
+
     public void AnimatePuUse(Action OnStart, Action OnEndRoutine3)
     {
         OnStart?.Invoke();
@@ -338,12 +338,13 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         StartCoroutine(AnimationManager.Instance.FadeBurnPU(spriteRenderer.material, delayBefor, false, duration, null, End, End2));
     }
-    
 
-    public void DissolvePuToNc(Vector3 targetPosition, Action OnEnd)
+ 
+    public void DissolveNcToEs(Vector3 targetPosition, Action FillEs, Action OnEnd)
     {
         Vector3 newTarget = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0, 0, 0), Values.Instance.ncToEsDuration, null, null, null, OnEnd));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0.3f, 0.3f, 0), Values.Instance.ncToEsDuration, null,
+           ()=> spriteRenderer.material.SetFloat("_OutlineAlpha",0f), FillEs,() => StartCoroutine(AnimationManager.Instance.AlphaAnimation(spriteRenderer, false, Values.Instance.defaultFadeD, OnEnd))));
     }
 
     public void CardReveal(bool reveal, Action onFinish)

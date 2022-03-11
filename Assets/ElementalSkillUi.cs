@@ -32,16 +32,22 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
 
     [Button]
-    public void FullEffect(bool enableLoop)
+    public IEnumerator FullEffect(bool enableLoop)
     {
-        glowRenderer.color = new Color(1f, 1f, 1f);
-        liquidAnimation.Play();
-        shineAnimation.Play("es_full_glow");
-        if (enableLoop)
+        yield return new WaitForSeconds(1f);
+        WhiteGlow();
+        if (enableLoop && isPlayer)
         {
             StartCoroutine(EnableGlowLoop());
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFull, true);
         }
+    }
+
+    public void WhiteGlow()
+    {
+        glowRenderer.color = new Color(1f, 1f, 1f);
+        liquidAnimation.Play();
+        shineAnimation.Play("es_full_glow");
     }
 
     public IEnumerator EnableGlowLoop()
@@ -63,34 +69,44 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         AnimationManager.Instance.SetAlpha(glowRenderer, 0f);
     }
 
+    [Button]
     public void FillElemental(int amount)
     {
         float targetY = 0f;
         switch (amount)
         {
             case 0:
-                targetY = -5.55f;
+                targetY = -5.54f;
+                if (!isPlayer)
+                    targetY = 5.62f;
                 break;
             case 1:
                 targetY = -5.14f;
+                if (!isPlayer)
+                    targetY = 5.22f;
                 break;
             case 2:
                 targetY = -4.65f;
+                if (!isPlayer)
+                    targetY = 4.72f;
                 break;
             case 3:
                 targetY = -4.22f;
+                if (!isPlayer)
+                    targetY = 4.3f;
                 break;
         }
+
         if (amount != 0)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFill, true);
         }
-        StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(pElementSkillLiquid.transform, 0.6f,
+        StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(pElementSkillLiquid.transform, 0f,
             new Vector3(pElementSkillLiquid.transform.position.x, targetY, 88.8f), Values.Instance.elementalSkillFillDuration, () =>
             {
                 if (ncCounterUse == 3)
                 {
-                    FullEffect(true);
+                    StartCoroutine(FullEffect(true));
                 }
             }, null));
     }
@@ -111,10 +127,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             ncCounterUse = 3;
         }
-        if (isPlayer)
-        {
-            FillElemental(ncCounterUse);
-        }
+        FillElemental(ncCounterUse);
     }
 
     public void InitializeES(string elementalSkillType)
@@ -143,11 +156,8 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     break;
                 }
         }
-        if (isPlayer)
-        {
-            pElementalSkillLiquid.color = liquidColor;
-            glowColor = liquidColor;
-        }
+        pElementalSkillLiquid.color = liquidColor;
+        glowColor = liquidColor;
         pElementalSkillIcon.sprite = Resources.Load("Sprites/GameScene/ElementalSkill/" + iconPath, typeof(Sprite)) as Sprite;
     }
 
@@ -179,8 +189,8 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             if (isPlayer && ncCounterUse == 3 && isClickable)
             {
                 DisableGlow();
+                WhiteGlow();
                 BattleSystem.Instance.OnEsClick(this);
-                FullEffect(false);
             }
             else
             {
@@ -188,6 +198,8 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             }
         }
     }
+
+
     public void OnPointerUp(PointerEventData eventData)
     {
 
@@ -264,5 +276,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         FillElemental(0);
         ncCounterUse = 0;
+     /*   if (isPlayer)
+            DisableGlow();*/
     }
 }

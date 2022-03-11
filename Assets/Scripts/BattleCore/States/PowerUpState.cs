@@ -69,6 +69,8 @@ public class PowerUpState : State
                     }
                     else
                     {
+                        if (puIndex == -1)
+                            battleSystem.Interface.eEs.WhiteGlow();
                         battleSystem.InitProjectile(isPlayerActivate, puIndex, powerUpName, posTarget1, posTarget2, () => IgnitePowerUp(powerUpName, cardTarget1, cardTarget2));
                     }
 
@@ -192,10 +194,10 @@ public class PowerUpState : State
         battleSystem.Interface.InitNinjaAttackAnimation(isPlayerActivate, puElement);
         if (puIndex != -1)
         {
-            if (isPlayerActivate && battleSystem.Interface.pEs.IsNcEqualsPesElement(puElement))
+            if (IsNcEqualElement())
             {
-                
-                battleSystem.DissolvePuToNc(puIndex,()=> battleSystem.UpdateEsAfterNcUse(powerUpName));
+
+                battleSystem.DissolveNcToEs(isPlayerActivate, puIndex, () => battleSystem.UpdateEsAfterNcUse(isPlayerActivate, powerUpName));
             }
             else
             {
@@ -234,15 +236,15 @@ public class PowerUpState : State
             case nameof(PowerUpNamesEnum.wp): //swap_player_enemy = w1
                 {
 
-                   // battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[0]);
-                   // battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[1]);
+                    // battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[0]);
+                    // battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[1]);
                     battleSystem.SwapTwoCards(cardTarget1, cardTarget2, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.wm1): //swap_hands = wm1
                 {
-                   // battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[0]);
-                   // battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[1]);
+                    // battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[0]);
+                    // battleSystem.UpdateZPos(true, PowerUpStruct.Instance.GetReleventTagCards(powerUpName, isPlayerActivate)[1]);
                     battleSystem.SwapPlayersHands();
                     break;
                 }
@@ -353,6 +355,13 @@ public class PowerUpState : State
                 }
         }
 
+    }
+
+    private bool IsNcEqualElement()
+    {
+        if(!isPlayerActivate)
+        return battleSystem.Interface.eEs.IsNcEqualsPesElement(puElement);
+        return battleSystem.Interface.pEs.IsNcEqualsPesElement(puElement);
     }
 
     private async void SwapRandomCards(string listOfCards)

@@ -439,15 +439,9 @@ public class BattleUI : MonoBehaviour
     public void ResetEs(bool isPlayer)
     {
         if (isPlayer)
-        {
-
             pEs.ResetEs();
-        }
         else
-        {
-            // eEs.FillElemental(0);
-            // eEs.ncCounterUse = 0;
-        }
+            eEs.ResetEs();
     }
 
 
@@ -563,10 +557,10 @@ public class BattleUI : MonoBehaviour
             dialog.transform.position = new Vector2(0, -7f);
             dialog.transform.localScale = new Vector2(0.1f, 0.1f);
             Action shineEffect = null;
-           /* if (puName.Contains("m") || puName.Contains("p"))
-            {
-                shineEffect = () => StartCoroutine(AnimationManager.Instance.ShineCard(infoPuBg.material, 0.6f, GetColorFromElement(puName[0].ToString()), null));
-            }*/
+            /* if (puName.Contains("m") || puName.Contains("p"))
+             {
+                 shineEffect = () => StartCoroutine(AnimationManager.Instance.ShineCard(infoPuBg.material, 0.6f, GetColorFromElement(puName[0].ToString()), null));
+             }*/
             StartCoroutine(AnimationManager.Instance.ShowDialogFromPu(dialog.transform, startingPosition, targetDialog, OnEnd));
             StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(dialog, true, Values.Instance.infoDialogFadeOutDuration, shineEffect));
         }
@@ -1110,6 +1104,8 @@ public class BattleUI : MonoBehaviour
         //   () => projectile.SetActive(false), EndAction));
 
     }
+
+    
 
     public void FadeStrighterOrFlusher(bool isPlayer, bool isFlusher, bool enable, Action Reset)
     {

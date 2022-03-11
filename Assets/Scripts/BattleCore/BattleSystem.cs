@@ -1109,22 +1109,26 @@ public class BattleSystem : StateMachine
             ResetPuAction = null;
         });
     }
-    public void DissolvePuToNc(int index, Action OnEnd)
+    public void DissolveNcToEs(bool isPlayer, int index, Action FillEs)
     {
         ResetPuAction = () =>
         {
-            OnEnd?.Invoke();
-            puDeckUi.DissolvePuToNc(index, () =>
-        {
-            StartCoroutine(ResetPuUi(true, index));
-            ResetPuAction = null;
-        });
+            /*            FillEs?.Invoke();
+            */
+            puDeckUi.DissolveNcToEs(isPlayer,index, FillEs, () =>
+       {
+           StartCoroutine(ResetPuUi(isPlayer, index));
+           ResetPuAction = null;
+       });
         };
     }
 
-    public void UpdateEsAfterNcUse(string puName)
+    public void UpdateEsAfterNcUse(bool isPlayer,string puName)
     {
+        if(isPlayer)
         ui.pEs.UpdateEsAfterNcUse(puName.Contains("m"));
+        else
+        ui.eEs.UpdateEsAfterNcUse(puName.Contains("m"));
     }
 
     private void ListenForPowerupUse()
@@ -2458,6 +2462,7 @@ public class BattleSystem : StateMachine
     [Button]
     public void EnemyBetPopUp(int dmg)
     {
+        ui.SlideRankingImgIfOpen();
         choosenRaise = dmg;
         EnableBetDialog(dmg, true);
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BetAsk, true);
