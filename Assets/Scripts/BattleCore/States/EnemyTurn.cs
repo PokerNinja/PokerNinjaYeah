@@ -39,7 +39,7 @@ public class EnemyTurn : State
              battleSystem.Interface.SetTurnIndicator(false, true);
              //battleSystem.Interface.WhosTurnAnimation(false,  isFinalTurn);
              battleSystem.turnInitInProgress = false; // Maybe with delay?
-             battleSystem.NewTimerStarter(false);
+             battleSystem.NewTimerStarter();
              if (battleSystem.BOT_MODE)
              {
                  battleSystem.SetState(new BotEnemy(battleSystem, turnCounter,false,false));

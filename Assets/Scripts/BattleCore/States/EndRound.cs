@@ -134,7 +134,7 @@ public class EndRound : State
                 battleSystem.cardsDeckUi.CreateShadowCard(battleSystem.cardsDeckUi.enemyShadowCard, () => AnimateWinWithHand(bestOpponentHand, false));
             }
 
-            winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestOpponentHand.Rank); ;
+            winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestOpponentHand.Rank);
             //  winnerMsg += bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
         }
         // Player win

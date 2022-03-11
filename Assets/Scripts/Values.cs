@@ -28,6 +28,7 @@ public class Values : Singleton<Values>
     public float fontAppearance = 0.7f;
     public int ChanceForBotEmoji = 3;
     public float raiseTimerDuration = 30f;
+    public float delayBeforeGameOver = 8f;
 
     // public int replaceUseLimit = 1;
     //    public GamePhase resetReplaceEvery = GamePhase.Turn;
@@ -159,6 +160,7 @@ public class Values : Singleton<Values>
     public float bgMaxValueSwapColor = 0.67f;
     public float hitTextScaleDuration = 2f;
     public float hitTextFDuration = 0.5f;
+    public float delayBetweenWinningCardsToWinnerText = 1f;
 
     [Title("ShakeDisableAnimation", bold: false)]
     public float disableClickShakeSpeed = 1.8f;

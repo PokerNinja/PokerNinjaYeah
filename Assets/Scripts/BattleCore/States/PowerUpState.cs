@@ -140,7 +140,7 @@ public class PowerUpState : State
         }
         else if (powerUpName.Equals("im2"))
         {
-            int randomAmount = battleSystem.GenerateRandom(4, 6);
+            int randomAmount = battleSystem.GenerateRandom(5, 7);
             return randomAmount.ToString();
         }
         return cardTarget1;
@@ -201,10 +201,6 @@ public class PowerUpState : State
             {
                 battleSystem.DissolvePuAfterUse(isPlayerActivate, puIndex);
             }
-        }
-        else if (puIndex == -1 && isPlayerActivate)
-        {
-            battleSystem.ReduceSkillUse();
         }
         if (puIndex == -1)
         {

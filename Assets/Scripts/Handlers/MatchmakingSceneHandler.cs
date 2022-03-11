@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using APIs;
 using Managers;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -38,7 +39,10 @@ namespace Handlers
         private readonly string tip13 = "Ninja-cards are divided to 3 Elements- Fire, ice, Wind. Fire burns. Ice freezes. Wind swaps.";
         private string[] tips;
 
-        public GameObject dotPrefab;
+       // public GameObject dotPrefab;
+        public GameObject dot1;
+        public GameObject dot2;
+        public GameObject dot3;
 
         private void Start()
         {
@@ -162,11 +166,19 @@ namespace Handlers
                         }, Debug.Log);
                 }, Debug.Log);
             searchingText.text = "Game found!";
+            DisableDots();
+        }
+
+        private void DisableDots()
+        {
+            dot1.SetActive(false);
+            dot2.SetActive(false);
+            dot3.SetActive(false);
         }
 
         private IEnumerator CheckIfGameForReal()
         {
-            yield return new WaitForSeconds(20f);
+            yield return new WaitForSeconds(10f);
             if (cancelGame)
             {
                 StartCoroutine(LeaveSearchRoutine());
@@ -331,12 +343,16 @@ namespace Handlers
             }
         }
 
-
-        private  void DotsEffect()
+        [Button]
+        private  async void DotsEffect()
         {
-           Instantiate(dotPrefab);
-           /* await Task.Delay(390);
-           Instantiate(dotPrefab,new Vector3(1.1f, 1.23f, 1f), Quaternion.identity);*/
+            dot1.SetActive(true);
+            await Task.Delay(320);
+            dot2.SetActive(true);
+            await Task.Delay(320);
+            dot3.SetActive(true);
+            /* await Task.Delay(390);
+            Instantiate(dotPrefab,new Vector3(1.1f, 1.23f, 1f), Quaternion.identity);*/
         }
         private void OnGUI()
         {

@@ -762,20 +762,17 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardObject.spriteRenderer.material = ghostMaterial;
             cardObject.LoadSprite(true);
             AddCardToList(cardTag, cardObject, indexToInsert);
-
             StartCoroutine(cardObject.FadeGhost(true, disableDarkScreen));
         }
         else
         {
-
-            //cardObject.spriteRenderer.material = dissolveMaterial;
+            AddCardToList(cardTag, cardObject, indexToInsert);
             StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
         Values.Instance.cardDrawMoveDuration, DarkCardUnderSmoke, () =>
             cardObject.CardReveal(!isFaceDown)
            , disableDarkScreen, () =>
         {
             closeDrawer?.Invoke();
-            AddCardToList(cardTag, cardObject, indexToInsert);
         }));
         }
 
@@ -1951,19 +1948,25 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
     {
         ghostCardUi = null;
         ghostCard = null;
+        Vector3 targetPos;
         ResetUiLists();
         foreach (CardUi cardToDestroy in FindAllCardsObjects())
         {
-            if (cardToDestroy.cardMark.activeSelf)
-            {
-                cardToDestroy.cardMark.SetActive(false);
-            }
-            StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => RestAfterDestroy(cardToDestroy, null)));
+            cardToDestroy.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
+            // StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => RestAfterDestroy(cardToDestroy, null)));
+            targetPos = new Vector3(cardToDestroy.transform.position.x + 15, cardToDestroy.transform.position.y, cardToDestroy.transform.position.z);
+            StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(cardToDestroy.transform, GenerateRandom(0.2f,0.9f), targetPos,3f,null, () => RestAfterDestroy(cardToDestroy, null)));
         }
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve, true);
         DealHands();
     }
 
+  
+
+    internal float GenerateRandom(float v1, float v2)
+    {
+        return UnityEngine.Random.Range(v1, v2);
+    }
     public void handToPrint(List<Card> cardsList)
     {
         String totalCards = " ";

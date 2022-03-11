@@ -487,10 +487,6 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    internal void EnablePlayerSkill(bool enable)
-    {
-       // playerSkillUi.EnablePu(enable);
-    }
 
     [Button]
     public void DissolvePuToNc(int index , Action OnEnd)

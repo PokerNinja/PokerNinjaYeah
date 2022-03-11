@@ -727,10 +727,9 @@ public class AnimationManager : Singleton<AnimationManager>
         yield break;
     }
 
-    public IEnumerator ScaleHp(Transform selector, float damage, Action shakeCamera)
+    public IEnumerator ScaleHp(Transform selector, float damage, Action Perfect)
     {
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.HpDrop, true);
-        shakeCamera?.Invoke();
         float movementDuration = Values.Instance.hpScaleDuration;
         float startTime = Time.time;
         float t = 0;
@@ -750,7 +749,7 @@ public class AnimationManager : Singleton<AnimationManager>
             yield return null;
             if (selector.localPosition == targetPosition)
             {
-                //  endAction?.Invoke();
+                Perfect?.Invoke();
                 break;
             }
         }

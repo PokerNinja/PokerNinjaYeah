@@ -40,6 +40,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         if (enableLoop)
         {
             StartCoroutine(EnableGlowLoop());
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFull, true);
         }
     }
 
@@ -68,16 +69,16 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         switch (amount)
         {
             case 0:
-                targetY = -5.54f;
+                targetY = -5.55f;
                 break;
             case 1:
-                targetY = -5f;
+                targetY = -5.14f;
                 break;
             case 2:
-                targetY = -4.6f;
+                targetY = -4.65f;
                 break;
             case 3:
-                targetY = -4.23f;
+                targetY = -4.22f;
                 break;
         }
         if (amount != 0)
@@ -85,14 +86,13 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFill, true);
         }
         StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(pElementSkillLiquid.transform, 0.6f,
-            new Vector3(pElementSkillLiquid.transform.position.x, targetY, 88.8f), Values.Instance.elementalSkillFillDuration, null, () =>
+            new Vector3(pElementSkillLiquid.transform.position.x, targetY, 88.8f), Values.Instance.elementalSkillFillDuration, () =>
             {
                 if (ncCounterUse == 3)
                 {
                     FullEffect(true);
-                    SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFull, true);
                 }
-            }));
+            }, null));
     }
 
     public bool IsNcEqualsPesElement(string element)
