@@ -279,22 +279,12 @@ public class AnimationManager : Singleton<AnimationManager>
     public IEnumerator AlphaCanvasGruop(CanvasGroup canvas, bool fadeIn, float duration, Action OnFinish)
     {
 
-        float alphaAmount = 1;
+        float alphaAmount = canvas.alpha;
         float alphaTarget = 0;
         if (fadeIn)
         {
-            alphaAmount = 0;
             alphaTarget = 1;
         }
-        /*if (canvas.alpha == alphaTarget)
-        {
-            OnFinish?.Invoke();
-            Debug.LogError("IM ALREADY ALPHAING");
-        }
-        else
-        {*/
-        canvas.alpha = alphaAmount;
-        //FIXIT
         if (alphaAmount == alphaTarget)
         {
             OnFinish?.Invoke();

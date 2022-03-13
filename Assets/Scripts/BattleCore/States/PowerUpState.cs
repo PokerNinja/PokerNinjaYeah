@@ -177,6 +177,12 @@ public class PowerUpState : State
             battleSystem.Interface.pEs.EnableSelecetPositionZ(true);
         }
         battleSystem.Interface.EnableDarkScreen(true, true, null);
+        if (battleSystem.tutoManager.step == 2)
+        {
+            battleSystem.tutoManager.SetObjectClickable(battleSystem.cardsDeckUi.playerCardsUi[0].spriteRenderer);
+            battleSystem.tutoManager.SetObjectClickable(battleSystem.cardsDeckUi.playerCardsUi[1].spriteRenderer);
+
+        }
     }
 
     private void ActivateSelectionPointer(string powerUpName)
@@ -227,7 +233,7 @@ public class PowerUpState : State
                 {
                     bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
                     battleSystem.DestroyAndDrawCard(cardTarget1, 0f, true, false);
-                    battleSystem.DestroyAndDrawCard(cardTarget2, Values.Instance.delayBetweenProjectiles, isFirstTargetFreeze, true);
+                    battleSystem.DestroyAndDrawCard(cardTarget2, 0.3f, isFirstTargetFreeze, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.w2)://swap_player_board = w2
@@ -281,7 +287,7 @@ public class PowerUpState : State
                 {
                     bool isFirstTargetFreeze = battleSystem.cardsDeckUi.GetCardUiByName(cardTarget1).freeze;
                     battleSystem.FreezePlayingCard(cardTarget1, 0, true, true, false);
-                    battleSystem.FreezePlayingCard(cardTarget2, 200, true, !isFirstTargetFreeze, true);
+                    battleSystem.FreezePlayingCard(cardTarget2, 300, true, !isFirstTargetFreeze, true);
                     break;
                 }
             case nameof(PowerUpNamesEnum.im1): //block_player_2_cards = im1
@@ -359,8 +365,8 @@ public class PowerUpState : State
 
     private bool IsNcEqualElement()
     {
-        if(!isPlayerActivate)
-        return battleSystem.Interface.eEs.IsNcEqualsPesElement(puElement);
+        if (!isPlayerActivate)
+            return battleSystem.Interface.eEs.IsNcEqualsPesElement(puElement);
         return battleSystem.Interface.pEs.IsNcEqualsPesElement(puElement);
     }
 
@@ -420,7 +426,7 @@ public class PowerUpState : State
         }
     }
 
-    private void FreezeRandomCards(string listOfCards, string limit)
+    private async void FreezeRandomCards(string listOfCards, string limit)
     {
         List<string> cardsNames = new List<string>(listOfCards.Split(','));
         int randomAmount = int.Parse(limit);
@@ -438,7 +444,8 @@ public class PowerUpState : State
             {
                 isLast = true;
             }
-            battleSystem.FreezePlayingCard(ConvertFixedCardPlace(cardsNames[i]), battleSystem.GenerateRandom(400, 800), true, isFirstFrozen, isLast);
+            await Task.Delay(battleSystem.GenerateRandom(400, 700));
+            battleSystem.FreezePlayingCard(ConvertFixedCardPlace(cardsNames[i]), 100, true, isFirstFrozen, isLast);
             isFirstFrozen = false;
         }
     }

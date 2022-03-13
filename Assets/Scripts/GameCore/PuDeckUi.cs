@@ -100,6 +100,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         puToReset.spriteRenderer.material.SetFloat("_WaveSpeed", 0f);
         puToReset.spriteRenderer.material.SetFloat("_DistortAmount", 0f);
         puToReset.spriteRenderer.color = new Color(1, 1, 1);
+        puToReset.spriteRenderer.sortingOrder = 1;
         puToReset.name = "ReadyToUsePU";
         puToReset.puName = "X";
         puToReset.puDisplayName = "NN";

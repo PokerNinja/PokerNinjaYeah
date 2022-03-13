@@ -402,30 +402,30 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     public CardUi GetCardUiByName(string cardTarget)
     {
         Debug.Log("FoundTB " + cardTarget);
-/*        List<CardUi> listTarget;
-        switch (cardTarget[0])
-        {
-            case 'P':
-                listTarget = playerCardsUi;
-                break;
-            case 'E':
-                listTarget = enemyCardsUi;
-                break;
-            case 'D':
-                listTarget = extraDeckCardsUi;
-                break;
-            default:
-                listTarget = boardCardsUi;
-                break;
-        }
-        for (int i = 0; i < listTarget.Count; i++)
-        {
-            if (listTarget[i].cardPlace.Equals(cardTarget))
-            {
-                Debug.Log("Found");
-                return listTarget[i];
-            }
-        }*/ //MAKE IT BETTER
+        /*        List<CardUi> listTarget;
+                switch (cardTarget[0])
+                {
+                    case 'P':
+                        listTarget = playerCardsUi;
+                        break;
+                    case 'E':
+                        listTarget = enemyCardsUi;
+                        break;
+                    case 'D':
+                        listTarget = extraDeckCardsUi;
+                        break;
+                    default:
+                        listTarget = boardCardsUi;
+                        break;
+                }
+                for (int i = 0; i < listTarget.Count; i++)
+                {
+                    if (listTarget[i].cardPlace.Equals(cardTarget))
+                    {
+                        Debug.Log("Found");
+                        return listTarget[i];
+                    }
+                }*/ //MAKE IT BETTER
         List<CardUi> allCardsUi = playerCardsUi.Concat(enemyCardsUi).Concat(boardCardsUi).Concat(extraDeckCardsUi).ToList();
         for (int i = 0; i < allCardsUi.Count; i++)
         {
@@ -462,6 +462,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     public void RestAfterDestroy(CardUi cardToDestroy, Action OnEnd)
     {
+        RemoveFromList(cardToDestroy);
         ResetCardUI(cardToDestroy);
         cardToDestroy.Activate(false);
         OnEnd?.Invoke();
@@ -739,7 +740,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 cardScale = cardVectorBoard;
             }
         }
-
         cardObject.name = cardPlace;
         cardObject.transform.position = new Vector3(cardTransform.position.x, cardTransform.position.y, 1); ;
         cardObject.transform.localScale = cardTransform.localScale;
@@ -767,6 +767,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         else
         {
             AddCardToList(cardTag, cardObject, indexToInsert);
+            Debug.Log("i " + indexToInsert);
+            Debug.Log("c " + cardPlace);
             StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
         Values.Instance.cardDrawMoveDuration, DarkCardUnderSmoke, () =>
             cardObject.CardReveal(!isFaceDown)
@@ -1530,7 +1532,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             extraDeckCardsUi[1].SetSelection(true, "", "");
         }
         yield return new WaitForSecondsRealtime(0.85f);
-        Debug.Log("EndOFDraw@ =" );
+        Debug.Log("EndOFDraw@ =");
 
         endAction?.Invoke();
     }
@@ -1587,7 +1589,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     private void DestroyWithDelay(string cardPlace, Action OnEnd)
     {
         CardUi cardToDestroy = GetCardUiByName(cardPlace);
-        RemoveFromList(cardToDestroy);
+        // RemoveFromList(cardToDestroy);
         //boardCardsUi.Remove(cardToDestroy); //TODO why this
         if (cardToDestroy == null)
         {
@@ -1607,13 +1609,20 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 changeOffset = false;
             }
             StartCoroutine(cardToDestroy.FadeBurnOut(targetMaterial, changeOffset, () =>
+            {
+                //RemoveFromList(cardToDestroy);
+                RestAfterDestroy(cardToDestroy, OnEnd);
+            }
             //  Destroy(cardToDestroy)));
-            RestAfterDestroy(cardToDestroy, OnEnd)));
+            ));
         }
         else
         {
             StartCoroutine(cardToDestroy.Dissolve(false, dissolveMaterial, 0f, () =>
-                      RestAfterDestroy(cardToDestroy, OnEnd)));
+            {
+              //  RemoveFromList(cardToDestroy);
+                RestAfterDestroy(cardToDestroy, OnEnd);
+            }));
         }
     }
 
@@ -1624,14 +1633,15 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Card newCard = deck.Pop();
         UpdateCardsList(cardPlace, newCard, true);
         int indexToInsert = ConvertCardPlaceToIndex(cardPlace);
-        if (isFirstCard)
-        {
-            AnimateDrawer(true, () => CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert));
-        }
-        else
-        {
-            CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert);
-        }
+        CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert);
+        /* if (isFirstCard)
+         {
+             AnimateDrawer(true, () => CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert));
+         }
+         else
+         {
+             CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert);
+         }*/
     }
 
     internal void UpdateCardValue(string cardTarget, int value, Action disableDarkScreen)
@@ -1895,8 +1905,8 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         cardSwap2.cardPlace = tempPlace1;
         cardSwap1.InitCardsTag(cardSwap2.tag);
         cardSwap2.InitCardsTag(tempTag1);
-       cardSwap1.EnableSelecetPositionZ(false);
-       cardSwap2.EnableSelecetPositionZ(false);
+        cardSwap1.EnableSelecetPositionZ(false);
+        cardSwap2.EnableSelecetPositionZ(false);
     }
 
     private void GhostCardEffect(bool enable, CardUi cardObject)
@@ -1923,14 +1933,14 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         }
     }
 
-    private void AnimateDrawer(bool open, Action action)
+    public void AnimateDrawer(bool open, Action action)
     {
         isDrawerOpen = open;
         float targetX;
         if (open)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
-           //s targetX = -0.22f;
+            //s targetX = -0.22f;
             targetX = -1.15f;
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
             new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, action));
@@ -1955,13 +1965,13 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
             cardToDestroy.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
             // StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => RestAfterDestroy(cardToDestroy, null)));
             targetPos = new Vector3(cardToDestroy.transform.position.x + 15, cardToDestroy.transform.position.y, cardToDestroy.transform.position.z);
-            StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(cardToDestroy.transform, GenerateRandom(0.2f,0.9f), targetPos,3f,null, () => RestAfterDestroy(cardToDestroy, null)));
+            StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(cardToDestroy.transform, GenerateRandom(0.2f, 0.9f), targetPos, 3f, null, () => RestAfterDestroy(cardToDestroy, null)));
         }
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve, true);
         DealHands();
     }
 
-  
+
 
     internal float GenerateRandom(float v1, float v2)
     {
@@ -1982,7 +1992,8 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         if (puElement.Equals("f"))
         {
             ncAction = Constants.NcAction.Defrost;
-        }else if (puElement.Equals("i"))
+        }
+        else if (puElement.Equals("i"))
         {
             ncAction = Constants.NcAction.Shatter;
         }

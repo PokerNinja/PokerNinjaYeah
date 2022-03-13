@@ -29,7 +29,11 @@ public class BotEnemy : State
         Debug.Log("BOTSTATER");
         this.battleSystem = battleSystem;
         this.turnCounter = turnCounter;
-        if (betOffer)
+        if (battleSystem.tutoManager.step> 0 && battleSystem.tutoManager.step < 8)
+        {
+            MakeTutoAction(battleSystem.tutoManager.step);
+        }
+        else if (betOffer)
         {
             DecideAcceptBet();
         }
@@ -62,6 +66,28 @@ public class BotEnemy : State
             InitBotTurn();
             Debug.Log("BOT ENERGY:" + energyLeft);
         }
+    }
+
+    private void MakeTutoAction(int step)
+    {
+        switch (step)
+        {
+            case 3:
+                ActionWithDelay(2000, () => battleSystem.FakeEnemyPuUse(0, Constants.EnemyCard1, "", true));
+                break;
+            case 6:
+                ActionWithDelay(2000, () => battleSystem.FakeEnemyPuUse(0, Constants.EnemyCard2, "", true));
+                break;
+            case 7:
+                ActionWithDelay(2000, () => battleSystem.FakeEnemyPuUse(0, Constants.EnemyCard2, Constants.BoardCards[3], true));
+                break;
+        }
+    }
+
+    private async void ActionWithDelay(int delay, Action action)
+    {
+        await Task.Delay(delay);
+        action.Invoke();
     }
 
     private async void DecideAcceptBet()

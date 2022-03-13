@@ -26,8 +26,8 @@ public class BeginRound : State
         battleSystem.InitDecks();
         yield return new WaitForSeconds(delayForStart);
         battleSystem.ResetRoundSettings(() => StartTurn());
-
     }
+
 
     private void StartTurn()
     {
@@ -37,7 +37,7 @@ public class BeginRound : State
         battleSystem.readyToPlay = true;
         if (!isFirstRound)
         {
-            battleSystem.Interface.MoveDealerBtn( !isPlayerTurn);
+            battleSystem.Interface.MoveDealerBtn(!isPlayerTurn);
         }
         battleSystem.Interface.EnableVisionClick(true);
         /*  if (Values.Instance.resetReplaceEvery == Values.GamePhase.Round)

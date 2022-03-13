@@ -59,13 +59,30 @@ public class PlayerTurn : State
         battleSystem.DealPu(true, () =>
         {
             battleSystem.isPlayerBotModeTurn = true;
-           // Action tutorialAction = null;
+            // Action tutorialAction = null;
             battleSystem.NewTimerStarter();
-           // BattleSystem.Instance.StartCoroutine(battleSystem.ActivatePlayerButtons(true, false));
-            // battleSystem.WhosTurnAnimation(true, yourLastTurn);
             battleSystem.ChargeEnergyCounter(energyChargeCount);
             battleSystem.Interface.SetTurnIndicator(true, true);
-            battleSystem.ActivatePlayerButtonsOut(true,false);
+            battleSystem.ActivatePlayerButtonsOut(true, false);
+            if (Constants.TUTORIAL_MODE)
+            {
+                switch (battleSystem.tutoManager.step)
+                {
+                    case 0:
+                        battleSystem.tutoManager.SetStep(1);
+                        battleSystem.tutoManager.SetObjectClickable(battleSystem.puDeckUi.playerPusUi[0].spriteRenderer);
+                        break;
+                    case 3:
+                        battleSystem.tutoManager.SetStep(4);
+                        break;
+                    case 6:
+                        battleSystem.tutoManager.SetStep(7);
+                        break;
+                    case 8:
+                        battleSystem.tutoManager.SetStep(9);
+                        break;
+                }
+            }
         }
         );
         yield break;

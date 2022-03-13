@@ -403,7 +403,14 @@ public class EndRound : State
         if (startNewRound)
         {
             battleSystem.endRoutineFinished = true;
-            battleSystem.StartNewRoundRoutine(delay);
+            if (battleSystem.tutoManager.step == 7)
+            {
+                battleSystem.tutoManager.SetStep(8);
+            }
+            else
+            {
+                battleSystem.StartNewRoundRoutine(delay);
+            }
         }
     }
 }

@@ -118,15 +118,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform, 1.2f, 0.135f, true, () =>
             {
                 Constants.TemproryUnclickable = false;
-                if (Constants.TUTORIAL_MODE)
-                {
-                StartCoroutine(BattleSystemTuto.Instance.OnCardsSelectedForPU(cardPlace, transform.position));
-                }
-                else
-                {
                 StartCoroutine(BattleSystem.Instance.OnCardsSelectedForPU(cardPlace, transform.position));
-                }
-
             }));
         }
         else if(Constants.cardsToSelectCounter > 0  && freeze)

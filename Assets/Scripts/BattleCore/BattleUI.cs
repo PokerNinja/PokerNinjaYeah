@@ -69,7 +69,7 @@ public class BattleUI : MonoBehaviour
     public SpriteRenderer enemyFrameTurn;
     public SpriteRenderer playerLargeTurnIndicator;
 
-    public SpriteRenderer btnReplaceRenderer;
+    public SpriteRenderer btnDrawRenderer;
 
 
     public GameObject youWin;
@@ -1249,7 +1249,7 @@ public class BattleUI : MonoBehaviour
         }
         // Make IT more stable
         //StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, btnReplaceRenderer.material, value, btnEnable));
-        StartCoroutine(AnimationManager.Instance.DarkerAnimation(btnReplaceRenderer, !enable, Values.Instance.puChangeColorDisableDuration, btnEnable));
+        StartCoroutine(AnimationManager.Instance.DarkerAnimation(btnDrawRenderer, !enable, Values.Instance.puChangeColorDisableDuration, btnEnable));
     }
 
     public void BgFadeInColor()
@@ -1717,15 +1717,11 @@ public class BattleUI : MonoBehaviour
 
     private void SetPointer(int index, string cardsTag, string element)
     {
-        //   SpriteRenderer pointer = pointerSprite1;
         Animation pointerAnim = pointerAnimation1;
         Vector2 position = new Vector2(0, 0);
-        //  Vector2 addition = new Vector2(0, 0);
-        Color color = GetColorFromElement(element);
         bool enable = false;
         if (index == 2)
         {
-            //  pointer = pointerSprite2;
             pointerAnim = pointerAnimation2;
         }
         switch (cardsTag)
@@ -1752,8 +1748,7 @@ public class BattleUI : MonoBehaviour
         }
         if (enable)
         {
-            // pointer.color = color;
-            pointerAnim.transform.parent.transform.position = position /*+ addition*/;
+            pointerAnim.transform.parent.transform.position = position;
             pointerAnim.Play();
         }
         pointerAnim.transform.parent.gameObject.SetActive(enable);

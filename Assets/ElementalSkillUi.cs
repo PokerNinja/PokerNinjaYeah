@@ -274,9 +274,9 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     internal void ResetEs()
     {
-        FillElemental(0);
+        if (isPlayer)
+            DisableGlow();
         ncCounterUse = 0;
-     /*   if (isPlayer)
-            DisableGlow();*/
+        FillElemental(0);
     }
 }
