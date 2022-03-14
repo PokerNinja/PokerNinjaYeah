@@ -171,7 +171,7 @@ public class BattleSystem : StateMachine
     private void Start()
     {
         Constants.BOT_MODE = true;
-        Constants.TUTORIAL_MODE = true;
+        //Constants.TUTORIAL_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
         TUTORIAL_MODE = Constants.TUTORIAL_MODE;
@@ -309,7 +309,7 @@ public class BattleSystem : StateMachine
     private string[] CreatePuDeck(bool tutorial)
     {
         string[] deck;
-        if (!tutorial)
+        if (tutorial)
         {
             deck = new string[]{
               "f1","f2","f3","i1","i2","i3","w1","w2","w3",
@@ -327,11 +327,11 @@ public class BattleSystem : StateMachine
                  "w1","w2","w3","f2","i3","w1","w2","w3","f2","i3","f3",
                  "i1","f1","i2",
                  "w1","w2","w3",
-                 "fm2","wm2","fm2",
-                 "fm1","fm1","fm1",
-                 "fm1","fm1","im2",
-              "w2","wm1","w1","wm2","wm2","wm2","w1","f3","f2",
-            "w2" , "im2","f1","w2","i3","i3","f1"};
+                 "fm2","wm2","tm1",
+                 "t6","t5","t4",
+                 "t3","t2","t1" };
+              /*"w2","wm1","w1","wm2","wm2","wm2","w1","f3","f2",
+            "w2" , "im2","f1","w2","i3","i3","f1"};*/
         }
         return deck;
     }
@@ -1250,7 +1250,8 @@ public class BattleSystem : StateMachine
 
     private bool IsLargeCard(string cardPlace)
     {
-        return cardPlace.Contains("Player") || cardPlace.Contains("Enemy");
+        return !cardPlace.Contains("B");
+        //return cardPlace.Contains("Player") || cardPlace.Contains("Enemy");
     }
 
     private void ResetValuesAfterCardSelection(string cardPlace)

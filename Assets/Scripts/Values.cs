@@ -81,13 +81,14 @@ public class Values : Singleton<Values>
     public Color fireVision;
     public Color iceVision;
     public Color windVision;
+    public Color techVision;
     public Color shadowVision;
-    public Color electricVision;
 
     [Title("ElementSkill", bold: false)]
     public Color fireElement;
     public Color iceElement;
     public Color windElement;
+    public Color techElement;
 
 
     [Title("Text")]
