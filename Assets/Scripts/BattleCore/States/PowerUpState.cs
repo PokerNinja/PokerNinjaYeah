@@ -159,6 +159,10 @@ public class PowerUpState : State
         {
             return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true));
         }
+        else if (powerUpName.Equals("im1"))
+        {
+            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true));
+        }
         return cardTarget2;
     }
 
@@ -332,16 +336,23 @@ public class PowerUpState : State
                     battleSystem.GhostPu(isPlayerActivate, true);
                     break;
                 }
-            case nameof(PowerUpNamesEnum.s4): //player value up 2
-            case nameof(PowerUpNamesEnum.s6): //board value up 2
+            case nameof(PowerUpNamesEnum.t1): //player value up 2
+            case nameof(PowerUpNamesEnum.t3): //enemy value up 2
+            case nameof(PowerUpNamesEnum.t5): //board value up 2
                 {
                     battleSystem.ChangeValuePu(cardTarget2, 2);
                     break;
                 }
-            case nameof(PowerUpNamesEnum.s5): //player value down 2
-            case nameof(PowerUpNamesEnum.s7): //board value down 2
+            case nameof(PowerUpNamesEnum.t2): //player value down 2
+            case nameof(PowerUpNamesEnum.t4): //enemy value down 2
+            case nameof(PowerUpNamesEnum.t6): //board value down 2
                 {
                     battleSystem.ChangeValuePu(cardTarget2, -2);
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.tm1): //techgeddon
+                {
+                    TechRandomCards(cardTarget2);
                     break;
                 }
             case nameof(PowerUpNamesEnum.sm4): //smoke turn river
@@ -394,6 +405,19 @@ public class PowerUpState : State
         {
             await Task.Delay(150);
             battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), IsResetTornado(count - i));
+        }
+    }
+    
+    private async void TechRandomCards(string listOfCards)
+    {
+        //  List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
+        List<string> cardsNames = new List<string>(listOfCards.Split(','));
+        Debug.LogError("COUNT " + cardsNames.Count);
+        await Task.Delay(150);
+        for (int i = 0; i < cardsNames.Count; i++)
+        {
+            await Task.Delay(battleSystem.GenerateRandom(400, 700));
+            battleSystem.ChangeValuePu(cardsNames[i], +2);
         }
     }
 

@@ -14515,11 +14515,12 @@ MonoBehaviour:
   fireVision: {r: 0.8901961, g: 0.08627451, b: 0.06666667, a: 1}
   iceVision: {r: 0.12941177, g: 0.7490196, b: 0.9254902, a: 1}
   windVision: {r: 0.99607843, g: 0.76862746, b: 0.37254903, a: 1}
+  techVision: {r: 0.015686275, g: 0.6509804, b: 0.34901962, a: 1}
   shadowVision: {r: 0.9411765, g: 0.23137255, b: 0.21568628, a: 1}
-  electricVision: {r: 0.007176912, g: 0, b: 0.8396226, a: 1}
   fireElement: {r: 0.4509804, g: 0, b: 0, a: 1}
   iceElement: {r: 0, g: 0.65882355, b: 0.94509804, a: 1}
   windElement: {r: 0.8980392, g: 0.7058824, b: 0.3764706, a: 1}
+  techElement: {r: 0, g: 0, b: 0, a: 0}
   redText: '#F03B37'
   blueText: '#02C8FF'
   yellowText: '#FFC35E'
@@ -15105,7 +15106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BOT_MODE: 1
-  TUTORIAL_MODE: 1
+  TUTORIAL_MODE: 0
   END_TURN_AFTER_PU: 0
   tutoManager: {fileID: 1171170518}
   ui: {fileID: 1384007426}
@@ -29345,8 +29346,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1959771878}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.16, y: 3.57, z: 0}
-  m_LocalScale: {x: 0.75, y: 0.75, z: 1}
+  m_LocalPosition: {x: -4.44, y: 2.78, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2048990532}
   - {fileID: 277485756}

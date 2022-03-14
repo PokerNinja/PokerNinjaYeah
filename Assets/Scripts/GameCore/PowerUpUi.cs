@@ -392,11 +392,11 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             case "w":
                 targetColor = Values.Instance.windVision;
                 break;
+            case "t":
+                targetColor = Values.Instance.techVision;
+                break;
             case "s":
                 targetColor = Values.Instance.shadowVision;
-                break;
-            case "e":
-                targetColor = Values.Instance.electricVision;
                 break;
         }
         return targetColor;
