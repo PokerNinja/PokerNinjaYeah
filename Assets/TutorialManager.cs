@@ -69,7 +69,6 @@ public class TutorialManager : MonoBehaviour
                 break;
             case 7: // getting the Dragon
                 InstructionsEnable(dragonCard7);
-                SetPointer(pointerAnimation1, ObjectTargetEnum.nc1);
                 blockScreen.SetActive(true);
                 break;
             case 8: // after Damge
@@ -91,10 +90,8 @@ public class TutorialManager : MonoBehaviour
             SetStep(5);
                 break;
             case 6:
-                InstructionsDisable();
-                timerForMsgEnable = false;
-                break;
             case 7:
+                timerForMsgEnable = false;
                 InstructionsDisable();
                 blockScreen.SetActive(false);
                 break;
@@ -188,7 +185,7 @@ public class TutorialManager : MonoBehaviour
     private void InstructionsEnable(string text)
     {
         instructionsText.text = text;
-        StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(instructionsCanvas, true, 0.5f, null));
+        StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(instructionsCanvas, true, 1f, null));
     }
     public void InstructionsDisable()
     {

@@ -78,16 +78,16 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         (PowerUpNamesEnum.sm1.ToString(), "GHOST", "Add a ghost card to your hand.", "", 0, Constants.PlayerCardsTag, Constants.PoolCardTag);
     /*28*/
     public PuStructInfo player_value_up_2 = new PuStructInfo
-        (PowerUpNamesEnum.t1.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.s4.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
     /*29*/
     public PuStructInfo player_value_down_2 = new PuStructInfo
-        (PowerUpNamesEnum.t2.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.s5.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
     /*30*/
-    public PuStructInfo enemy_value_up_2 = new PuStructInfo
-        (PowerUpNamesEnum.t3.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
+    public PuStructInfo board_value_up_2 = new PuStructInfo
+        (PowerUpNamesEnum.s6.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
     /*31*/
-    public PuStructInfo enemy_value_down_2 = new PuStructInfo
-        (PowerUpNamesEnum.t4.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
+    public PuStructInfo board_value_down_2 = new PuStructInfo
+        (PowerUpNamesEnum.s7.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
     /*32*/
     public PuStructInfo smoke_turn_river = new PuStructInfo
         (PowerUpNamesEnum.sm4.ToString(), "Smoke", "Smoke the turn and the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them", "", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
@@ -106,17 +106,6 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
     /*37*/
     public PuStructInfo esWind = new PuStructInfo
         (PowerUpNamesEnum.wp.ToString(), "wp", "<size=110%><b><color=#FFC35E>SWAP</color> two cards of your choise.</b>\n<size=50%>\n<b><size=90%>*use 3 <color=#FFC35E>Wind</color> Ninja Card to unlock", "Choose two cards to <color=#FFC35E>swap</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
-
-    /*38*/
-    public PuStructInfo board_value_up_2 = new PuStructInfo
-        (PowerUpNamesEnum.t5.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
-    /*39*/
-    public PuStructInfo board_value_down_2 = new PuStructInfo
-        (PowerUpNamesEnum.t6.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
-     /*40*/
-    public PuStructInfo techgeddon = new PuStructInfo
-        (PowerUpNamesEnum.tm1.ToString(), "Value", "Change the value of random cards.", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
-
 
     /*9*/
     public PuStructInfo shuffle_board = new PuStructInfo
@@ -190,20 +179,14 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
                 return ghost_board;
             case nameof(PowerUpNamesEnum.sm1):
                 return ghost_player;
-            case nameof(PowerUpNamesEnum.t1):
+            case nameof(PowerUpNamesEnum.s4):
                 return player_value_up_2;
-            case nameof(PowerUpNamesEnum.t2):
+            case nameof(PowerUpNamesEnum.s5):
                 return player_value_down_2;
-            case nameof(PowerUpNamesEnum.t3):
-                return enemy_value_up_2;
-            case nameof(PowerUpNamesEnum.t4):
-                return enemy_value_down_2;
-            case nameof(PowerUpNamesEnum.t5):
+            case nameof(PowerUpNamesEnum.s6):
                 return board_value_up_2;
-            case nameof(PowerUpNamesEnum.t6):
+            case nameof(PowerUpNamesEnum.s7):
                 return board_value_down_2;
-            case nameof(PowerUpNamesEnum.tm1):
-                return techgeddon;
             case nameof(PowerUpNamesEnum.sm4):
                 return smoke_turn_river;
             case nameof(PowerUpNamesEnum.im2):
@@ -278,19 +261,16 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         s2 = 25, //smoke_board
         s3 = 26, //ghost_board
         sm1 = 27, //ghost_player
-        t1 = 28, // player value up 2
-        t2 = 29, //player value down 2
-        t3 = 30, //enemy value up 2
-        t4 = 31, //enemy value down 2
+        s4 = 28, // player value up 2
+        s5 = 29, //player value down 2
+        s6 = 30, //board value up 2
+        s7 = 31, //board value down 2
         sm4 = 32, //smoke turn river
         im2 = 33, //smoke turn river
         wm2 = 34, //smoke turn river
         fp = 35, //smoke turn river
         ip = 36, //smoke turn river
         wp = 37, //smoke turn river
-        t5 = 38, //board value up 2
-        t6 = 39, //board value down 2
-        tm1 = 40, //rainTech value down 2
     }
 
     #region // PuInfo

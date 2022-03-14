@@ -1050,10 +1050,7 @@ public class BattleUI : MonoBehaviour
         }
         if (!puElement.Equals("w"))
         {
-            if (puElement.Equals("t"))
-            {
-                PuIgnite.Invoke();
-            }
+
             if (posTarget1 == new Vector2(0, 0))
             {
                 StartCoroutine(ShootProjectile(false, startingPos, projectile1, posTarget2, PuIgnite));
@@ -1108,7 +1105,7 @@ public class BattleUI : MonoBehaviour
 
     }
 
-
+    
 
     public void FadeStrighterOrFlusher(bool isPlayer, bool isFlusher, bool enable, Action Reset)
     {
@@ -1687,11 +1684,11 @@ public class BattleUI : MonoBehaviour
             case "w":
                 targetColor = Values.Instance.windVision;
                 break;
-            case "t":
-                targetColor = Values.Instance.techVision;
-                break;
             case "s":
                 targetColor = Values.Instance.shadowVision;
+                break;
+            case "e":
+                targetColor = Values.Instance.electricVision;
                 break;
         }
         return targetColor;
@@ -1722,7 +1719,6 @@ public class BattleUI : MonoBehaviour
     {
         Animation pointerAnim = pointerAnimation1;
         Vector2 position = new Vector2(0, 0);
-        Vector2 scale = new Vector2(1, 1);
         bool enable = false;
         if (index == 2)
         {
@@ -1746,15 +1742,13 @@ public class BattleUI : MonoBehaviour
                 enable = true;
                 break;
             case Constants.DeckCardsTag:
-                position = new Vector2(-3.2f, 1.91f);
-                scale = new Vector2(-1, 1);
+                position = new Vector2(-4.54f, 2.78f);
                 enable = true;
                 break;
         }
         if (enable)
         {
             pointerAnim.transform.parent.transform.position = position;
-            pointerAnim.transform.parent.transform.localScale = scale;
             pointerAnim.Play();
         }
         pointerAnim.transform.parent.gameObject.SetActive(enable);

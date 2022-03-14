@@ -767,6 +767,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         else
         {
             AddCardToList(cardTag, cardObject, indexToInsert);
+            Debug.Log("i " + indexToInsert);
+            Debug.Log("c " + cardPlace);
             StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
         Values.Instance.cardDrawMoveDuration, DarkCardUnderSmoke, () =>
             cardObject.CardReveal(!isFaceDown)
