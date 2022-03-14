@@ -22,14 +22,54 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public UnityEvent onClick = new UnityEvent();
     public UnityEvent onLongPress = new UnityEvent();
 
-    public Animation animation;
+    public Animation shineAnimation;
+
+    public Animation liquidAnimation;
+    public Color glowColor;
+    public SpriteRenderer glowRenderer;
+
+
 
 
     [Button]
-    public void FullEffect()
+    public IEnumerator FullEffect(bool enableLoop)
     {
-        animation.Play();
+        yield return new WaitForSeconds(1f);
+        WhiteGlow();
+        if (enableLoop && isPlayer)
+        {
+            StartCoroutine(EnableGlowLoop());
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFull, true);
+        }
     }
+
+    public void WhiteGlow()
+    {
+        glowRenderer.color = new Color(1f, 1f, 1f);
+        liquidAnimation.Play();
+        shineAnimation.Play("es_full_glow");
+    }
+
+    public IEnumerator EnableGlowLoop()
+    {
+        if (ncCounterUse == 3)
+        {
+            yield return new WaitForSeconds(2.2f);
+            glowRenderer.color = glowColor;
+            shineAnimation.Play("es_shine_loop");
+        }
+    }
+
+    public void DisableGlow()
+    {
+        shineAnimation.Rewind();
+        shineAnimation.Play();
+        shineAnimation.Sample();
+        shineAnimation.Stop();
+        AnimationManager.Instance.SetAlpha(glowRenderer, 0f);
+    }
+
+    [Button]
     public void FillElemental(int amount)
     {
         float targetY = 0f;
@@ -37,30 +77,38 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             case 0:
                 targetY = -5.54f;
+                if (!isPlayer)
+                    targetY = 5.62f;
                 break;
             case 1:
-                targetY = -5f;
+                targetY = -5.14f;
+                if (!isPlayer)
+                    targetY = 5.22f;
                 break;
             case 2:
-                targetY = -4.6f;
+                targetY = -4.65f;
+                if (!isPlayer)
+                    targetY = 4.72f;
                 break;
             case 3:
-                targetY = -4.23f;
+                targetY = -4.22f;
+                if (!isPlayer)
+                    targetY = 4.3f;
                 break;
         }
+
         if (amount != 0)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFill, true);
         }
-        StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(pElementSkillLiquid.transform, 0,
-            new Vector3(pElementSkillLiquid.transform.position.x, targetY, pElementSkillLiquid.transform.position.z), Values.Instance.elementalSkillFillDuration, null, () =>
+        StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(pElementSkillLiquid.transform, 0f,
+            new Vector3(pElementSkillLiquid.transform.position.x, targetY, 88.8f), Values.Instance.elementalSkillFillDuration, () =>
             {
                 if (ncCounterUse == 3)
                 {
-                    FullEffect();
-                    SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFull, true);
+                    StartCoroutine(FullEffect(true));
                 }
-            }));
+            }, null));
     }
 
     public bool IsNcEqualsPesElement(string element)
@@ -71,15 +119,15 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     [Button]
     public void UpdateEsAfterNcUse(bool isMonster)
     {
-            if (isMonster)
-            {
-                ncCounterUse++;
-            }
-            if (++ncCounterUse >= 3)
-            {
-                ncCounterUse = 3;
-            }
-            FillElemental(ncCounterUse);
+        if (isMonster)
+        {
+            ncCounterUse++;
+        }
+        if (++ncCounterUse >= 3)
+        {
+            ncCounterUse = 3;
+        }
+        FillElemental(ncCounterUse);
     }
 
     public void InitializeES(string elementalSkillType)
@@ -108,10 +156,8 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     break;
                 }
         }
-        if (isPlayer)
-        {
-            pElementalSkillLiquid.color = liquidColor;
-        }
+        pElementalSkillLiquid.color = liquidColor;
+        glowColor = liquidColor;
         pElementalSkillIcon.sprite = Resources.Load("Sprites/GameScene/ElementalSkill/" + iconPath, typeof(Sprite)) as Sprite;
     }
 
@@ -142,6 +188,8 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             if (isPlayer && ncCounterUse == 3 && isClickable)
             {
+                DisableGlow();
+                WhiteGlow();
                 BattleSystem.Instance.OnEsClick(this);
             }
             else
@@ -150,6 +198,8 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             }
         }
     }
+
+
     public void OnPointerUp(PointerEventData eventData)
     {
 
@@ -193,7 +243,12 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
         {
-            BattleSystem.Instance.ShowPuInfo(transform.position, true, false, element + "p", "");
+            Vector3 pos = transform.position;
+            if (!isPlayer)
+            {
+                pos += new Vector3(0, -5, 0);
+            }
+            BattleSystem.Instance.ShowPuInfo(pos, true, false, element + "p", "");
         }
         else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
         {
@@ -201,6 +256,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
     }
 
+    [Button]
     public void EnableSelecetPositionZ(bool aboveDarkScreen)
     {
         float interval = 88.5f;
@@ -214,5 +270,13 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         held = true;
         onLongPress.Invoke();
+    }
+
+    internal void ResetEs()
+    {
+        if (isPlayer)
+            DisableGlow();
+        ncCounterUse = 0;
+        FillElemental(0);
     }
 }

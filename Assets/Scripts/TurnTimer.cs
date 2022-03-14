@@ -123,20 +123,23 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public IEnumerator StartTimer(float timerDuration)
     {
-        StartCoroutine(AnimateFillCounter());
-        yield return new WaitForSeconds(Values.Instance.delayTimerStart);
-        pause = false;
-        endTurnByPlayer = false;
-        updateTime = true;
-        totalTime = timerDuration;
-        countTimer = totalTime;
-        if (thereCanBeOnlyOne == null)
+        if (!Constants.TUTORIAL_MODE)
         {
-            thereCanBeOnlyOne = StartCoroutine(CountDown());
-        }
-        else
-        {
+            StartCoroutine(AnimateFillCounter());
+            yield return new WaitForSeconds(Values.Instance.delayTimerStart);
+            pause = false;
+            endTurnByPlayer = false;
+            updateTime = true;
+            totalTime = timerDuration;
+            countTimer = totalTime;
+            if (thereCanBeOnlyOne == null)
+            {
+                thereCanBeOnlyOne = StartCoroutine(CountDown());
+            }
+            else
+            {
 
+            }
         }
 
     }
@@ -296,6 +299,10 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (enable)
         {
             SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
+        }
+        else if (isLastSeconds)
+        {
+            SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, true);
         }
     }
 

@@ -86,16 +86,8 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnClick()
     {
-
-        if (Constants.TUTORIAL_MODE)
-        {
-            BattleSystemTuto.Instance.OnPuClick(this);
-        }
-        else
-        {
+        if (BattleSystem.Instance.tutoManager.step != 1)
             BattleSystem.Instance.OnPuClick(this);
-        }
-
         /*if (BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.HideDialog();
@@ -128,7 +120,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }*/
     }
 
-    
+
     public void OnPointerUp(PointerEventData eventData)
     {
 
@@ -139,14 +131,9 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             {
                 onClick.Invoke();
             }
-            else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
-            {
-                BattleSystemTuto.Instance.HideDialog();
-            }
-            else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
-            {
-                BattleSystem.Instance.HideDialog(puIndex != -1);
-            }
+
+            BattleSystem.Instance.HideDialog(puIndex != -1);
+
         }
         PressSprite(false);
     }
@@ -176,14 +163,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OND()
     {
-        if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
-        {
-            BattleSystem.Instance.ShowPuInfo(transform.position, puIndex != -1, puIndex == 1, puName, puDisplayName);
-        }
-        else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
-        {
-            BattleSystemTuto.Instance.ShowPuInfo(transform.position, puIndex == 1, puName, puDisplayName);
-        }
+        BattleSystem.Instance.ShowPuInfo(transform.position, puIndex != -1, puIndex == 1, puName, puDisplayName);
     }
 
 
@@ -225,7 +205,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             sprite = "pu_back";
         }
-        else if(isPlayer)
+        else if (isPlayer)
         {
             spriteRenderer.color = new Color(0.66f, 0.66f, 0.66f, 1f);
         }
@@ -286,7 +266,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
 
- 
+
     public void AnimatePuUse(Action OnStart, Action OnEndRoutine3)
     {
         OnStart?.Invoke();
@@ -338,12 +318,13 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         StartCoroutine(AnimationManager.Instance.FadeBurnPU(spriteRenderer.material, delayBefor, false, duration, null, End, End2));
     }
-    
 
-    public void DissolvePuToNc(Vector3 targetPosition, Action OnEnd)
+
+    public void DissolveNcToEs(Vector3 targetPosition, Action FillEs, Action OnEnd)
     {
         Vector3 newTarget = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0, 0, 0), 7f, null, null, null, OnEnd));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0.3f, 0.3f, 0), Values.Instance.ncToEsDuration, null,
+           () => spriteRenderer.material.SetFloat("_OutlineAlpha", 0f), FillEs, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(spriteRenderer, false, Values.Instance.defaultFadeD, OnEnd))));
     }
 
     public void CardReveal(bool reveal, Action onFinish)

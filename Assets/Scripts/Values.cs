@@ -28,6 +28,7 @@ public class Values : Singleton<Values>
     public float fontAppearance = 0.7f;
     public int ChanceForBotEmoji = 3;
     public float raiseTimerDuration = 30f;
+    public float delayBeforeGameOver = 8f;
 
     // public int replaceUseLimit = 1;
     //    public GamePhase resetReplaceEvery = GamePhase.Turn;
@@ -131,7 +132,7 @@ public class Values : Singleton<Values>
     public float delayBetweenDealBoardCards = 0.18f;
     public float freezeMaterialFadeBurnWidth = 0.56f;
 
-    [Title("PowerUpUi", bold: false)]
+    [Title("NC", bold: false)]
     public float pusDrawerMoveDuration = 2f;
     public float puPushNewSlotMoveDuration = 2f;
     public float puDrawMoveDuration = 2f;
@@ -142,6 +143,7 @@ public class Values : Singleton<Values>
     public float floatingShakeAnimationSpeed = 0.5f;
     public float floatingShakeAnimationX = 0.55f;
     public float floatingShakeAnimationY = 0.12f;
+    public float ncToEsDuration = 5f;
 
     [Title("Turn", bold: false)]
     public float turnBtnAlphaDuration = 1f;
@@ -158,6 +160,7 @@ public class Values : Singleton<Values>
     public float bgMaxValueSwapColor = 0.67f;
     public float hitTextScaleDuration = 2f;
     public float hitTextFDuration = 0.5f;
+    public float delayBetweenWinningCardsToWinnerText = 1f;
 
     [Title("ShakeDisableAnimation", bold: false)]
     public float disableClickShakeSpeed = 1.8f;

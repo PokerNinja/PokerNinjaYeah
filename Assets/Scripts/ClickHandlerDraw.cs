@@ -71,21 +71,15 @@ public class ClickHandlerDraw : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         // TODO move this to battleSystem
         // BattleSystem battleSystem = GameObject.Find("BattleSystem").GetComponent<BattleSystem>();
         //Maybe Better One
-        if (!Constants.TUTORIAL_MODE)
+        if (BattleSystem.Instance.infoShow)
         {
-            if (BattleSystem.Instance.infoShow)
-            {
-                BattleSystem.Instance.HideDialog(false);
-            }
-            BattleSystem.Instance.EnableReplaceDialog(false, false);
+            BattleSystem.Instance.HideDialog(false);
         }
-        else
+        BattleSystem.Instance.EnableReplaceDialog(false, false);
+        if(BattleSystem.Instance.tutoManager.step == 5)
         {
-            if (BattleSystemTuto.Instance.infoShow)
-            {
-                BattleSystemTuto.Instance.HideDialog();
-            }
-            BattleSystemTuto.Instance.EnableReplaceDialog(false, false);
+            spriteRenderer.sortingOrder = 0;
+            BattleSystem.Instance.tutoManager.SetStep(6);
         }
     }
     public void OnPointerUp(PointerEventData eventData)
@@ -97,15 +91,7 @@ public class ClickHandlerDraw : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             onClick.Invoke();
         }
-        else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
-        {
-            BattleSystem.Instance.HideDialog(false);
-        }
-        else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
-        {
-            BattleSystemTuto.Instance.HideDialog();
-        }
-
+        BattleSystem.Instance.HideDialog(false);
     }
 
 
@@ -119,27 +105,20 @@ public class ClickHandlerDraw : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     }
     private void LoadSpriteBtn(bool press)
     {
-            animator.SetBool("enable", !press);
+        animator.SetBool("enable", !press);
         //string path = btnName;
-        
-      /*  }
-        else if (press)
-        {
-            path += "_p";
-        }
-        spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + path, typeof(Sprite)) as Sprite;*/
+
+        /*  }
+          else if (press)
+          {
+              path += "_p";
+          }
+          spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + path, typeof(Sprite)) as Sprite;*/
     }
 
     public void OND()
     {
-        if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
-        {
-            BattleSystem.Instance.ShowPuInfo(transform.position, false, false, "replace", Constants.ReplacePuInfo);
-        }
-        else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
-        {
-            BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, "replace", Constants.ReplacePuInfo);
-        }
+        BattleSystem.Instance.ShowPuInfo(transform.position, false, false, "replace", Constants.ReplacePuInfo);
     }
 
 

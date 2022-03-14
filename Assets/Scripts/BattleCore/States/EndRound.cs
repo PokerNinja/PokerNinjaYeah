@@ -134,7 +134,7 @@ public class EndRound : State
                 battleSystem.cardsDeckUi.CreateShadowCard(battleSystem.cardsDeckUi.enemyShadowCard, () => AnimateWinWithHand(bestOpponentHand, false));
             }
 
-            winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestOpponentHand.Rank); ;
+            winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestOpponentHand.Rank);
             //  winnerMsg += bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
         }
         // Player win
@@ -403,7 +403,14 @@ public class EndRound : State
         if (startNewRound)
         {
             battleSystem.endRoutineFinished = true;
-            battleSystem.StartNewRoundRoutine(delay);
+            if (battleSystem.tutoManager.step == 7)
+            {
+                battleSystem.tutoManager.SetStep(8);
+            }
+            else
+            {
+                battleSystem.StartNewRoundRoutine(delay);
+            }
         }
     }
 }

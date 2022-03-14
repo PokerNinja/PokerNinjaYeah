@@ -40,7 +40,8 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     public Transform playerSkill;
     public Transform enemySkill;
 
-    public Transform pesTranform;
+    public Transform pEsTranform;
+    public Transform eEsTranform;
    // public PowerUpUi playerSkillUi;
 
 
@@ -99,6 +100,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         puToReset.spriteRenderer.material.SetFloat("_WaveSpeed", 0f);
         puToReset.spriteRenderer.material.SetFloat("_DistortAmount", 0f);
         puToReset.spriteRenderer.color = new Color(1, 1, 1);
+        puToReset.spriteRenderer.sortingOrder = 1;
         puToReset.name = "ReadyToUsePU";
         puToReset.puName = "X";
         puToReset.puDisplayName = "NN";
@@ -487,15 +489,14 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    internal void EnablePlayerSkill(bool enable)
-    {
-       // playerSkillUi.EnablePu(enable);
-    }
 
     [Button]
-    public void DissolvePuToNc(int index , Action OnEnd)
+    public void DissolveNcToEs(bool isPlayer, int index , Action FillEs, Action OnEnd)
     {
-        GetPu(true, index).DissolvePuToNc(pesTranform.position, OnEnd);
+        Vector3 target = pEsTranform.position;
+        if (!isPlayer)
+            target = eEsTranform.position;
+        GetPu(isPlayer, index).DissolveNcToEs(target, FillEs, OnEnd);
     }
     
 }

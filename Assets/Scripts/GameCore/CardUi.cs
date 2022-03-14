@@ -59,7 +59,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     {
         spriteRenderer.material.SetFloat("_FadeAmount", -0.1f);
         spriteRenderer.material.SetFloat("_OutlineAlpha", 0f);
-        EnableSelecetPositionZ(false);
+        //EnableSelecetPositionZ(false);
         cardMark.SetActive(false);
         SoundManager.Instance.RandomSoundEffect(0);
     }
@@ -118,20 +118,16 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform, 1.2f, 0.135f, true, () =>
             {
                 Constants.TemproryUnclickable = false;
-                if (Constants.TUTORIAL_MODE)
-                {
-                StartCoroutine(BattleSystemTuto.Instance.OnCardsSelectedForPU(cardPlace, transform.position));
-                }
-                else
-                {
                 StartCoroutine(BattleSystem.Instance.OnCardsSelectedForPU(cardPlace, transform.position));
-                }
-
             }));
         }
-        else if(Constants.cardsToSelectCounter > 0 && freeze)
+        else if(Constants.cardsToSelectCounter > 0  && freeze)
         {
             BattleSystem.Instance.Interface.FreezeSign(transform.position);
+        }
+        else if(!clickbleForPU && BattleSystem.Instance.firstCardTargetPU.Equals(cardPlace) && Constants.cardsToSelectCounter == 1)
+        {
+            BattleSystem.Instance.ResetNC();
         }
         else
         {
