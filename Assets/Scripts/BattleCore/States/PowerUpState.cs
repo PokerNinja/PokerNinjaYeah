@@ -144,6 +144,10 @@ public class PowerUpState : State
         {
             int randomAmount = battleSystem.GenerateRandom(5, 7);
             return randomAmount.ToString();
+        }if (powerUpName.Equals("tm1"))
+        {
+            int randomAmount = battleSystem.GenerateRandom(4, 6);
+            return randomAmount.ToString();
         }
         return cardTarget1;
     }
@@ -357,7 +361,7 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.tm1): //techgeddon
                 {
-                    TechRandomCards(cardTarget2);
+                    TechRandomCards(cardTarget2, cardTarget1);
                     break;
                 }
             case nameof(PowerUpNamesEnum.sm4): //smoke turn river
@@ -413,14 +417,16 @@ public class PowerUpState : State
         }
     }
     
-    private async void TechRandomCards(string listOfCards)
+    private async void TechRandomCards(string listOfCards, string amount)
     {
         //  List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
+        int randomAmount = int.Parse(amount);
+
         List<string> cardsNames = new List<string>(listOfCards.Split(','));
         await Task.Delay(150);
-        for (int i = 0; i < cardsNames.Count; i++)
+        for (int i = 0; i < randomAmount; i++)
         {
-            await Task.Delay(battleSystem.GenerateRandom(400, 700));
+            await Task.Delay(battleSystem.GenerateRandom(250, 380));
             battleSystem.ChangeValuePu(cardsNames[i], +2);
         }
     }
@@ -535,7 +541,13 @@ public class PowerUpState : State
                 {
                     battleSystem.cardsDeckUi.EnableNcActionSlot(card.cardPlace, puElement);
                     Debug.LogWarning("EnableNCavtion");
-
+                }
+                else if (card.glitch)
+                {
+                    if (puElement.Equals("i"))
+                    {
+                        battleSystem.cardsDeckUi.GetParentByPlace(card.cardPlace).EnableNcAction(true, Constants.NcAction.Unglitched);
+                    }
                 }
             }
             else

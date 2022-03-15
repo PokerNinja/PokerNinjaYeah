@@ -126,6 +126,10 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         {
             BattleSystem.Instance.Interface.FreezeSign(transform.position);
         }
+        else if(Constants.cardsToSelectCounter > 0  && glitch)
+        {
+            BattleSystem.Instance.Interface.GlitchedSign(transform.position);
+        }
         else if(!clickbleForPU && BattleSystem.Instance.firstCardTargetPU.Equals(cardPlace) && Constants.cardsToSelectCounter == 1)
         {
             BattleSystem.Instance.ResetNC();

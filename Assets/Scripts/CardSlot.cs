@@ -33,6 +33,10 @@ public class CardSlot : MonoBehaviour
         {
             spritePath = "shatter";
         }
+        else if (ncAction == Constants.NcAction.Unglitched)
+        {
+            spritePath = "unglitch";
+        }
         return Resources.Load("Sprites/PU/" + spritePath, typeof(Sprite)) as Sprite;
     }
 }

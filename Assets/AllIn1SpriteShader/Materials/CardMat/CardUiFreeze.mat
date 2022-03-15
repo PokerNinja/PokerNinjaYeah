@@ -9,8 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: CardUiFreeze
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
-  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA FADE_ON GLITCH_ON GLOWLIGHT_ON OUTBASE_ON
-    OUTDIST_ON OUTTEX_ON OVERLAYMULT_ON OVERLAY_ON PIXELATE_ON RADIALGRADIENT_ON
+  m_ShaderKeywords: CHROMABERR_ON COLORSWAP_ON ETC1_EXTERNAL_ALPHA FADE_ON GLITCH_ON
+    GLOWLIGHT_ON OUTBASE_ON OUTDIST_ON OUTTEX_ON OVERLAYMULT_ON OVERLAY_ON RADIALGRADIENT_ON
     SHAKEUV_ON SHINE_ON _GLOWAFFECTLIGHT_ON _GRADISRADIAL_ON _OUTLINEDISTORTTOGGLE_ON
     _OUTLINETEXTOGGLE_ON
   m_LightmapFlags: 4
@@ -31,8 +31,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ColorSwapTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: 0eb58aa7ceb54d44388fc1e5ec82a2f2, type: 3}
+        m_Scale: {x: 0, y: 0}
         m_Offset: {x: 0, y: 0}
     - _DistortTex:
         m_Texture: {fileID: 2800000, guid: 7aad8c583ef292e48b06af0d1f2fab97, type: 3}
@@ -71,9 +71,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OverlayTex:
-        m_Texture: {fileID: 2800000, guid: d7b3866ceecb09b4ba26f5b9f7e7b492, type: 3}
-        m_Scale: {x: 1.2, y: 1.2}
-        m_Offset: {x: -0.13, y: 0}
+        m_Texture: {fileID: 2800000, guid: 7cdb36608bfdf5e44a83aa876b2d5b4b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _ShineMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -105,8 +105,8 @@ Material:
     - _Brightness: 0
     - _BurnAmount: 0
     - _BurnScale: 7
-    - _ChromAberrAlpha: 0.683
-    - _ChromAberrAmount: 0.824
+    - _ChromAberrAlpha: 0.171
+    - _ChromAberrAmount: 0
     - _ClipUvDown: 0
     - _ClipUvLeft: 0
     - _ClipUvRight: 0
@@ -119,10 +119,10 @@ Material:
     - _ColorRampBlend: 1
     - _ColorRampLuminosity: 0
     - _ColorRampOutline: 0
-    - _ColorSwapBlend: 1
-    - _ColorSwapBlueLuminosity: 0.5
-    - _ColorSwapGreenLuminosity: 0.5
-    - _ColorSwapRedLuminosity: 0.543
+    - _ColorSwapBlend: 0
+    - _ColorSwapBlueLuminosity: 0.55
+    - _ColorSwapGreenLuminosity: -0.3
+    - _ColorSwapRedLuminosity: -0.18
     - _Contrast: 1
     - _DistortAmount: 0.5
     - _DistortTexXSpeed: 5
@@ -139,7 +139,7 @@ Material:
     - _GhostColorBoost: 0
     - _GhostTransparency: 0
     - _GlitchAmount: 0
-    - _GlitchSize: 0.4
+    - _GlitchSize: 0.36
     - _Glow: 100
     - _GlowAffectLight: 1
     - _GlowTexUsed: 0
@@ -252,9 +252,9 @@ Material:
     - _ColorChangeTarget: {r: 1, g: 0, b: 0, a: 1}
     - _ColorChangeTarget2: {r: 1, g: 0, b: 0, a: 1}
     - _ColorChangeTarget3: {r: 1, g: 0, b: 0, a: 1}
-    - _ColorSwapBlue: {r: 1, g: 1, b: 1, a: 1}
+    - _ColorSwapBlue: {r: 0.000303527, g: 0.4341537, b: 0.10946172, a: 1}
     - _ColorSwapGreen: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorSwapRed: {r: 1, g: 1, b: 1, a: 1}
+    - _ColorSwapRed: {r: 0.06124607, g: 0.79129815, b: 0, a: 1}
     - _FadeBurnColor: {r: 0, g: 0.26774764, b: 1, a: 1}
     - _GlowColor: {r: 0.9056604, g: 0, b: 0, a: 0.7294118}
     - _GradBotLeftCol: {r: 0.5019608, g: 0.27450982, b: 0.57254905, a: 1}

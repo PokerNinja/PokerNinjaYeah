@@ -118,6 +118,7 @@ public class BattleUI : MonoBehaviour
     public ParticleSystem icenadoPS;
     public ParticleSystem armageddonPS;
     public ParticleSystem shutterIce;
+    public GameObject techRain;
 
     [SerializeField] public SpriteRenderer turnArrowSprite;// MAYBE in Timer
     [SerializeField] public BetBtnUi betBtn;
@@ -182,6 +183,7 @@ public class BattleUI : MonoBehaviour
     public TextMeshProUGUI hpForThisRoundText;
 
     public GameObject frozenIndicator;
+    public GameObject glitchedIndicator;
 
     public Transform dealerTransform;
     public Transform dealerSlotP;
@@ -608,6 +610,14 @@ public class BattleUI : MonoBehaviour
             case "w3":
                 spritePath = "nc_wind";
                 break;
+            case "t1":
+            case "t2":
+            case "t3":
+            case "t4":
+            case "t5":
+            case "t6":
+                spritePath = "nc_tech";
+                break;
             case "fm1":
             case "fm2":
                 spritePath = "dc_fire";
@@ -620,6 +630,9 @@ public class BattleUI : MonoBehaviour
             case "wm2":
                 spritePath = "dc_wind";
                 break;
+            case "tm1":
+                spritePath = "dc_tech";
+                break;
             case "wp":
                 spritePath = "wp_info";
                 break;
@@ -628,6 +641,9 @@ public class BattleUI : MonoBehaviour
                 break;
             case "ip":
                 spritePath = "ip_info";
+                break;
+            case "tp":
+                spritePath = "tp_info";
                 break;
         }
         return Resources.Load("Sprites/GameScene/Info/" + spritePath, typeof(Sprite)) as Sprite;
@@ -1710,6 +1726,11 @@ public class BattleUI : MonoBehaviour
         }
     }
 
+    internal void StartMatrix()
+    {
+        GameObject ps = Instantiate(techRain);
+        Destroy(ps, 5f);
+    }
 
     public void ShakeCamera()
     {
@@ -1846,11 +1867,15 @@ public class BattleUI : MonoBehaviour
         enemyHpUi.transform.parent.position = new Vector3(enemyHpUi.transform.parent.position.x, enemyHpUi.transform.parent.position.y, newZ);
     }
 
-
     public void FreezeSign(Vector3 position)
     {
         GameObject frozenPrefab = Instantiate(frozenIndicator, position, Quaternion.identity);
         Destroy(frozenPrefab, 1.5f);
+    }
+    public void GlitchedSign(Vector3 position)
+    {
+        GameObject glitchedPrefab = Instantiate(glitchedIndicator, position, Quaternion.identity);
+        Destroy(glitchedPrefab, 3f);
     }
 
     internal void SetOfferChooseRaiseDialog(bool enable, float penelty, bool option2Availabe, bool option3Available)

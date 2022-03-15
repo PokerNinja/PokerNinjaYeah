@@ -109,9 +109,9 @@ Material:
     - _ColorRampLuminosity: -0.12
     - _ColorRampOutline: 0
     - _ColorSwapBlend: 0
-    - _ColorSwapBlueLuminosity: -0.38
+    - _ColorSwapBlueLuminosity: 0.55
     - _ColorSwapGreenLuminosity: -0.3
-    - _ColorSwapRedLuminosity: -0.15
+    - _ColorSwapRedLuminosity: -0.18
     - _Contrast: 1
     - _DistortAmount: 0.5
     - _DistortTexXSpeed: 5

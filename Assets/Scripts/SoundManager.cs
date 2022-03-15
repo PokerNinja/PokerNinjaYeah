@@ -68,6 +68,8 @@ public class SoundManager : Singleton<SoundManager>
     public AudioClip coinFlipTurn;
     public AudioClip esFill;
     public AudioClip esFull;
+    public AudioClip glitchUp;
+    public AudioClip glitchDown;
 
 
 
@@ -600,6 +602,16 @@ public class SoundManager : Singleton<SoundManager>
                     soundToPlay = esFull;
                     break;
                 }
+            case SoundName.GlitchUp:
+                {
+                    soundToPlay = glitchUp;
+                    break;
+                }
+            case SoundName.GlitchDown:
+                {
+                    soundToPlay = glitchDown;
+                    break;
+                }
         }
 
         await PlayAsync(soundToPlay, normalPitch);
@@ -659,5 +671,7 @@ public class SoundManager : Singleton<SoundManager>
         CoinFlipTurn,
         EsFill,
         EsFull,
+        GlitchUp,
+        GlitchDown,
     }
 }

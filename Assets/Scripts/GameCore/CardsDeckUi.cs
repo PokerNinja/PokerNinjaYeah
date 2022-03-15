@@ -53,6 +53,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     public string playerShadowCard, enemyShadowCard;
     public Material burnMaterial;
     public Material dissolveMaterial;
+    public Material glitchMaterial;
     public Material ghostMaterial;
     public Material shadowMaterial;
     public Transform[] boardTransform;
@@ -1664,17 +1665,28 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             targetCardUi.glitch = true;
             targetCardUi.cardDescription = pickedCard.ToString(CardToStringFormatEnum.ShortCardName);
-            StartCoroutine(GlitchEffect(targetCardUi, targetCardUi.GetisFaceDown(), null));
+            StartCoroutine(GlitchEffect(targetCardUi, targetCardUi.GetisFaceDown(), ()=> {
+            if(targetCardUi.freeze)
+                    pickedCardUi.spriteRenderer.material.SetFloat("_GlitchAmount", 0);
+            }));
             UpdateCardsList(targetCardUi.cardPlace, pickedCard, true);
         }
         else
         {
             ReplaceCardsInDeck(newCard, pickedCard);
         }
-
         pickedCardUi.cardDescription = newCard.ToString(CardToStringFormatEnum.ShortCardName);
         StartCoroutine(GlitchEffect(pickedCardUi, pickedCardUi.GetisFaceDown(), disableDarkScreen));
         UpdateCardsList(pickedCardUi.cardPlace, newCard, true);
+        PlayGlitchSound(value);
+    }
+
+    private void PlayGlitchSound(int value)
+    {
+        if (value >0)
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.GlitchUp, false);
+        else
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.GlitchDown, false);
     }
 
     private void ReplaceCardsInDeck(Card targetCard, Card newCard)
@@ -1698,29 +1710,42 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     private IEnumerator GlitchEffect(CardUi pickedCardUi, bool isFaceDown, Action Reset)
     {
         //yield return new WaitForSeconds(Values.Instance.durationGlitchBeforeChange);
-        EnableGlitchValues(true, pickedCardUi.spriteRenderer.material);
-        StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_OverlayBlend", 1f, pickedCardUi.spriteRenderer.material, 1f, null));
+        pickedCardUi.spriteRenderer.material = glitchMaterial;
+        Action changeSprite = null;
+        float duration = Values.Instance.glitchEffectDuration;
         if (!isFaceDown)
         {
-            pickedCardUi.LoadSprite(true);
+            changeSprite = () => pickedCardUi.LoadSprite(true);
         }
+        StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_OverlayBlend", duration, pickedCardUi.spriteRenderer.material, 1f, changeSprite));
+        StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_ColorSwapBlend", duration, pickedCardUi.spriteRenderer.material, 1f, null));
+        StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_ChromAberrAmount", duration, pickedCardUi.spriteRenderer.material, 0.7f, null));
+        pickedCardUi.spriteRenderer.material.SetFloat("_GlitchAmount", 20);
         yield return new WaitForSeconds(Values.Instance.durationGlitchAfterChange);
-        StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_OverlayBlend", 1f, pickedCardUi.spriteRenderer.material, 0f, null));
-        //EnableGlitchValues(false, pickedCardUi.spriteRenderer.material);
+        StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_ColorSwapBlend", duration, pickedCardUi.spriteRenderer.material, 0f, null));
+        EnableGlitchValues(true, pickedCardUi.spriteRenderer.material);
         Reset?.Invoke();
     }
 
     public void EnableGlitchValues(bool enable, Material targetMaterial)
     {
-        float pixelateTarget = 512;
-        float glitchAmount = 0;
         if (enable)
         {
-            pixelateTarget = 74f;
-            glitchAmount = 4.2f;
+            targetMaterial.SetFloat("_GlitchAmount", 1.6f);
+            targetMaterial.SetFloat("_ChromAberrAmount", 0.26f);
         }
-        targetMaterial.SetFloat("_PixelateSize", pixelateTarget);
-        targetMaterial.SetFloat("_GlitchAmount", glitchAmount);
+        else
+        {
+            targetMaterial.SetFloat("_GlitchAmount", 20f);
+            targetMaterial.SetFloat("_ChromAberrAmount", 0.7f);
+            StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_OverlayBlend", Values.Instance.glitchEffectDuration, targetMaterial, 0f,
+                () =>
+                {
+                    targetMaterial.SetFloat("_GlitchAmount", 0);
+                    targetMaterial.SetFloat("_ChromAberrAmount", 0);
+                }
+                ));
+        }
     }
 
     internal void SwapTwoCards(string cardToSwap, string cardTarget, Action DisableDarkScreen)

@@ -136,6 +136,8 @@ public class Values : Singleton<Values>
     public Color burnColorTech;
     public Color burnOutlineColor;
     public Color burnOutlineColorTech;
+    public float glitchEffectDuration = 1f;
+
 
     [Title("NC", bold: false)]
     public float pusDrawerMoveDuration = 2f;

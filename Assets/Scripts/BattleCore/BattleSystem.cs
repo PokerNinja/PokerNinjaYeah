@@ -170,9 +170,10 @@ public class BattleSystem : StateMachine
 
     private void Start()
     {
-        //Constants.BOT_MODE = true;
-        //Constants.TUTORIAL_MODE = true;
+        Constants.BOT_MODE = true;
+        Constants.TUTORIAL_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
+        Debug.LogError("Tu " + TUTORIAL_MODE);
         BOT_MODE = Constants.BOT_MODE;
         TUTORIAL_MODE = Constants.TUTORIAL_MODE;
         if (BOT_MODE)
@@ -329,10 +330,10 @@ public class BattleSystem : StateMachine
                  "w1","w2","w3",
                  "fm2","wm2","tm1",
                  "t6","t5","t4",
-                 "t3","t2","t1" };
-            /*"w2","wm1","w1","wm2","wm2","wm2","w1","f3","f2",
-          "w2" , "im2","f1","w2","i3","i3","f1"};*/
-        }
+                 "t3","t2","t1",
+            "w2","wm1","w1","wm2","wm2","wm2","w1","f3","f2",
+          "w2" , "im2","f1","w2","i3","i3","f1"};
+    }
         return deck;
     }
 
@@ -1785,10 +1786,12 @@ public class BattleSystem : StateMachine
         }
         if (cardToFreeze.glitch && isToFreeze)
         {
-            cardsDeckUi.EnableGlitchValues(false, cardToFreeze.spriteRenderer.material);
             cardToFreeze.glitch = false;
             ui.FreezeObject(cardToFreeze.spriteRenderer, true, cardToFreeze.GetisFaceDown(), () =>
-                 ui.FreezeObject(cardToFreeze.spriteRenderer, false, cardToFreeze.GetisFaceDown(), resetAction, true) , true);
+            {
+                ui.FreezeObject(cardToFreeze.spriteRenderer, false, cardToFreeze.GetisFaceDown(), resetAction, true);
+                cardsDeckUi.EnableGlitchValues(false, cardToFreeze.spriteRenderer.material);
+            }, true);
         }
         else if (isToFreeze && cardToFreeze.freeze)
         {
@@ -1947,6 +1950,11 @@ public class BattleSystem : StateMachine
         else if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.fm2)))
         {
             StartCoroutine(ui.StartArmageddon());
+            IgnitePowerUp.Invoke();
+        }
+        else if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.tm1)))
+        {
+            ui.StartMatrix();
             IgnitePowerUp.Invoke();
         }
         else
