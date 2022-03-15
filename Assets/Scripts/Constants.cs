@@ -45,6 +45,9 @@ public class Constants : Singleton<Constants>
     public static string DealerInfo = "The dealer has the last move, and gets 1 energy in the last round";
     public static string DrawInstructions = "Choose a Ninja Card to replace";
 
+    public const string TechWheel2 = "TechWheel2";
+    public const string TechWheel3 = "TechWheel3";
+
     public static bool TUTORIAL_MODE = false;
     public static bool HP_GAME = false;
     public static bool BOT_MODE = false;

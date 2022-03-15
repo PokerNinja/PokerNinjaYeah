@@ -7,11 +7,11 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CardUiBurn
+  m_Name: CardUiFreeze
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
-  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA FADE_ON GLITCH_ON OUTBASE_ON OUTDIST_ON OUTTEX_ON
-    OVERLAYMULT_ON OVERLAY_ON PIXELATE_ON RADIALGRADIENT_ON SHAKEUV_ON SHINE_ON _GRADISRADIAL_ON
-    _OUTLINEDISTORTTOGGLE_ON _OUTLINETEXTOGGLE_ON
+  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA FADE_ON GLITCH_ON GLOWLIGHT_ON OUTBASE_ON
+    OUTDIST_ON OUTTEX_ON OVERLAY_ON PIXELATE_ON RADIALGRADIENT_ON SHAKEUV_ON SHINE_ON
+    _GLOWAFFECTLIGHT_ON _GRADISRADIAL_ON _OUTLINEDISTORTTOGGLE_ON _OUTLINETEXTOGGLE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -38,18 +38,26 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FadeBurnTex:
-        m_Texture: {fileID: 2800000, guid: 9d2c7a8ece505b9448aaa5644d19c4b5, type: 3}
-        m_Scale: {x: -0.18, y: 0}
-        m_Offset: {x: 0.14, y: 0.38}
+        m_Texture: {fileID: 2800000, guid: fab06e0be9375cc4d823efa71629885c, type: 3}
+        m_Scale: {x: 1, y: 0.73}
+        m_Offset: {x: 0, y: 0.12}
     - _FadeTex:
-        m_Texture: {fileID: 2800000, guid: 1b15f279e52c44e4083c7491f9976ba7, type: 3}
-        m_Scale: {x: 0.9, y: 1}
-        m_Offset: {x: 1.07, y: 0}
+        m_Texture: {fileID: 2800000, guid: 9d3c28376a53e2045ab9a3eb85e31443, type: 3}
+        m_Scale: {x: 0.9, y: 0.9}
+        m_Offset: {x: 0.1, y: 0.1}
     - _GlowTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaskTex:
+        m_Texture: {fileID: 2800000, guid: 839adabbc5de26041bac66450214a831, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -62,9 +70,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OverlayTex:
-        m_Texture: {fileID: 2800000, guid: d7b3866ceecb09b4ba26f5b9f7e7b492, type: 3}
-        m_Scale: {x: 1.2, y: 1.2}
-        m_Offset: {x: -0.13, y: 0}
+        m_Texture: {fileID: 2800000, guid: 997e24e0c9d1ba34ebd49a0a580dac5c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _ShineMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -106,6 +114,7 @@ Material:
     - _ColorChangeTolerance: 0.367
     - _ColorChangeTolerance2: 0.25
     - _ColorChangeTolerance3: 0.25
+    - _ColorMask: 15
     - _ColorRampBlend: 1
     - _ColorRampLuminosity: 0
     - _ColorRampOutline: 0
@@ -118,19 +127,20 @@ Material:
     - _DistortTexXSpeed: 5
     - _DistortTexYSpeed: 5
     - _FadeAmount: -0.1
-    - _FadeBurnGlow: 145
-    - _FadeBurnTransition: 0.176
-    - _FadeBurnWidth: 0.145
+    - _FadeBurnGlow: 4
+    - _FadeBurnTransition: 0.101
+    - _FadeBurnWidth: 0.56
     - _FishEyeUvAmount: 0
-    - _FlickerAlpha: 0
-    - _FlickerFreq: 0.2
-    - _FlickerPercent: 0.05
+    - _FlickerAlpha: 0.131
+    - _FlickerFreq: 1.4
+    - _FlickerPercent: 0
     - _GhostBlend: 1
     - _GhostColorBoost: 0
     - _GhostTransparency: 0
-    - _GlitchAmount: 0
+    - _GlitchAmount: 4.2
     - _GlitchSize: 0.4
     - _Glow: 100
+    - _GlowAffectLight: 1
     - _GlowTexUsed: 0
     - _GradBlend: 0
     - _GradBoostX: 0.56
@@ -154,12 +164,13 @@ Material:
     - _HologramStripesAmount: 0.1
     - _HologramStripesSpeed: 4.5
     - _HologramUnmodAmount: 0
-    - _HsvBright: 1
-    - _HsvSaturation: 1
+    - _HsvBright: 1.01
+    - _HsvSaturation: 1.15
     - _HsvShift: 0
     - _InnerOutlineAlpha: 1
     - _InnerOutlineGlow: 250
     - _InnerOutlineThickness: 2.92
+    - _LitAmount: 1
     - _MaxXUV: 1
     - _MaxYUV: 1
     - _MinXUV: 0
@@ -169,12 +180,13 @@ Material:
     - _MyDstMode: 10
     - _MySrcMode: 5
     - _NegativeAmount: 1
+    - _NormalStrength: 1
     - _OffsetUvX: 0
     - _OffsetUvY: 0
     - _OnlyInnerOutline: 0
     - _OnlyOutline: 0
     - _Outline8Directions: 0
-    - _OutlineAlpha: 1
+    - _OutlineAlpha: 0
     - _OutlineDistortAmount: 0.3
     - _OutlineDistortTexXSpeed: -1
     - _OutlineDistortTexYSpeed: -2
@@ -187,15 +199,15 @@ Material:
     - _OutlineTexXSpeed: 10
     - _OutlineTexYSpeed: 0
     - _OutlineWidth: 0.064
-    - _OverlayBlend: 0
+    - _OverlayBlend: 1
     - _OverlayGlow: 1
     - _PinchUvAmount: 0
-    - _PixelateSize: 512
+    - _PixelateSize: 74
     - _PosterizeGamma: 0.75
     - _PosterizeNumColors: 12.1
     - _PosterizeOutline: 0
     - _RandomSeed: 0
-    - _RectSize: 1.27
+    - _RectSize: 1.6
     - _RotateUvAmount: 0
     - _RoundWaveSpeed: 2
     - _RoundWaveStrength: 0.042
@@ -209,6 +221,11 @@ Material:
     - _ShineLocation: 0
     - _ShineRotate: 1.88
     - _ShineWidth: 0.211
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
     - _TextureScrollXSpeed: 1
     - _TextureScrollYSpeed: 0
     - _TwistUvAmount: 0.24
@@ -237,7 +254,7 @@ Material:
     - _ColorSwapBlue: {r: 1, g: 1, b: 1, a: 1}
     - _ColorSwapGreen: {r: 1, g: 1, b: 1, a: 1}
     - _ColorSwapRed: {r: 1, g: 1, b: 1, a: 1}
-    - _FadeBurnColor: {r: 1, g: 0.03137255, b: 0, a: 1}
+    - _FadeBurnColor: {r: 0, g: 0.26774764, b: 1, a: 1}
     - _GlowColor: {r: 0.9056604, g: 0, b: 0, a: 0.7294118}
     - _GradBotLeftCol: {r: 0.5019608, g: 0.27450982, b: 0.57254905, a: 1}
     - _GradBotRightCol: {r: 0, g: 0, b: 1, a: 1}
@@ -247,7 +264,7 @@ Material:
     - _HitEffectColor: {r: 1, g: 1, b: 1, a: 1}
     - _HologramStripeColor: {r: 0, g: 1, b: 1, a: 1}
     - _InnerOutlineColor: {r: 1, g: 0, b: 0, a: 1}
-    - _OutlineColor: {r: 1, g: 0.5137255, b: 0.29803923, a: 1}
+    - _OutlineColor: {r: 1, g: 0.89411765, b: 0, a: 1}
     - _OverlayColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 1}
     - _ShineColor: {r: 1, g: 1, b: 1, a: 1}

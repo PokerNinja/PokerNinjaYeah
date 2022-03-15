@@ -437,6 +437,9 @@ public class GameMenuHandler : MonoBehaviour
                 case 2:
                     elementChoiseString = "w";
                     break;
+                case 3:
+                    elementChoiseString = "t";
+                    break;
             }
             SavePlayerElement(index);
             SavePlayerElementString(elementChoiseString);

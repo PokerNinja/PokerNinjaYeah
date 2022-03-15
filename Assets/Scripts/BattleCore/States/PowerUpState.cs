@@ -159,7 +159,7 @@ public class PowerUpState : State
         {
             return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true));
         }
-        else if (powerUpName.Equals("im1"))
+        else if (powerUpName.Equals("tm1"))
         {
             return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true));
         }
@@ -350,6 +350,11 @@ public class PowerUpState : State
                     battleSystem.ChangeValuePu(cardTarget2, -2);
                     break;
                 }
+            case nameof(PowerUpNamesEnum.tp): //Es value up1 up2
+                {
+                    battleSystem.ChangeValuePu(cardTarget1, int.Parse(cardTarget2)+1);
+                    break;
+                }
             case nameof(PowerUpNamesEnum.tm1): //techgeddon
                 {
                     TechRandomCards(cardTarget2);
@@ -412,7 +417,6 @@ public class PowerUpState : State
     {
         //  List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
         List<string> cardsNames = new List<string>(listOfCards.Split(','));
-        Debug.LogError("COUNT " + cardsNames.Count);
         await Task.Delay(150);
         for (int i = 0; i < cardsNames.Count; i++)
         {

@@ -198,6 +198,9 @@ public class BattleUI : MonoBehaviour
     public GameObject IglooPref;
     public SpriteRenderer perfectRenderer;
 
+    public TechWheel techWheel2;
+    public GameObject techWheel3;
+
     public void Initialize(PlayerInfo player, PlayerInfo enemy, float totalHp)
     {
         pEs.InitializeES(player.id[0].ToString());
@@ -1054,7 +1057,7 @@ public class BattleUI : MonoBehaviour
             {
                 PuIgnite.Invoke();
             }
-            if (posTarget1 == new Vector2(0, 0))
+            else if (posTarget1 == new Vector2(0, 0))
             {
                 StartCoroutine(ShootProjectile(false, startingPos, projectile1, posTarget2, PuIgnite));
             }
@@ -1701,6 +1704,10 @@ public class BattleUI : MonoBehaviour
     {
         cardSelection1Renderer.gameObject.SetActive(false);
         cardSelection2Renderer.gameObject.SetActive(false);
+        if (techWheel2.gameObject.activeSelf)
+        {
+            techWheel2.DisableWheel();
+        }
     }
 
 
@@ -1854,7 +1861,14 @@ public class BattleUI : MonoBehaviour
         raiseChooseDialog.SetActive(enable);
         raiseChooseText.text = "Offer Your opponent a <b><color=#F03B37>DMG</color></b> raise\n<b><color=#F03B37>-" + penelty + " DMG </color></b>to the opponent when declined";
     }
-
+    public void SetTechWheelForSelection(Vector2 position, bool isSmall)
+    {
+        techWheel2.EnableWheel(position, isSmall);
+    }
+    public void SetWheelSelectionBtn(int option)
+    {
+        techWheel2.SetSelection(option);
+    }
 
 }
 

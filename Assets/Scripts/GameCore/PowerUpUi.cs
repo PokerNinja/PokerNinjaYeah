@@ -320,11 +320,14 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
 
-    public void DissolveNcToEs(Vector3 targetPosition, Action FillEs, Action OnEnd)
+    public async void DissolveNcToEs(Vector3 targetPosition, Action FillEs, Action OnEnd)
     {
+        spriteRenderer.material.SetFloat("_OutlineAlpha", 0f);
         Vector3 newTarget = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0.3f, 0.3f, 0), Values.Instance.ncToEsDuration, null,
-           () => spriteRenderer.material.SetFloat("_OutlineAlpha", 0f), FillEs, () => StartCoroutine(AnimationManager.Instance.AlphaAnimation(spriteRenderer, false, Values.Instance.defaultFadeD, OnEnd))));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0.4f, 0.4f, 0), Values.Instance.ncToEsDuration, 
+           null, null, null,OnEnd));
+        await Task.Delay(250);
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(spriteRenderer, false, Values.Instance.defaultFadeD, FillEs));
     }
 
     public void CardReveal(bool reveal, Action onFinish)

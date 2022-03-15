@@ -97,7 +97,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 break;
         }
 
-        if (amount != 0)
+        if (amount != 0 && isPlayer)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFill, true);
         }
@@ -155,6 +155,12 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     iconPath = "wind_icon";
                     break;
                 }
+            case "t": //tech
+                {
+                    liquidColor = Values.Instance.techElement;
+                    iconPath = "tech_icon";
+                    break;
+                }
         }
         pElementalSkillLiquid.color = liquidColor;
         glowColor = liquidColor;
@@ -209,11 +215,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             onClick.Invoke();
         }
-        else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
-        {
-            BattleSystemTuto.Instance.HideDialog();
-        }
-        else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
+        else if ( BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.HideDialog(true);
         }
@@ -241,7 +243,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
  */
     public void OND()
     {
-        if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
+        if ( !BattleSystem.Instance.infoShow)
         {
             Vector3 pos = transform.position;
             if (!isPlayer)
@@ -249,10 +251,6 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 pos += new Vector3(0, -5, 0);
             }
             BattleSystem.Instance.ShowPuInfo(pos, true, false, element + "p", "");
-        }
-        else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
-        {
-            // BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, element + "p", "");
         }
     }
 

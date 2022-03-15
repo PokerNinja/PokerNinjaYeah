@@ -132,6 +132,10 @@ public class Values : Singleton<Values>
     public float delayBetweenDealPlayersCards = 0.18f;
     public float delayBetweenDealBoardCards = 0.18f;
     public float freezeMaterialFadeBurnWidth = 0.56f;
+    public Color burnColor;
+    public Color burnColorTech;
+    public Color burnOutlineColor;
+    public Color burnOutlineColorTech;
 
     [Title("NC", bold: false)]
     public float pusDrawerMoveDuration = 2f;

@@ -37,7 +37,7 @@ exports.matchmaker = functions.database.ref('matchmaking/{playerId}')
                         gameId: gameId,
                         createOn: getFormattedDate(),
                         cardDeck: createShuffleDeck(),
-                        puDeck: createPuDeck(),
+                        puDeck: createPuDeck(context.params.playerId, secondPlayer.key),
                         powerup: createEmptyPu(),
                         bet: 'empty',
                         playersIds: [context.params.playerId, secondPlayer.key]
@@ -91,26 +91,49 @@ function generateGameId() {
     return gameId;
 }
 
-function createPuDeck() {
+function createPuDeck(player1Id, player2Id) {
  
     var fPus = ["f1","f2","f3"];
     var wPus = ["w1","w2","w3"];
     var iPus = ["i1","i2","i3"];
-    var sPus = ["s1","s2","s3","s4","s5","s6","s7"];
+    var tPus = ["t1","t2","t3","t4","t5","t6"];
 
     var fMPus = ["fm1","fm2"];
     var wMPus = ["wm1","wm2"];
     var iMPus = ["im1","im2"];
-    var sMPus = ["sm1","sm2","sm3","sm4"];
+    var tMPus = ["tm1"];
 
-    var deckOptions =["wif"];
+    var deckOptions ="wtfi";
     var deckPus = [];
     var stringChosenOption;
     var f = 0;
     var w = 0;
     var i = 0;
-    var s = 0;
-    stringChosenOption=deckOptions[Math.floor((Math.random() * deckOptions.length) + 0)];
+    var t = 0;
+
+    var playerElement =  player1Id.charAt(0);
+    var enemyElement = player2Id.charAt(0);
+    var ncs = playerElement;
+    if(playerElement!= enemyElement)
+    {
+        ncs += enemyElement;
+    }
+    if(!ncs.includes("t")){
+        ncs = "fiw";
+    }
+    else
+       {
+        deckOptions = shuffleWord(deckOptions);
+        for(z = 0; ncs.length<3 ; z++)
+             {
+             if(!ncs.includes(deckOptions.charAt(z)))
+                 {
+                     ncs+= deckOptions.charAt(z);
+                 }
+             }
+       }
+
+    stringChosenOption=ncs;
 
     for(x = 0; deckPus.length < 56; x){
          if(stringChosenOption.includes("f")){
@@ -134,11 +157,11 @@ function createPuDeck() {
                     i = 0;
               }
          }
-         if(stringChosenOption.includes("s")){
-              deckPus[x++] = sPus[s];
-              s++;
-              if(s == sPus.length){
-                    s = 0;
+         if(stringChosenOption.includes("t")){
+              deckPus[x++] = tPus[t];
+              t++;
+              if(t == tPus.length){
+                    t = 0;
               }
          }
     }
@@ -152,8 +175,8 @@ function createPuDeck() {
       if(stringChosenOption.includes("i")){
                deckPus = deckPus.concat(iMPus);
          }
-      if(stringChosenOption.includes("s")){
-               deckPus = deckPus.concat(sMPus);
+      if(stringChosenOption.includes("t")){
+               deckPus = deckPus.concat(tMPus);
          }
     
     return shuffleArray(deckPus);
@@ -193,6 +216,14 @@ function createEmptyPu(){
     return powerup;
     }
 
+    function shuffleWord (word){
+        var shuffledWord = '';
+        word = word.split('');
+         while (word.length > 0) {
+               shuffledWord +=  word.splice(word.length * Math.random() << 0, 1);
+      }
+    return shuffledWord;
+    }
 
 function createTurnMangement(player1,player2){
     var TurnManager = {

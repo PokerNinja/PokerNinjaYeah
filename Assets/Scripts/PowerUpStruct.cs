@@ -106,7 +106,6 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
     /*37*/
     public PuStructInfo esWind = new PuStructInfo
         (PowerUpNamesEnum.wp.ToString(), "wp", "<size=110%><b><color=#FFC35E>SWAP</color> two cards of your choise.</b>\n<size=50%>\n<b><size=90%>*use 3 <color=#FFC35E>Wind</color> Ninja Card to unlock", "Choose two cards to <color=#FFC35E>swap</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
-
     /*38*/
     public PuStructInfo board_value_up_2 = new PuStructInfo
         (PowerUpNamesEnum.t5.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
@@ -116,6 +115,10 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
      /*40*/
     public PuStructInfo techgeddon = new PuStructInfo
         (PowerUpNamesEnum.tm1.ToString(), "Value", "Change the value of random cards.", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
+     /*41*/
+    public PuStructInfo esTech = new PuStructInfo
+        (PowerUpNamesEnum.wp.ToString(), "tp", "<size=110%><b><color=#FFC35E>SWAP</color> two cards of your choise.</b>\n<size=50%>\n<b><size=90%>*use 3 <color=#FFC35E>Tech/color> Ninja Card to unlock", "Choose two cards to <color=#FFC35E>swap</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
+
 
 
     /*9*/
@@ -216,6 +219,8 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
                 return esIce;
             case nameof(PowerUpNamesEnum.wp):
                 return esWind;
+            case nameof(PowerUpNamesEnum.tp):
+                return esTech;
 
                 /*draw_all = 3,
                 shuffle_board = 9,
@@ -291,6 +296,7 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         t5 = 38, //board value up 2
         t6 = 39, //board value down 2
         tm1 = 40, //rainTech value down 2
+        tp = 41, //smoke turn river
     }
 
     #region // PuInfo

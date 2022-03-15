@@ -170,7 +170,7 @@ public class BattleSystem : StateMachine
 
     private void Start()
     {
-        Constants.BOT_MODE = true;
+        //Constants.BOT_MODE = true;
         //Constants.TUTORIAL_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         BOT_MODE = Constants.BOT_MODE;
@@ -309,7 +309,7 @@ public class BattleSystem : StateMachine
     private string[] CreatePuDeck(bool tutorial)
     {
         string[] deck;
-        if (tutorial)
+        if (!tutorial)
         {
             deck = new string[]{
               "f1","f2","f3","i1","i2","i3","w1","w2","w3",
@@ -330,8 +330,8 @@ public class BattleSystem : StateMachine
                  "fm2","wm2","tm1",
                  "t6","t5","t4",
                  "t3","t2","t1" };
-              /*"w2","wm1","w1","wm2","wm2","wm2","w1","f3","f2",
-            "w2" , "im2","f1","w2","i3","i3","f1"};*/
+            /*"w2","wm1","w1","wm2","wm2","wm2","w1","f3","f2",
+          "w2" , "im2","f1","w2","i3","i3","f1"};*/
         }
         return deck;
     }
@@ -1215,11 +1215,13 @@ public class BattleSystem : StateMachine
 
     public IEnumerator OnCardsSelectedForPU(string cardPlace, Vector2 position)
     {
-
         if (Constants.cardsToSelectCounter == 0)
         {
             ui.ResetPointers();
-            ui.SetCardSelection(1, newPowerUpName[0].ToString(), position, IsLargeCard(cardPlace), true);
+            if (cardPlace.Length != 1) // Choice of wheel
+            {
+                ui.SetCardSelection(1, newPowerUpName[0].ToString(), position, IsLargeCard(cardPlace), true);
+            }
             //  playerPuInProcess = true;
             if (newPowerUpName.Equals("fm1"))
             {
@@ -1233,6 +1235,10 @@ public class BattleSystem : StateMachine
         }
         else if (Constants.cardsToSelectCounter == 1)
         {
+            if (newPowerUpName.Equals("tp"))
+            {
+                ui.SetTechWheelForSelection(position, cardPlace.Contains("B"));
+            }
             ui.SetCardSelection(2, newPowerUpName[0].ToString(), position, IsLargeCard(cardPlace), true);
             firstCardTargetPU = cardPlace;
             firstPosTargetPU = position;
@@ -1246,6 +1252,14 @@ public class BattleSystem : StateMachine
                 sameCardsSelection = false;
             }
         }
+    }
+
+
+    public void OnWheelSelected(int option)
+    {
+        --Constants.cardsToSelectCounter;
+        ui.SetWheelSelectionBtn(option);
+        StartCoroutine(OnCardsSelectedForPU(option.ToString(), new Vector2(0, 0)));
     }
 
     private bool IsLargeCard(string cardPlace)
@@ -1431,7 +1445,7 @@ public class BattleSystem : StateMachine
         }
         else
         {
-            if (/*puUi.puElement.Equals("i") ||*/ (puUi.puElement.Equals("w") && !puUi.isMonster) || puUi.puName.Equals("fm1"))
+            if ((puUi.puElement.Equals("t") || (puUi.puElement.Equals("w")) && !puUi.isMonster) || puUi.puName.Equals("fm1"))
             {
                 string[] cardsTag = PowerUpStruct.Instance.GetReleventTagCards(puUi.name, true);
                 int cardsLimit = 0;
@@ -1439,8 +1453,8 @@ public class BattleSystem : StateMachine
                 {
                     cardsLimit = 1;
                 }
-                if (!CheckIfCardsAvailbleForSelect(cardsLimit, cardsDeckUi.GetListByTag(cardsTag[0]))
-                    || !CheckIfCardsAvailbleForSelect(cardsLimit, cardsDeckUi.GetListByTag(cardsTag[1])))
+                if (!CheckIfCardsAvailbleForSelect(cardsLimit, puUi.puElement.Equals("w"), cardsDeckUi.GetListByTag(cardsTag[0]))
+                    || !CheckIfCardsAvailbleForSelect(cardsLimit, puUi.puElement.Equals("w"), cardsDeckUi.GetListByTag(cardsTag[1])))
                 {
                     puUi.EnablePu(false);
                 }
@@ -1464,7 +1478,7 @@ public class BattleSystem : StateMachine
         }
     }
 
-    private bool CheckIfCardsAvailbleForSelect(int cardsLimit, List<CardUi> cards)
+    private bool CheckIfCardsAvailbleForSelect(int cardsLimit, bool glitchBlocked, List<CardUi> cards)
     {
         int frozenCards = 0;
         if (cards != null)
@@ -1472,13 +1486,20 @@ public class BattleSystem : StateMachine
 
             foreach (CardUi card in cards)
             {
-                if (card.freeze)
+                if (glitchBlocked)
+                {
+                    if (card.freeze || card.glitch)
+                    {
+                        frozenCards++;
+                    }
+                }
+                else if (card.freeze)
                 {
                     frozenCards++;
-                    if (cards.Count - frozenCards <= cardsLimit)
-                    {
-                        return false;
-                    }
+                }
+                if (cards.Count - frozenCards <= cardsLimit)
+                {
+                    return false;
                 }
             }
         }
@@ -1762,7 +1783,14 @@ public class BattleSystem : StateMachine
         {
             resetAction = () => EnableDarkAndSorting(false);
         }
-        if (isToFreeze && cardToFreeze.freeze)
+        if (cardToFreeze.glitch && isToFreeze)
+        {
+            cardsDeckUi.EnableGlitchValues(false, cardToFreeze.spriteRenderer.material);
+            cardToFreeze.glitch = false;
+            ui.FreezeObject(cardToFreeze.spriteRenderer, true, cardToFreeze.GetisFaceDown(), () =>
+                 ui.FreezeObject(cardToFreeze.spriteRenderer, false, cardToFreeze.GetisFaceDown(), resetAction, true) , true);
+        }
+        else if (isToFreeze && cardToFreeze.freeze)
         {
             DoubleFreezeCard(cardToFreeze, cardTarget, resetAction, isFirst, reset);
         }
@@ -1770,11 +1798,11 @@ public class BattleSystem : StateMachine
         {
             cardToFreeze.freeze = isToFreeze;
             ui.FreezeObject(cardToFreeze.spriteRenderer, isToFreeze, cardToFreeze.GetisFaceDown(), resetAction, true);
-            if (reset)
-            {
-                await Task.Delay(1700);
-                cardsDeckUi.CloseDrawer();
-            }
+        }
+        if (reset)
+        {
+            await Task.Delay(1700);
+            cardsDeckUi.CloseDrawer();
         }
     }
 

@@ -475,6 +475,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardToReset.freeze = false;
             cardToReset.spriteRenderer.material.SetColor("_FadeBurnColor", Color.yellow);
         }
+        cardToReset.glitch = false;
+        EnableGlitchValues(false, cardToReset.spriteRenderer.material);
         cardToReset.cardPlace = "pool";
         cardToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
         cardToReset.spriteRenderer.material.SetFloat("_ShakeUvSpeed", 0f);
@@ -1589,6 +1591,13 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         CardUi cardToDestroy = GetCardUiByName(cardPlace);
         // RemoveFromList(cardToDestroy);
         //boardCardsUi.Remove(cardToDestroy); //TODO why this
+        Color burnColor = Values.Instance.burnColor;
+        Color outlineColor = Values.Instance.burnOutlineColor;
+        if (cardToDestroy.glitch)
+        {
+            burnColor = Values.Instance.burnColorTech;
+            outlineColor = Values.Instance.burnOutlineColorTech;
+        }
         if (cardToDestroy == null)
         {
             Debug.LogError("Destroy: fck");
@@ -1600,6 +1609,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 cardToDestroy.cardMark.SetActive(false);
             }
             Material targetMaterial = burnMaterial;
+            targetMaterial.SetColor("_FadeBurnColor", burnColor);
+            targetMaterial.SetColor("_OutlineColor", outlineColor);
             bool changeOffset = true;
             if (cardPlace.Contains("Ghost"))
             {
@@ -1618,7 +1629,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             StartCoroutine(cardToDestroy.Dissolve(false, dissolveMaterial, 0f, () =>
             {
-              //  RemoveFromList(cardToDestroy);
+                //  RemoveFromList(cardToDestroy);
                 RestAfterDestroy(cardToDestroy, OnEnd);
             }));
         }
@@ -1648,8 +1659,10 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Card pickedCard = Card.StringToCard(pickedCardUi.cardDescription);
         Card newCard = new Card(pickedCard.ConvertIntToValue(pickedCard.GetCardValueInSimpleInt() + value), pickedCard.CardSuit);
         CardUi targetCardUi = GetCardUiByDescription(newCard.ToString(CardToStringFormatEnum.ShortCardName));
+        pickedCardUi.glitch = true;
         if (targetCardUi != null)
         {
+            targetCardUi.glitch = true;
             targetCardUi.cardDescription = pickedCard.ToString(CardToStringFormatEnum.ShortCardName);
             StartCoroutine(GlitchEffect(targetCardUi, targetCardUi.GetisFaceDown(), null));
             UpdateCardsList(targetCardUi.cardPlace, pickedCard, true);
@@ -1684,33 +1697,30 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     private IEnumerator GlitchEffect(CardUi pickedCardUi, bool isFaceDown, Action Reset)
     {
-        //pickedCardUi.spriteRenderer.material = glitchMaterial;
-        yield return new WaitForSeconds(Values.Instance.durationGlitchBeforeChange);
+        //yield return new WaitForSeconds(Values.Instance.durationGlitchBeforeChange);
         EnableGlitchValues(true, pickedCardUi.spriteRenderer.material);
+        StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_OverlayBlend", 1f, pickedCardUi.spriteRenderer.material, 1f, null));
         if (!isFaceDown)
         {
             pickedCardUi.LoadSprite(true);
         }
         yield return new WaitForSeconds(Values.Instance.durationGlitchAfterChange);
-        EnableGlitchValues(false, pickedCardUi.spriteRenderer.material);
-        // pickedCardUi.spriteRenderer.material = dissolveMaterial;
+        StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_OverlayBlend", 1f, pickedCardUi.spriteRenderer.material, 0f, null));
+        //EnableGlitchValues(false, pickedCardUi.spriteRenderer.material);
         Reset?.Invoke();
     }
 
-    private void EnableGlitchValues(bool enable, Material targetMaterial)
+    public void EnableGlitchValues(bool enable, Material targetMaterial)
     {
-        float hueTarget = 0;
+        float pixelateTarget = 512;
         float glitchAmount = 0;
-        float flickerAmount = 0;
         if (enable)
         {
-            hueTarget = 44f;
-            glitchAmount = 16.9f;
-            flickerAmount = 0.101f;
+            pixelateTarget = 74f;
+            glitchAmount = 4.2f;
         }
-        targetMaterial.SetFloat("_HsvShift", hueTarget);
+        targetMaterial.SetFloat("_PixelateSize", pixelateTarget);
         targetMaterial.SetFloat("_GlitchAmount", glitchAmount);
-        targetMaterial.SetFloat("_FlickerPercent", flickerAmount);
     }
 
     internal void SwapTwoCards(string cardToSwap, string cardTarget, Action DisableDarkScreen)

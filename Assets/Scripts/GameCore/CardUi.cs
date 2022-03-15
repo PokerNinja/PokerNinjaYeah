@@ -18,6 +18,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     //public SpriteRenderer cardSelectionRenderer;
     public GameObject cardMark;
     public bool freeze;
+    public bool glitch;
     public bool isGhost;
     public Constants.CardsOwener whosCards = Constants.CardsOwener.Pool;
     private bool flipInProgress = false;
@@ -151,11 +152,18 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         bool okToSelect = true;
         if (freeze)
         {
-            if (puName.Equals("s1") || puElement.Equals("f")|| puElement.Equals("i") || !selectionEnable)
+            if (puName.Equals("s1") || puElement.Equals("f")|| puElement.Equals("i")||  !selectionEnable)
             {
                 okToSelect = true;
             }
             else
+            {
+                okToSelect = false;
+            }
+        }
+        if (glitch)
+        {
+            if (puElement.Equals("w"))
             {
                 okToSelect = false;
             }
@@ -172,21 +180,8 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             }
         }
 
-
         if (okToSelect)
         {
-            //   if (BattleSystem.Instance.cardsToSelectCounter > 0)
-            /*if (Values.Instance.TUTORIAL_MODE)
-            {
-                if (cardPlace.Equals(Constants.PlayerCard1) || cardPlace.Equals(Constants.EnemyCard2) || cardPlace.Equals(Constants.BFlop2))
-                {
-                    clickbleForPU = selectionEnable;
-                }
-            }
-            else
-            {
-                clickbleForPU = selectionEnable;
-            }*/
             clickbleForPU = selectionEnable;
 
             //cardSelection.SetActive(selectionEnable);
