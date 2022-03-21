@@ -200,8 +200,8 @@ public class BattleUI : MonoBehaviour
     public GameObject IglooPref;
     public SpriteRenderer perfectRenderer;
 
-    public TechWheel techWheel2;
-    public GameObject techWheel3;
+    public TechWheel techWheelEs;
+    public TechWheel techWheelDr;
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy, float totalHp)
     {
@@ -256,10 +256,11 @@ public class BattleUI : MonoBehaviour
 
 
 
-    public void FreezeObject(SpriteRenderer spriteTarget, bool isToFreeze, bool isFaceDown, Action onReset, bool enableSound)
+    public void FreezeObject(SpriteRenderer spriteTarget, bool isToFreeze, bool isFaceDown,bool withGlithc, Action onReset, bool enableSound)
     {
-
-        StartCoroutine(AnimationManager.Instance.FreezeEffect(isToFreeze, isFaceDown, spriteTarget, freezeMaterial, onReset));
+        if(!withGlithc)
+            Debug.LogError("444");
+        StartCoroutine(AnimationManager.Instance.FreezeEffect(isToFreeze, isFaceDown, withGlithc, spriteTarget, freezeMaterial, onReset));
         if (enableSound)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuFreeze, false);
@@ -631,6 +632,7 @@ public class BattleUI : MonoBehaviour
                 spritePath = "dc_wind";
                 break;
             case "tm1":
+            case "tm2":
                 spritePath = "dc_tech";
                 break;
             case "wp":
@@ -1720,10 +1722,10 @@ public class BattleUI : MonoBehaviour
     {
         cardSelection1Renderer.gameObject.SetActive(false);
         cardSelection2Renderer.gameObject.SetActive(false);
-        if (techWheel2.gameObject.activeSelf)
-        {
-            techWheel2.DisableWheel();
-        }
+        if (techWheelEs.gameObject.activeSelf)
+            techWheelEs.DisableWheel();
+        if (techWheelDr.gameObject.activeSelf)
+            techWheelDr.DisableWheel();
     }
 
     internal void StartMatrix()
@@ -1886,14 +1888,14 @@ public class BattleUI : MonoBehaviour
         raiseChooseDialog.SetActive(enable);
         raiseChooseText.text = "Offer Your opponent a <b><color=#F03B37>DMG</color></b> raise\n<b><color=#F03B37>-" + penelty + " DMG </color></b>to the opponent when declined";
     }
-    public void SetTechWheelForSelection(Vector2 position, bool isSmall)
+    public void SetTechWheelForSelection(Vector2 position, bool isDragon)
     {
-        techWheel2.EnableWheel(position, isSmall);
+        if (isDragon)
+            techWheelDr.EnableWheel(position);
+        else
+            techWheelEs.EnableWheel(position);
     }
-    public void SetWheelSelectionBtn(int option)
-    {
-        techWheel2.SetSelection(option);
-    }
+
 
 }
 

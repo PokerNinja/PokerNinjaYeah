@@ -52,7 +52,7 @@ public class TutorialManager : MonoBehaviour
             case 3: // after f1 ignite
                 timerForMsgEnable = false;
                 SetObjectClickable(BattleSystem.Instance.Interface.turnTimer.GetComponent<SpriteRenderer>());
-                StartCoroutine(ActionsWithDelay(4,() => InstructionsEnable(endYourTurn3), () => SetPointer(pointerAnimation1, ObjectTargetEnum.endTurn)));
+                StartCoroutine(ActionsWithDelay(4, () => InstructionsEnable(endYourTurn3), () => SetPointer(pointerAnimation1, ObjectTargetEnum.endTurn)));
                 break;
             case 4: // energyCharge
                 InstructionsEnable(energyCharge4);
@@ -60,12 +60,12 @@ public class TutorialManager : MonoBehaviour
                 break;
             case 5: // draw
                 SetObjectClickable(BattleSystem.Instance.Interface.btnDrawRenderer);
-                StartCoroutine(ActionsWithDelay(1.5f,() => InstructionsEnable(draw5), () => SetPointer(pointerAnimation1, ObjectTargetEnum.draw)));
+                StartCoroutine(ActionsWithDelay(1.5f, () => InstructionsEnable(draw5), () => SetPointer(pointerAnimation1, ObjectTargetEnum.draw)));
                 break;
             case 6: // after draw
                 InstructionsDisable();
                 StartCoroutine(TimerForMsgAppear(noActionText6));
-                StartCoroutine(ActionsWithDelay(3f,()=>blockScreen.SetActive(true),null));
+                StartCoroutine(ActionsWithDelay(3f, () => blockScreen.SetActive(true), null));
                 break;
             case 7: // getting the Dragon
                 InstructionsEnable(dragonCard7);
@@ -88,7 +88,7 @@ public class TutorialManager : MonoBehaviour
         {
             case 4:
                 InstructionsDisable();
-            SetStep(5);
+                SetStep(5);
                 break;
             case 6:
                 InstructionsDisable();
@@ -105,7 +105,7 @@ public class TutorialManager : MonoBehaviour
                 break;
         }
     }
-    private IEnumerator ActionsWithDelay(float seconds,Action action1, Action action2)
+    private IEnumerator ActionsWithDelay(float seconds, Action action1, Action action2)
     {
         yield return new WaitForSeconds(seconds);
         action1?.Invoke();
@@ -119,6 +119,57 @@ public class TutorialManager : MonoBehaviour
         draw,
         energies,
     }
+
+
+
+    public void DisplayTip(Constants.TipsEnum tipToDisplay, bool enableScreenBlocker)
+    {
+        if(LoadPrefsInt(tipToDisplay.ToString()) == 0)
+        {
+            SavePrefsInt(tipToDisplay.ToString(), 1);
+            blockScreen.SetActive(enableScreenBlocker);
+            InstructionsEnable(ConvertTipEnumToString(tipToDisplay));
+            SetPointer(pointerAnimation1, ConvertTipEnumToObjectWithPointer(tipToDisplay));
+        }
+    }
+
+    private ObjectTargetEnum ConvertTipEnumToObjectWithPointer(Constants.TipsEnum tipToDisplay)
+    {
+        switch (tipToDisplay)
+        {
+            case 0: // NC
+                return ObjectTargetEnum.nc1;
+        }
+        return ObjectTargetEnum.nc1;
+    }
+
+    private string ConvertTipEnumToString(Constants.TipsEnum tipToDisplay)
+    {
+        switch (tipToDisplay)
+        {
+            case 0: // NC
+                return open1;
+        }
+        return "";
+    }
+
+    public void SavePrefsInt(string key, int value)
+    {
+        PlayerPrefs.SetInt(key, value);
+    }
+
+    public int LoadPrefsInt(string key)
+    {
+        if (PlayerPrefs.HasKey(key))
+        {
+            return PlayerPrefs.GetInt(key);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     private void SetPointer(Animation pointerAnim, ObjectTargetEnum objectTarget)
     {
         Vector3 position = new Vector3(0, 0, 0);
@@ -143,7 +194,6 @@ public class TutorialManager : MonoBehaviour
                 break;
 
         }
-
         pointerAnim.transform.parent.transform.position = position;
         pointerAnim.Play();
         pointerAnim.transform.parent.gameObject.SetActive(true);
@@ -226,13 +276,13 @@ public class TutorialManager : MonoBehaviour
         }
     }
 
- 
+
 
     public void ResetPointers()
     {
         pointerAnimation1.Stop();
         //pointerAnimation2.Stop();
         pointerAnimation1.transform.parent.gameObject.SetActive(false);
-       // pointerAnimation2.transform.parent.gameObject.SetActive(false);
+        // pointerAnimation2.transform.parent.gameObject.SetActive(false);
     }
 }

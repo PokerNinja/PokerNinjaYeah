@@ -12,6 +12,7 @@ using StandardPokerHandEvaluator;
 using Sirenix.OdinInspector;
 using System.Threading.Tasks;
 using System.Linq;
+using UnityEngine.UI;
 
 public class BattleSystem : StateMachine
 {
@@ -170,11 +171,11 @@ public class BattleSystem : StateMachine
 
     private void Start()
     {
-        Constants.BOT_MODE = true;
-        Constants.TUTORIAL_MODE = true;
+        // Constants.BOT_MODE = true;
+        // Constants.TUTORIAL_MODE = true;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         Debug.LogError("Tu " + TUTORIAL_MODE);
-        BOT_MODE = Constants.BOT_MODE;
+        //BOT_MODE = Constants.BOT_MODE;
         TUTORIAL_MODE = Constants.TUTORIAL_MODE;
         if (BOT_MODE)
         {
@@ -333,7 +334,7 @@ public class BattleSystem : StateMachine
                  "t3","t2","t1",
             "w2","wm1","w1","wm2","wm2","wm2","w1","f3","f2",
           "w2" , "im2","f1","w2","i3","i3","f1"};
-    }
+        }
         return deck;
     }
 
@@ -412,6 +413,7 @@ public class BattleSystem : StateMachine
             puDeckUi.ResetOutstandPus();
             ui.ResetPointers();
             ui.ResetCardSelection();
+            puDeckUi.DisableDragonBtn();
             StartCoroutine(ActivatePlayerButtons(!endTurn, false));// Here or after darkEnd
             ui.EnableDarkScreen(true, false, () =>
              {
@@ -990,7 +992,7 @@ public class BattleSystem : StateMachine
     #region Settings
     public void ResetRoundSettings(Action FinishCallbac)
     {
-        currentDamageThisRound = startingDamageForRound;
+        currentDamageThisRound = GetStartingDamage();
         ui.hpForThisRoundText.text = currentDamageThisRound.ToString();
         raiseOffer = false;
         ResetFlusherStrighter();
@@ -1018,6 +1020,7 @@ public class BattleSystem : StateMachine
         UpdateHandRank(true);
         cardsDeckUi.DeleteAllCards(() => DealHands(FinishCallbac));
     }
+
 
     private void ResetFlusherStrighter()
     {
@@ -1236,9 +1239,10 @@ public class BattleSystem : StateMachine
         }
         else if (Constants.cardsToSelectCounter == 1)
         {
-            if (newPowerUpName.Equals("tp"))
+            if (newPowerUpName.Equals("tp") || newPowerUpName.Equals("tm1"))
             {
-                ui.SetTechWheelForSelection(position, cardPlace.Contains("B"));
+                ui.SetTechWheelForSelection(position, newPowerUpName.Equals("tm1") /*cardPlace.Contains("B")*/);
+                cardsDeckUi.DisableCardsSelection("All");
             }
             ui.SetCardSelection(2, newPowerUpName[0].ToString(), position, IsLargeCard(cardPlace), true);
             firstCardTargetPU = cardPlace;
@@ -1256,10 +1260,9 @@ public class BattleSystem : StateMachine
     }
 
 
-    public void OnWheelSelected(int option)
+    public void OnWheelSelected(bool isDragon, int option)
     {
         --Constants.cardsToSelectCounter;
-        ui.SetWheelSelectionBtn(option);
         StartCoroutine(OnCardsSelectedForPU(option.ToString(), new Vector2(0, 0)));
     }
 
@@ -1274,7 +1277,7 @@ public class BattleSystem : StateMachine
         ui.EnableDarkScreen(true, false, () =>
         {
             ui.pEs.EnableSelecetPositionZ(false);
-            StartCoroutine(ResetSortingOrder(false));
+            StartCoroutine(ResetSortingOrder(fm1Activated));
         }
         );
         selectMode = false;
@@ -1293,10 +1296,18 @@ public class BattleSystem : StateMachine
     public void ShowPuInfo(Vector2 startingPosition, bool isPu, bool paddingRight, string puName, string puDisplayName)
     {
         infoShow = true;
-        ui.ShowPuInfoDialog(startingPosition, isPu, paddingRight, puName, puDisplayName, true, false, null);
+        ui.ShowPuInfoDialog(startingPosition, isPu, paddingRight, puName, puDisplayName, true, false, () => StartCoroutine(AutoFadeInfo()));
         if (tutoManager.step == 1)
             tutoManager.SetStep(2);
     }
+
+    private IEnumerator AutoFadeInfo()
+    {
+        yield return new WaitForSeconds(2f);
+        if (infoShow)
+            ui.ShowPuInfoDialog(new Vector2(0, 0), false, false, " ", " ", false, false, () => infoShow = false);
+    }
+
     public void HideDialog(bool isPu)
     {
         ui.ShowPuInfoDialog(new Vector2(0, 0), isPu, false, " ", " ", false, false, () => infoShow = false);
@@ -1464,11 +1475,11 @@ public class BattleSystem : StateMachine
                     puUi.EnablePu(true);
                 }
             }
-            else if (puUi.puName.Equals("wm1") && cardsDeckUi.IsOneCardFromHandsFreeze())
+            else if (puUi.puName.Equals("wm1") && cardsDeckUi.IsOneCardFromHandsFreeze(true))
             {
                 puUi.EnablePu(false);
             }
-            else if (puUi.puName.Equals("wm2") && cardsDeckUi.GetHowManyAvailableUnfrozenCards() < 2)
+            else if (puUi.puName.Equals("wm2") && cardsDeckUi.GetHowManyAvailableUnfrozenCards(true) < 2)
             {
                 puUi.EnablePu(false);
             }
@@ -1692,10 +1703,10 @@ public class BattleSystem : StateMachine
         {
             ui.EnableVisionClick(true);
             newPowerUpName = "x";
-            fm1Activated = false;
             //selectCardsMode = true;
+            fm1Activated = false;
             ResetPuAction?.Invoke();
-            StartCoroutine(ResetSortingOrder(false));//true?
+            StartCoroutine(ResetSortingOrder(fm1Activated));//true?
         }
         //  ui.EnableDarkScreen(isPlayerActivatePu, enable, () => {
         ResetPuAction = null;
@@ -1723,7 +1734,7 @@ public class BattleSystem : StateMachine
         playerPuInProcess = false;
         if (delay)
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(3f);
         }
         Debug.LogError("Imreseting");
         foreach (CardUi card in cardsDeckUi.GetListByTag("All"))
@@ -1764,7 +1775,7 @@ public class BattleSystem : StateMachine
 
     public void SetCardsSelectionAndDisplayInfo(int cardsToSelectCounter, string newPuName)
     {
-        if (!newPuName.Equals("fm1"))
+        if (!newPuName.Equals("fm1") || cardsToSelectCounter == 3)
         {
             selectMode = true;
         }
@@ -1786,11 +1797,11 @@ public class BattleSystem : StateMachine
         }
         if (cardToFreeze.glitch && isToFreeze)
         {
-            cardToFreeze.glitch = false;
-            ui.FreezeObject(cardToFreeze.spriteRenderer, true, cardToFreeze.GetisFaceDown(), () =>
+            ui.FreezeObject(cardToFreeze.spriteRenderer, true, cardToFreeze.GetisFaceDown(), true, () =>
             {
-                ui.FreezeObject(cardToFreeze.spriteRenderer, false, cardToFreeze.GetisFaceDown(), resetAction, true);
+                cardToFreeze.glitch = false;
                 cardsDeckUi.EnableGlitchValues(false, cardToFreeze.spriteRenderer.material);
+                ui.FreezeObject(cardToFreeze.spriteRenderer, false, cardToFreeze.GetisFaceDown(), true, resetAction, true);
             }, true);
         }
         else if (isToFreeze && cardToFreeze.freeze)
@@ -1800,7 +1811,7 @@ public class BattleSystem : StateMachine
         else
         {
             cardToFreeze.freeze = isToFreeze;
-            ui.FreezeObject(cardToFreeze.spriteRenderer, isToFreeze, cardToFreeze.GetisFaceDown(), resetAction, true);
+            ui.FreezeObject(cardToFreeze.spriteRenderer, isToFreeze, cardToFreeze.GetisFaceDown(), false, resetAction, true);
         }
         if (reset)
         {
@@ -1952,7 +1963,7 @@ public class BattleSystem : StateMachine
             StartCoroutine(ui.StartArmageddon());
             IgnitePowerUp.Invoke();
         }
-        else if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.tm1)))
+        else if (powerUpName.Equals(nameof(PowerUpStruct.PowerUpNamesEnum.tm2)))
         {
             ui.StartMatrix();
             IgnitePowerUp.Invoke();
@@ -2787,7 +2798,23 @@ public class BattleSystem : StateMachine
     {
         Time.timeScale = 1;
     }
+    private float GetStartingDamage()
+    {
+        if (enemyHp < startingDamageForRound && enemyHp <= playerHp)
+            return enemyHp;
+        if (playerHp < startingDamageForRound && playerHp <= enemyHp)
+            return playerHp;
+        return startingDamageForRound;
+    }
 
-
+    public void DragonActivate()
+    {
+        if (newPowerUpName.Equals("fm1"))
+            selectMode = false;
+        puDeckUi.DisableDragonBtn();
+        ui.InitLargeText(false, "");
+        ui.EnableDarkScreen(true, false,
+            () => SetState(new PowerUpState(this, true, newEnergyCost, newPowerUpName, "V", "", new Vector2(0, 0), new Vector2(0, 0), newPuSlotIndexUse)));
+    }
 }
 

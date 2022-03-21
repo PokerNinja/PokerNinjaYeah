@@ -102,7 +102,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFill, true);
         }
         StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(pElementSkillLiquid.transform, 0f,
-            new Vector3(pElementSkillLiquid.transform.position.x, targetY, 88.8f), Values.Instance.elementalSkillFillDuration, () =>
+            new Vector3(pElementSkillLiquid.transform.position.x, targetY, pElementSkillLiquid.transform.position.z), Values.Instance.elementalSkillFillDuration, () =>
             {
                 if (ncCounterUse == 3)
                 {
@@ -127,6 +127,8 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             ncCounterUse = 3;
         }
+        if (isPlayer)
+            EnableSelecetPositionZ(false);
         FillElemental(ncCounterUse);
     }
 
@@ -257,6 +259,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     [Button]
     public void EnableSelecetPositionZ(bool aboveDarkScreen)
     {
+        Debug.LogError("What");
         float interval = 88.5f;
         if (aboveDarkScreen)
         {

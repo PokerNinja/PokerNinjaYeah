@@ -42,7 +42,12 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     public Transform pEsTranform;
     public Transform eEsTranform;
-   // public PowerUpUi playerSkillUi;
+
+
+    public Image dragonBtnV;
+    public CanvasGroup dragonParent;
+
+    // public PowerUpUi playerSkillUi;
 
 
     public static PuDeckUi Instance()
@@ -106,7 +111,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         puToReset.puDisplayName = "NN";
         puToReset.puIndex = -10;
         puToReset.outStand = false;
-       // puToReset.freeze = false;
+        // puToReset.freeze = false;
         puToReset.tag = "PowerUp";
         puToReset.transform.position = puTransform.position;
         puToReset.transform.localScale = puTransform.localScale;
@@ -333,7 +338,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         if (open)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
-           // targetX = 4.39f;
+            // targetX = 4.39f;
             targetX = 5.35f;
         }
         else
@@ -451,7 +456,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     {
         if (isPlayer)
         {
-            if(puIndex == -1)
+            if (puIndex == -1)
             {
                 return playerSkill.position;
             }
@@ -491,12 +496,51 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
 
     [Button]
-    public void DissolveNcToEs(bool isPlayer, int index , Action FillEs, Action OnEnd)
+    public void DissolveNcToEs(bool isPlayer, int index, Action FillEs, Action OnEnd)
     {
         Vector3 target = pEsTranform.position;
         if (!isPlayer)
             target = eEsTranform.position;
         GetPu(isPlayer, index).DissolveNcToEs(target, FillEs, OnEnd);
     }
-    
+
+    internal void EnableDragonBtn(int index, string element)
+    {
+        dragonParent.gameObject.SetActive(true);
+        dragonBtnV.color = GetColorFromElement(element);
+        dragonParent.transform.position = GetPu(true, index).transform.position;
+        Vector3 newPosition = new Vector3(dragonParent.transform.position.x, dragonParent.transform.position.y + 2.7f, 30f);
+        StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(dragonParent.transform, 0, newPosition, 1f, null,
+            () => dragonParent.interactable = true));
+    }
+
+    private Color GetColorFromElement(string element)
+    {
+        switch (element)
+        {
+            case "f":
+                return Values.Instance.fireVision;
+            case "i":
+                return Values.Instance.iceVision;
+            case "w":
+                return Values.Instance.windVision;
+            case "t":
+                return Values.Instance.techVision;
+        }
+        return Values.Instance.shadowVision;
+    }
+
+    internal void DisableDragonBtn()
+    {
+        if (dragonParent.gameObject.activeSelf)
+        {
+            dragonParent.interactable = false;
+            StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(dragonParent, false, 0.5f, 
+                () => { 
+                    dragonParent.gameObject.SetActive(false);
+                    dragonParent.alpha = 1;
+                }));
+        }
+    }
+
 }

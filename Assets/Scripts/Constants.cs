@@ -74,7 +74,23 @@ public class Constants : Singleton<Constants>
         }
         return cardPlace;
     }
-
+    public enum TipsEnum
+    {
+        FirstNc,     //f
+        LongPressNc, //f
+        Draw,        //f
+        Energy,      //f
+        EndTurn,     //f
+        FirstDragon,
+        LastTurn,
+        RaiseBtn,    //f
+        NcAboutToDestroy,
+        RankMenu,    //f
+        RankInNumber,//f
+        Vision,      //f
+        Emojis,      //f
+        ElementSkill,      
+    }
     public enum TutorialObjectEnum
     {
         startGame = 0,

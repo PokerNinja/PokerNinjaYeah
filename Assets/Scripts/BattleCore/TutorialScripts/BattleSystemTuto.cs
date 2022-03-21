@@ -803,7 +803,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
             {
                 puUi.EnablePu(false);
             }
-            else if (puUi.puName.Equals("wm1") && cardsDeckUi.IsOneCardFromHandsFreeze())
+            else if (puUi.puName.Equals("wm1") && cardsDeckUi.IsOneCardFromHandsFreeze(true))
             {
                 puUi.EnablePu(false);
             }

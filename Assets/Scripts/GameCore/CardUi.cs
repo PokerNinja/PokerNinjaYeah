@@ -136,9 +136,18 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
         }
         else
         {
+            if (glitch)
+                StartCoroutine(CantClickGlitch());
             StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material, Values.Instance.disableClickShakeDuration));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
+    }
+
+    private IEnumerator CantClickGlitch()
+    {
+        spriteRenderer.material.SetFloat("_GlitchAmount", 20f);
+        yield return new WaitForSeconds(Values.Instance.disableClickShakeDuration);
+        spriteRenderer.material.SetFloat("_GlitchAmount", 1.6f);
     }
 
     internal void LoadNewFlusherSprite()
@@ -153,6 +162,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
     public void SetSelection(bool selectionEnable, string puElement, string puName)
     {
+        //Todo WTF
         bool okToSelect = true;
         if (freeze)
         {
