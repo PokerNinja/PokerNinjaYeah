@@ -400,7 +400,7 @@ public class BattleSystem : StateMachine
 
     public void DisableSelectMode(bool endTurn)
     {
-        if (selectMode && !Constants.TemproryUnclickable)
+        if (selectMode || !Constants.TemproryUnclickable)
         {
             selectMode = false;
             sameCardsSelection = false;
@@ -413,7 +413,8 @@ public class BattleSystem : StateMachine
             puDeckUi.ResetOutstandPus();
             ui.ResetPointers();
             ui.ResetCardSelection();
-            puDeckUi.DisableDragonBtn();
+            puDeckUi.DisableDragonBtn(false);
+            newPowerUpName = "x";
             StartCoroutine(ActivatePlayerButtons(!endTurn, false));// Here or after darkEnd
             ui.EnableDarkScreen(true, false, () =>
              {
@@ -508,7 +509,7 @@ public class BattleSystem : StateMachine
             ShouldFlipArrow(!firstToPlayBotMode);
             currentTurn = 6;
             isRoundReady = true;
-            currentGameInfo.cardDeck = CreateCardsDeck(true);
+            currentGameInfo.cardDeck = CreateCardsDeck(false);
             ui.winLabel.SetActive(false);
             firstToPlayBotMode = !firstToPlayBotMode;
             SetState(new BeginRound(this, firstToPlayBotMode, false));
@@ -735,13 +736,13 @@ public class BattleSystem : StateMachine
     private IEnumerator WaitForPuToEndLoop()
     {
         DisableSelectMode(true);
+        endClickable = true; // MAybe elsewehere??
         if (playerPuInProcess || ReplaceInProgress)
         {
             //playerPuInProcess = false;
             Debug.Log("aboiut To PUINPR");
             yield return new WaitForSeconds(3f);
             Debug.Log("aboiut To PUINPR4");
-            endClickable = true;
         }
         EndTurn();
 
@@ -1127,6 +1128,7 @@ public class BattleSystem : StateMachine
     }
     public void DissolveNcToEs(bool isPlayer, int index, Action FillEs)
     {
+       
         ResetPuAction = () =>
         {
             /*            FillEs?.Invoke();
@@ -1345,11 +1347,11 @@ public class BattleSystem : StateMachine
             ShowEmojiBot(!isPlayer);
         }
     }
-    internal void ResetPuUi(PowerUpUi pu)
-    {
-        puDeckUi.RemovePuFromList(pu.isPlayer, pu.puIndex);
-        puDeckUi.ResetPuUI(pu, null);
-    }
+    /*  internal void ResetPuUi(PowerUpUi pu)
+      {
+          puDeckUi.RemovePuFromList(pu.isPlayer, pu.puIndex);
+          puDeckUi.ResetPuUI(pu, null);
+      }*/
 
     public void UpdatePuInDb(string firstCardTargetPUstring, string secondCardTargetPU, int puIndex)
     {
@@ -1667,8 +1669,8 @@ public class BattleSystem : StateMachine
         {
             SmokeCardPu(false, cardPlace, false, false, false);
         }
-        if (isFirstCard)
-            cardsDeckUi.AnimateDrawer(true, null);
+        // if (isFirstCard)
+        cardsDeckUi.AnimateDrawer(true, null);
         yield return new WaitForSeconds(delay);
         cardsDeckUi.DestroyCardObjectFire(cardPlace, null);
         yield return new WaitForSeconds(0.3f);
@@ -2002,7 +2004,7 @@ public class BattleSystem : StateMachine
             ReduceEnergy(Values.Instance.energyCostForDraw);
             StartCoroutine(ActivatePlayerButtons(false, false));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.BtnClick, false);
-
+            ui.DrawBtnEffect();
             DealPu(true, () =>
             {
                 ReplaceInProgress = false;
@@ -2179,12 +2181,14 @@ public class BattleSystem : StateMachine
             ui.EnablePlayerButtons(true);
             ActivatePlayerPus();
             ui.betBtn.EnableBetBtn(HaveEnoughToRaise());
+            puDeckUi.energyCoster.EnableDrawEnergy(energyCounter >= 1);
         }
         else if (!enable)
         {
             ui.EnablePlayerButtons(false);
             DisablePlayerPus();
             ui.betBtn.EnableBetBtn(false);
+            puDeckUi.energyCoster.EnableDrawEnergy(false);
         }
     }
 
@@ -2225,6 +2229,7 @@ public class BattleSystem : StateMachine
             energyCounter -= amountToSub;
             ui.UpdateEnergy(false, amountToSub);
         }
+        puDeckUi.energyCoster.EnableDrawEnergy(energyCounter >= 1);
     }
     internal void EmojiSelected(int id)
     {
@@ -2811,7 +2816,7 @@ public class BattleSystem : StateMachine
     {
         if (newPowerUpName.Equals("fm1"))
             selectMode = false;
-        puDeckUi.DisableDragonBtn();
+        puDeckUi.DisableDragonBtn(true);
         ui.InitLargeText(false, "");
         ui.EnableDarkScreen(true, false,
             () => SetState(new PowerUpState(this, true, newEnergyCost, newPowerUpName, "V", "", new Vector2(0, 0), new Vector2(0, 0), newPuSlotIndexUse)));

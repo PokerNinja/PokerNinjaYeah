@@ -203,6 +203,7 @@ public class BattleUI : MonoBehaviour
     public TechWheel techWheelEs;
     public TechWheel techWheelDr;
 
+
     public void Initialize(PlayerInfo player, PlayerInfo enemy, float totalHp)
     {
         pEs.InitializeES(player.id[0].ToString());
@@ -1263,17 +1264,15 @@ public class BattleUI : MonoBehaviour
     internal void EnableBtnReplace(bool enable)
     {
         Action btnEnable = () => BattleSystem.Instance.btnReplaceClickable = enable; ;
-        if (enable)
-        {
-        }
-        else
-        {
+        if (!enable)
+        { 
             btnEnable.Invoke();
             btnEnable = null;
         }
         // Make IT more stable
         //StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, btnReplaceRenderer.material, value, btnEnable));
         StartCoroutine(AnimationManager.Instance.DarkerAnimation(btnDrawRenderer, !enable, Values.Instance.puChangeColorDisableDuration, btnEnable));
+
     }
 
     public void BgFadeInColor()
@@ -1790,6 +1789,8 @@ public class BattleUI : MonoBehaviour
         pointerAnim.transform.parent.gameObject.SetActive(enable);
     }
 
+  
+
     public void ResetPointers()
     {
         pointerAnimation1.Stop();
@@ -1895,7 +1896,11 @@ public class BattleUI : MonoBehaviour
         else
             techWheelEs.EnableWheel(position);
     }
-
+    internal void DrawBtnEffect()
+    {
+        StartCoroutine(AnimationManager.Instance.UpdateValue(true,"_Glow",0.4f,btnDrawRenderer.material,0.8f,
+            () => StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_Glow", 0.4f, btnDrawRenderer.material, 0f,null))));
+    }
 
 }
 

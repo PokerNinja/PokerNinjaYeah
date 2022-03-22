@@ -72,6 +72,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     [Button]
     public void FillElemental(int amount)
     {
+        Debug.LogError("FILLINH");
         float targetY = 0f;
         switch (amount)
         {
@@ -113,6 +114,9 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public bool IsNcEqualsPesElement(string element)
     {
+        Debug.LogError("E" + element);
+        Debug.LogError("TE" + this.element);
+
         return this.element == element;
     }
 

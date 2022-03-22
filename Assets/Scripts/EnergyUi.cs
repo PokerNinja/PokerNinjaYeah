@@ -42,7 +42,7 @@ public class EnergyUi : MonoBehaviour
 
     void Start()
     {
-        spriteRenderer.material.SetFloat("_DistortTexXSpeed", 5f + index * 0.1f);
+        //spriteRenderer.material.SetFloat("_DistortTexXSpeed", 5f + index * 0.1f);
     }
 
 

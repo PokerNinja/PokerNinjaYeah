@@ -45,7 +45,10 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
 
     public Image dragonBtnV;
+    public Image dragonBtnBg;
     public CanvasGroup dragonParent;
+    public Animation dragonBtnAnimation;
+    public EnergyCost energyCoster;
 
     // public PowerUpUi playerSkillUi;
 
@@ -89,6 +92,8 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void DestroyPu(PowerUpUi pu, Action RemoveFromList, Action OnEnd)
     {
+        if (pu.isPlayer)
+            energyCoster.DisableNcEnergy(pu.puIndex == 0);
         pu.DissolvePu(0f, Values.Instance.puDissolveDuration, RemoveFromList, () => ResetPuUI(pu, OnEnd));
         //  StartCoroutine(AnimationManager.Instance.FadeBurnPU(pu.spriteRenderer.material, 0f , false, 4f, null, RemoveFromList, () => ResetPuUI(pu, OnEnd)));
     }
@@ -141,17 +146,21 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     private void PushPuPosition(bool isPlayer, Action EndAction)
     {
         //{} V MAYBE DIFFERENT NO ARRAY
+        if (isPlayer)
+        {
+            energyCoster.DisableNcEnergy(false);
+            energyCoster.DisableNcEnergy(true);
+        }
         PowerUpUi pu;
         Transform target;
         if (isPlayer)
         {
-
-
             pu = playerPusUi[0];
             pu.puIndex = 1;
             playerPusUi[1] = pu;
             playerPusUi[0] = null;
             target = playerPuBParent.transform;
+
         }
         else
         {
@@ -162,7 +171,12 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
             target = enemyPuBParent.transform;
         }
         pu.transform.SetParent(target);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(pu.transform, target.position, pu.transform.localScale, Values.Instance.puPushNewSlotMoveDuration, EndAction, null, null, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(pu.transform, target.position, pu.transform.localScale, Values.Instance.puPushNewSlotMoveDuration, EndAction, null, null,
+            () =>
+            {
+                if (isPlayer)
+                    energyCoster.SetEnergy(1, pu.isMonster);
+            }));
 
     }
 
@@ -379,8 +393,14 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         }
         puObject.Init(puName, index, PowerUpStruct.Instance.GetPowerUpDisplayName(puName), puName[0].ToString(), isPlayer);
         StartCoroutine(AnimationManager.Instance.SmoothMove(puObject.transform, puParent.transform.position, puVector,
-        Values.Instance.puDrawMoveDuration, null, () => puObject.CardReveal(isPlayer, null), EndAction, () => puObject.LoopShine(puObject.isMonster)));
+        Values.Instance.puDrawMoveDuration, null,
+        () => puObject.CardReveal(isPlayer, () =>
+         {
+             if (isPlayer)
+                 energyCoster.SetEnergy(index, puObject.isMonster);
+         }), EndAction, () => puObject.LoopShine(puObject.isMonster)));
         AddCardToList(puTag, index, puObject);
+
     }
 
     private void AddCardToList(string cardTag, int index, PowerUpUi puObject)
@@ -420,10 +440,6 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
             Camera.main.gameObject.AddComponent<Physics2DRaycaster>();
         }
     }
-
-
-
-
 
 
 
@@ -504,14 +520,21 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         GetPu(isPlayer, index).DissolveNcToEs(target, FillEs, OnEnd);
     }
 
-    internal void EnableDragonBtn(int index, string element)
+    internal async void EnableDragonBtn(int index, string element)
     {
-        dragonParent.gameObject.SetActive(true);
+        //dragonParent.gameObject.SetActive(true);
+        SetOutlineBtn(false);
         dragonBtnV.color = GetColorFromElement(element);
-        dragonParent.transform.position = GetPu(true, index).transform.position;
-        Vector3 newPosition = new Vector3(dragonParent.transform.position.x, dragonParent.transform.position.y + 2.7f, 30f);
-        StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(dragonParent.transform, 0, newPosition, 1f, null,
-            () => dragonParent.interactable = true));
+        dragonBtnBg.material.SetColor("_OutlineColor", GetColorFromElement(element));
+        dragonBtnBg.material.SetFloat("_Glow", 0f);
+        dragonParent.transform.position = new Vector3(GetPu(true, index).transform.position.x, GetPu(true, index).transform.position.y, 19f);
+        //dragonParent.transform.position = GetPu(true, index).transform.position;
+        dragonBtnAnimation.Play("dragon_btn");
+        await Task.Delay(600);
+        SetOutlineBtn(true);
+        dragonParent.interactable = true;
+        /*  StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(dragonParent.transform, 0, newPosition, 1f, null,
+              () => dragonParent.interactable = true));*/
     }
 
     private Color GetColorFromElement(string element)
@@ -530,17 +553,34 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         return Values.Instance.shadowVision;
     }
 
-    internal void DisableDragonBtn()
+    internal void DisableDragonBtn(bool isClicked)
     {
-        if (dragonParent.gameObject.activeSelf)
+        string animPath = "dragon_btn_out";
+        if (dragonBtnV.color.a == 1)
         {
             dragonParent.interactable = false;
-            StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(dragonParent, false, 0.5f, 
-                () => { 
-                    dragonParent.gameObject.SetActive(false);
-                    dragonParent.alpha = 1;
-                }));
+            /* StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(dragonParent, false, 0.5f, 
+                 () => { 
+                     dragonParent.gameObject.SetActive(false);
+                     dragonParent.alpha = 1;
+                 }));*/
+            SetOutlineBtn(false);
+            if (isClicked)
+            {
+                animPath = "dragon_btn_click";
+                StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_Glow", 0.6f, dragonBtnBg.material, 5f, null));
+            }
+            dragonBtnAnimation.Play(animPath);
         }
+    }
+
+
+    private void SetOutlineBtn(bool enable)
+    {
+        float amount = 0;
+        if (enable)
+            amount = 1;
+        dragonBtnBg.material.SetFloat("_OutlineAlpha", amount);
     }
 
 }

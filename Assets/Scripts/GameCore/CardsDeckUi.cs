@@ -1740,9 +1740,10 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     public void EnableGlitchValues(bool enable, Material targetMaterial)
     {
+        Debug.Log("HEYGLITCH");
         if (enable)
         {
-            targetMaterial.SetFloat("_GlitchAmount", GenerateRandom(1.4f, 1.75f));
+            targetMaterial.SetFloat("_GlitchAmount", GenerateRandom(1.1f, 1.4f));
             targetMaterial.SetFloat("_ChromAberrAmount", 0.26f);
         }
         else
@@ -1979,23 +1980,23 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
 
     public void AnimateDrawer(bool open, Action action)
     {
-        isDrawerOpen = open;
         float targetX;
-        if (open)
+        if (open && !isDrawerOpen)
         {
+            isDrawerOpen = true;
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
             //s targetX = -0.22f;
             targetX = -1.15f;
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
             new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, action));
         }
-        else
+        else if(!open && isDrawerOpen)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CloseDrawer, false);
             targetX = 1.1f;
             action?.Invoke();
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
-            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, null));
+            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, () => isDrawerOpen = false));
         }
     }
     public void DeleteAllCards(Action DealHands)

@@ -238,7 +238,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             EnableShake(enable);
         }
         StartCoroutine(AnimationManager.Instance.DarkerAnimation(spriteRenderer, !enable, Values.Instance.puChangeColorDisableDuration, () => isClickable = enable));
-
+        BattleSystem.Instance.puDeckUi.energyCoster.AvailableEnergy(enable, puIndex);
         //StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, spriteRenderer.material, value, () => isClickable = enable));
     }
 
@@ -302,7 +302,16 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             distortAmount = 0.17f;
             outlineAlpha = 1f;
+            float outlineWidth = 0.03f;
+            float outlineDistortAmount = 1.33f;
+            if (isMonster)
+            {
+                outlineWidth = 0.075f;
+                outlineDistortAmount = 2f;
+            }
             spriteRenderer.material.SetColor("_OutlineColor", GetColorFromElement(puElement));
+            spriteRenderer.material.SetFloat("_OutlineWidth", outlineWidth);
+            spriteRenderer.material.SetFloat("_OutlineDistortAmount", outlineDistortAmount);
         }
         else
         {

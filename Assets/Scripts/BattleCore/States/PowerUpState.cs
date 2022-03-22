@@ -217,11 +217,16 @@ public class PowerUpState : State
         if (isPlayerActivate)
         {
             battleSystem.Interface.ResetCardSelection();
-          //  battleSystem.puDeckUi.DisableDragonBtn();
+            battleSystem.ReduceEnergy(energyCost);
+            battleSystem.selectMode = false;
+            Constants.cardsToSelectCounter = 0;
         }
         battleSystem.Interface.InitNinjaAttackAnimation(isPlayerActivate, puElement);
         if (puIndex != -1)
         {
+            Debug.LogError("Elemnting NC:  " + puElement);
+            if (isPlayerActivate)
+                battleSystem.puDeckUi.energyCoster.DisableNcEnergy(puIndex== 0);
             if (IsNcEqualElement())
                 battleSystem.DissolveNcToEs(isPlayerActivate, puIndex, () => battleSystem.UpdateEsAfterNcUse(isPlayerActivate, powerUpName));
             else
@@ -233,9 +238,10 @@ public class PowerUpState : State
         }
         if (isPlayerActivate)
         {
-            battleSystem.ReduceEnergy(energyCost);
+            /*battleSystem.ReduceEnergy(energyCost);
             battleSystem.selectMode = false;
-            Constants.cardsToSelectCounter = 0;
+            Constants.cardsToSelectCounter = 0;*/
+
             //  battleSystem.playerPuInProcess = true;
         }
         switch (powerUpName)
