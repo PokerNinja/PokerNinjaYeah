@@ -1707,7 +1707,6 @@ public class BattleSystem : StateMachine
         {
             resetAction = () => EnableDarkAndSorting(false);
         }
-        cardsDeckUi.RestAfterDestroy(cardsDeckUi.GetCardUiByName(cardPlace), null);
         cardsDeckUi.DrawAndReplaceCard(cardPlace, isFlip, resetAction, isFirstCard, ResetEnable);
     }
     public async void ReplaceSelectedCard2(string cardPlace, bool isFlip, int delay, bool ResetEnable, bool isFirstCard, bool isLastCard)

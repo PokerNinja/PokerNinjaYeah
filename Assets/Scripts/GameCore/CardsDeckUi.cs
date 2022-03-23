@@ -1629,8 +1629,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             }
             StartCoroutine(cardToDestroy.FadeBurnOut(targetMaterial, changeOffset, () =>
             {
-                OnEnd?.Invoke();
-                //RestAfterDestroy(cardToDestroy, OnEnd);
+                //RemoveFromList(cardToDestroy);
+                RestAfterDestroy(cardToDestroy, OnEnd);
             }
             //  Destroy(cardToDestroy)));
             ));
@@ -1639,9 +1639,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             StartCoroutine(cardToDestroy.Dissolve(false, dissolveMaterial, 0f, () =>
             {
-                OnEnd?.Invoke();
                 //  RemoveFromList(cardToDestroy);
-                //RestAfterDestroy(cardToDestroy, OnEnd);
+                RestAfterDestroy(cardToDestroy, OnEnd);
             }));
         }
     }
