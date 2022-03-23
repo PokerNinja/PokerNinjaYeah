@@ -78,18 +78,18 @@ public class Constants : Singleton<Constants>
     {
         FirstNc,     //f
         LongPressNc, //f
-        Draw,        //f
         Energy,      //f
+        Draw,        //f
         EndTurn,     //f
+        HpDrop,    
         FirstDragon,
+        RankInNumber,//f
+        RankMenu,    //f
         LastTurn,
         RaiseBtn,    //f
-        NcAboutToDestroy,
-        RankMenu,    //f
-        RankInNumber,//f
         Vision,      //f
         Emojis,      //f
-        ElementSkill,      
+        ElementSkill,    
     }
     public enum TutorialObjectEnum
     {

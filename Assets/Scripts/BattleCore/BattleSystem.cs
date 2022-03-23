@@ -18,7 +18,9 @@ public class BattleSystem : StateMachine
 {
     public static BattleSystem Instance { get; private set; }
 
+    [GUIColor(1f, 0.1f, 0.1f)]
     public bool BOT_MODE;
+    [GUIColor(1f, 0.1f, 0.1f)]
     public bool TUTORIAL_MODE;
     [SerializeField] public bool END_TURN_AFTER_PU;
 
@@ -171,12 +173,15 @@ public class BattleSystem : StateMachine
 
     private void Start()
     {
-        // Constants.BOT_MODE = true;
-        // Constants.TUTORIAL_MODE = true;
+      
+        BOT_MODE = Constants.BOT_MODE;
+        TUTORIAL_MODE = Constants.TUTORIAL_MODE;
+        if (!BOT_MODE)
+            BOT_MODE =  Values.Instance.TEST_MODE;
+        if (!TUTORIAL_MODE)
+            TUTORIAL_MODE = Values.Instance.TUTORIAL_MODE;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         Debug.LogError("Tu " + TUTORIAL_MODE);
-        //BOT_MODE = Constants.BOT_MODE;
-        TUTORIAL_MODE = Constants.TUTORIAL_MODE;
         if (BOT_MODE)
         {
             InitTestMode();
@@ -186,14 +191,7 @@ public class BattleSystem : StateMachine
             gameManager = MainManager.Instance.gameManager;
             currentGameInfo = gameManager.currentGameInfo;
         }
-        if (TUTORIAL_MODE)
-        {
-            fullHp = 2500;
-        }
-        else
-        {
-            fullHp = 3000;
-        }
+        fullHp = 3000;
         playerHp = fullHp;
         enemyHp = fullHp;
         startingDamageForRound = 1000;
@@ -331,9 +329,11 @@ public class BattleSystem : StateMachine
                  "w1","w2","w3",
                  "fm2","wm2","tm1",
                  "t6","t5","t4",
-                 "t3","t2","t1",
-            "w2","wm1","w1","wm2","wm2","wm2","w1","f3","f2",
-          "w2" , "im2","f1","w2","i3","i3","f1"};
+                 "t3","t2","t1"
+            , "f2","f1","w2","i3","i3","f1","i1","i3","w3","f1","w1","i2","w1",
+          "w3" , "f2","f1","w2","i3","i3","f1",
+                "f2","f1","w2","i3","i3","f1","i1","i3","w3","f1","w1","i2","w1",
+          "w3" , "f2","f1","w2","i3","i3","f1"};
         }
         return deck;
     }
@@ -341,28 +341,34 @@ public class BattleSystem : StateMachine
     private string[] CreateCardsDeck(bool tutorial)
     {
         string[] deck;
-        if (!tutorial)
-        {
-            deck = new string[]{
+        deck = new string[]{
                 "Ac", "2c", "3c", "4c", "5c", "6c", "7c", "8c", "9c", "Tc", "Jc", "Qc", "Kc",
                        "Ad", "2d", "3d", "4d", "5d", "6d", "7d", "8d", "9d", "Td", "Jd", "Qd", "Kd",
                        "As", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s", "Ts", "Js", "Qs", "Ks",
                        "Ah", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Th", "Jh", "Qh", "Kh" };
-            deck = ShuffleArray(deck);
-        }
-        else
-        {
-            deck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
-                "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Jh","2c", "3h","4s","5h","Ac", "7s",
-                "3s",
-                "5c",
-                "6h",
-                "8d",
-                "8h", "Jc","4s",
-                "9d", "3c", "4c","Jh"
-                /*,board[4],board[3], board[2],board[1],board[0],enemysHand[1], playersHand[1],enemysHand[0],playersHand[0]*/
-            };
-        }
+        deck = ShuffleArray(deck);
+        /*   if (!tutorial)
+           {
+               deck = new string[]{
+                   "Ac", "2c", "3c", "4c", "5c", "6c", "7c", "8c", "9c", "Tc", "Jc", "Qc", "Kc",
+                          "Ad", "2d", "3d", "4d", "5d", "6d", "7d", "8d", "9d", "Td", "Jd", "Qd", "Kd",
+                          "As", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s", "Ts", "Js", "Qs", "Ks",
+                          "Ah", "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Th", "Jh", "Qh", "Kh" };
+               deck = ShuffleArray(deck);
+           }
+           else
+           {
+               deck = new String[] { "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah",
+                   "Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Ah","Ac", "Ah","As","Jh","2c", "3h","4s","5h","Ac", "7s",
+                   "3s",
+                   "5c",
+                   "6h",
+                   "8d",
+                   "8h", "Jc","4s",
+                   "9d", "3c", "4c","Jh"
+                   *//*,board[4],board[3], board[2],board[1],board[0],enemysHand[1], playersHand[1],enemysHand[0],playersHand[0]*//*
+               };
+           }*/
         return deck;
     }
 
@@ -508,10 +514,13 @@ public class BattleSystem : StateMachine
         {
             ShouldFlipArrow(!firstToPlayBotMode);
             currentTurn = 6;
+            currentRound++;
             isRoundReady = true;
             currentGameInfo.cardDeck = CreateCardsDeck(false);
             ui.winLabel.SetActive(false);
             firstToPlayBotMode = !firstToPlayBotMode;
+            firstRound = false;
+            Debug.LogError("FIRTSTT");
             SetState(new BeginRound(this, firstToPlayBotMode, false));
         }
     }
@@ -546,7 +555,20 @@ public class BattleSystem : StateMachine
     {
         float damage = (currentDamageThisRound + extraDamage) / fullHp;
         StartCoroutine(ui.DisplayDamageText(!isPlayerWin, currentDamageThisRound, extraDamage));
-        StartCoroutine(ui.CardProjectileEffect(isPlayerWin, null, () => ui.UpdateDamage(damage, !isPlayerWin, IsPerfect())));
+        StartCoroutine(ui.CardProjectileEffect(isPlayerWin, () =>TutrialWinMsg(isPlayerWin)
+        , () => ui.UpdateDamage(damage, !isPlayerWin, IsPerfect())));;
+    }
+
+    private void TutrialWinMsg(bool isPlayerWin)
+    {
+            if (tutoManager.step == 7)
+        {
+                if(isPlayerWin)
+                tutoManager.SetStep(8);
+                else
+                tutoManager.SetStep(9);
+
+        }
     }
 
     private bool IsPerfect()
@@ -573,6 +595,10 @@ public class BattleSystem : StateMachine
                     handRank = 1609;
                 }
             }
+            if (TUTORIAL_MODE && currentRound>=2 && currentTurn < 6)
+            {
+                tutoManager.RankInstructions(handRank);
+            }else
             ui.UpdateCardRank(handRank);
         }
         else
@@ -1128,7 +1154,7 @@ public class BattleSystem : StateMachine
     }
     public void DissolveNcToEs(bool isPlayer, int index, Action FillEs)
     {
-       
+
         ResetPuAction = () =>
         {
             /*            FillEs?.Invoke();
@@ -1143,6 +1169,8 @@ public class BattleSystem : StateMachine
 
     public void UpdateEsAfterNcUse(bool isPlayer, string puName)
     {
+        Debug.LogError("ES WWW" + puName);
+
         if (isPlayer)
             ui.pEs.UpdateEsAfterNcUse(puName.Contains("m"));
         else
@@ -2075,6 +2103,11 @@ public class BattleSystem : StateMachine
     public void SlideRankingImg()
     {
         ui.SlideRankingImg();
+        if (tutoManager.step == 21)
+        {
+            tutoManager.InstructionsDisable();
+            tutoManager.blockScreen.SetActive(false);
+        }
     }
 
 
@@ -2593,6 +2626,12 @@ public class BattleSystem : StateMachine
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
+        if(tutoManager.step == 10)
+        {
+            tutoManager.InstructionsDisable();
+            tutoManager.blockScreen.SetActive(false);
+            ui.betBtn.spriteRenderer.sortingOrder = 0;
+        }
     }
 
     public void PlayerChooseRaise(int dmg)
@@ -2685,6 +2724,8 @@ public class BattleSystem : StateMachine
     public float ConvertWinenerRankToDamage(bool playerWin)
     {
         int rank = ui.ConvertHandRankToTextNumber(cardsDeckUi.CalculateHand(true, playerWin, false, false).Rank);
+        if (TUTORIAL_MODE && currentRound == 1)
+            rank = 10;
         switch (rank)
         {
             case 1:
@@ -2781,18 +2822,18 @@ public class BattleSystem : StateMachine
             Debug.Log("update po use! " + newPowerUpName);
         }, Debug.Log);
     }*/
-    private void OnApplicationPause(bool pause)
-    {
-        if (pause)
-        {
-            Debug.Log("Pause");
-            PauseGame();
-        }
-        else
-        {
-            ResumeGame();
-        }
-    }
+    /* private void OnApplicationPause(bool pause)
+     {
+         if (pause)
+         {
+             Debug.Log("Pause");
+             PauseGame();
+         }
+         else
+         {
+             ResumeGame();
+         }
+     }*/
     [Button]
     public void PauseGame()
     {

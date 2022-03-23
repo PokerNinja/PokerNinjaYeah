@@ -123,7 +123,7 @@ public class BattleUI : MonoBehaviour
     [SerializeField] public SpriteRenderer turnArrowSprite;// MAYBE in Timer
     [SerializeField] public BetBtnUi betBtn;
     [SerializeField] public TextMeshProUGUI currentRankText;
-    [SerializeField] private TextMeshProUGUI currentRankNumber;
+    [SerializeField] public TextMeshProUGUI currentRankNumber;
 
     [SerializeField] private GameObject pFlusher, pStrighter, eFlusher, eStrighter;
 
@@ -1202,7 +1202,7 @@ public class BattleUI : MonoBehaviour
             string extraDamageTxt = "";
             if (extraDamageF != 0)
             {
-                extraDamageTxt = " +" + extraDamageF;
+                extraDamageTxt = " +" + extraDamageF + RichText(" DMG", Values.Instance.redText,true);
             }
             handRankText.text = ConvertHandRankToTextDescription(rank) + extraDamageTxt;
         }

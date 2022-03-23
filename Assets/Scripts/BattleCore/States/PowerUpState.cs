@@ -200,8 +200,8 @@ public class PowerUpState : State
         battleSystem.Interface.EnableDarkScreen(true, true, null);
         if (battleSystem.tutoManager.step == 2)
         {
-            battleSystem.tutoManager.SetObjectClickable(battleSystem.cardsDeckUi.playerCardsUi[0].spriteRenderer);
-            battleSystem.tutoManager.SetObjectClickable(battleSystem.cardsDeckUi.playerCardsUi[1].spriteRenderer);
+            battleSystem.tutoManager.SetObjectClickable(true,battleSystem.cardsDeckUi.playerCardsUi[0].spriteRenderer);
+            battleSystem.tutoManager.SetObjectClickable(true,battleSystem.cardsDeckUi.playerCardsUi[1].spriteRenderer);
 
         }
     }

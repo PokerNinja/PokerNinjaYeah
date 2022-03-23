@@ -169,7 +169,7 @@ public class EndRound : State
         {
             battleSystem.Interface.tieTitle.SetActive(true);
             startNewRound = true;
-            winnerMsg = battleSystem.Interface.RichText("TIE ", Values.Instance.yellowText, true) + bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
+            winnerMsg = battleSystem.Interface.RichText("TIE ", Values.Instance.yellowText, true) + battleSystem.Interface.ConvertHandRankToTextDescription(bestPlayerHand.Rank)/*bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription)*/;
             StartNewRoundAction(true);
         }
 
@@ -404,11 +404,7 @@ public class EndRound : State
         if (startNewRound)
         {
             battleSystem.endRoutineFinished = true;
-            if (battleSystem.tutoManager.step == 7)
-            {
-                battleSystem.tutoManager.SetStep(8);
-            }
-            else
+            if (battleSystem.tutoManager.step != 7)
             {
                 battleSystem.StartNewRoundRoutine(delay);
             }

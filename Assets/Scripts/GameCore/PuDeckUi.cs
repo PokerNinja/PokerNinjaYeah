@@ -580,7 +580,8 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         float amount = 0;
         if (enable)
             amount = 1;
-        dragonBtnBg.material.SetFloat("_OutlineAlpha", amount);
+        StartCoroutine(AnimationManager.Instance.UpdateValue(!enable, "_OutlineAlpha", Values.Instance.outlineFadeDuration, dragonBtnBg.material, amount, null));
+      //  dragonBtnBg.material.SetFloat("_OutlineAlpha", amount);
     }
 
 }

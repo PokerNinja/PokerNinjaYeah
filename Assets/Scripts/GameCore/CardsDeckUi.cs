@@ -472,8 +472,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardToReset.freeze = false;
             cardToReset.spriteRenderer.material.SetColor("_FadeBurnColor", Color.yellow);
         }
-        cardToReset.glitch = false;
         EnableGlitchValues(false, cardToReset.spriteRenderer.material);
+        cardToReset.glitch = false;
         cardToReset.cardPlace = "pool";
         cardToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
         cardToReset.spriteRenderer.material.SetFloat("_ShakeUvSpeed", 0f);
@@ -1990,7 +1990,7 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
             new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, action));
         }
-        else if(!open && isDrawerOpen)
+        else if (!open && isDrawerOpen)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CloseDrawer, false);
             targetX = 1.1f;
@@ -2007,7 +2007,8 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         ResetUiLists();
         foreach (CardUi cardToDestroy in FindAllCardsObjects())
         {
-            cardToDestroy.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
+            //cardToDestroy.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
+            StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_OutlineAlpha", Values.Instance.outlineFadeDuration, cardToDestroy.spriteRenderer.material, 0, null));
             // StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => RestAfterDestroy(cardToDestroy, null)));
             targetPos = new Vector3(cardToDestroy.transform.position.x + 15, cardToDestroy.transform.position.y, cardToDestroy.transform.position.z);
             StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(cardToDestroy.transform, GenerateRandom(0.2f, 0.9f), targetPos, 3f, null, () => RestAfterDestroy(cardToDestroy, null)));

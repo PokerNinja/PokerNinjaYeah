@@ -237,7 +237,7 @@ Material:
     - _ColorSwapBlue: {r: 0.000303527, g: 0.4341537, b: 0.10946172, a: 1}
     - _ColorSwapGreen: {r: 1, g: 1, b: 1, a: 1}
     - _ColorSwapRed: {r: 0.06124607, g: 0.79129815, b: 0, a: 1}
-    - _FadeBurnColor: {r: 1, g: 0.03137255, b: 0, a: 1}
+    - _FadeBurnColor: {r: 0.34901962, g: 1, b: 0, a: 1}
     - _GlowColor: {r: 0.9056604, g: 0, b: 0, a: 0.7294118}
     - _GradBotLeftCol: {r: 0.5019608, g: 0.27450982, b: 0.57254905, a: 1}
     - _GradBotRightCol: {r: 0, g: 0, b: 1, a: 1}
@@ -247,7 +247,7 @@ Material:
     - _HitEffectColor: {r: 1, g: 1, b: 1, a: 1}
     - _HologramStripeColor: {r: 0, g: 1, b: 1, a: 1}
     - _InnerOutlineColor: {r: 1, g: 0, b: 0, a: 1}
-    - _OutlineColor: {r: 1, g: 0.5137255, b: 0.29803923, a: 1}
+    - _OutlineColor: {r: 0.101960786, g: 0.42745098, b: 0.27450982, a: 1}
     - _OverlayColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 1}
     - _ShineColor: {r: 1, g: 1, b: 1, a: 1}

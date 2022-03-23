@@ -198,10 +198,10 @@ public class AnimationManager : Singleton<AnimationManager>
         }
         else
         {
-
+            bool fadeInProgress = true;
             spriteRenderer.color = new Color(r, g, b, dissolveAmount);
             //FIXIT
-            while (dissolveAmount != alphaTarget)
+            while (fadeInProgress)
             {
                 //yield return new WaitForFixedUpdate();
                 yield return null;
@@ -217,11 +217,10 @@ public class AnimationManager : Singleton<AnimationManager>
                 spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
                 if (dissolveAmount >= 1 || dissolveAmount <= 0)
                 {
-                    // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
-                    // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
-
-                    spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaTarget));
+                     Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
+                    spriteRenderer.color = new Color(r, g, b, alphaTarget);
                     OnFinish?.Invoke();
+                   // fadeInProgress = false;
                     break;
                 }
             }
@@ -1441,6 +1440,9 @@ public class AnimationManager : Singleton<AnimationManager>
             else
             {
                 cardUi.spriteRenderer.material.SetColor("_OutlineColor", visionColor);
+                /*if(enable)
+                StartCoroutine(UpdateValue(!enable, "_OutlineAlpha", Values.Instance.outlineFadeDuration, cardUi.spriteRenderer.material, alphaAmoint, null));
+                else*/
                 cardUi.spriteRenderer.material.SetFloat("_OutlineAlpha", alphaAmoint);
             }
         }

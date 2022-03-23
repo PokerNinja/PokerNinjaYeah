@@ -102,6 +102,8 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EsFill, true);
         }
+        EnableSelecetPositionZ(false);
+        Debug.LogError("AboutTo UPDATE es YYYY: " + targetY);
         StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(pElementSkillLiquid.transform, 0f,
             new Vector3(pElementSkillLiquid.transform.position.x, targetY, pElementSkillLiquid.transform.position.z), Values.Instance.elementalSkillFillDuration, () =>
             {
@@ -131,8 +133,9 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             ncCounterUse = 3;
         }
-        if (isPlayer)
-            EnableSelecetPositionZ(false);
+        /*if (isPlayer)
+            EnableSelecetPositionZ(false);*/
+        Debug.LogError("ES UPDATE es " + ncCounterUse);
         FillElemental(ncCounterUse);
     }
 
@@ -267,7 +270,7 @@ public class ElementalSkillUi : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         float interval = 88.5f;
         if (aboveDarkScreen)
         {
-            interval = 28f;
+            interval = 29f;
         }
         transform.position = new Vector3(transform.position.x, transform.position.y, interval);
     }
