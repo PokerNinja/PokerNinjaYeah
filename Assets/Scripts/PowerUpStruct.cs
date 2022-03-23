@@ -30,16 +30,16 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         (PowerUpNamesEnum.w1.ToString(), "STEAL ENEMY PLAYER", "<b><color=#FFC35E>Swap</color></b> one card from your hand with one card from the opponent's hand.", "Choose two cards to <color=#FFC35E>swap</color>", 2, Constants.PlayerCardsTag, Constants.EnemyCardsTag);
     /*7*/
     public PuStructInfo swap_hands = new PuStructInfo
-        (PowerUpNamesEnum.wm1.ToString(), "SWAP HANDS", "<b><color=#FFC35E>Swapper\nSwap</color></b> your hand with the opponent's hand.", "", 0, Constants.PlayerCardsTag, Constants.EnemyCardsTag);
+        (PowerUpNamesEnum.wm1.ToString(), "SWAP HANDS", "<b><color=#FFC35E>Swapper\nSwap</color></b> your hand with the opponent's hand.", "", 3, Constants.PlayerCardsTag, Constants.EnemyCardsTag);
     /*8*/
     public PuStructInfo draw_two_player = new PuStructInfo
-        (PowerUpNamesEnum.fm1.ToString(), "DRAW 2 CARDS", "<b><color=#F03B37>Sacrifice\nDraw</color></b> two cards, <b><color=#F03B37>Burn</color></b>  and replace with one of yours.", "Choose a card and replace with one of yours", 2, Constants.PlayerCardsTag, Constants.DeckCardsTag);
+        (PowerUpNamesEnum.fm1.ToString(), "DRAW 2 CARDS", "<b><color=#F03B37>Sacrifice\nDraw</color></b> two cards, <b><color=#F03B37>Burn</color></b>  and replace with one of yours.", "Choose a card and replace with one of yours", 3, Constants.PlayerCardsTag, Constants.DeckCardsTag);
     /*16*/
     public PuStructInfo flip = new PuStructInfo
         (PowerUpNamesEnum.sflip.ToString(), "FLIP", "Reveal 1 card", "Choose a card to reveal", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
     /*17*/
     public PuStructInfo armagedon = new PuStructInfo
-        (PowerUpNamesEnum.fm2.ToString(), "ARMAGEDDON", "<b><color=#F03B37>Armageddon\nBurn</color></b> random cards"/*most the cards in play and replace them with new ones.*/, "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.fm2.ToString(), "ARMAGEDDON", "<b><color=#F03B37>Armageddon\nBurn</color></b> random cards"/*most the cards in play and replace them with new ones.*/, "", 3, Constants.AllCardsTag, Constants.PoolCardTag);
     /*18*/
     public PuStructInfo block_enemy_card = new PuStructInfo
         (PowerUpNamesEnum.i1.ToString(), "FREEZE ENEMY CARD", "<b><color=#02C8FF>Freeze</color></b> one of the opponent's cards, making it un-moveable.", "Choose a card to <color=#02C8FF>freeze</color>", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
@@ -51,15 +51,15 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         (PowerUpNamesEnum.i3.ToString(), "FREEZE PLAYER CARD", "<b><color=#02C8FF>Freeze</color></b> one of your cards, making it un-moveable.", "Choose a card to <color=#02C8FF>freeze</color>", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
     /*21*/
     public PuStructInfo block_player_hand = new PuStructInfo
-        (PowerUpNamesEnum.im1.ToString(), "FREEZE PLAYER HAND", "<b><color=#02C8FF>Igloo\nFreeze</color></b> your hand, making it un-moveable.", "", 0, Constants.PlayerCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.im1.ToString(), "FREEZE PLAYER HAND", "<b><color=#02C8FF>Igloo\nFreeze</color></b> your hand, making it un-moveable.", "", 3, Constants.PlayerCardsTag, Constants.PoolCardTag);
 
     /*22*/
     public PuStructInfo strighter = new PuStructInfo
-        (PowerUpNamesEnum.sm2.ToString(), "Strighter", "Achive stright with four cards until the end of the round.", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.sm2.ToString(), "Strighter", "Achive stright with four cards until the end of the round.", "", 3, Constants.AllCardsTag, Constants.PoolCardTag);
 
     /*23*/
     public PuStructInfo flusher = new PuStructInfo
-        (PowerUpNamesEnum.sm3.ToString(), "Flusher", "Achive flush with four cards until the end of the round.", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.sm3.ToString(), "Flusher", "Achive flush with four cards until the end of the round.", "", 3, Constants.AllCardsTag, Constants.PoolCardTag);
 
     /*24*/
     public PuStructInfo smoke_player = new PuStructInfo
@@ -75,28 +75,28 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
 
     /*27*/
     public PuStructInfo ghost_player = new PuStructInfo
-        (PowerUpNamesEnum.sm1.ToString(), "GHOST", "Add a ghost card to your hand.", "", 0, Constants.PlayerCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.sm1.ToString(), "GHOST", "Add a ghost card to your hand.", "", 3, Constants.PlayerCardsTag, Constants.PoolCardTag);
     /*28*/
     public PuStructInfo player_value_up_2 = new PuStructInfo
-        (PowerUpNamesEnum.s4.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.t1.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
     /*29*/
     public PuStructInfo player_value_down_2 = new PuStructInfo
-        (PowerUpNamesEnum.s5.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.t2.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.PlayerCardsTag, Constants.PoolCardTag);
     /*30*/
-    public PuStructInfo board_value_up_2 = new PuStructInfo
-        (PowerUpNamesEnum.s6.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
+    public PuStructInfo enemy_value_up_2 = new PuStructInfo
+        (PowerUpNamesEnum.t3.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
     /*31*/
-    public PuStructInfo board_value_down_2 = new PuStructInfo
-        (PowerUpNamesEnum.s7.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
+    public PuStructInfo enemy_value_down_2 = new PuStructInfo
+        (PowerUpNamesEnum.t4.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.EnemyCardsTag, Constants.PoolCardTag);
     /*32*/
     public PuStructInfo smoke_turn_river = new PuStructInfo
-        (PowerUpNamesEnum.sm4.ToString(), "Smoke", "Smoke the turn and the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them", "", 0, Constants.BoardCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.sm4.ToString(), "Smoke", "Smoke the turn and the river. Those cards are now untargetable (Except for wind), and the Opponent can't see them", "", 3, Constants.BoardCardsTag, Constants.PoolCardTag);
     /*33*/
     public PuStructInfo iceagedon = new PuStructInfo
-        (PowerUpNamesEnum.im2.ToString(), "Iceagedon", "<b><color=#02C8FF>Icegeddon\nFreeze</color></b> random cards", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.im2.ToString(), "Iceagedon", "<b><color=#02C8FF>Icegeddon\nFreeze</color></b> random cards", "", 3, Constants.AllCardsTag, Constants.PoolCardTag);
     /*34*/
     public PuStructInfo tornado = new PuStructInfo
-        (PowerUpNamesEnum.wm2.ToString(), "Tornado", "<b><color=#FFC35E>Tornado\nSwap</color></b> random cards", "", 0, Constants.AllCardsTag, Constants.PoolCardTag);
+        (PowerUpNamesEnum.wm2.ToString(), "Tornado", "<b><color=#FFC35E>Tornado\nSwap</color></b> random cards", "", 3, Constants.AllCardsTag, Constants.PoolCardTag);
     /*35*/
     public PuStructInfo esFire = new PuStructInfo
         (PowerUpNamesEnum.fp.ToString(), "fp", "<size=110%><b><color=#F03B37>Burn</color> two cards of your choise.</b>\n<size=50%>\n<b><size=90%>*use 3 <color=#F03B37>Fire</color> Ninja Card to unlock", "Choose two cards to <color=#F03B37>burn</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
@@ -106,6 +106,23 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
     /*37*/
     public PuStructInfo esWind = new PuStructInfo
         (PowerUpNamesEnum.wp.ToString(), "wp", "<size=110%><b><color=#FFC35E>SWAP</color> two cards of your choise.</b>\n<size=50%>\n<b><size=90%>*use 3 <color=#FFC35E>Wind</color> Ninja Card to unlock", "Choose two cards to <color=#FFC35E>swap</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
+    /*38*/
+    public PuStructInfo board_value_up_2 = new PuStructInfo
+        (PowerUpNamesEnum.t5.ToString(), "Value", "Add 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
+    /*39*/
+    public PuStructInfo board_value_down_2 = new PuStructInfo
+        (PowerUpNamesEnum.t6.ToString(), "Value", "Subtract 2 of the value of the selected card.", "Choose one card to change its value", 1, Constants.BoardCardsTag, Constants.PoolCardTag);
+    /*40*/
+    public PuStructInfo techDr = new PuStructInfo
+        (PowerUpNamesEnum.tm1.ToString(), "Value", "Change the value of random cards.", "", 2, Constants.PlayerCardsTag, Constants.PoolCardTag);
+    /*41*/
+    public PuStructInfo esTech = new PuStructInfo
+        (PowerUpNamesEnum.wp.ToString(), "tp", "<size=110%><b><color=#FFC35E>SWAP</color> two cards of your choise.</b>\n<size=50%>\n<b><size=90%>*use 3 <color=#FFC35E>Tech/color> Ninja Card to unlock", "Choose two cards to <color=#FFC35E>swap</color>", 2, Constants.AllCardsTag, Constants.PoolCardTag);
+    /*42*/
+    public PuStructInfo techgeddon = new PuStructInfo
+        (PowerUpNamesEnum.tm2.ToString(), "Value", "Change the value of random cards.", "", 3, Constants.AllCardsTag, Constants.PoolCardTag);
+
+
 
     /*9*/
     public PuStructInfo shuffle_board = new PuStructInfo
@@ -179,14 +196,22 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
                 return ghost_board;
             case nameof(PowerUpNamesEnum.sm1):
                 return ghost_player;
-            case nameof(PowerUpNamesEnum.s4):
+            case nameof(PowerUpNamesEnum.t1):
                 return player_value_up_2;
-            case nameof(PowerUpNamesEnum.s5):
+            case nameof(PowerUpNamesEnum.t2):
                 return player_value_down_2;
-            case nameof(PowerUpNamesEnum.s6):
+            case nameof(PowerUpNamesEnum.t3):
+                return enemy_value_up_2;
+            case nameof(PowerUpNamesEnum.t4):
+                return enemy_value_down_2;
+            case nameof(PowerUpNamesEnum.t5):
                 return board_value_up_2;
-            case nameof(PowerUpNamesEnum.s7):
+            case nameof(PowerUpNamesEnum.t6):
                 return board_value_down_2;
+            case nameof(PowerUpNamesEnum.tm1):
+                return techDr;
+            case nameof(PowerUpNamesEnum.tm2):
+                return techgeddon;
             case nameof(PowerUpNamesEnum.sm4):
                 return smoke_turn_river;
             case nameof(PowerUpNamesEnum.im2):
@@ -199,6 +224,8 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
                 return esIce;
             case nameof(PowerUpNamesEnum.wp):
                 return esWind;
+            case nameof(PowerUpNamesEnum.tp):
+                return esTech;
 
                 /*draw_all = 3,
                 shuffle_board = 9,
@@ -261,16 +288,21 @@ public class PowerUpStruct : Singleton<PowerUpStruct>
         s2 = 25, //smoke_board
         s3 = 26, //ghost_board
         sm1 = 27, //ghost_player
-        s4 = 28, // player value up 2
-        s5 = 29, //player value down 2
-        s6 = 30, //board value up 2
-        s7 = 31, //board value down 2
+        t1 = 28, // player value up 2
+        t2 = 29, //player value down 2
+        t3 = 30, //enemy value up 2
+        t4 = 31, //enemy value down 2
         sm4 = 32, //smoke turn river
         im2 = 33, //smoke turn river
         wm2 = 34, //smoke turn river
         fp = 35, //smoke turn river
         ip = 36, //smoke turn river
         wp = 37, //smoke turn river
+        t5 = 38, //board value up 2
+        t6 = 39, //board value down 2
+        tm1 = 40, //drTech
+        tp = 41, //smoke turn river
+        tm2 = 42, //rainTech
     }
 
     #region // PuInfo

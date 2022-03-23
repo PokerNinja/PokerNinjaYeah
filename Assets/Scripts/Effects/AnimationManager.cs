@@ -198,10 +198,10 @@ public class AnimationManager : Singleton<AnimationManager>
         }
         else
         {
-
+            bool fadeInProgress = true;
             spriteRenderer.color = new Color(r, g, b, dissolveAmount);
             //FIXIT
-            while (dissolveAmount != alphaTarget)
+            while (fadeInProgress)
             {
                 //yield return new WaitForFixedUpdate();
                 yield return null;
@@ -217,11 +217,9 @@ public class AnimationManager : Singleton<AnimationManager>
                 spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
                 if (dissolveAmount >= 1 || dissolveAmount <= 0)
                 {
-                    // Debug.LogError("NEEDTOFIX? " + dissolveAmount);
-                    // Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
-
-                    spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, alphaTarget));
+                    spriteRenderer.color = new Color(r, g, b, alphaTarget);
                     OnFinish?.Invoke();
+                   // fadeInProgress = false;
                     break;
                 }
             }
@@ -279,22 +277,12 @@ public class AnimationManager : Singleton<AnimationManager>
     public IEnumerator AlphaCanvasGruop(CanvasGroup canvas, bool fadeIn, float duration, Action OnFinish)
     {
 
-        float alphaAmount = 1;
+        float alphaAmount = canvas.alpha;
         float alphaTarget = 0;
         if (fadeIn)
         {
-            alphaAmount = 0;
             alphaTarget = 1;
         }
-        /*if (canvas.alpha == alphaTarget)
-        {
-            OnFinish?.Invoke();
-            Debug.LogError("IM ALREADY ALPHAING");
-        }
-        else
-        {*/
-        canvas.alpha = alphaAmount;
-        //FIXIT
         if (alphaAmount == alphaTarget)
         {
             OnFinish?.Invoke();
@@ -449,10 +437,23 @@ public class AnimationManager : Singleton<AnimationManager>
         }
     }
 
-    public IEnumerator FreezeEffect(bool freeze, bool isFaceDown, SpriteRenderer targetObj, Material targetMaterial, Action onFinishDissolve)
+    public IEnumerator FreezeEffect(bool freeze, bool isFaceDown, bool withGlithc, SpriteRenderer targetObj, Material targetMaterial, Action onFinishDissolve)
     {
         float freezeDuration = Values.Instance.FreezeDuration;
-        targetObj.material = targetMaterial;
+        if (!withGlithc)
+            targetObj.material = targetMaterial;
+        /*   if (withGlithc)
+           {
+               targetMaterial.SetFloat("_GlitchAmount", 15f);
+               targetMaterial.SetFloat("_ChromAberrAmount", 0.26f);
+               targetMaterial.SetFloat("_OverlayBlend", 1f);
+               Debug.LogError("with");
+           }
+           else
+           {
+
+               Debug.LogError("without");
+           }*/
         // targetObj.material.SetColor("_FadeBurnColor", Color.blue);
         // float tiling = UnityEngine.Random.Range(0.2f, 0.4f);
         // targetObj.material.SetTextureScale("_FadeTex", new Vector2(tiling, tiling));
@@ -482,7 +483,7 @@ public class AnimationManager : Singleton<AnimationManager>
                 dissolveAmount -= Time.deltaTime / freezeDuration;
             }
             targetObj.material.SetFloat("_FadeAmount", dissolveAmount);
-            if (dissolveAmount >= fullFreezeAmount || dissolveAmount <= -0.1f)
+            if (dissolveAmount >= fullFreezeAmount || dissolveAmount <= -0.1f) //PO
             {
                 onFinishDissolve?.Invoke();
                 if (!freeze)
@@ -710,7 +711,7 @@ public class AnimationManager : Singleton<AnimationManager>
         yield return new WaitForSeconds(delay);
         beginAction?.Invoke();
         float startTime = Time.time;
-        float t =0;
+        float t = 0;
         float speed = 1f;
         float time = Time.time;
         while (selector.position != targetPosition)
@@ -727,10 +728,9 @@ public class AnimationManager : Singleton<AnimationManager>
         yield break;
     }
 
-    public IEnumerator ScaleHp(Transform selector, float damage, Action shakeCamera)
+    public IEnumerator ScaleHp(Transform selector, float damage, Action Perfect)
     {
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.HpDrop, true);
-        shakeCamera?.Invoke();
         float movementDuration = Values.Instance.hpScaleDuration;
         float startTime = Time.time;
         float t = 0;
@@ -750,7 +750,7 @@ public class AnimationManager : Singleton<AnimationManager>
             yield return null;
             if (selector.localPosition == targetPosition)
             {
-                //  endAction?.Invoke();
+                Perfect?.Invoke();
                 break;
             }
         }
@@ -1439,6 +1439,9 @@ public class AnimationManager : Singleton<AnimationManager>
             else
             {
                 cardUi.spriteRenderer.material.SetColor("_OutlineColor", visionColor);
+                /*if(enable)
+                StartCoroutine(UpdateValue(!enable, "_OutlineAlpha", Values.Instance.outlineFadeDuration, cardUi.spriteRenderer.material, alphaAmoint, null));
+                else*/
                 cardUi.spriteRenderer.material.SetFloat("_OutlineAlpha", alphaAmoint);
             }
         }
@@ -1462,7 +1465,7 @@ public class AnimationManager : Singleton<AnimationManager>
               StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, null));
           }
       }*/
-    public void AnimateWinningHandToBoard2(List<CardUi> winningPlayerCards, int cardToGlow, List<CardUi> losingBoardCards, Transform[] boardTransform, Action UpdateValueEndRoutine)
+    public async void AnimateWinningHandToBoard2(List<CardUi> winningPlayerCards, int cardToGlow, List<CardUi> losingBoardCards, Transform[] boardTransform, Action UpdateValueEndRoutine)
     {
 
         Vector3 targetScale = new Vector3(0.75f, 0.75f, 0.75f);
@@ -1473,6 +1476,7 @@ public class AnimationManager : Singleton<AnimationManager>
             // MUST MAKE BETTER
             StartCoroutine(card.FadeBurnOut(card.spriteRenderer.material, false, () => battleSystem.cardsDeckUi.RestAfterDestroy(card, null)));
         }
+        await Task.Delay(600);
         VisionEffect(winningPlayerCards, cardToGlow, true);
         for (int i = 0; i < 5; i++)
         {

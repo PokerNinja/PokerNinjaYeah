@@ -26,9 +26,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     ObjectPooler objectPooler;
 
-
-
-
     public CardSlot playerCardAParent;
     public CardSlot playerCardBParent;
     public CardSlot enemyCardAParent;
@@ -53,6 +50,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     public string playerShadowCard, enemyShadowCard;
     public Material burnMaterial;
     public Material dissolveMaterial;
+    public Material glitchMaterial;
     public Material ghostMaterial;
     public Material shadowMaterial;
     public Transform[] boardTransform;
@@ -223,8 +221,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return new Card(card.GetLowerValuer(), newSuit);
     }
 
-
-
     private void ReplaceUiCardForStrighter(string oldCard, string newCard)
     {
         Debug.LogError("o " + oldCard);
@@ -291,6 +287,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         newCardsOptions.Add(new Card(CardEnum.Eight, targetSiut));
         return newCardsOptions;
     }
+
 
     internal void InitDeckFromServer(string[] deckFromDB)
     {
@@ -402,30 +399,30 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     public CardUi GetCardUiByName(string cardTarget)
     {
         Debug.Log("FoundTB " + cardTarget);
-/*        List<CardUi> listTarget;
-        switch (cardTarget[0])
-        {
-            case 'P':
-                listTarget = playerCardsUi;
-                break;
-            case 'E':
-                listTarget = enemyCardsUi;
-                break;
-            case 'D':
-                listTarget = extraDeckCardsUi;
-                break;
-            default:
-                listTarget = boardCardsUi;
-                break;
-        }
-        for (int i = 0; i < listTarget.Count; i++)
-        {
-            if (listTarget[i].cardPlace.Equals(cardTarget))
-            {
-                Debug.Log("Found");
-                return listTarget[i];
-            }
-        }*/ //MAKE IT BETTER
+        /*        List<CardUi> listTarget;
+                switch (cardTarget[0])
+                {
+                    case 'P':
+                        listTarget = playerCardsUi;
+                        break;
+                    case 'E':
+                        listTarget = enemyCardsUi;
+                        break;
+                    case 'D':
+                        listTarget = extraDeckCardsUi;
+                        break;
+                    default:
+                        listTarget = boardCardsUi;
+                        break;
+                }
+                for (int i = 0; i < listTarget.Count; i++)
+                {
+                    if (listTarget[i].cardPlace.Equals(cardTarget))
+                    {
+                        Debug.Log("Found");
+                        return listTarget[i];
+                    }
+                }*/ //MAKE IT BETTER
         List<CardUi> allCardsUi = playerCardsUi.Concat(enemyCardsUi).Concat(boardCardsUi).Concat(extraDeckCardsUi).ToList();
         for (int i = 0; i < allCardsUi.Count; i++)
         {
@@ -462,6 +459,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     public void RestAfterDestroy(CardUi cardToDestroy, Action OnEnd)
     {
+        RemoveFromList(cardToDestroy);
         ResetCardUI(cardToDestroy);
         cardToDestroy.Activate(false);
         OnEnd?.Invoke();
@@ -474,6 +472,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardToReset.freeze = false;
             cardToReset.spriteRenderer.material.SetColor("_FadeBurnColor", Color.yellow);
         }
+        EnableGlitchValues(false, cardToReset.spriteRenderer.material);
+        cardToReset.glitch = false;
         cardToReset.cardPlace = "pool";
         cardToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
         cardToReset.spriteRenderer.material.SetFloat("_ShakeUvSpeed", 0f);
@@ -739,7 +739,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 cardScale = cardVectorBoard;
             }
         }
-
         cardObject.name = cardPlace;
         cardObject.transform.position = new Vector3(cardTransform.position.x, cardTransform.position.y, 1); ;
         cardObject.transform.localScale = cardTransform.localScale;
@@ -762,20 +761,17 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardObject.spriteRenderer.material = ghostMaterial;
             cardObject.LoadSprite(true);
             AddCardToList(cardTag, cardObject, indexToInsert);
-
             StartCoroutine(cardObject.FadeGhost(true, disableDarkScreen));
         }
         else
         {
-
-            //cardObject.spriteRenderer.material = dissolveMaterial;
+            AddCardToList(cardTag, cardObject, indexToInsert);
             StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
         Values.Instance.cardDrawMoveDuration, DarkCardUnderSmoke, () =>
             cardObject.CardReveal(!isFaceDown)
            , disableDarkScreen, () =>
         {
             closeDrawer?.Invoke();
-            AddCardToList(cardTag, cardObject, indexToInsert);
         }));
         }
 
@@ -1090,20 +1086,33 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return false;
     }
 
-    internal bool IsOneCardFromHandsFreeze()
+    internal bool IsOneCardFromHandsFreeze(bool alsoGlitch)
     {
         if (playerCardsUi[0].freeze || playerCardsUi[1].freeze || enemyCardsUi[0].freeze || enemyCardsUi[1].freeze)
         {
-            return true;
+            if (alsoGlitch)
+            {
+                if (playerCardsUi[0].glitch || playerCardsUi[1].glitch || enemyCardsUi[0].glitch || enemyCardsUi[1].glitch)
+                    return true;
+            }
+            else
+                return true;
         }
         return false;
     }
-    internal int GetHowManyAvailableUnfrozenCards()
+    internal int GetHowManyAvailableUnfrozenCards(bool alsoGlitch)
     {
         int unFrozenCounter = 0;
         foreach (CardUi card in GetListByTag(Constants.AllCardsTag))
         {
-            if (!card.freeze)
+            if (alsoGlitch)
+            {
+                if (!card.freeze && !card.glitch)
+                {
+                    unFrozenCounter++;
+                }
+            }
+            else if (!card.freeze)
             {
                 unFrozenCounter++;
             }
@@ -1533,7 +1542,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             extraDeckCardsUi[1].SetSelection(true, "", "");
         }
         yield return new WaitForSecondsRealtime(0.85f);
-        Debug.Log("EndOFDraw@ =" );
+        Debug.Log("EndOFDraw@ =");
 
         endAction?.Invoke();
     }
@@ -1590,8 +1599,15 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     private void DestroyWithDelay(string cardPlace, Action OnEnd)
     {
         CardUi cardToDestroy = GetCardUiByName(cardPlace);
-        RemoveFromList(cardToDestroy);
+        // RemoveFromList(cardToDestroy);
         //boardCardsUi.Remove(cardToDestroy); //TODO why this
+        Color burnColor = Values.Instance.burnColor;
+        Color outlineColor = Values.Instance.burnOutlineColor;
+        if (cardToDestroy.glitch)
+        {
+            burnColor = Values.Instance.burnColorTech;
+            outlineColor = Values.Instance.burnOutlineColorTech;
+        }
         if (cardToDestroy == null)
         {
             Debug.LogError("Destroy: fck");
@@ -1603,6 +1619,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 cardToDestroy.cardMark.SetActive(false);
             }
             Material targetMaterial = burnMaterial;
+            targetMaterial.SetColor("_FadeBurnColor", burnColor);
+            targetMaterial.SetColor("_OutlineColor", outlineColor);
             bool changeOffset = true;
             if (cardPlace.Contains("Ghost"))
             {
@@ -1610,13 +1628,21 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 changeOffset = false;
             }
             StartCoroutine(cardToDestroy.FadeBurnOut(targetMaterial, changeOffset, () =>
+            {
+                OnEnd?.Invoke();
+                //RestAfterDestroy(cardToDestroy, OnEnd);
+            }
             //  Destroy(cardToDestroy)));
-            RestAfterDestroy(cardToDestroy, OnEnd)));
+            ));
         }
         else
         {
             StartCoroutine(cardToDestroy.Dissolve(false, dissolveMaterial, 0f, () =>
-                      RestAfterDestroy(cardToDestroy, OnEnd)));
+            {
+                OnEnd?.Invoke();
+                //  RemoveFromList(cardToDestroy);
+                //RestAfterDestroy(cardToDestroy, OnEnd);
+            }));
         }
     }
 
@@ -1627,14 +1653,15 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Card newCard = deck.Pop();
         UpdateCardsList(cardPlace, newCard, true);
         int indexToInsert = ConvertCardPlaceToIndex(cardPlace);
-        if (isFirstCard)
-        {
-            AnimateDrawer(true, () => CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert));
-        }
-        else
-        {
-            CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert);
-        }
+        CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert);
+        /* if (isFirstCard)
+         {
+             AnimateDrawer(true, () => CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert));
+         }
+         else
+         {
+             CardCreatorUi(newCard, isFlip, true, GetParentByPlace(cardPlace), cardPlace, disableDarkScreen, isLastCard, indexToInsert);
+         }*/
     }
 
     internal void UpdateCardValue(string cardTarget, int value, Action disableDarkScreen)
@@ -1643,20 +1670,34 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         Card pickedCard = Card.StringToCard(pickedCardUi.cardDescription);
         Card newCard = new Card(pickedCard.ConvertIntToValue(pickedCard.GetCardValueInSimpleInt() + value), pickedCard.CardSuit);
         CardUi targetCardUi = GetCardUiByDescription(newCard.ToString(CardToStringFormatEnum.ShortCardName));
+        pickedCardUi.glitch = true;
         if (targetCardUi != null)
         {
+            targetCardUi.glitch = true;
             targetCardUi.cardDescription = pickedCard.ToString(CardToStringFormatEnum.ShortCardName);
-            StartCoroutine(GlitchEffect(targetCardUi, targetCardUi.GetisFaceDown(), null));
+            StartCoroutine(GlitchEffect(targetCardUi, targetCardUi.GetisFaceDown(), () =>
+            {
+                if (targetCardUi.freeze)
+                    pickedCardUi.spriteRenderer.material.SetFloat("_GlitchAmount", 0);
+            }));
             UpdateCardsList(targetCardUi.cardPlace, pickedCard, true);
         }
         else
         {
             ReplaceCardsInDeck(newCard, pickedCard);
         }
-
         pickedCardUi.cardDescription = newCard.ToString(CardToStringFormatEnum.ShortCardName);
         StartCoroutine(GlitchEffect(pickedCardUi, pickedCardUi.GetisFaceDown(), disableDarkScreen));
         UpdateCardsList(pickedCardUi.cardPlace, newCard, true);
+        PlayGlitchSound(value);
+    }
+
+    private void PlayGlitchSound(int value)
+    {
+        if (value > 0)
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.GlitchUp, false);
+        else
+            SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.GlitchDown, false);
     }
 
     private void ReplaceCardsInDeck(Card targetCard, Card newCard)
@@ -1679,33 +1720,45 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     private IEnumerator GlitchEffect(CardUi pickedCardUi, bool isFaceDown, Action Reset)
     {
-        //pickedCardUi.spriteRenderer.material = glitchMaterial;
-        yield return new WaitForSeconds(Values.Instance.durationGlitchBeforeChange);
-        EnableGlitchValues(true, pickedCardUi.spriteRenderer.material);
+        //yield return new WaitForSeconds(Values.Instance.durationGlitchBeforeChange);
+        if (!pickedCardUi.freeze)
+            pickedCardUi.spriteRenderer.material = glitchMaterial;
+        Action changeSprite = null;
+        float duration = Values.Instance.glitchEffectDuration;
         if (!isFaceDown)
         {
-            pickedCardUi.LoadSprite(true);
+            changeSprite = () => pickedCardUi.LoadSprite(true);
         }
+        StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_OverlayBlend", duration, pickedCardUi.spriteRenderer.material, 1f, changeSprite));
+        StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_ColorSwapBlend", duration, pickedCardUi.spriteRenderer.material, 1f, null));
+        StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_ChromAberrAmount", duration, pickedCardUi.spriteRenderer.material, 0.7f, null));
+        pickedCardUi.spriteRenderer.material.SetFloat("_GlitchAmount", 20);
         yield return new WaitForSeconds(Values.Instance.durationGlitchAfterChange);
-        EnableGlitchValues(false, pickedCardUi.spriteRenderer.material);
-        // pickedCardUi.spriteRenderer.material = dissolveMaterial;
+        StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_ColorSwapBlend", duration, pickedCardUi.spriteRenderer.material, 0f, null));
+        EnableGlitchValues(true, pickedCardUi.spriteRenderer.material);
         Reset?.Invoke();
     }
 
-    private void EnableGlitchValues(bool enable, Material targetMaterial)
+    public void EnableGlitchValues(bool enable, Material targetMaterial)
     {
-        float hueTarget = 0;
-        float glitchAmount = 0;
-        float flickerAmount = 0;
+        Debug.Log("HEYGLITCH");
         if (enable)
         {
-            hueTarget = 44f;
-            glitchAmount = 16.9f;
-            flickerAmount = 0.101f;
+            targetMaterial.SetFloat("_GlitchAmount", GenerateRandom(1.1f, 1.4f));
+            targetMaterial.SetFloat("_ChromAberrAmount", 0.26f);
         }
-        targetMaterial.SetFloat("_HsvShift", hueTarget);
-        targetMaterial.SetFloat("_GlitchAmount", glitchAmount);
-        targetMaterial.SetFloat("_FlickerPercent", flickerAmount);
+        else
+        {
+            targetMaterial.SetFloat("_GlitchAmount", 18f);
+            targetMaterial.SetFloat("_ChromAberrAmount", 0.4f);
+            StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_OverlayBlend", Values.Instance.glitchEffectDuration, targetMaterial, 0f,
+                () =>
+                {
+                    targetMaterial.SetFloat("_GlitchAmount", 0);
+                    targetMaterial.SetFloat("_ChromAberrAmount", 0);
+                }
+                ));
+        }
     }
 
     internal void SwapTwoCards(string cardToSwap, string cardTarget, Action DisableDarkScreen)
@@ -1926,44 +1979,51 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         }
     }
 
-    private void AnimateDrawer(bool open, Action action)
+    public void AnimateDrawer(bool open, Action action)
     {
-        isDrawerOpen = open;
         float targetX;
-        if (open)
+        if (open && !isDrawerOpen)
         {
+            isDrawerOpen = true;
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
-           //s targetX = -0.22f;
+            //s targetX = -0.22f;
             targetX = -1.15f;
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
             new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, action));
         }
-        else
+        else if (!open && isDrawerOpen)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CloseDrawer, false);
             targetX = 1.1f;
             action?.Invoke();
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
-            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, null));
+            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, () => isDrawerOpen = false));
         }
     }
     public void DeleteAllCards(Action DealHands)
     {
         ghostCardUi = null;
         ghostCard = null;
+        Vector3 targetPos;
         ResetUiLists();
         foreach (CardUi cardToDestroy in FindAllCardsObjects())
         {
-            if (cardToDestroy.cardMark.activeSelf)
-            {
-                cardToDestroy.cardMark.SetActive(false);
-            }
-            StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => RestAfterDestroy(cardToDestroy, null)));
+            //cardToDestroy.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
+            StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_OutlineAlpha", Values.Instance.outlineFadeDuration, cardToDestroy.spriteRenderer.material, 0, null));
+            // StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => RestAfterDestroy(cardToDestroy, null)));
+            targetPos = new Vector3(cardToDestroy.transform.position.x + 15, cardToDestroy.transform.position.y, cardToDestroy.transform.position.z);
+            StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(cardToDestroy.transform, GenerateRandom(0.2f, 0.9f), targetPos, 3f, null, () => RestAfterDestroy(cardToDestroy, null)));
         }
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Dissolve, true);
         DealHands();
     }
 
+
+
+    internal float GenerateRandom(float v1, float v2)
+    {
+        return UnityEngine.Random.Range(v1, v2);
+    }
     public void handToPrint(List<Card> cardsList)
     {
         String totalCards = " ";
@@ -1979,7 +2039,8 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         if (puElement.Equals("f"))
         {
             ncAction = Constants.NcAction.Defrost;
-        }else if (puElement.Equals("i"))
+        }
+        else if (puElement.Equals("i"))
         {
             ncAction = Constants.NcAction.Shatter;
         }

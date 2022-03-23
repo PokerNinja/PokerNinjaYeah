@@ -18,6 +18,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     //public SpriteRenderer cardSelectionRenderer;
     public GameObject cardMark;
     public bool freeze;
+    public bool glitch;
     public bool isGhost;
     public Constants.CardsOwener whosCards = Constants.CardsOwener.Pool;
     private bool flipInProgress = false;
@@ -59,7 +60,7 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
     {
         spriteRenderer.material.SetFloat("_FadeAmount", -0.1f);
         spriteRenderer.material.SetFloat("_OutlineAlpha", 0f);
-        EnableSelecetPositionZ(false);
+        //EnableSelecetPositionZ(false);
         cardMark.SetActive(false);
         SoundManager.Instance.RandomSoundEffect(0);
     }
@@ -118,26 +119,36 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             StartCoroutine(AnimationManager.Instance.PulseSize(true, gameObject.transform, 1.2f, 0.135f, true, () =>
             {
                 Constants.TemproryUnclickable = false;
-                if (Constants.TUTORIAL_MODE)
-                {
-                StartCoroutine(BattleSystemTuto.Instance.OnCardsSelectedForPU(cardPlace, transform.position));
-                }
-                else
-                {
                 StartCoroutine(BattleSystem.Instance.OnCardsSelectedForPU(cardPlace, transform.position));
-                }
-
             }));
         }
-        else if(Constants.cardsToSelectCounter > 0 && freeze)
+        else if(Constants.cardsToSelectCounter > 0  && freeze)
         {
             BattleSystem.Instance.Interface.FreezeSign(transform.position);
         }
+        else if(Constants.cardsToSelectCounter > 0  && glitch)
+        {
+            BattleSystem.Instance.Interface.GlitchedSign(transform.position);
+            StartCoroutine(CantClickGlitch());
+        }
+        else if(!clickbleForPU && BattleSystem.Instance.firstCardTargetPU.Equals(cardPlace) && Constants.cardsToSelectCounter == 1)
+        {
+            BattleSystem.Instance.ResetNC();
+        }
         else
         {
+            if (glitch)
+                StartCoroutine(CantClickGlitch());
             StartCoroutine(AnimationManager.Instance.Shake(spriteRenderer.material, Values.Instance.disableClickShakeDuration));
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
+    }
+
+    private IEnumerator CantClickGlitch()
+    {
+        spriteRenderer.material.SetFloat("_GlitchAmount", 20f);
+        yield return new WaitForSeconds(Values.Instance.disableClickShakeDuration);
+        spriteRenderer.material.SetFloat("_GlitchAmount", 1.6f);
     }
 
     internal void LoadNewFlusherSprite()
@@ -152,14 +163,22 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
 
     public void SetSelection(bool selectionEnable, string puElement, string puName)
     {
+        //Todo WTF
         bool okToSelect = true;
         if (freeze)
         {
-            if (puName.Equals("s1") || puElement.Equals("f")|| puElement.Equals("i") || !selectionEnable)
+            if (puName.Equals("s1") || puElement.Equals("f")|| puElement.Equals("i")||  !selectionEnable)
             {
                 okToSelect = true;
             }
             else
+            {
+                okToSelect = false;
+            }
+        }
+        if (glitch)
+        {
+            if (puElement.Equals("w"))
             {
                 okToSelect = false;
             }
@@ -176,21 +195,8 @@ public class CardUi : MonoBehaviour, IPointerClickHandler
             }
         }
 
-
         if (okToSelect)
         {
-            //   if (BattleSystem.Instance.cardsToSelectCounter > 0)
-            /*if (Values.Instance.TUTORIAL_MODE)
-            {
-                if (cardPlace.Equals(Constants.PlayerCard1) || cardPlace.Equals(Constants.EnemyCard2) || cardPlace.Equals(Constants.BFlop2))
-                {
-                    clickbleForPU = selectionEnable;
-                }
-            }
-            else
-            {
-                clickbleForPU = selectionEnable;
-            }*/
             clickbleForPU = selectionEnable;
 
             //cardSelection.SetActive(selectionEnable);

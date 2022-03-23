@@ -9,9 +9,10 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: CardUiDefault
   m_Shader: {fileID: 4800000, guid: a36b7719ff0465b42ab1407d67672c5f, type: 3}
-  m_ShaderKeywords: COLORRAMPOUTLINE_ON ETC1_EXTERNAL_ALPHA FADE_ON GRADIENT2COL_ON
-    GRADIENTCOLORRAMP_ON OUTBASE_ON OUTDIST_ON OUTTEX_ON OVERLAYMULT_ON RADIALGRADIENT_ON
-    SHAKEUV_ON _COLORRAMPOUTLINE_ON _GRADISRADIAL_ON _OUTLINEDISTORTTOGGLE_ON _OUTLINETEXTOGGLE_ON
+  m_ShaderKeywords: COLORRAMPOUTLINE_ON ETC1_EXTERNAL_ALPHA FADE_ON GLITCH_ON GRADIENT2COL_ON
+    GRADIENTCOLORRAMP_ON OUTBASE_ON OUTDIST_ON OUTTEX_ON OVERLAYMULT_ON OVERLAY_ON
+    RADIALGRADIENT_ON SHAKEUV_ON SHINE_ON _COLORRAMPOUTLINE_ON _GRADISRADIAL_ON _OUTLINEDISTORTTOGGLE_ON
+    _OUTLINETEXTOGGLE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -62,9 +63,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OverlayTex:
-        m_Texture: {fileID: 2800000, guid: f96aebb9bcd1e3b44bafbb23b1bdac88, type: 3}
-        m_Scale: {x: 0.92, y: 0.5}
-        m_Offset: {x: 0, y: 0}
+        m_Texture: {fileID: 2800000, guid: 5437ac54c4b74574b9dff7441dc103d5, type: 3}
+        m_Scale: {x: 1.2, y: 1.2}
+        m_Offset: {x: -0.13, y: 0}
     - _ShineMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -129,7 +130,7 @@ Material:
     - _GhostColorBoost: 0
     - _GhostTransparency: 0.117
     - _GlitchAmount: 0
-    - _GlitchSize: 0.95
+    - _GlitchSize: 0.4
     - _Glow: 100
     - _GlowTexUsed: 0
     - _GradBlend: 0
@@ -188,9 +189,9 @@ Material:
     - _OutlineTexYSpeed: 0
     - _OutlineWidth: 0.064
     - _OverlayBlend: 0
-    - _OverlayGlow: 23.9
+    - _OverlayGlow: 1
     - _PinchUvAmount: 0
-    - _PixelateSize: 336
+    - _PixelateSize: 512
     - _PosterizeGamma: 0.75
     - _PosterizeNumColors: 33
     - _PosterizeOutline: 0
@@ -248,7 +249,7 @@ Material:
     - _HologramStripeColor: {r: 0, g: 0, b: 0, a: 1}
     - _InnerOutlineColor: {r: 0.76315784, g: 0, b: 1, a: 1}
     - _OutlineColor: {r: 1, g: 0.8926476, b: 0, a: 1}
-    - _OverlayColor: {r: 0.76315784, g: 0, b: 1, a: 1}
+    - _OverlayColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 1}
     - _ShineColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

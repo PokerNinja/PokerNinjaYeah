@@ -44,13 +44,9 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             onClick.Invoke();
         }
-        else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
+        else if (BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.HideDialog(false);
-        }
-        else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
-        {
-            BattleSystemTuto.Instance.HideDialog();
         }
 
     }
@@ -67,14 +63,11 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OND()
     {
-        if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
+        if ( !BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.ShowPuInfo(transform.position, false, false, "end", Constants.ReplacePuInfo);
         }
-        else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
-        {
-            BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, "end", Constants.ReplacePuInfo);
-        }
+        
     }
 
     public void StopTimer()
@@ -123,20 +116,23 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public IEnumerator StartTimer(float timerDuration)
     {
-        StartCoroutine(AnimateFillCounter());
-        yield return new WaitForSeconds(Values.Instance.delayTimerStart);
-        pause = false;
-        endTurnByPlayer = false;
-        updateTime = true;
-        totalTime = timerDuration;
-        countTimer = totalTime;
-        if (thereCanBeOnlyOne == null)
+        if (!Constants.TUTORIAL_MODE)
         {
-            thereCanBeOnlyOne = StartCoroutine(CountDown());
-        }
-        else
-        {
+            StartCoroutine(AnimateFillCounter());
+            yield return new WaitForSeconds(Values.Instance.delayTimerStart);
+            pause = false;
+            endTurnByPlayer = false;
+            updateTime = true;
+            totalTime = timerDuration;
+            countTimer = totalTime;
+            if (thereCanBeOnlyOne == null)
+            {
+                thereCanBeOnlyOne = StartCoroutine(CountDown());
+            }
+            else
+            {
 
+            }
         }
 
     }
@@ -296,6 +292,10 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (enable)
         {
             SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
+        }
+        else if (isLastSeconds)
+        {
+            SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, true);
         }
     }
 

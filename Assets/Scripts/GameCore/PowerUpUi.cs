@@ -86,16 +86,8 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnClick()
     {
-
-        if (Constants.TUTORIAL_MODE)
-        {
-            BattleSystemTuto.Instance.OnPuClick(this);
-        }
-        else
-        {
+        if (BattleSystem.Instance.tutoManager.step != 1)
             BattleSystem.Instance.OnPuClick(this);
-        }
-
         /*if (BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.HideDialog();
@@ -128,7 +120,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }*/
     }
 
-    
+
     public void OnPointerUp(PointerEventData eventData)
     {
 
@@ -139,14 +131,9 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             {
                 onClick.Invoke();
             }
-            else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
-            {
-                BattleSystemTuto.Instance.HideDialog();
-            }
-            else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
-            {
-                BattleSystem.Instance.HideDialog(puIndex != -1);
-            }
+
+            BattleSystem.Instance.HideDialog(puIndex != -1);
+
         }
         PressSprite(false);
     }
@@ -176,14 +163,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OND()
     {
-        if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
-        {
-            BattleSystem.Instance.ShowPuInfo(transform.position, puIndex != -1, puIndex == 1, puName, puDisplayName);
-        }
-        else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
-        {
-            BattleSystemTuto.Instance.ShowPuInfo(transform.position, puIndex == 1, puName, puDisplayName);
-        }
+        BattleSystem.Instance.ShowPuInfo(transform.position, puIndex != -1, puIndex == 1, puName, puDisplayName);
     }
 
 
@@ -225,7 +205,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             sprite = "pu_back";
         }
-        else if(isPlayer)
+        else if (isPlayer)
         {
             spriteRenderer.color = new Color(0.66f, 0.66f, 0.66f, 1f);
         }
@@ -258,7 +238,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             EnableShake(enable);
         }
         StartCoroutine(AnimationManager.Instance.DarkerAnimation(spriteRenderer, !enable, Values.Instance.puChangeColorDisableDuration, () => isClickable = enable));
-
+        BattleSystem.Instance.puDeckUi.energyCoster.AvailableEnergy(enable, puIndex);
         //StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, spriteRenderer.material, value, () => isClickable = enable));
     }
 
@@ -286,7 +266,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
 
- 
+
     public void AnimatePuUse(Action OnStart, Action OnEndRoutine3)
     {
         OnStart?.Invoke();
@@ -298,7 +278,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             /*StartCoroutine(AnimationManager.Instance.PulseSize(true, transform, 1.15f, 0.4f, true,
             () => StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3))));*/
             StartCoroutine(AnimationManager.Instance.SmoothMove(transform, new Vector3(transform.parent.position.x, transform.parent.position.y + 0.2f, transform.position.z),
-                new Vector3(transform.localScale.x * 1.05f, transform.localScale.y * 1.05f, 1f), 0.5f, null, () => EnableValuesForSelect(true), null, null));
+                new Vector3(transform.localScale.x * 1.05f, transform.localScale.y * 1.05f, 1f), 0.5f, () => EnableValuesForSelect(true), null, null, null));
 
             /*StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(transform.localScale.x * 1.1f, transform.localScale.y * 1.1f), 0.5f,
                 () => EnableValuesForSelect(true)));*/
@@ -322,7 +302,16 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             distortAmount = 0.17f;
             outlineAlpha = 1f;
+            float outlineWidth = 0.03f;
+            float outlineDistortAmount = 1.33f;
+            if (isMonster)
+            {
+                outlineWidth = 0.075f;
+                outlineDistortAmount = 2f;
+            }
             spriteRenderer.material.SetColor("_OutlineColor", GetColorFromElement(puElement));
+            spriteRenderer.material.SetFloat("_OutlineWidth", outlineWidth);
+            spriteRenderer.material.SetFloat("_OutlineDistortAmount", outlineDistortAmount);
         }
         else
         {
@@ -330,20 +319,27 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             StartCoroutine(AnimationManager.Instance.SmoothMove(transform, new Vector3(transform.parent.position.x, transform.parent.position.y, transform.position.z)
                 , new Vector3(1f, 1f, 1f), 0.5f, null, null, null, null));
         }
-        spriteRenderer.material.SetFloat("_OutlineAlpha", outlineAlpha);
+       // spriteRenderer.material.SetFloat("_OutlineAlpha", outlineAlpha);
         spriteRenderer.material.SetFloat("_DistortAmount", distortAmount);
+        StartCoroutine(AnimationManager.Instance.UpdateValue(!enable, "_OutlineAlpha", Values.Instance.outlineFadeDuration, spriteRenderer.material, outlineAlpha, null));
     }
 
     public void DissolvePu(float delayBefor, float duration, Action End, Action End2)
     {
         StartCoroutine(AnimationManager.Instance.FadeBurnPU(spriteRenderer.material, delayBefor, false, duration, null, End, End2));
     }
-    
 
-    public void DissolvePuToNc(Vector3 targetPosition, Action OnEnd)
+
+    public async void DissolveNcToEs(Vector3 targetPosition, Action FillEs, Action OnEnd)
     {
+        StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_OutlineAlpha", Values.Instance.outlineFadeDuration, spriteRenderer.material, 0f, null));
         Vector3 newTarget = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0, 0, 0), 7f, null, null, null, OnEnd));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0.4f, 0.4f, 0), Values.Instance.ncToEsDuration, 
+           null, null, null,OnEnd));
+        await Task.Delay(250);
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(spriteRenderer, false, Values.Instance.defaultFadeD, null));
+        await Task.Delay(130);
+        FillEs?.Invoke();
     }
 
     public void CardReveal(bool reveal, Action onFinish)
@@ -411,11 +407,11 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             case "w":
                 targetColor = Values.Instance.windVision;
                 break;
+            case "t":
+                targetColor = Values.Instance.techVision;
+                break;
             case "s":
                 targetColor = Values.Instance.shadowVision;
-                break;
-            case "e":
-                targetColor = Values.Instance.electricVision;
                 break;
         }
         return targetColor;

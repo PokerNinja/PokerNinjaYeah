@@ -8,6 +8,9 @@ public class Constants : Singleton<Constants>
 
     public readonly string volumeSoundKey = "music_key";
     public readonly string botEnergyKey = "bot_energy_key";
+    public readonly string botRaiseKey = "bot_raise_key";
+    public readonly string botEsElementKey = "bot_es_e_key";
+    public readonly string botEsCounterKey = "bot_es_c_key";
     public readonly string PLAYER_WIN_BOT = "PLAYER_WIN_BOT";
     public readonly string PLAYER_LOSE_BOT = "PLAYER_LOSE_BOT";
     public const string PlayerCardsTag = "CardP";
@@ -17,7 +20,7 @@ public class Constants : Singleton<Constants>
     public const string AllCardsTag = "All";
     public const string PoolCardTag = "Pool";
     public enum CardsOwener { Player, Enemy, Board, Deck, Pool, }
-    public enum NcAction { Shatter, Defrost , Nothing}
+    public enum NcAction { Shatter, Defrost , Unglitched, Nothing}
 
     public const string PlayerCard1 = "PlayerCard1";
     public const string PlayerCard2 = "PlayerCard2";
@@ -41,6 +44,9 @@ public class Constants : Singleton<Constants>
     public static string EndInfo = "Click to end your turn";
     public static string DealerInfo = "The dealer has the last move, and gets 1 energy in the last round";
     public static string DrawInstructions = "Choose a Ninja Card to replace";
+
+    public const string TechWheel2 = "TechWheel2";
+    public const string TechWheel3 = "TechWheel3";
 
     public static bool TUTORIAL_MODE = false;
     public static bool HP_GAME = false;
@@ -68,7 +74,23 @@ public class Constants : Singleton<Constants>
         }
         return cardPlace;
     }
-
+    public enum TipsEnum
+    {
+        FirstNc,     //f
+        LongPressNc, //f
+        Energy,      //f
+        Draw,        //f
+        EndTurn,     //f
+        HpDrop,    
+        FirstDragon,
+        RankInNumber,//f
+        RankMenu,    //f
+        LastTurn,
+        RaiseBtn,    //f
+        Vision,      //f
+        Emojis,      //f
+        ElementSkill,    
+    }
     public enum TutorialObjectEnum
     {
         startGame = 0,

@@ -134,7 +134,7 @@ public class EndRound : State
                 battleSystem.cardsDeckUi.CreateShadowCard(battleSystem.cardsDeckUi.enemyShadowCard, () => AnimateWinWithHand(bestOpponentHand, false));
             }
 
-            winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestOpponentHand.Rank); ;
+            winnerMsg += battleSystem.Interface.ConvertHandRankToTextDescription(bestOpponentHand.Rank);
             //  winnerMsg += bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
         }
         // Player win
@@ -169,7 +169,7 @@ public class EndRound : State
         {
             battleSystem.Interface.tieTitle.SetActive(true);
             startNewRound = true;
-            winnerMsg = battleSystem.Interface.RichText("TIE ", Values.Instance.yellowText, true) + bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription);
+            winnerMsg = battleSystem.Interface.RichText("TIE ", Values.Instance.yellowText, true) + battleSystem.Interface.ConvertHandRankToTextDescription(bestPlayerHand.Rank)/*bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription)*/;
             StartNewRoundAction(true);
         }
 
@@ -250,28 +250,16 @@ public class EndRound : State
         for (int i = 0; i < 5; i++)
         {
             winningCardDesc = winningCards[i].ToString(CardToStringFormatEnum.ShortCardName);
+
             if (card1Str.Equals(winningCardDesc))
-            {
-                if (card1.freeze)
-                {
-                    //TODO make it better
-                    battleSystem.Interface.FreezeObject(card1.spriteRenderer, false, card1.GetisFaceDown(), null, false);
-                }
                 winningPlayersCards.Add(card1);
-            }
+
             if (card2Str.Equals(winningCardDesc))
-            {
-                if (card2.freeze)
-                {
-                    battleSystem.Interface.FreezeObject(card2.spriteRenderer, false, card2.GetisFaceDown(), null, false);
-                    //TODO make it better
-                }
                 winningPlayersCards.Add(card2);
-            }
+
             if (cardGhostStr.Equals(winningCardDesc))
-            {
                 winningPlayersCards.Add(battleSystem.cardsDeckUi.ghostCardUi);
-            }
+
 
             for (int j = 0; j < 5; j++)
             {
@@ -282,6 +270,8 @@ public class EndRound : State
                 }
             }
         }
+        ResetEffects(winningPlayersCards);
+        ResetEffects(winningBoardCards);
         losingBoardCards.RemoveAll(item => winningBoardCards.Contains(item));
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.EndRoundGong, true);
         /* AnimationManager.Instance.AnimateWinningHandToBoard(winningPlayersCards, losingBoardCards,
@@ -302,6 +292,17 @@ public class EndRound : State
                battleSystem.EndRoundVisual(isPlayerWin);
                StartNewRoundAction(true);
            });
+    }
+
+    private void ResetEffects(List<CardUi> cardsToReset)
+    {
+        foreach (CardUi card in cardsToReset)
+        {
+            if (card.freeze)
+                battleSystem.Interface.FreezeObject(card.spriteRenderer, false, card.GetisFaceDown(), false, null, false);
+            if (card.glitch)
+                battleSystem.cardsDeckUi.EnableGlitchValues(false, card.spriteRenderer.material);
+        }
     }
 
     private int ConvertRankToCardToGlow(int rank)
@@ -403,7 +404,10 @@ public class EndRound : State
         if (startNewRound)
         {
             battleSystem.endRoutineFinished = true;
-            battleSystem.StartNewRoundRoutine(delay);
+            if (battleSystem.tutoManager.step != 7)
+            {
+                battleSystem.StartNewRoundRoutine(delay);
+            }
         }
     }
 }

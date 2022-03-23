@@ -30,10 +30,15 @@ public class GameMenuHandler : MonoBehaviour
     public bool HP_GAME;
 
     public Transform[] elementChoiceTransforms;
+    public string[] elementChoiceString = { "Fire", "Ice", "Wind", "Tech" };
+    public Color[] elementChoiceColor;
+    public Animation elementTextAnim;
+    public TextMeshProUGUI chosenElementText;
     public SpriteRenderer elementChoicerRenderer;
     private string elementChoiseString;
     private int currentElementIndex;
     private bool clickBlocker;
+    private bool firstPick;
 
     private bool tutorialVisible = false;
     public AudioSource auidioSource;
@@ -44,12 +49,14 @@ public class GameMenuHandler : MonoBehaviour
     }
     void Start()
     {
+        Resources.UnloadUnusedAssets();
         Constants.HP_GAME = HP_GAME;
         Constants.BOT_MODE = false;
 
         appVersion.text = "version: " + Application.version;
         DatabaseAPI.InitializeDatabase();
 
+        firstPick = true;
         playerName.text = LoadPlayerNickName();
         currentElementIndex = -1;
         OnElementPick(LoadPlayerElement());
@@ -202,7 +209,7 @@ public class GameMenuHandler : MonoBehaviour
     }
     private string LoadPlayerNickName()
     {
-        return PlayerPrefs.GetString("player_name", "Ninja");
+        return PlayerPrefs.GetString("player_name", "NinjaName");
     }
     private void SavePlayerElement(int element)
     {
@@ -350,6 +357,7 @@ public class GameMenuHandler : MonoBehaviour
         }
     }
     bool isRankOpen = false;
+
     public IEnumerator SmoothMoveRank(Transform selector, float movementDuration, Action endActionEmptyScroll, Action endActionFullScroll, Action finishSliding)
     {
         float startTime = Time.time;
@@ -437,6 +445,9 @@ public class GameMenuHandler : MonoBehaviour
                 case 2:
                     elementChoiseString = "w";
                     break;
+                case 3:
+                    elementChoiseString = "t";
+                    break;
             }
             SavePlayerElement(index);
             SavePlayerElementString(elementChoiseString);
@@ -452,7 +463,25 @@ public class GameMenuHandler : MonoBehaviour
         elementChoicerRenderer.color = new Color(1, 1, 1, 0);
         elementChoicerRenderer.transform.position = new Vector3(elementChoiceTransforms[index].position.x, elementChoiceTransforms[index].position.y, elementChoicerRenderer.transform.position.z);
         StartCoroutine(AlphaAnimation(elementChoicerRenderer, true, 0.17f, () => clickBlocker = false));
-        auidioSource.Play();
+        if (firstPick)
+            firstPick = false;
+        else
+        {
+            DisplayElementText(index);
+            auidioSource.Play();
+        }
+    }
+
+    private void DisplayElementText(int index)
+    {
+        elementTextAnim.Rewind();
+        elementTextAnim.Play();
+        elementTextAnim.Sample();
+        elementTextAnim.Stop();
+        chosenElementText.color = elementChoiceColor[index];
+        chosenElementText.text = elementChoiceString[index];
+        chosenElementText.transform.parent.transform.position = elementChoicerRenderer.transform.position;
+        elementTextAnim.Play();
     }
 
     public IEnumerator AlphaAnimation(SpriteRenderer spriteRenderer, bool fadeIn, float duration, Action OnFinish)

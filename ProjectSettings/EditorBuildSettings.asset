@@ -7,13 +7,13 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/GameMenuScene.unity
-    guid: 08b9bc743e0fddd4cac96312767c6ade
+    guid: 2580fb2509c4f9342a5791c6a448ad8a
   - enabled: 1
     path: Assets/Scenes/MatchmakingScene.unity
     guid: b5d97a4e9deb3414a8f0870f66684664
   - enabled: 1
     path: Assets/Scenes/GameScene2.unity
-    guid: 1566d3d9a5768e84b96a35daac4287e6
+    guid: 425d47a7f3567884cb34240f4603c01d
   - enabled: 1
     path: Assets/Scenes/TutorialScene.unity
     guid: 016124f53b703b7468da530db96a53f5
