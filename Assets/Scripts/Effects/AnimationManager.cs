@@ -217,7 +217,6 @@ public class AnimationManager : Singleton<AnimationManager>
                 spriteRenderer.color = new Color(r, g, b, Mathf.Lerp(0f, 1f, dissolveAmount));
                 if (dissolveAmount >= 1 || dissolveAmount <= 0)
                 {
-                     Debug.LogError("NEEDTOFIX " + spriteRenderer.gameObject.name);
                     spriteRenderer.color = new Color(r, g, b, alphaTarget);
                     OnFinish?.Invoke();
                    // fadeInProgress = false;
