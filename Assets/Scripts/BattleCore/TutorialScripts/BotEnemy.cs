@@ -29,7 +29,7 @@ public class BotEnemy : State
         Debug.Log("BOTSTATER");
         this.battleSystem = battleSystem;
         this.turnCounter = turnCounter;
-        if (battleSystem.tutoManager.step> 0 && battleSystem.tutoManager.step < 8)
+        if (battleSystem.tutoManager.step > 0 && battleSystem.tutoManager.step < 8)
         {
             MakeTutoAction(battleSystem.tutoManager.step);
         }
@@ -116,7 +116,7 @@ public class BotEnemy : State
         int act = options[battleSystem.GenerateRandom(0, options.Count)];
         await Task.Delay(battleSystem.GenerateRandom(2200, 5500));
 
-        if (act == EnemyActions.AcceptRaise.GetHashCode())
+        if (act == EnemyActions.AcceptRaise.GetHashCode() || battleSystem.TUTORIAL_MODE)
         {
             battleSystem.EnemyAcceptRaise();
         }
@@ -375,16 +375,13 @@ public class BotEnemy : State
             case "f":
                 if (currentRank >= 7)
                 {
+                    cardTarget1 = GetCardOf(Constants.BoardCardsTag, "", 0, false, false, false);
                     if (!card1DuplicateBoard || !card2DuplicateBoard)
                     {
                         if (!BotGotFrozenCards(0) && !card1DuplicateBoard && card1 < card2)
                             cardTarget1 = Constants.EnemyCard1;
                         if (!BotGotFrozenCards(1) && !card2DuplicateBoard && card2 < card1)
                             cardTarget1 = Constants.EnemyCard2;
-                    }
-                    else
-                    {
-                        cardTarget1 = GetCardOf(Constants.BoardCardsTag, "", 0, false, false, false);
                     }
                     cardTarget2 = GetCardOf(Constants.BoardCardsTag, cardTarget1, 0, false, false, false);
                 }
@@ -1142,7 +1139,7 @@ public class BotEnemy : State
     }
     private List<int> CalculateRaiseProbability(int amount)
     {
-        if (battleSystem.LoadPrefsInt(Constants.Instance.botRaiseKey) == 1 || !battleSystem.HaveEnoughToRaise())
+        if (battleSystem.LoadPrefsInt(Constants.Instance.botRaiseKey) == 1 || !battleSystem.HaveEnoughToRaise() || battleSystem.TUTORIAL_MODE)
         {
             amount = 0;
         }

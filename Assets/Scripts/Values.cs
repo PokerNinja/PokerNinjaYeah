@@ -66,6 +66,7 @@ public class Values : Singleton<Values>
     public Color brightRed ;
     public Color darkRed ;
     public Color yellow;
+    public float outlineFadeDuration = 0.27f;
 
 
     [Title("Ninja")]

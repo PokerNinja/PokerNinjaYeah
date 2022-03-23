@@ -34,6 +34,7 @@ public class ButtonLongPress : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public void OND()
     {
         BattleSystem.Instance.ShowPuInfo(transform.position, false, false,"dealer","");
+        BattleSystem.Instance.Interface.StartMatrix();
     }
 
     public void ONU()

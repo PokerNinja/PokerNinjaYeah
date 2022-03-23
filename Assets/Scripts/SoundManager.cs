@@ -17,6 +17,7 @@ public class SoundManager : Singleton<SoundManager>
     public int soundPoolCount;
     public AudioSource audioPrefab;
 
+    public AudioClip[] musics;
     public AudioClip[] drawCardSounds;
     public AudioClip[] burnCardSounds;
     public AudioClip[] windCardSounds;
@@ -91,7 +92,12 @@ public class SoundManager : Singleton<SoundManager>
 
     private void Start()
     {
-        
+        SetMusicClip();
+    }
+
+    private void SetMusicClip()
+    {
+        musicSound = musics[Random.Range(0, 3)];
     }
 
     private string MUSIC_VOLUME_KEY = "MUSIC_VOLUME_KEY";

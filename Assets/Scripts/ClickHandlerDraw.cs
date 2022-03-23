@@ -1,4 +1,5 @@
 
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -10,8 +11,8 @@ public class ClickHandlerDraw : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public UnityEvent onLongPress = new UnityEvent();
     private float holdTime = 0.3f;
     public SpriteRenderer spriteRenderer;
-    public Animator animator;
     private bool held = false;
+    public Animation drawAnimation;
 
 
     /*public void OnClick()
@@ -82,9 +83,12 @@ public class ClickHandlerDraw : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             BattleSystem.Instance.tutoManager.SetStep(6);
         }
     }
+
+   
     public void OnPointerUp(PointerEventData eventData)
     {
-        LoadSpriteBtn(false);
+        //LoadSpriteBtn(false);
+        PressEffect(false);
         CancelInvoke("OnLongPress");
 
         if (!held)
@@ -97,15 +101,28 @@ public class ClickHandlerDraw : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void OnPointerDown(PointerEventData eventData)
     {
-
-        LoadSpriteBtn(true);
+        PressEffect(true);
+        //  LoadSpriteBtn(true);
         held = false;
         Invoke("OnLongPress", holdTime);
 
     }
+
+    private void PressEffect(bool enable)
+    {
+        if (enable)
+        {
+            drawAnimation.Play("draw_click_d");
+        }
+        else
+        {
+            drawAnimation.Play("draw_click_u");
+        }
+    }
+
     private void LoadSpriteBtn(bool press)
     {
-        animator.SetBool("enable", !press);
+        //animator.SetBool("enable", !press);
         //string path = btnName;
 
         /*  }

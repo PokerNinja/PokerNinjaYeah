@@ -26,9 +26,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     ObjectPooler objectPooler;
 
-
-
-
     public CardSlot playerCardAParent;
     public CardSlot playerCardBParent;
     public CardSlot enemyCardAParent;
@@ -224,8 +221,6 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return new Card(card.GetLowerValuer(), newSuit);
     }
 
-
-
     private void ReplaceUiCardForStrighter(string oldCard, string newCard)
     {
         Debug.LogError("o " + oldCard);
@@ -292,6 +287,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         newCardsOptions.Add(new Card(CardEnum.Eight, targetSiut));
         return newCardsOptions;
     }
+
 
     internal void InitDeckFromServer(string[] deckFromDB)
     {
@@ -476,8 +472,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             cardToReset.freeze = false;
             cardToReset.spriteRenderer.material.SetColor("_FadeBurnColor", Color.yellow);
         }
-        cardToReset.glitch = false;
         EnableGlitchValues(false, cardToReset.spriteRenderer.material);
+        cardToReset.glitch = false;
         cardToReset.cardPlace = "pool";
         cardToReset.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
         cardToReset.spriteRenderer.material.SetFloat("_ShakeUvSpeed", 0f);
@@ -1090,20 +1086,33 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return false;
     }
 
-    internal bool IsOneCardFromHandsFreeze()
+    internal bool IsOneCardFromHandsFreeze(bool alsoGlitch)
     {
         if (playerCardsUi[0].freeze || playerCardsUi[1].freeze || enemyCardsUi[0].freeze || enemyCardsUi[1].freeze)
         {
-            return true;
+            if (alsoGlitch)
+            {
+                if (playerCardsUi[0].glitch || playerCardsUi[1].glitch || enemyCardsUi[0].glitch || enemyCardsUi[1].glitch)
+                    return true;
+            }
+            else
+                return true;
         }
         return false;
     }
-    internal int GetHowManyAvailableUnfrozenCards()
+    internal int GetHowManyAvailableUnfrozenCards(bool alsoGlitch)
     {
         int unFrozenCounter = 0;
         foreach (CardUi card in GetListByTag(Constants.AllCardsTag))
         {
-            if (!card.freeze)
+            if (alsoGlitch)
+            {
+                if (!card.freeze && !card.glitch)
+                {
+                    unFrozenCounter++;
+                }
+            }
+            else if (!card.freeze)
             {
                 unFrozenCounter++;
             }
@@ -1665,8 +1674,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             targetCardUi.glitch = true;
             targetCardUi.cardDescription = pickedCard.ToString(CardToStringFormatEnum.ShortCardName);
-            StartCoroutine(GlitchEffect(targetCardUi, targetCardUi.GetisFaceDown(), ()=> {
-            if(targetCardUi.freeze)
+            StartCoroutine(GlitchEffect(targetCardUi, targetCardUi.GetisFaceDown(), () =>
+            {
+                if (targetCardUi.freeze)
                     pickedCardUi.spriteRenderer.material.SetFloat("_GlitchAmount", 0);
             }));
             UpdateCardsList(targetCardUi.cardPlace, pickedCard, true);
@@ -1683,7 +1693,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     private void PlayGlitchSound(int value)
     {
-        if (value >0)
+        if (value > 0)
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.GlitchUp, false);
         else
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.GlitchDown, false);
@@ -1710,7 +1720,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     private IEnumerator GlitchEffect(CardUi pickedCardUi, bool isFaceDown, Action Reset)
     {
         //yield return new WaitForSeconds(Values.Instance.durationGlitchBeforeChange);
-        pickedCardUi.spriteRenderer.material = glitchMaterial;
+        if (!pickedCardUi.freeze)
+            pickedCardUi.spriteRenderer.material = glitchMaterial;
         Action changeSprite = null;
         float duration = Values.Instance.glitchEffectDuration;
         if (!isFaceDown)
@@ -1729,15 +1740,16 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     public void EnableGlitchValues(bool enable, Material targetMaterial)
     {
+        Debug.Log("HEYGLITCH");
         if (enable)
         {
-            targetMaterial.SetFloat("_GlitchAmount", 1.6f);
+            targetMaterial.SetFloat("_GlitchAmount", GenerateRandom(1.1f, 1.4f));
             targetMaterial.SetFloat("_ChromAberrAmount", 0.26f);
         }
         else
         {
-            targetMaterial.SetFloat("_GlitchAmount", 20f);
-            targetMaterial.SetFloat("_ChromAberrAmount", 0.7f);
+            targetMaterial.SetFloat("_GlitchAmount", 18f);
+            targetMaterial.SetFloat("_ChromAberrAmount", 0.4f);
             StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_OverlayBlend", Values.Instance.glitchEffectDuration, targetMaterial, 0f,
                 () =>
                 {
@@ -1968,23 +1980,23 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
 
     public void AnimateDrawer(bool open, Action action)
     {
-        isDrawerOpen = open;
         float targetX;
-        if (open)
+        if (open && !isDrawerOpen)
         {
+            isDrawerOpen = true;
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
             //s targetX = -0.22f;
             targetX = -1.15f;
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
             new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, action));
         }
-        else
+        else if (!open && isDrawerOpen)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CloseDrawer, false);
             targetX = 1.1f;
             action?.Invoke();
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
-            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, null));
+            new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, () => isDrawerOpen = false));
         }
     }
     public void DeleteAllCards(Action DealHands)
@@ -1995,7 +2007,8 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         ResetUiLists();
         foreach (CardUi cardToDestroy in FindAllCardsObjects())
         {
-            cardToDestroy.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
+            //cardToDestroy.spriteRenderer.material.SetFloat("_OutlineAlpha", 0);
+            StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_OutlineAlpha", Values.Instance.outlineFadeDuration, cardToDestroy.spriteRenderer.material, 0, null));
             // StartCoroutine(cardToDestroy.Dissolve(cardToDestroy.freeze, dissolveMaterial, 0, () => RestAfterDestroy(cardToDestroy, null)));
             targetPos = new Vector3(cardToDestroy.transform.position.x + 15, cardToDestroy.transform.position.y, cardToDestroy.transform.position.z);
             StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(cardToDestroy.transform, GenerateRandom(0.2f, 0.9f), targetPos, 3f, null, () => RestAfterDestroy(cardToDestroy, null)));

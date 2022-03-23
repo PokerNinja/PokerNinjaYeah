@@ -166,7 +166,7 @@ public class BattleUITuto : MonoBehaviour
     public void FreezeObject(SpriteRenderer spriteTarget, bool isToFreeze, bool isFaceDown, Action onReset, bool enableSound)
     {
 
-        StartCoroutine(AnimationManager.Instance.FreezeEffect(isToFreeze, isFaceDown, spriteTarget, freezeMaterial, onReset));
+        StartCoroutine(AnimationManager.Instance.FreezeEffect(isToFreeze, isFaceDown,false, spriteTarget, freezeMaterial, onReset));
         if (enableSound)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.PuFreeze, false);

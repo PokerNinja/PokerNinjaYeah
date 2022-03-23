@@ -83,6 +83,11 @@ public class PowerUpState : State
             else // PLAYER ACTIVATE
             {
                 int cardsToSelect = PowerUpStruct.Instance.GetPowerUpCardsToSelect(powerUpName);
+                if (cardTarget1.Equals("V"))
+                    cardsToSelect = 0;
+                if (cardTarget1.Equals("V") && powerUpName.Equals("fm1"))
+                    cardsToSelect = 2;
+
                 if (cardsToSelect == 0 || cardTarget2.Length > 0)
                 {// Shove IT somewhereElse
                  //  battleSystem.Interface.InitNinjaAttackAnimation(true, puElement);
@@ -118,7 +123,7 @@ public class PowerUpState : State
                 else
                 {
                     // battleSystem.selectCardsMode = true;
-                    if (waitForAction)
+                    if (waitForAction && cardTarget1.Equals("V"))
                     { //DRAW 2 CARDS
                       //EnableZpoitionForCardsList(battleSystem.cardsDeckUi.playerCardsUi, true);
                         battleSystem.Draw2Cards(false, () => ActivateSelectMode(cardsToSelect, powerUpName));
@@ -144,7 +149,8 @@ public class PowerUpState : State
         {
             int randomAmount = battleSystem.GenerateRandom(5, 7);
             return randomAmount.ToString();
-        }if (powerUpName.Equals("tm1"))
+        }
+        if (powerUpName.Equals("tm2"))
         {
             int randomAmount = battleSystem.GenerateRandom(4, 6);
             return randomAmount.ToString();
@@ -163,7 +169,7 @@ public class PowerUpState : State
         {
             return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true));
         }
-        else if (powerUpName.Equals("tm1"))
+        else if (powerUpName.Equals("tm2"))
         {
             return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true));
         }
@@ -175,20 +181,27 @@ public class PowerUpState : State
         UpdateZpositionCardsList(powerUpName, true);
         Debug.Log("ActivateSelectMode =" + powerUpName);
         battleSystem.SetCardsSelectionAndDisplayInfo(cardsToSelect, powerUpName);
-        ActivateCardSelection(PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true));
-        if (!PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true)[0].Equals(Constants.AllCardsTag))
+        if (cardsToSelect != 3)
         {
-            ActivateSelectionPointer(powerUpName);
+            ActivateCardSelection(PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true));
+            if (!PowerUpStruct.Instance.GetReleventTagCards(powerUpName, true)[0].Equals(Constants.AllCardsTag))
+            {
+                ActivateSelectionPointer(powerUpName);
+            }
         }
         if (puElement.Equals(battleSystem.Interface.pEs.element))
         {
             battleSystem.Interface.pEs.EnableSelecetPositionZ(true);
         }
+        if (cardsToSelect == 3)
+        {
+            battleSystem.puDeckUi.EnableDragonBtn(puIndex, puElement);
+        }
         battleSystem.Interface.EnableDarkScreen(true, true, null);
         if (battleSystem.tutoManager.step == 2)
         {
-            battleSystem.tutoManager.SetObjectClickable(battleSystem.cardsDeckUi.playerCardsUi[0].spriteRenderer);
-            battleSystem.tutoManager.SetObjectClickable(battleSystem.cardsDeckUi.playerCardsUi[1].spriteRenderer);
+            battleSystem.tutoManager.SetObjectClickable(true,battleSystem.cardsDeckUi.playerCardsUi[0].spriteRenderer);
+            battleSystem.tutoManager.SetObjectClickable(true,battleSystem.cardsDeckUi.playerCardsUi[1].spriteRenderer);
 
         }
     }
@@ -204,19 +217,20 @@ public class PowerUpState : State
         if (isPlayerActivate)
         {
             battleSystem.Interface.ResetCardSelection();
+            battleSystem.ReduceEnergy(energyCost);
+            battleSystem.selectMode = false;
+            Constants.cardsToSelectCounter = 0;
         }
         battleSystem.Interface.InitNinjaAttackAnimation(isPlayerActivate, puElement);
         if (puIndex != -1)
         {
+            Debug.LogError("Elemnting NC:  " + puElement);
+            if (isPlayerActivate)
+                battleSystem.puDeckUi.energyCoster.DisableNcEnergy(puIndex== 0);
             if (IsNcEqualElement())
-            {
-
                 battleSystem.DissolveNcToEs(isPlayerActivate, puIndex, () => battleSystem.UpdateEsAfterNcUse(isPlayerActivate, powerUpName));
-            }
             else
-            {
                 battleSystem.DissolvePuAfterUse(isPlayerActivate, puIndex);
-            }
         }
         if (puIndex == -1)
         {
@@ -224,8 +238,10 @@ public class PowerUpState : State
         }
         if (isPlayerActivate)
         {
-            battleSystem.ReduceEnergy(energyCost);
+            /*battleSystem.ReduceEnergy(energyCost);
             battleSystem.selectMode = false;
+            Constants.cardsToSelectCounter = 0;*/
+
             //  battleSystem.playerPuInProcess = true;
         }
         switch (powerUpName)
@@ -356,10 +372,15 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.tp): //Es value up1 up2
                 {
-                    battleSystem.ChangeValuePu(cardTarget1, int.Parse(cardTarget2)+1);
+                    battleSystem.ChangeValuePu(cardTarget1, int.Parse(cardTarget2) + 1);
                     break;
                 }
-            case nameof(PowerUpNamesEnum.tm1): //techgeddon
+            case nameof(PowerUpNamesEnum.tm1): //techDr
+                {
+                    battleSystem.ChangeValuePu(cardTarget1, int.Parse(cardTarget2));
+                    break;
+                }
+            case nameof(PowerUpNamesEnum.tm2): //techgeddon
                 {
                     TechRandomCards(cardTarget2, cardTarget1);
                     break;
@@ -416,7 +437,7 @@ public class PowerUpState : State
             battleSystem.SwapTwoCards(ConvertFixedCardPlace(cardsNames[i++]), ConvertFixedCardPlace(cardsNames[i++]), IsResetTornado(count - i));
         }
     }
-    
+
     private async void TechRandomCards(string listOfCards, string amount)
     {
         //  List<string> cardsNames = battleSystem.GetRandomAvailableCardsNames();
@@ -426,8 +447,8 @@ public class PowerUpState : State
         await Task.Delay(150);
         for (int i = 0; i < randomAmount; i++)
         {
-            await Task.Delay(battleSystem.GenerateRandom(250, 380));
-            battleSystem.ChangeValuePu(cardsNames[i], +2);
+           await Task.Delay(battleSystem.GenerateRandom(300, 450));
+            battleSystem.ChangeValuePu(ConvertFixedCardPlace(cardsNames[i]), +2);
         }
     }
 

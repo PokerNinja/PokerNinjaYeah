@@ -70,7 +70,7 @@ public class PlayerTurn : State
                 {
                     case 0:
                         battleSystem.tutoManager.SetStep(1);
-                        battleSystem.tutoManager.SetObjectClickable(battleSystem.puDeckUi.playerPusUi[0].spriteRenderer);
+                        battleSystem.tutoManager.SetObjectClickable(true,battleSystem.puDeckUi.playerPusUi[0].spriteRenderer);
                         break;
                     case 3:
                         battleSystem.tutoManager.SetStep(4);
@@ -79,9 +79,12 @@ public class PlayerTurn : State
                         battleSystem.tutoManager.SetStep(7);
                         break;
                     case 8:
-                        battleSystem.tutoManager.SetStep(9);
+                    case 9:
+                        battleSystem.tutoManager.SetStep(10);
                         break;
                 }
+                if (turnCounter == 6 && battleSystem.currentRound == 1)
+                    battleSystem.tutoManager.SetStep(29);
             }
         }
         );

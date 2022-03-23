@@ -15,7 +15,7 @@ public class RaiseTimer : MonoBehaviour
     private float totalTime;
     private int starting;
     private Coroutine thereCanBeOnlyOne;
-
+    private bool isLastSeconds;
 
 
     public void StopTimer()
@@ -25,6 +25,11 @@ public class RaiseTimer : MonoBehaviour
         countTimer = -10f;
         countdownCircleTimer.fillAmount = 1.0f;
         thereCanBeOnlyOne = null;
+        if (isLastSeconds)
+        {
+            Debug.LogError("coubter" + countTimer);
+            SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
+        }
     }
 
 
@@ -44,7 +49,7 @@ public class RaiseTimer : MonoBehaviour
     private IEnumerator CountDown()
     {
         bool isEnemyTurn = !BattleSystem.Instance.IsPlayerTurn();
-        bool isLastSeconds = false;
+        isLastSeconds = false;
         while (countTimer > 0 && updateTime)
         {
             if (isEnemyTurn && !isLastSeconds && countTimer < 5)
@@ -63,8 +68,10 @@ public class RaiseTimer : MonoBehaviour
         }
         if (countTimer <= 0 || !updateTime)
         {
+            Debug.LogError("about toStop");
             if (isEnemyTurn)
             {
+            Debug.LogError("StopTimer");
                 SoundManager.Instance.PlayConstantSound(SoundManager.ConstantSoundsEnum.LastSeconds, false);
                 BattleSystem.Instance.RefuseBet();
             }

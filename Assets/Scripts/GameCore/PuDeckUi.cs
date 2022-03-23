@@ -42,7 +42,15 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     public Transform pEsTranform;
     public Transform eEsTranform;
-   // public PowerUpUi playerSkillUi;
+
+
+    public Image dragonBtnV;
+    public Image dragonBtnBg;
+    public CanvasGroup dragonParent;
+    public Animation dragonBtnAnimation;
+    public EnergyCost energyCoster;
+
+    // public PowerUpUi playerSkillUi;
 
 
     public static PuDeckUi Instance()
@@ -84,6 +92,8 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void DestroyPu(PowerUpUi pu, Action RemoveFromList, Action OnEnd)
     {
+        if (pu.isPlayer)
+            energyCoster.DisableNcEnergy(pu.puIndex == 0);
         pu.DissolvePu(0f, Values.Instance.puDissolveDuration, RemoveFromList, () => ResetPuUI(pu, OnEnd));
         //  StartCoroutine(AnimationManager.Instance.FadeBurnPU(pu.spriteRenderer.material, 0f , false, 4f, null, RemoveFromList, () => ResetPuUI(pu, OnEnd)));
     }
@@ -106,7 +116,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         puToReset.puDisplayName = "NN";
         puToReset.puIndex = -10;
         puToReset.outStand = false;
-       // puToReset.freeze = false;
+        // puToReset.freeze = false;
         puToReset.tag = "PowerUp";
         puToReset.transform.position = puTransform.position;
         puToReset.transform.localScale = puTransform.localScale;
@@ -136,17 +146,21 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     private void PushPuPosition(bool isPlayer, Action EndAction)
     {
         //{} V MAYBE DIFFERENT NO ARRAY
+        if (isPlayer)
+        {
+            energyCoster.DisableNcEnergy(false);
+            energyCoster.DisableNcEnergy(true);
+        }
         PowerUpUi pu;
         Transform target;
         if (isPlayer)
         {
-
-
             pu = playerPusUi[0];
             pu.puIndex = 1;
             playerPusUi[1] = pu;
             playerPusUi[0] = null;
             target = playerPuBParent.transform;
+
         }
         else
         {
@@ -157,7 +171,12 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
             target = enemyPuBParent.transform;
         }
         pu.transform.SetParent(target);
-        StartCoroutine(AnimationManager.Instance.SmoothMove(pu.transform, target.position, pu.transform.localScale, Values.Instance.puPushNewSlotMoveDuration, EndAction, null, null, null));
+        StartCoroutine(AnimationManager.Instance.SmoothMove(pu.transform, target.position, pu.transform.localScale, Values.Instance.puPushNewSlotMoveDuration, EndAction, null, null,
+            () =>
+            {
+                if (isPlayer)
+                    energyCoster.SetEnergy(1, pu.isMonster);
+            }));
 
     }
 
@@ -333,7 +352,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         if (open)
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
-           // targetX = 4.39f;
+            // targetX = 4.39f;
             targetX = 5.35f;
         }
         else
@@ -374,8 +393,14 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
         }
         puObject.Init(puName, index, PowerUpStruct.Instance.GetPowerUpDisplayName(puName), puName[0].ToString(), isPlayer);
         StartCoroutine(AnimationManager.Instance.SmoothMove(puObject.transform, puParent.transform.position, puVector,
-        Values.Instance.puDrawMoveDuration, null, () => puObject.CardReveal(isPlayer, null), EndAction, () => puObject.LoopShine(puObject.isMonster)));
+        Values.Instance.puDrawMoveDuration, null,
+        () => puObject.CardReveal(isPlayer, () =>
+         {
+             if (isPlayer)
+                 energyCoster.SetEnergy(index, puObject.isMonster);
+         }), EndAction, () => puObject.LoopShine(puObject.isMonster)));
         AddCardToList(puTag, index, puObject);
+
     }
 
     private void AddCardToList(string cardTag, int index, PowerUpUi puObject)
@@ -418,10 +443,6 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
 
 
-
-
-
-
     internal PowerUpUi GetPu(bool isPlayer, int puIndex)
     {
         if (isPlayer)
@@ -451,7 +472,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
     {
         if (isPlayer)
         {
-            if(puIndex == -1)
+            if (puIndex == -1)
             {
                 return playerSkill.position;
             }
@@ -491,12 +512,76 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
 
     [Button]
-    public void DissolveNcToEs(bool isPlayer, int index , Action FillEs, Action OnEnd)
+    public void DissolveNcToEs(bool isPlayer, int index, Action FillEs, Action OnEnd)
     {
         Vector3 target = pEsTranform.position;
         if (!isPlayer)
             target = eEsTranform.position;
         GetPu(isPlayer, index).DissolveNcToEs(target, FillEs, OnEnd);
     }
-    
+
+    internal async void EnableDragonBtn(int index, string element)
+    {
+        //dragonParent.gameObject.SetActive(true);
+        SetOutlineBtn(false);
+        dragonBtnV.color = GetColorFromElement(element);
+        dragonBtnBg.material.SetColor("_OutlineColor", GetColorFromElement(element));
+        dragonBtnBg.material.SetFloat("_Glow", 0f);
+        dragonParent.transform.position = new Vector3(GetPu(true, index).transform.position.x, GetPu(true, index).transform.position.y, 19f);
+        //dragonParent.transform.position = GetPu(true, index).transform.position;
+        dragonBtnAnimation.Play("dragon_btn");
+        await Task.Delay(600);
+        SetOutlineBtn(true);
+        dragonParent.interactable = true;
+        /*  StartCoroutine(AnimationManager.Instance.SimpleSmoothMove(dragonParent.transform, 0, newPosition, 1f, null,
+              () => dragonParent.interactable = true));*/
+    }
+
+    private Color GetColorFromElement(string element)
+    {
+        switch (element)
+        {
+            case "f":
+                return Values.Instance.fireVision;
+            case "i":
+                return Values.Instance.iceVision;
+            case "w":
+                return Values.Instance.windVision;
+            case "t":
+                return Values.Instance.techVision;
+        }
+        return Values.Instance.shadowVision;
+    }
+
+    internal void DisableDragonBtn(bool isClicked)
+    {
+        string animPath = "dragon_btn_out";
+        if (dragonBtnV.color.a == 1)
+        {
+            dragonParent.interactable = false;
+            /* StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(dragonParent, false, 0.5f, 
+                 () => { 
+                     dragonParent.gameObject.SetActive(false);
+                     dragonParent.alpha = 1;
+                 }));*/
+            SetOutlineBtn(false);
+            if (isClicked)
+            {
+                animPath = "dragon_btn_click";
+                StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_Glow", 0.6f, dragonBtnBg.material, 5f, null));
+            }
+            dragonBtnAnimation.Play(animPath);
+        }
+    }
+
+
+    private void SetOutlineBtn(bool enable)
+    {
+        float amount = 0;
+        if (enable)
+            amount = 1;
+        StartCoroutine(AnimationManager.Instance.UpdateValue(!enable, "_OutlineAlpha", Values.Instance.outlineFadeDuration, dragonBtnBg.material, amount, null));
+      //  dragonBtnBg.material.SetFloat("_OutlineAlpha", amount);
+    }
+
 }

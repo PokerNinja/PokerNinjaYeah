@@ -238,7 +238,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             EnableShake(enable);
         }
         StartCoroutine(AnimationManager.Instance.DarkerAnimation(spriteRenderer, !enable, Values.Instance.puChangeColorDisableDuration, () => isClickable = enable));
-
+        BattleSystem.Instance.puDeckUi.energyCoster.AvailableEnergy(enable, puIndex);
         //StartCoroutine(AnimationManager.Instance.UpdateValue(enable, "_GradBlend", Values.Instance.puChangeColorDisableDuration, spriteRenderer.material, value, () => isClickable = enable));
     }
 
@@ -278,7 +278,7 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             /*StartCoroutine(AnimationManager.Instance.PulseSize(true, transform, 1.15f, 0.4f, true,
             () => StartCoroutine(AnimationManager.Instance.ShinePU(false, 1, 1, spriteRenderer.material, OnEndRoutine3))));*/
             StartCoroutine(AnimationManager.Instance.SmoothMove(transform, new Vector3(transform.parent.position.x, transform.parent.position.y + 0.2f, transform.position.z),
-                new Vector3(transform.localScale.x * 1.05f, transform.localScale.y * 1.05f, 1f), 0.5f, null, () => EnableValuesForSelect(true), null, null));
+                new Vector3(transform.localScale.x * 1.05f, transform.localScale.y * 1.05f, 1f), 0.5f, () => EnableValuesForSelect(true), null, null, null));
 
             /*StartCoroutine(AnimationManager.Instance.ScaleAnimation(transform, new Vector2(transform.localScale.x * 1.1f, transform.localScale.y * 1.1f), 0.5f,
                 () => EnableValuesForSelect(true)));*/
@@ -302,7 +302,16 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             distortAmount = 0.17f;
             outlineAlpha = 1f;
+            float outlineWidth = 0.03f;
+            float outlineDistortAmount = 1.33f;
+            if (isMonster)
+            {
+                outlineWidth = 0.075f;
+                outlineDistortAmount = 2f;
+            }
             spriteRenderer.material.SetColor("_OutlineColor", GetColorFromElement(puElement));
+            spriteRenderer.material.SetFloat("_OutlineWidth", outlineWidth);
+            spriteRenderer.material.SetFloat("_OutlineDistortAmount", outlineDistortAmount);
         }
         else
         {
@@ -310,8 +319,9 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             StartCoroutine(AnimationManager.Instance.SmoothMove(transform, new Vector3(transform.parent.position.x, transform.parent.position.y, transform.position.z)
                 , new Vector3(1f, 1f, 1f), 0.5f, null, null, null, null));
         }
-        spriteRenderer.material.SetFloat("_OutlineAlpha", outlineAlpha);
+       // spriteRenderer.material.SetFloat("_OutlineAlpha", outlineAlpha);
         spriteRenderer.material.SetFloat("_DistortAmount", distortAmount);
+        StartCoroutine(AnimationManager.Instance.UpdateValue(!enable, "_OutlineAlpha", Values.Instance.outlineFadeDuration, spriteRenderer.material, outlineAlpha, null));
     }
 
     public void DissolvePu(float delayBefor, float duration, Action End, Action End2)
@@ -322,12 +332,14 @@ public class PowerUpUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public async void DissolveNcToEs(Vector3 targetPosition, Action FillEs, Action OnEnd)
     {
-        spriteRenderer.material.SetFloat("_OutlineAlpha", 0f);
+        StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_OutlineAlpha", Values.Instance.outlineFadeDuration, spriteRenderer.material, 0f, null));
         Vector3 newTarget = new Vector3(targetPosition.x, targetPosition.y, transform.position.z);
         StartCoroutine(AnimationManager.Instance.SmoothMove(transform, newTarget, new Vector3(0.4f, 0.4f, 0), Values.Instance.ncToEsDuration, 
            null, null, null,OnEnd));
         await Task.Delay(250);
-        StartCoroutine(AnimationManager.Instance.AlphaAnimation(spriteRenderer, false, Values.Instance.defaultFadeD, FillEs));
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(spriteRenderer, false, Values.Instance.defaultFadeD, null));
+        await Task.Delay(130);
+        FillEs?.Invoke();
     }
 
     public void CardReveal(bool reveal, Action onFinish)

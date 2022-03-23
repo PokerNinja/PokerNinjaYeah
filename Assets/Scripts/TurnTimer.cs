@@ -44,13 +44,9 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             onClick.Invoke();
         }
-        else if (!Constants.TUTORIAL_MODE && BattleSystem.Instance.infoShow)
+        else if (BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.HideDialog(false);
-        }
-        else if (Constants.TUTORIAL_MODE && BattleSystemTuto.Instance.infoShow)
-        {
-            BattleSystemTuto.Instance.HideDialog();
         }
 
     }
@@ -67,14 +63,11 @@ public class TurnTimer : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OND()
     {
-        if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
+        if ( !BattleSystem.Instance.infoShow)
         {
             BattleSystem.Instance.ShowPuInfo(transform.position, false, false, "end", Constants.ReplacePuInfo);
         }
-        else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
-        {
-            BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, "end", Constants.ReplacePuInfo);
-        }
+        
     }
 
     public void StopTimer()
