@@ -944,8 +944,9 @@ public class BattleUI : MonoBehaviour
         }
         largeTextGO.SetActive(enable);
     }
-    internal void UpdateCardRank(int handRank)
+    internal bool UpdateCardRank(int handRank)
     {
+        bool isUP = false;
         if (handRank == -1)
         {
             handRank = 7000;
@@ -959,13 +960,16 @@ public class BattleUI : MonoBehaviour
             if (lastHandRank < currentHandRank)
             {
                 SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankDown);
+                
             }
             else
             {
+                isUP = true;
                 SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankUp);
             }
         }
         lastHandRank = currentHandRank;
+        return isUP;
         // currentRankText.text = ConvertHandRankToTextDescription(handRank);
     }
 

@@ -163,15 +163,15 @@ public class PowerUpState : State
         Debug.LogError("HELLO");
         if (powerUpName.Equals("im2") || powerUpName.Equals("fm2"))
         {
-            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(false));
+            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(false,false));
         }
         else if (powerUpName.Equals("wm2"))
         {
-            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true));
+            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true,true));
         }
         else if (powerUpName.Equals("tm2"))
         {
-            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true));
+            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true,false));
         }
         return cardTarget2;
     }

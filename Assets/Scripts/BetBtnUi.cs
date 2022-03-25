@@ -88,13 +88,9 @@ public class BetBtnUi : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OND()
     {
-        if (!Constants.TUTORIAL_MODE && !BattleSystem.Instance.infoShow)
+        if (!BattleSystem.Instance.infoShow)
         {
             ShowRaiseInfo();
-        }
-        else if (Constants.TUTORIAL_MODE && !BattleSystemTuto.Instance.infoShow)
-        {
-            //BattleSystemTuto.Instance.ShowPuInfo(transform.position, false, "bet", Constants.ReplacePuInfo);
         }
     }
 

@@ -673,7 +673,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return playerHandWithBoard;
     }
 
-    internal List<string> GetAvailbeCards(bool onlyUnfreeze)
+    internal List<string> GetAvailbeCards(bool onlyUnfreeze,bool onlyUnglitch)
     {
         List<string> allCardsNames = new List<string>();
         allCardsNames.Add(Constants.PlayerCard1);
@@ -696,6 +696,16 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             for (int i = allCardsNames.Count - 1; i >= 0; i--)
             {
                 if (GetCardUiByName(allCardsNames[i]).freeze)
+                {
+                    allCardsNames.RemoveAt(i);
+                }
+            }
+        }
+        if (onlyUnglitch)
+        {
+            for (int i = allCardsNames.Count - 1; i >= 0; i--)
+            {
+                if (GetCardUiByName(allCardsNames[i]).glitch)
                 {
                     allCardsNames.RemoveAt(i);
                 }
@@ -1630,6 +1640,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             StartCoroutine(cardToDestroy.FadeBurnOut(targetMaterial, changeOffset, () =>
             {
                 OnEnd?.Invoke();
+                ResetCardUI(cardToDestroy);
+                cardToDestroy.Activate(false);
                 //RestAfterDestroy(cardToDestroy, OnEnd);
             }
             //  Destroy(cardToDestroy)));
@@ -1640,6 +1652,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
             StartCoroutine(cardToDestroy.Dissolve(false, dissolveMaterial, 0f, () =>
             {
                 OnEnd?.Invoke();
+                ResetCardUI(cardToDestroy);
+                cardToDestroy.Activate(false);
                 //  RemoveFromList(cardToDestroy);
                 //RestAfterDestroy(cardToDestroy, OnEnd);
             }));

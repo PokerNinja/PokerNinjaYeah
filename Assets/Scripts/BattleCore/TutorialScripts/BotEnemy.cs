@@ -533,15 +533,15 @@ public class BotEnemy : State
                 cardTarget2 = GetCardOf(Constants.EnemyCardsTag, "", 0, true, false, false);
                 break;
             case "wm2":
-                cardTarget1 = GetListOfRandomCardsForMonster(true);
+                cardTarget1 = GetListOfRandomCardsForMonster(true,true);
                 break;
             case "im2":
                 cardTarget2 = battleSystem.GenerateRandom(4, 6).ToString();
-                cardTarget1 = GetListOfRandomCardsForMonster(false);
+                cardTarget1 = GetListOfRandomCardsForMonster(false,false);
                 break;
             case "fm2":
                 cardTarget2 = battleSystem.GenerateRandom(5, 7).ToString();
-                cardTarget1 = GetListOfRandomCardsForMonster(false);
+                cardTarget1 = GetListOfRandomCardsForMonster(false,false);
                 break;
 
         }
@@ -567,9 +567,9 @@ public class BotEnemy : State
         }
     }
 
-    private string GetListOfRandomCardsForMonster(bool onlyUnfreeze)
+    private string GetListOfRandomCardsForMonster(bool onlyUnfreeze,bool onlyUnglitch)
     {
-        return string.Join(",", battleSystem.GetRandomAvailableCardsNames(onlyUnfreeze));
+        return string.Join(",", battleSystem.GetRandomAvailableCardsNames(onlyUnfreeze,onlyUnglitch));
     }
     /* private string GetPlayerRevealedCardAndIfFreeze(bool canTargetFreeze)
      {
