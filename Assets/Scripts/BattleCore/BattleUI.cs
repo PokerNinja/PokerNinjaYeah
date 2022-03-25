@@ -200,8 +200,12 @@ public class BattleUI : MonoBehaviour
     public GameObject IglooPref;
     public SpriteRenderer perfectRenderer;
 
-    public TechWheel techWheelEs;
-    public TechWheel techWheelDr;
+    public TechTree techWheelEs;
+    public TechTree techWheelDr;
+    public GameObject sacreficer1;
+    public GameObject sacreficer2;
+    public GameObject sacrefire;
+   // public Animator sacrefireAnimator;
 
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy, float totalHp)
@@ -1573,6 +1577,8 @@ public class BattleUI : MonoBehaviour
         StartCoroutine(StartIcenado());
 
     }
+
+   
     internal IEnumerator StartIcenado()
     {
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Iceagedon, true);
@@ -1898,12 +1904,29 @@ public class BattleUI : MonoBehaviour
         if (isDragon)
             techWheelDr.EnableWheel(position);
         else
-            techWheelEs.EnableWheel(position);
+            StartCoroutine(techWheelEs.EnableEsWheel());
     }
     internal void DrawBtnEffect()
     {
         StartCoroutine(AnimationManager.Instance.UpdateValue(true,"_Glow",0.4f,btnDrawRenderer.material,0.8f,
             () => StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_Glow", 0.4f, btnDrawRenderer.material, 0f,null))));
+    }
+
+    [Button]
+    public void EnableEsTechTree(bool enable)
+    {
+        StartCoroutine( techWheelEs.EnableEsWheel());
+    }
+    public void EnableSacrficers()
+    {
+        sacreficer1.SetActive(true);
+        sacreficer2.SetActive(true);
+    }
+   
+    internal void EnableNcX(Vector2 position)
+    {
+        //sacrefireAnimator.transform.position = position;
+        //sacrefireAnimator.Play("NC_X");
     }
 
 }

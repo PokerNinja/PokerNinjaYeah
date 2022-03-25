@@ -8,7 +8,7 @@ AnimationClip:
   m_PrefabAsset: {fileID: 0}
   m_Name: xanim2
   serializedVersion: 6
-  m_Legacy: 0
+  m_Legacy: 1
   m_Compressed: 0
   m_UseHighQualityCurve: 1
   m_RotationCurves: []
@@ -127,41 +127,13 @@ AnimationClip:
     classID: 212
     script: {fileID: 0}
   m_SampleRate: 60
-  m_WrapMode: 0
+  m_WrapMode: 1
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
   m_ClipBindingConstant:
-    genericBindings:
-    - serializedVersion: 2
-      path: 0
-      attribute: 3
-      script: {fileID: 0}
-      typeID: 4
-      customType: 0
-      isPPtrCurve: 0
-    - serializedVersion: 2
-      path: 0
-      attribute: 304273561
-      script: {fileID: 0}
-      typeID: 212
-      customType: 0
-      isPPtrCurve: 0
-    - serializedVersion: 2
-      path: 0
-      attribute: 0
-      script: {fileID: 0}
-      typeID: 212
-      customType: 23
-      isPPtrCurve: 1
-    pptrCurveMapping:
-    - {fileID: 21300000, guid: fb156857df100ae409bef1ea63c3fc8e, type: 3}
-    - {fileID: 21300000, guid: fb156857df100ae409bef1ea63c3fc8e, type: 3}
-    - {fileID: 21300000, guid: 3efced453d282cd498cab41582f89fc9, type: 3}
-    - {fileID: 21300000, guid: 2174bf0274a9b814ea180e199a20615b, type: 3}
-    - {fileID: 21300000, guid: cef255f797983344899aeca0e1035522, type: 3}
-    - {fileID: 21300000, guid: cef255f797983344899aeca0e1035522, type: 3}
-    - {fileID: 21300000, guid: cef255f797983344899aeca0e1035522, type: 3}
+    genericBindings: []
+    pptrCurveMapping: []
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}

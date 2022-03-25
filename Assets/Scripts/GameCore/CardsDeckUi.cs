@@ -55,6 +55,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     public Material shadowMaterial;
     public Transform[] boardTransform;
     private PokerHandRankingTable poker;
+    public GameObject sacrefirePref;
 
     #region Settings
 
@@ -302,9 +303,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void ResetExtraDeckCards()
     {
-        DestroyCardObjectFire(extraDeckCardsUi[1].cardPlace, null);
-        DestroyCardObjectFire(extraDeckCardsUi[0].cardPlace, () => extraDeckCardsUi = new List<CardUi>());
-
+        DestroyCardObjectFire(extraDeckCardsUi[1].cardPlace, true, null);
+        DestroyCardObjectFire(extraDeckCardsUi[0].cardPlace, true, () => extraDeckCardsUi = new List<CardUi>());
     }
 
     public IEnumerator CreateHands(Action WaitForCloseDrawerAnimation, Action FinishCallback)
@@ -673,7 +673,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         return playerHandWithBoard;
     }
 
-    internal List<string> GetAvailbeCards(bool onlyUnfreeze,bool onlyUnglitch)
+    internal List<string> GetAvailbeCards(bool onlyUnfreeze, bool onlyUnglitch)
     {
         List<string> allCardsNames = new List<string>();
         allCardsNames.Add(Constants.PlayerCard1);
@@ -1484,7 +1484,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     {
         if (ghostCardUi != null)
         {
-            DestroyCardObjectFire(ghostCardUi.cardPlace, () => AddGhostCard(cardsOwener, UpdateRank, Reset));
+            DestroyCardObjectFire(ghostCardUi.cardPlace, false, () => AddGhostCard(cardsOwener, UpdateRank, Reset));
         }
         else
         {
@@ -1596,9 +1596,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     }
 
 
-    internal void DestroyCardObjectFire(string cardPlace, Action OnEnd)
+    internal void DestroyCardObjectFire(string cardPlace, bool withFireEffect, Action OnEnd)
     {
-        DestroyWithDelay(cardPlace, OnEnd);
+        DestroyWithDelay(cardPlace, withFireEffect, OnEnd);
     }
 
     internal void DestroyCardObjectIce(string cardPlace, Action OnEnd)
@@ -1606,7 +1606,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         //  RemoveFromList(GetListByTag(cardToDestroy.tag), cardToDestroy);
     }
 
-    private void DestroyWithDelay(string cardPlace, Action OnEnd)
+    private void DestroyWithDelay(string cardPlace, bool withFireEffect, Action OnEnd)
     {
         CardUi cardToDestroy = GetCardUiByName(cardPlace);
         // RemoveFromList(cardToDestroy);
@@ -1622,31 +1622,34 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         {
             Debug.LogError("Destroy: fck");
         }
-        if (!cardPlace.Contains("Deck"))
+
+        if (cardToDestroy.cardMark.activeSelf)
         {
-            if (cardToDestroy.cardMark.activeSelf)
-            {
-                cardToDestroy.cardMark.SetActive(false);
-            }
-            Material targetMaterial = burnMaterial;
-            targetMaterial.SetColor("_FadeBurnColor", burnColor);
-            targetMaterial.SetColor("_OutlineColor", outlineColor);
-            bool changeOffset = true;
-            if (cardPlace.Contains("Ghost"))
-            {
-                targetMaterial = ghostMaterial;
-                changeOffset = false;
-            }
-            StartCoroutine(cardToDestroy.FadeBurnOut(targetMaterial, changeOffset, () =>
-            {
-                OnEnd?.Invoke();
-                ResetCardUI(cardToDestroy);
-                cardToDestroy.Activate(false);
+            cardToDestroy.cardMark.SetActive(false);
+        }
+        Material targetMaterial = burnMaterial;
+        targetMaterial.SetColor("_FadeBurnColor", burnColor);
+        targetMaterial.SetColor("_OutlineColor", outlineColor);
+        bool changeOffset = true;
+        if (cardPlace.Contains("Ghost"))
+        {
+            targetMaterial = ghostMaterial;
+            changeOffset = false;
+        }
+        if (withFireEffect)
+        {
+            ApplySacrfire(cardToDestroy.transform.position);
+        }
+        StartCoroutine(cardToDestroy.FadeBurnOut(targetMaterial, changeOffset, () =>
+        {
+            OnEnd?.Invoke();
+            ResetCardUI(cardToDestroy);
+            cardToDestroy.Activate(false);
                 //RestAfterDestroy(cardToDestroy, OnEnd);
             }
-            //  Destroy(cardToDestroy)));
-            ));
-        }
+        //  Destroy(cardToDestroy)));
+        ));
+        /*}
         else
         {
             StartCoroutine(cardToDestroy.Dissolve(false, dissolveMaterial, 0f, () =>
@@ -1657,8 +1660,9 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
                 //  RemoveFromList(cardToDestroy);
                 //RestAfterDestroy(cardToDestroy, OnEnd);
             }));
-        }
+        }*/
     }
+
 
 
     internal void DrawAndReplaceCard(string cardPlace, bool isFlip, Action disableDarkScreen, bool isFirstCard, bool isLastCard)
@@ -2065,6 +2069,21 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
     {
         GetParentByPlace(cardPlace).EnableNcAction(false, Constants.NcAction.Nothing);
 
+    }
+
+    [Button]
+    public void SSS()
+    {
+        ApplySacrfire(new Vector3(0, 0, 30));
+    }
+    private void ApplySacrfire(Vector3 position)
+    {
+        GameObject sacrficer = Instantiate(sacrefirePref);
+        Animation sdaf;
+       // sdaf.PlayQueued();
+        sacrficer.SetActive(true);
+        sacrficer.transform.position = position;
+      //  Destroy(sacrficer, 3f);
     }
 }
 

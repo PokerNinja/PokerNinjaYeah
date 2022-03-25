@@ -83,7 +83,7 @@ public class PlayerTurn : State
                         battleSystem.tutoManager.SetStep(10);
                         break;
                 }
-                if (turnCounter == 6 && battleSystem.currentRound == 1)
+                if (turnCounter == 1 && battleSystem.currentRound == 2)
                     battleSystem.tutoManager.SetStep(29);
             }
         }

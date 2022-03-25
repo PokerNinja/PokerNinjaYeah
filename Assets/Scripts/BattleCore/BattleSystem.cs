@@ -173,11 +173,11 @@ public class BattleSystem : StateMachine
 
     private void Start()
     {
-      
-       /* BOT_MODE = Constants.BOT_MODE;
-        TUTORIAL_MODE = Constants.TUTORIAL_MODE;*/
+
+        /* BOT_MODE = Constants.BOT_MODE;
+         TUTORIAL_MODE = Constants.TUTORIAL_MODE;*/
         if (!BOT_MODE)
-            BOT_MODE =  Values.Instance.TEST_MODE;
+            BOT_MODE = Values.Instance.TEST_MODE;
         if (!TUTORIAL_MODE)
             TUTORIAL_MODE = Values.Instance.TUTORIAL_MODE;
         Constants.BOT_MODE = BOT_MODE;
@@ -557,17 +557,17 @@ public class BattleSystem : StateMachine
     {
         float damage = (currentDamageThisRound + extraDamage) / fullHp;
         StartCoroutine(ui.DisplayDamageText(!isPlayerWin, currentDamageThisRound, extraDamage));
-        StartCoroutine(ui.CardProjectileEffect(isPlayerWin, () =>TutrialWinMsg(isPlayerWin)
-        , () => ui.UpdateDamage(damage, !isPlayerWin, IsPerfect())));;
+        StartCoroutine(ui.CardProjectileEffect(isPlayerWin, () => TutrialWinMsg(isPlayerWin)
+        , () => ui.UpdateDamage(damage, !isPlayerWin, IsPerfect()))); ;
     }
 
     private void TutrialWinMsg(bool isPlayerWin)
     {
-            if (tutoManager.step == 7)
+        if (tutoManager.step == 7)
         {
-                if(isPlayerWin)
+            if (isPlayerWin)
                 tutoManager.SetStep(8);
-                else
+            else
                 tutoManager.SetStep(9);
 
         }
@@ -720,7 +720,7 @@ public class BattleSystem : StateMachine
         }
     }
 
-    internal List<string> GetRandomAvailableCardsNames(bool onlyUnfreeze,bool onlyUnglitch)
+    internal List<string> GetRandomAvailableCardsNames(bool onlyUnfreeze, bool onlyUnglitch)
     {
         List<string> cardsNames = cardsDeckUi.GetAvailbeCards(onlyUnfreeze, onlyUnglitch);
         var rnd = new System.Random();
@@ -1710,15 +1710,15 @@ public class BattleSystem : StateMachine
         // if (isFirstCard)
         cardsDeckUi.AnimateDrawer(true, null);
         yield return new WaitForSeconds(delay);
-        cardsDeckUi.DestroyCardObjectFire(cardPlace, null);
+        cardsDeckUi.DestroyCardObjectFire(cardPlace, false, null);
         yield return new WaitForSeconds(0.3f);
         Action resetAction = null;
         if (ResetEnable)
         {
             resetAction = () => EnableDarkAndSorting(false);
         }
-       cardsDeckUi.RemoveFromList(cardsDeckUi.GetCardUiByName(cardPlace));
-        
+        cardsDeckUi.RemoveFromList(cardsDeckUi.GetCardUiByName(cardPlace));
+
         //cardsDeckUi.RestAfterDestroy(cardsDeckUi.GetCardUiByName(cardPlace), null);
         cardsDeckUi.DrawAndReplaceCard(cardPlace, isFlip, resetAction, isFirstCard, ResetEnable);
     }
@@ -1730,7 +1730,7 @@ public class BattleSystem : StateMachine
         }
 
         await Task.Delay(500);
-        cardsDeckUi.DestroyCardObjectFire(cardPlace, null);
+        cardsDeckUi.DestroyCardObjectFire(cardPlace, false, null);
         await Task.Delay(500);
         Action resetAction = null;
         if (ResetEnable)
@@ -1878,18 +1878,27 @@ public class BattleSystem : StateMachine
     internal void SwapAndDestroy(string cardTarget1, string cardTarget2)
     {
         if (cardTarget2.Contains("Deck"))
-        {
             cardsDeckUi.SwapAndDestroy(cardTarget2, cardTarget1, () => EnableDarkAndSorting(false));
-        }
         else
-        {
             cardsDeckUi.SwapAndDestroy(cardTarget1, cardTarget2, () => EnableDarkAndSorting(false));
-        }
+       // EnableSecrfire(cardTarget1,cardTarget2);
     }
 
-
+   /* private void EnableSecrfire(string cardTarget1, string cardTarget2)
+    {
+        string target = cardTarget1;
+        if (cardTarget2.Contains("Deck"))
+            target = cardTarget2;
+        if (target.Contains("1"))
+            target = Constants.Deck2;
+        else
+            target = Constants.Deck1;
+        StartCoroutine(ui.EnableSacrfire(cardsDeckUi.extraDeckCardsUi[target));
+    }
+*/
     internal void Draw2Cards(bool isEnemy, Action EndAction)
     {
+        ui.EnableSacrficers();
         cardsDeckUi.Draw2CardsWithDrawer(isEnemy, EndAction);
     }
 
@@ -2117,7 +2126,7 @@ public class BattleSystem : StateMachine
     {
         ui.SlideRankingImg();
         if (tutoManager.step == 21)
-            tutoManager.InstructionsDisable(false) ;
+            tutoManager.InstructionsDisable(false);
     }
 
 
@@ -2638,7 +2647,7 @@ public class BattleSystem : StateMachine
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CantClick, false);
         }
-        if(tutoManager.step == 10)
+        if (tutoManager.step == 10)
         {
             tutoManager.InstructionsDisable(false);
             ui.betBtn.spriteRenderer.sortingOrder = 0;
