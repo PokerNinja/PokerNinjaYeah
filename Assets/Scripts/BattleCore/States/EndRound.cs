@@ -171,6 +171,7 @@ public class EndRound : State
             startNewRound = true;
             winnerMsg = battleSystem.Interface.RichText("TIE ", Values.Instance.yellowText, true) + battleSystem.Interface.ConvertHandRankToTextDescription(bestPlayerHand.Rank)/*bestOpponentHand.ToString(Hand.HandToStringFormatEnum.HandDescription)*/;
             StartNewRoundAction(true);
+            battleSystem.tutoManager.SetStep(88);
         }
 
         /* if (startNewRound && enemyStartsNextRound)

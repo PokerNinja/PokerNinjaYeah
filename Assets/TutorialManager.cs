@@ -30,6 +30,7 @@ public class TutorialManager : MonoBehaviour
         "\nRemember you can hold you finger on anything for more information.";
     private string dragonCard7 = "You got a rare dragon card! They cost 2 energy.";
     private string firstWin8 = "You damaged your opponent’s HP! Abit more and you win!";
+    private string firstTie88 = "It's a TIE! No one loses HP.";
     private string firstLose9 = "You opponent cause you DMG! You lose when you have no HP left!";
     private string raise10 = "you can offer your opponent to raise the DMG for this round." +
         "\nYour opponent lose HP if declines. you can use that to bluff!";
@@ -51,28 +52,34 @@ public class TutorialManager : MonoBehaviour
                 SetPointer(pointerAnimation1, ObjectTargetEnum.nc1);
                 break;
             case 2: // after long click
-                InstructionsDisable();
+                InstructionsDisable(true);
                 StartCoroutine(TimerForMsgAppear(noActionText2));
                 break;
             case 3: // after f1 ignite
                 timerForMsgEnable = false;
-                SetObjectClickable(true, BattleSystem.Instance.Interface.turnTimer.GetComponent<SpriteRenderer>());
-                StartCoroutine(ActionsWithDelay(4, () => InstructionsEnable(endYourTurn3), () => SetPointer(pointerAnimation1, ObjectTargetEnum.endTurn)));
+                StartCoroutine(ActionsWithDelay(2, () => InstructionsEnable(endYourTurn3),
+                    () =>
+                    {
+                        SetPointer(pointerAnimation1, ObjectTargetEnum.endTurn);
+                        SetObjectClickable(true, BattleSystem.Instance.Interface.turnTimer.GetComponent<SpriteRenderer>());
+                    }
+                    ));
                 break;
             case 4: // energyCharge
                 //SetObjectClickable(false, BattleSystem.Instance.Interface.turnTimer.GetComponent<SpriteRenderer>());
                 InstructionsEnable(energyCharge4);
+                blockScreen.SetActive(true);
                 SetPointer(pointerAnimation1, ObjectTargetEnum.energies);
                 break;
             case 5: // draw
                 SetObjectClickable(true, BattleSystem.Instance.Interface.btnDrawRenderer);
-                StartCoroutine(ActionsWithDelay(1.5f, () => InstructionsEnable(draw5), () => SetPointer(pointerAnimation1, ObjectTargetEnum.draw)));
+                StartCoroutine(ActionsWithDelay(1f, () => InstructionsEnable(draw5), () => SetPointer(pointerAnimation1, ObjectTargetEnum.draw)));
                 break;
             case 6: // after draw
                 SetObjectClickable(false, BattleSystem.Instance.Interface.btnDrawRenderer);
-                InstructionsDisable();
+                InstructionsDisable(true);
                 StartCoroutine(TimerForMsgAppear(noActionText6));
-                StartCoroutine(ActionsWithDelay(3f, () => blockScreen.SetActive(true), null));
+                //  StartCoroutine(ActionsWithDelay(5f, () => blockScreen.SetActive(true), null));
                 break;
             case 7: // getting the Dragon
                 InstructionsEnable(dragonCard7);
@@ -81,6 +88,10 @@ public class TutorialManager : MonoBehaviour
                 break;
             case 8: // after Damge You win
                 InstructionsEnable(firstWin8);
+                blockScreen.SetActive(true);
+                break;
+            case 88: // after Tie
+                InstructionsEnable(firstTie88);
                 blockScreen.SetActive(true);
                 break;
             case 9: // after Damge YOU Lose
@@ -113,30 +124,27 @@ public class TutorialManager : MonoBehaviour
 
     private void ResetPrefs()
     {
-       SavePrefsInt(Constants.TipsEnum.RankInNumber.ToString(),0);
-            }
+        SavePrefsInt(Constants.TipsEnum.RankInNumber.ToString(), 0);
+    }
 
     public void OnScreenClick()
     {
         switch (step)
         {
             case 4:
-                InstructionsDisable();
+                InstructionsDisable(true);
                 SetStep(5);
                 break;
             case 6:
-                InstructionsDisable();
+                InstructionsDisable(false);
                 timerForMsgEnable = false;
-                blockScreen.SetActive(false);
                 break;
             case 7:
-                InstructionsDisable();
-                blockScreen.SetActive(false);
+                InstructionsDisable(false);
                 break;
             case 8:
             case 9:
-                InstructionsDisable();
-                blockScreen.SetActive(false);
+                InstructionsDisable(false);
                 BattleSystem.Instance.StartNewRoundRoutine(true);
                 break;
             case 20:
@@ -304,11 +312,12 @@ public class TutorialManager : MonoBehaviour
         instructionsText.text = text;
         StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(instructionsCanvas, true, 0.5f, null));
     }
-    public void InstructionsDisable()
+    public void InstructionsDisable(bool enableBlock)
     {
         Debug.Log("disabl");
         StartCoroutine(AnimationManager.Instance.AlphaCanvasGruop(instructionsCanvas, false, 0.5f, null));
         ResetPointers();
+        blockScreen.SetActive(enableBlock);
     }
 
     public void SetObjectClickable(bool enable, SpriteRenderer targetRenderer)
@@ -339,6 +348,7 @@ public class TutorialManager : MonoBehaviour
             {
                 Debug.LogError("Boom");
                 InstructionsEnable(text);
+                blockScreen.SetActive(true);
             }
         }
     }
@@ -350,7 +360,7 @@ public class TutorialManager : MonoBehaviour
         pointerAnimation1.Stop();
         pointerAnimation2.Stop();
         pointerAnimation1.transform.parent.gameObject.SetActive(false);
-         pointerAnimation2.transform.parent.gameObject.SetActive(false);
+        pointerAnimation2.transform.parent.gameObject.SetActive(false);
     }
 
     internal void RankInstructions(int handRank)

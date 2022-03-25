@@ -174,12 +174,14 @@ public class BattleSystem : StateMachine
     private void Start()
     {
       
-        BOT_MODE = Constants.BOT_MODE;
-        TUTORIAL_MODE = Constants.TUTORIAL_MODE;
+       /* BOT_MODE = Constants.BOT_MODE;
+        TUTORIAL_MODE = Constants.TUTORIAL_MODE;*/
         if (!BOT_MODE)
             BOT_MODE =  Values.Instance.TEST_MODE;
         if (!TUTORIAL_MODE)
             TUTORIAL_MODE = Values.Instance.TUTORIAL_MODE;
+        Constants.BOT_MODE = BOT_MODE;
+        Constants.TUTORIAL_MODE = TUTORIAL_MODE;
         Debug.LogError("Alex " + Constants.BOT_MODE);
         Debug.LogError("Tu " + TUTORIAL_MODE);
         if (BOT_MODE)
@@ -406,7 +408,7 @@ public class BattleSystem : StateMachine
 
     public void DisableSelectMode(bool endTurn)
     {
-        if (selectMode || !Constants.TemproryUnclickable)
+        if (selectMode && !Constants.TemproryUnclickable)
         {
             selectMode = false;
             sameCardsSelection = false;
@@ -595,15 +597,23 @@ public class BattleSystem : StateMachine
                     handRank = 1609;
                 }
             }
-            if (TUTORIAL_MODE && currentRound>=2 && currentTurn < 6)
+
+            if (ui.UpdateCardRank(handRank))
             {
-                tutoManager.RankInstructions(handRank);
-            }else
-            ui.UpdateCardRank(handRank);
+                ApplyHandRankTutoTip(handRank);
+            }
         }
         else
         {
             ui.ResetHandRank();
+        }
+    }
+
+    private void ApplyHandRankTutoTip(int handRank)
+    {
+        if (TUTORIAL_MODE && currentRound >= 2 && currentTurn < 6)
+        {
+            tutoManager.RankInstructions(handRank);
         }
     }
 
@@ -676,7 +686,7 @@ public class BattleSystem : StateMachine
         {
             if (tutoManager.step == 3)
             {
-                tutoManager.InstructionsDisable();
+                tutoManager.InstructionsDisable(false);
                 ui.turnTimer.GetComponent<SpriteRenderer>().sortingOrder = 0;
             }
             endTurnInProcess = true;
@@ -710,9 +720,9 @@ public class BattleSystem : StateMachine
         }
     }
 
-    internal List<string> GetRandomAvailableCardsNames(bool onlyUnfreeze)
+    internal List<string> GetRandomAvailableCardsNames(bool onlyUnfreeze,bool onlyUnglitch)
     {
-        List<string> cardsNames = cardsDeckUi.GetAvailbeCards(onlyUnfreeze);
+        List<string> cardsNames = cardsDeckUi.GetAvailbeCards(onlyUnfreeze, onlyUnglitch);
         var rnd = new System.Random();
         List<string> shuffledcards = cardsNames.OrderBy(a => Guid.NewGuid()).ToList();
         return shuffledcards;
@@ -1707,7 +1717,9 @@ public class BattleSystem : StateMachine
         {
             resetAction = () => EnableDarkAndSorting(false);
         }
-        cardsDeckUi.RestAfterDestroy(cardsDeckUi.GetCardUiByName(cardPlace), null);
+       cardsDeckUi.RemoveFromList(cardsDeckUi.GetCardUiByName(cardPlace));
+        
+        //cardsDeckUi.RestAfterDestroy(cardsDeckUi.GetCardUiByName(cardPlace), null);
         cardsDeckUi.DrawAndReplaceCard(cardPlace, isFlip, resetAction, isFirstCard, ResetEnable);
     }
     public async void ReplaceSelectedCard2(string cardPlace, bool isFlip, int delay, bool ResetEnable, bool isFirstCard, bool isLastCard)
@@ -2105,10 +2117,7 @@ public class BattleSystem : StateMachine
     {
         ui.SlideRankingImg();
         if (tutoManager.step == 21)
-        {
-            tutoManager.InstructionsDisable();
-            tutoManager.blockScreen.SetActive(false);
-        }
+            tutoManager.InstructionsDisable(false) ;
     }
 
 
@@ -2273,6 +2282,8 @@ public class BattleSystem : StateMachine
             emojiCooledDown = false;
             UpdateEmojiDB(id);
             StartCoroutine(ui.DisplayEmoji(true, id, () => emojiCooledDown = true));
+            if (TUTORIAL_MODE)
+                tutoManager.InstructionsDisable(false);
         }
         else if (id == -1)
         {
@@ -2331,7 +2342,7 @@ public class BattleSystem : StateMachine
         if (tutoManager.step == 2)
         {
             tutoManager.timerForMsgEnable = false;
-            tutoManager.InstructionsDisable();
+            tutoManager.InstructionsDisable(true);
         }
         if (infoShow)
         {
@@ -2629,8 +2640,7 @@ public class BattleSystem : StateMachine
         }
         if(tutoManager.step == 10)
         {
-            tutoManager.InstructionsDisable();
-            tutoManager.blockScreen.SetActive(false);
+            tutoManager.InstructionsDisable(false);
             ui.betBtn.spriteRenderer.sortingOrder = 0;
         }
     }
