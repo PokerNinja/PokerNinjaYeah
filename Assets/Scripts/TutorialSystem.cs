@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -54,7 +54,7 @@ public class TutorialSystem : StateTuto
         tuto9,tuto10, tuto11, tuto12, tuto13, tuto14, tuto15, tuto16, tuto17, tuto18,tuto19,tuto20,tuto21,tuto22,tuto23,tuto24,
     "","","","","",tuto30};
 
-    public TutorialSystem(BattleSystemTuto battleSystem, bool enableFocus, int maskShape, int objectNumber, bool endByBtn) : base(battleSystem)
+   *//* public TutorialSystem(BattleSystemTuto battleSystem, bool enableFocus, int maskShape, int objectNumber, bool endByBtn) : base(battleSystem)
     {
         ui = battleSystem.tutorialUi;
         Action EndFocus = null;
@@ -328,7 +328,7 @@ public class TutorialSystem : StateTuto
             case 10:
                 return ui.handRankMenu;
             case 11:
-                return /*battleSystem.puDeckUi.playerSkillUi.spriteRenderer;*/ null;
+                return *//*battleSystem.puDeckUi.playerSkillUi.spriteRenderer;*//* null;
             case 12:
                 return battleSystem.cardsDeckUi.enemyCardsUi[1].spriteRenderer;
             case 13:
@@ -352,5 +352,6 @@ public class TutorialSystem : StateTuto
         noMask = 0,
         roundMask = 1,
         rectMask = 2,
-    }
+    }*//*
 }
+*/

@@ -202,10 +202,10 @@ public class BattleUI : MonoBehaviour
 
     public TechTree techWheelEs;
     public TechTree techWheelDr;
-    public GameObject sacreficer1;
-    public GameObject sacreficer2;
+    public SpriteRenderer sacreficer1;
+    public SpriteRenderer sacreficer2;
     public GameObject sacrefire;
-   // public Animator sacrefireAnimator;
+    public Animator xOnNc;
 
 
     public void Initialize(PlayerInfo player, PlayerInfo enemy, float totalHp)
@@ -261,9 +261,9 @@ public class BattleUI : MonoBehaviour
 
 
 
-    public void FreezeObject(SpriteRenderer spriteTarget, bool isToFreeze, bool isFaceDown,bool withGlithc, Action onReset, bool enableSound)
+    public void FreezeObject(SpriteRenderer spriteTarget, bool isToFreeze, bool isFaceDown, bool withGlithc, Action onReset, bool enableSound)
     {
-        if(!withGlithc)
+        if (!withGlithc)
             Debug.LogError("444");
         StartCoroutine(AnimationManager.Instance.FreezeEffect(isToFreeze, isFaceDown, withGlithc, spriteTarget, freezeMaterial, onReset));
         if (enableSound)
@@ -964,7 +964,7 @@ public class BattleUI : MonoBehaviour
             if (lastHandRank < currentHandRank)
             {
                 SoundManager.Instance.RandomSoundEffect(SoundManager.SoundName.RankDown);
-                
+
             }
             else
             {
@@ -1210,7 +1210,7 @@ public class BattleUI : MonoBehaviour
             string extraDamageTxt = "";
             if (extraDamageF != 0)
             {
-                extraDamageTxt = " +" + extraDamageF + RichText(" DMG", Values.Instance.redText,true);
+                extraDamageTxt = " +" + extraDamageF + RichText(" DMG", Values.Instance.redText, true);
             }
             handRankText.text = ConvertHandRankToTextDescription(rank) + extraDamageTxt;
         }
@@ -1273,7 +1273,7 @@ public class BattleUI : MonoBehaviour
     {
         Action btnEnable = () => BattleSystem.Instance.btnReplaceClickable = enable; ;
         if (!enable)
-        { 
+        {
             btnEnable.Invoke();
             btnEnable = null;
         }
@@ -1578,7 +1578,7 @@ public class BattleUI : MonoBehaviour
 
     }
 
-   
+
     internal IEnumerator StartIcenado()
     {
         SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.Iceagedon, true);
@@ -1799,7 +1799,7 @@ public class BattleUI : MonoBehaviour
         pointerAnim.transform.parent.gameObject.SetActive(enable);
     }
 
-  
+
 
     public void ResetPointers()
     {
@@ -1899,34 +1899,51 @@ public class BattleUI : MonoBehaviour
         raiseChooseDialog.SetActive(enable);
         raiseChooseText.text = "Offer Your opponent a <b><color=#F03B37>DMG</color></b> raise\n<b><color=#F03B37>-" + penelty + " DMG </color></b>to the opponent when declined";
     }
-    public void SetTechWheelForSelection(Vector2 position, bool isDragon)
+    public void SetTechWheelForSelection(bool isCard1, bool isDragon)
     {
         if (isDragon)
-            techWheelDr.EnableWheel(position);
+        {
+            techWheelDr.SetDragonTreePos(isCard1);
+            StartCoroutine(techWheelDr.EnableEsWheel());
+        }
         else
             StartCoroutine(techWheelEs.EnableEsWheel());
     }
     internal void DrawBtnEffect()
     {
-        StartCoroutine(AnimationManager.Instance.UpdateValue(true,"_Glow",0.4f,btnDrawRenderer.material,0.8f,
-            () => StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_Glow", 0.4f, btnDrawRenderer.material, 0f,null))));
+        StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_Glow", 0.4f, btnDrawRenderer.material, 0.8f,
+            () => StartCoroutine(AnimationManager.Instance.UpdateValue(false, "_Glow", 0.4f, btnDrawRenderer.material, 0f, null))));
     }
 
     [Button]
     public void EnableEsTechTree(bool enable)
     {
-        StartCoroutine( techWheelEs.EnableEsWheel());
+        StartCoroutine(techWheelEs.EnableEsWheel());
     }
     public void EnableSacrficers()
     {
-        sacreficer1.SetActive(true);
-        sacreficer2.SetActive(true);
+        sacreficer1.gameObject.SetActive(true);
+        sacreficer2.gameObject.SetActive(true);
     }
-   
-    internal void EnableNcX(Vector2 position)
+    public void DisableSacrficers()
     {
-        //sacrefireAnimator.transform.position = position;
-        //sacrefireAnimator.Play("NC_X");
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(sacreficer1, false, 0.4f, () => sacreficer1.gameObject.SetActive(false)));
+        StartCoroutine(AnimationManager.Instance.AlphaAnimation(sacreficer2, false, 0.4f, () => sacreficer2.gameObject.SetActive(false)));
+    }
+
+    bool xVisible = false;
+    internal void EnableNcX(bool enable)
+    {
+        if (enable)
+        {
+            xOnNc.Play("x_in");
+            xVisible = true;
+        }
+        else if (xVisible)
+        {
+            xOnNc.Play("x_out");
+            xVisible = false;
+        }
     }
 
 }

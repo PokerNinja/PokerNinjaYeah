@@ -174,8 +174,9 @@ public class BattleSystem : StateMachine
     private void Start()
     {
 
-        /* BOT_MODE = Constants.BOT_MODE;
+        /* 
          TUTORIAL_MODE = Constants.TUTORIAL_MODE;*/
+        BOT_MODE = Constants.BOT_MODE;
         if (!BOT_MODE)
             BOT_MODE = Values.Instance.TEST_MODE;
         if (!TUTORIAL_MODE)
@@ -424,6 +425,7 @@ public class BattleSystem : StateMachine
             puDeckUi.DisableDragonBtn(false);
             newPowerUpName = "x";
             StartCoroutine(ActivatePlayerButtons(!endTurn, false));// Here or after darkEnd
+            Constants.cardsToSelectCounter = 0;
             ui.EnableDarkScreen(true, false, () =>
              {
                  DisableVision();
@@ -684,17 +686,18 @@ public class BattleSystem : StateMachine
     {
         if (endClickable && !endTurnInProcess && !ReplaceInProgress)
         {
+            endTurnInProcess = true;
+            StartCoroutine(ActivatePlayerButtons(false, false));
             if (tutoManager.step == 3)
             {
                 tutoManager.InstructionsDisable(false);
                 ui.turnTimer.GetComponent<SpriteRenderer>().sortingOrder = 0;
             }
-            endTurnInProcess = true;
-            StartCoroutine(ActivatePlayerButtons(false, false));
             DisableSelectMode(true);
             ui.EnableBgColor(false); //MAYBE UNECECERY
             ui.SetTurnIndicator(false, false);
             ResetTimers();
+            ApplyNcSlotIsFull(puDeckUi.playerPusUi[0] != null && puDeckUi.playerPusUi[1] != null);
             if (!BOT_MODE)
             {
                 gameManager.AddGameActionLog(GameManager.ActionEnum.EndTurn, "end of turn: " + currentTurn, () => { }, Debug.Log);
@@ -717,6 +720,15 @@ public class BattleSystem : StateMachine
         {
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.CoinHit, false);
             Debug.LogError("endingProcees");
+        }
+    }
+
+    private void ApplyNcSlotIsFull(bool isFull)
+    {
+        if (isFull)
+        {
+        ui.EnableNcX(true);
+       // cardsDeckUi.playerCardsUi[1].
         }
     }
 
@@ -1262,7 +1274,7 @@ public class BattleSystem : StateMachine
         if (Constants.cardsToSelectCounter == 0)
         {
             ui.ResetPointers();
-            if (cardPlace.Length != 1) // Choice of wheel
+            if (cardPlace.Length > 2) // Choice of wheel
             {
                 ui.SetCardSelection(1, newPowerUpName[0].ToString(), position, IsLargeCard(cardPlace), true);
             }
@@ -1281,7 +1293,7 @@ public class BattleSystem : StateMachine
         {
             if (newPowerUpName.Equals("tp") || newPowerUpName.Equals("tm1"))
             {
-                ui.SetTechWheelForSelection(position, newPowerUpName.Equals("tm1") /*cardPlace.Contains("B")*/);
+                ui.SetTechWheelForSelection(cardPlace.Contains("1"), newPowerUpName.Equals("tm1"));
                 cardsDeckUi.DisableCardsSelection("All");
             }
             ui.SetCardSelection(2, newPowerUpName[0].ToString(), position, IsLargeCard(cardPlace), true);
@@ -1303,6 +1315,8 @@ public class BattleSystem : StateMachine
     public void OnWheelSelected(bool isDragon, int option)
     {
         --Constants.cardsToSelectCounter;
+        if (isDragon && option == 1)
+            option = -2;
         StartCoroutine(OnCardsSelectedForPU(option.ToString(), new Vector2(0, 0)));
     }
 
@@ -1505,7 +1519,11 @@ public class BattleSystem : StateMachine
                 {
                     cardsLimit = 1;
                 }
-                if (!CheckIfCardsAvailbleForSelect(cardsLimit, puUi.puElement.Equals("w"), cardsDeckUi.GetListByTag(cardsTag[0]))
+                if (puUi.puName.Equals("tm1") && cardsDeckUi.playerCardsUi[0].freeze && cardsDeckUi.playerCardsUi[1].freeze)
+                {
+                    puUi.EnablePu(false);
+                }
+                else if (!CheckIfCardsAvailbleForSelect(cardsLimit, puUi.puElement.Equals("w"), cardsDeckUi.GetListByTag(cardsTag[0]))
                     || !CheckIfCardsAvailbleForSelect(cardsLimit, puUi.puElement.Equals("w"), cardsDeckUi.GetListByTag(cardsTag[1])))
                 {
                     puUi.EnablePu(false);
@@ -1844,8 +1862,9 @@ public class BattleSystem : StateMachine
             {
                 cardToFreeze.glitch = false;
                 cardsDeckUi.EnableGlitchValues(false, cardToFreeze.spriteRenderer.material);
-                ui.FreezeObject(cardToFreeze.spriteRenderer, false, cardToFreeze.GetisFaceDown(), true, resetAction, true);
             }, true);
+            await Task.Delay(2000);
+            ui.FreezeObject(cardToFreeze.spriteRenderer, false, cardToFreeze.GetisFaceDown(), true, resetAction, true);
         }
         else if (isToFreeze && cardToFreeze.freeze)
         {
@@ -1877,25 +1896,26 @@ public class BattleSystem : StateMachine
 
     internal void SwapAndDestroy(string cardTarget1, string cardTarget2)
     {
+        Action OnEnd = () => EnableDarkAndSorting(false);
+        OnEnd += ()=>ui.DisableSacrficers(); 
         if (cardTarget2.Contains("Deck"))
-            cardsDeckUi.SwapAndDestroy(cardTarget2, cardTarget1, () => EnableDarkAndSorting(false));
+            cardsDeckUi.SwapAndDestroy(cardTarget2, cardTarget1, OnEnd);
         else
-            cardsDeckUi.SwapAndDestroy(cardTarget1, cardTarget2, () => EnableDarkAndSorting(false));
-       // EnableSecrfire(cardTarget1,cardTarget2);
+            cardsDeckUi.SwapAndDestroy(cardTarget1, cardTarget2, OnEnd);
     }
 
-   /* private void EnableSecrfire(string cardTarget1, string cardTarget2)
-    {
-        string target = cardTarget1;
-        if (cardTarget2.Contains("Deck"))
-            target = cardTarget2;
-        if (target.Contains("1"))
-            target = Constants.Deck2;
-        else
-            target = Constants.Deck1;
-        StartCoroutine(ui.EnableSacrfire(cardsDeckUi.extraDeckCardsUi[target));
-    }
-*/
+    /* private void EnableSecrfire(string cardTarget1, string cardTarget2)
+     {
+         string target = cardTarget1;
+         if (cardTarget2.Contains("Deck"))
+             target = cardTarget2;
+         if (target.Contains("1"))
+             target = Constants.Deck2;
+         else
+             target = Constants.Deck1;
+         StartCoroutine(ui.EnableSacrfire(cardsDeckUi.extraDeckCardsUi[target));
+     }
+ */
     internal void Draw2Cards(bool isEnemy, Action EndAction)
     {
         ui.EnableSacrficers();
@@ -1994,7 +2014,7 @@ public class BattleSystem : StateMachine
         {
             Debug.Log("DEaling");
 
-            puDeckUi.DealRoutine(isPlayer, OnEnd);
+            puDeckUi.DealRoutine(isPlayer,()=> ui.EnableNcX(false),  OnEnd);
         }
     }
 

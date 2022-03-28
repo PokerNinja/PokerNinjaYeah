@@ -270,18 +270,19 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
 
 
-    public void DealRoutine(bool isPlayer, Action OnEnd)
+    public void DealRoutine(bool isPlayer, Action DisableX, Action OnEnd)
     {
         int dealTasks;
         if (isPlayer)
         {
             dealTasks = GetPuDealTask(playerPusUi);
+            DisableX?.Invoke();
         }
         else
         {
             dealTasks = GetPuDealTask(enemyPusUi);
         }
-        UpdatePuPosition(isPlayer, dealTasks, () => DealPuFromDeck(isPlayer, false, 0, OnEnd));
+        UpdatePuPosition(isPlayer, dealTasks, null,() => DealPuFromDeck(isPlayer, false, 0, OnEnd));
     }
 
     private int GetPuDealTask(PowerUpUi[] puArray)
@@ -301,7 +302,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
 
     }
 
-    private void UpdatePuPosition(bool isPlayer, int puCount, Action DealPu)
+    private void UpdatePuPosition(bool isPlayer, int puCount, Action DisableX, Action DealPu)
     {
 
         switch (puCount)
@@ -322,7 +323,7 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
                 {
                     pu = enemyPusUi[1];
                 }
-
+                DisableX?.Invoke();
                 DestroyPu(pu, () => RemovePuFromList(isPlayer, 1), () => PushPuPosition(isPlayer, DealPu)); // MAYBE BUG NULL PUSHED
                 break;
         }
@@ -564,11 +565,12 @@ public class PuDeckUi : MonoBehaviour, IPointerDownHandler
                      dragonParent.gameObject.SetActive(false);
                      dragonParent.alpha = 1;
                  }));*/
-            SetOutlineBtn(false);
+            // SetOutlineBtn(false);
+            dragonBtnBg.material.SetFloat("_OutlineAlpha", 0);
             if (isClicked)
             {
                 animPath = "dragon_btn_click";
-                StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_Glow", 0.6f, dragonBtnBg.material, 5f, null));
+                StartCoroutine(AnimationManager.Instance.UpdateValue(true, "_Glow", 0.6f, dragonBtnBg.material, 30f, null));
             }
             dragonBtnAnimation.Play(animPath);
         }

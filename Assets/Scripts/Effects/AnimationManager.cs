@@ -219,7 +219,7 @@ public class AnimationManager : Singleton<AnimationManager>
                 {
                     spriteRenderer.color = new Color(r, g, b, alphaTarget);
                     OnFinish?.Invoke();
-                   // fadeInProgress = false;
+                    // fadeInProgress = false;
                     break;
                 }
             }
@@ -440,8 +440,12 @@ public class AnimationManager : Singleton<AnimationManager>
     public IEnumerator FreezeEffect(bool freeze, bool isFaceDown, bool withGlithc, SpriteRenderer targetObj, Material targetMaterial, Action onFinishDissolve)
     {
         float freezeDuration = Values.Instance.FreezeDuration;
+        Color fadeColor = Values.Instance.freezeColor;
         if (!withGlithc)
             targetObj.material = targetMaterial;
+        else
+            fadeColor = Values.Instance.burnColorTech;
+
         /*   if (withGlithc)
            {
                targetMaterial.SetFloat("_GlitchAmount", 15f);
@@ -459,6 +463,7 @@ public class AnimationManager : Singleton<AnimationManager>
         // targetObj.material.SetTextureScale("_FadeTex", new Vector2(tiling, tiling));
         float fullFreezeAmount = 0.5f;
         float dissolveAmount = -0.1f;
+        targetObj.material.SetColor("_FadeBurnColor",fadeColor);
         if (isFaceDown)
         {
             fullFreezeAmount = 0.6f;

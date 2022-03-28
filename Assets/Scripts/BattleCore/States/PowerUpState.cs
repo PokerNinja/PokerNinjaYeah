@@ -163,15 +163,15 @@ public class PowerUpState : State
         Debug.LogError("HELLO");
         if (powerUpName.Equals("im2") || powerUpName.Equals("fm2"))
         {
-            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(false,false));
+            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(false, false));
         }
         else if (powerUpName.Equals("wm2"))
         {
-            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true,true));
+            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true, true));
         }
         else if (powerUpName.Equals("tm2"))
         {
-            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true,false));
+            return string.Join(",", battleSystem.GetRandomAvailableCardsNames(true, false));
         }
         return cardTarget2;
     }
@@ -200,8 +200,8 @@ public class PowerUpState : State
         battleSystem.Interface.EnableDarkScreen(true, true, null);
         if (battleSystem.tutoManager.step == 2)
         {
-            battleSystem.tutoManager.SetObjectClickable(true,battleSystem.cardsDeckUi.playerCardsUi[0].spriteRenderer);
-            battleSystem.tutoManager.SetObjectClickable(true,battleSystem.cardsDeckUi.playerCardsUi[1].spriteRenderer);
+            battleSystem.tutoManager.SetObjectClickable(true, battleSystem.cardsDeckUi.playerCardsUi[0].spriteRenderer);
+            battleSystem.tutoManager.SetObjectClickable(true, battleSystem.cardsDeckUi.playerCardsUi[1].spriteRenderer);
 
         }
     }
@@ -226,7 +226,7 @@ public class PowerUpState : State
         {
             Debug.LogError("Elemnting NC:  " + puElement);
             if (isPlayerActivate)
-                battleSystem.puDeckUi.energyCoster.DisableNcEnergy(puIndex== 0);
+                battleSystem.puDeckUi.energyCoster.DisableNcEnergy(puIndex == 0);
             if (IsNcEqualElement())
                 battleSystem.DissolveNcToEs(isPlayerActivate, puIndex, () => battleSystem.UpdateEsAfterNcUse(isPlayerActivate, powerUpName));
             else
@@ -377,7 +377,7 @@ public class PowerUpState : State
                 }
             case nameof(PowerUpNamesEnum.tm1): //techDr
                 {
-                    battleSystem.ChangeValuePu(cardTarget1, int.Parse(cardTarget2));
+                    battleSystem.ChangeValuePu(cardTarget1, int.Parse(cardTarget2) + 1);
                     break;
                 }
             case nameof(PowerUpNamesEnum.tm2): //techgeddon
@@ -447,7 +447,7 @@ public class PowerUpState : State
         await Task.Delay(150);
         for (int i = 0; i < randomAmount; i++)
         {
-           await Task.Delay(battleSystem.GenerateRandom(300, 450));
+            await Task.Delay(battleSystem.GenerateRandom(300, 450));
             battleSystem.ChangeValuePu(ConvertFixedCardPlace(cardsNames[i]), +2);
         }
     }

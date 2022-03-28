@@ -1,4 +1,4 @@
-
+/*
 using Firebase.Functions;
 using Managers;
 using Serializables;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using UnityEngine.EventSystems;
 
-public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHandler
+public class BattleSystemTuto : StateMachineTuto*//*, ICancelHandler, IPointerDownHandler*//*
 {
     public static BattleSystemTuto Instance { get; private set; }
     public TutorialUi tutorialUi;
@@ -92,7 +92,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     public GameObject pokerTutorial;
     public GameObject dialogInfo;
     public GameObject tutoDialog;
-
+*//*
     private void Start()
     {
         pokerTutoPhase = 1;
@@ -398,12 +398,12 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         ui.SetTurnIndicator(false, false);
         EndAction?.Invoke();
         StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
-        /*  StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(),
+        *//*  StartCoroutine(AnimationManager.Instance.AlphaAnimation(ui.turnTextGO.GetComponent<SpriteRenderer>(),
               false, Values.Instance.textTurnFadeOutDuration, () =>
               {
                   EndAction?.Invoke();
                   StartCoroutine(CheckIfEnemyPuRunningAndStartPlayerTurn());
-              }));*/
+              }));*//*
     }
 
     internal void ActivateButtonForTutorial(int turnCounter)
@@ -508,7 +508,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     #region Settings
     public void ResetRoundSettings(Action FinishCallbac)
     {
-        /* Constants.TemproryUnclickable = false;
+        *//* Constants.TemproryUnclickable = false;
          ui.tieTitle.SetActive(false);
          ui.EnableBgColor(false);
 
@@ -517,7 +517,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
          if (firstRound)
          {
              firstRound = false;////
-         }*/
+         }*//*
         UpdateHandRank(true);
         //  cardsDeckUi.DeleteAllCards(() => DealHands(FinishCallbac));
         DealHands(FinishCallbac);
@@ -874,7 +874,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
 
     private void EnableDarkAndSorting(bool enable)
     {
-        /* if (TUTORIAL_MODE && newPowerUpName.Equals("i3"))
+        *//* if (TUTORIAL_MODE && newPowerUpName.Equals("i3"))
          { }
          else
          {
@@ -886,7 +886,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
                  //selectCardsMode = true;
              }
              ui.EnableDarkScreen(isPlayerActivatePu, enable, () => StartCoroutine(ResetSortingOrder(enable)));
-         }*/
+         }*//*
     }
 
     public void UpdateZPos(bool aboveDarkScreen, string tag)
@@ -989,7 +989,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         }
         else
         {
-            puDeckUi.DealRoutine(isPlayer, OnEnd);
+            puDeckUi.DealRoutine(isPlayer,null, OnEnd);
         }
     }
 
@@ -1027,10 +1027,10 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     {
         if (btnReplaceClickable && energyCounter > 0 && !disable && puDeckUi.GetPuListCount(true) < 2)
         {
-            /*if (TUTORIAL_MODE)
+            *//*if (TUTORIAL_MODE)
             {
                 FocusOnObjectWithText(false, 1, 14, false);
-            }*/
+            }*//*
             btnReplaceClickable = false;
             ReduceEnergy(Values.Instance.energyCostForDraw);
             ui.EnablePlayerButtons(false);
@@ -1043,7 +1043,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         else if (btnReplaceClickable || endTurn || disable)
         {
             Debug.LogError("1");
-            if (/*replaceMode ||*/ IsPlayerTurn() && energyCounter > 0)
+            if (*//*replaceMode ||*//* IsPlayerTurn() && energyCounter > 0)
             {
                 Debug.LogError("2");
                 PowerUpUi[] playerPus = puDeckUi.GetPuList(true);
@@ -1135,7 +1135,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
     }
     public void OnVisionBtnUp()
     {
-        if (!AreBoardCardsFlipped()/* && !selectMode*/)
+        if (!AreBoardCardsFlipped()*//* && !selectMode*//*)
         {
             AnimationManager.Instance.VisionEffect(cardsDeckUi.GetBoardAndPlayerHandList(), cardsDeckUi.GetBoardAndPlayerHandList().Count, false);
         }
@@ -1144,7 +1144,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         if (currentTurn == 4)
         {
             tutorialUi.btnTutorial.interactable = true;
-            AnimationManager.Instance.AlphaFade(true, tutorialUi.btnTutorialSprite, 1f, null/* ()=>infoDialog.gameObject.SetActive(false)*/);
+            AnimationManager.Instance.AlphaFade(true, tutorialUi.btnTutorialSprite, 1f, null*//* ()=>infoDialog.gameObject.SetActive(false)*//*);
         }
     }
 
@@ -1437,13 +1437,13 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
             case 3:
                 return 4;
             case 7:
-                return 3;/*
+                return 3;*//*
             case 6:
             case 5:
             case 4:
             case 2:
             case 1:
-                return 5;*/
+                return 5;*//*
         }
         return 5;
     }
@@ -1568,6 +1568,7 @@ public class BattleSystemTuto : StateMachineTuto, ICancelHandler, IPointerDownHa
         }
     }
 
-
+*//*
 }
 
+*/

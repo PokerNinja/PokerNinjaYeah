@@ -137,6 +137,7 @@ public class Values : Singleton<Values>
     public Color burnColorTech;
     public Color burnOutlineColor;
     public Color burnOutlineColorTech;
+    public Color freezeColor;
     public float glitchEffectDuration = 1f;
 
 

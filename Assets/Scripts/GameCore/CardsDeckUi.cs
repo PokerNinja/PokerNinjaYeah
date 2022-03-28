@@ -55,7 +55,8 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     public Material shadowMaterial;
     public Transform[] boardTransform;
     private PokerHandRankingTable poker;
-    public GameObject sacrefirePref;
+    public GameObject sacrefire1;
+    public GameObject sacrefire2;
 
     #region Settings
 
@@ -303,6 +304,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal void ResetExtraDeckCards()
     {
+        Debug.LogError("TREWST");
         DestroyCardObjectFire(extraDeckCardsUi[1].cardPlace, true, null);
         DestroyCardObjectFire(extraDeckCardsUi[0].cardPlace, true, () => extraDeckCardsUi = new List<CardUi>());
     }
@@ -751,6 +753,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         cardObject.name = cardPlace;
         cardObject.transform.position = new Vector3(cardTransform.position.x, cardTransform.position.y, 1); ;
+        // cardObject.transform.position = new Vector3(cardTransformA.position.x, cardTransformA.position.y, cardTransformA.position.z); ;
         cardObject.transform.localScale = cardTransform.localScale;
         cardObject.Init(cardTag, newCard.ToString(CardToStringFormatEnum.ShortCardName), isFaceDown, aboveDarkScreen, cardPlace);
         if (cardParent.smokeEnable)
@@ -776,6 +779,7 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         else
         {
             AddCardToList(cardTag, cardObject, indexToInsert);
+
             StartCoroutine(AnimationManager.Instance.SmoothMove(cardObject.transform, targetPosition, cardScale,
         Values.Instance.cardDrawMoveDuration, DarkCardUnderSmoke, () =>
             cardObject.CardReveal(!isFaceDown)
@@ -1100,12 +1104,11 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
     {
         if (playerCardsUi[0].freeze || playerCardsUi[1].freeze || enemyCardsUi[0].freeze || enemyCardsUi[1].freeze)
         {
-            if (alsoGlitch)
-            {
-                if (playerCardsUi[0].glitch || playerCardsUi[1].glitch || enemyCardsUi[0].glitch || enemyCardsUi[1].glitch)
-                    return true;
-            }
-            else
+            return true;
+        }
+        if (alsoGlitch)
+        {
+            if (playerCardsUi[0].glitch || playerCardsUi[1].glitch || enemyCardsUi[0].glitch || enemyCardsUi[1].glitch)
                 return true;
         }
         return false;
@@ -1378,12 +1381,11 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
 
     internal Vector2 GetCardPosition(string cardPlace)
     {
-
         if (cardPlace.Contains("Deck") || cardPlace.Equals("empty"))
         {
             return new Vector2(0, 0);
         }
-        else if (cardPlace.Length == 1 || cardPlace.Length > 20)
+        else if (cardPlace.Length == 1 || cardPlace.Length > 20 || cardPlace.Length <= 2)
         {
             return new Vector2(0, 0);
         }
@@ -1638,15 +1640,17 @@ public class CardsDeckUi : MonoBehaviour, IPointerDownHandler
         }
         if (withFireEffect)
         {
-            ApplySacrfire(cardToDestroy.transform.position);
+            Debug.LogError("O " + cardToDestroy.transform.position);
+            Debug.LogError("P " + cardToDestroy.cardPlace);
+            ApplySacrfire(cardPlace.Contains("Deck"), cardToDestroy.transform.position.x);
         }
         StartCoroutine(cardToDestroy.FadeBurnOut(targetMaterial, changeOffset, () =>
         {
             OnEnd?.Invoke();
             ResetCardUI(cardToDestroy);
             cardToDestroy.Activate(false);
-                //RestAfterDestroy(cardToDestroy, OnEnd);
-            }
+            //RestAfterDestroy(cardToDestroy, OnEnd);
+        }
         //  Destroy(cardToDestroy)));
         ));
         /*}
@@ -2004,7 +2008,7 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
         {
             isDrawerOpen = true;
             SoundManager.Instance.PlaySingleSound(SoundManager.SoundName.OpenDrawer, false);
-            //s targetX = -0.22f;
+            //  targetX = -0.22f;
             targetX = -1.15f;
             StartCoroutine(AnimationManager.Instance.SmoothMoveDrawer(transform.parent,
             new Vector3(targetX, transform.parent.position.y, transform.parent.position.z), Values.Instance.drawerMoveDuration, null, action));
@@ -2074,16 +2078,20 @@ card2ToFlip, CardPlaceToTag(cardTarget), CardPlaceToTag(cardToSwap))), null, Dis
     [Button]
     public void SSS()
     {
-        ApplySacrfire(new Vector3(0, 0, 30));
+        // ApplySacrfire(true, new Vector3(-7.2f, 2f, 30));
     }
-    private void ApplySacrfire(Vector3 position)
+    private async void ApplySacrfire(bool isDeckCard, float newX)
     {
-        GameObject sacrficer = Instantiate(sacrefirePref);
-        Animation sdaf;
-       // sdaf.PlayQueued();
-        sacrficer.SetActive(true);
-        sacrficer.transform.position = position;
-      //  Destroy(sacrficer, 3f);
+        Debug.LogError(isDeckCard);
+        GameObject target = sacrefire1;
+        if (isDeckCard)
+            target = sacrefire2;
+        target.transform.position = new Vector3(newX, target.transform.position.y, target.transform.position.x);
+        target.SetActive(true);
+        await Task.Delay(6000);
+        target.SetActive(false);
+        /*GameObject sacrficer = Instantiate(sacrefirePref,position, Quaternion.identity);
+        Destroy(sacrficer, 3f);*/
     }
 }
 

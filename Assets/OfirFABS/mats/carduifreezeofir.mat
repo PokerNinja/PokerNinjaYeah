@@ -142,7 +142,7 @@ Material:
     - _Glow: 100
     - _GlowAffectLight: 1
     - _GlowTexUsed: 0
-    - _GradBlend: 0.851
+    - _GradBlend: 0.743
     - _GradBoostX: 0.88
     - _GradBoostY: 1.2
     - _GradIsRadial: 1

@@ -1,4 +1,4 @@
-using Com.InfallibleCode.TurnBasedGame.Combat;
+/*using Com.InfallibleCode.TurnBasedGame.Combat;
 using System.Collections;
 using UnityEngine;
 
@@ -17,3 +17,4 @@ public abstract class StateTuto
     }
    
 }
+*/

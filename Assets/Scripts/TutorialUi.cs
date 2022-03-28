@@ -1,4 +1,4 @@
-using Sirenix.OdinInspector;
+/*using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -141,7 +141,7 @@ public class TutorialUi : MonoBehaviour
 
         }
 
-        BattleSystemTuto.Instance.FocusOnObjectWithText(enable, maskShape, objectToFocus, endByBtn);
+        BattleSystemTuto.Instance.FocusOnObjectWithText(enable, maskShape, objectToFocus, endByBtn);t
     }
 
     private void SetMasKBlink()
@@ -230,3 +230,4 @@ public class TutorialUi : MonoBehaviour
         darkScreenRenderer.sortingOrder = 33;
     }
 }
+*/

@@ -17,10 +17,12 @@ public class TechTree : MonoBehaviour
         optionsSprite[option].color = new Color(0.5f, 0.5f, 0.5f);
     }
 
-    internal void EnableWheel(Vector2 position)
+    internal void SetDragonTreePos(bool isPlayerCard1)
     {
-        gameObject.SetActive(true);
-
+        Vector3 targetPosition = new Vector3(1.33f, -1.17f, transform.position.z);
+        if (isPlayerCard1)
+            targetPosition = new Vector3(-0.71f, -1.17f, transform.position.z);
+        transform.position = targetPosition;
     }
 
     public IEnumerator EnableEsWheel()
@@ -35,7 +37,8 @@ public class TechTree : MonoBehaviour
     {
         optionsSprite[0].color = new Color(1f, 1f, 1f);
         optionsSprite[1].color = new Color(1f, 1f, 1f);
-        optionsSprite[2].color = new Color(1f, 1f, 1f);
+        if (!isDragon)
+            optionsSprite[2].color = new Color(1f, 1f, 1f);
     }
 
     internal void DisableWheel()
@@ -49,5 +52,4 @@ public class TechTree : MonoBehaviour
         BattleSystem.Instance.OnWheelSelected(isDragon, option);
     }
 
-   
 }

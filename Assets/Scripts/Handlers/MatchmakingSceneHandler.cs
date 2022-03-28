@@ -346,6 +346,7 @@ namespace Handlers
         [Button]
         private  async void DotsEffect()
         {
+            await Task.Delay(1000);
             dot1.SetActive(true);
             await Task.Delay(320);
             dot2.SetActive(true);

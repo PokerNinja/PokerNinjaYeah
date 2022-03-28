@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿/*using System.Threading.Tasks;
 
 public class TutorialEnemy : StateTuto
 {
@@ -8,16 +8,16 @@ public class TutorialEnemy : StateTuto
     {
         this.battleSystem = battleSystem;
         this.turnCounter = turnCounter;
-        /*var task = InitAction(turnCounter);
-        task.Wait();*/
-        InitFocusTutorial();
+        *//*var task = InitAction(turnCounter);
+        task.Wait();*//*
+       // InitFocusTutorial();
     }
 
-    private async void InitFocusTutorial()
+   *//* private async void InitFocusTutorial()
     {
         await Task.Delay(350);
-        /* battleSystem.FocusOnObjectWithText(true,false, Constants.TutorialObjectEnum.startGame.GetHashCode(), true);
-         CheckIfReadyToCountinue();*/
+        *//* battleSystem.FocusOnObjectWithText(true,false, Constants.TutorialObjectEnum.startGame.GetHashCode(), true);
+         CheckIfReadyToCountinue();*//*
         switch (turnCounter)
         {
             case 4:
@@ -71,5 +71,5 @@ public class TutorialEnemy : StateTuto
         PuUse1 = 3,
         PuUse2 = 4,
         SendEmoji = 5,
-    }
-}
+    }*//*
+}*/

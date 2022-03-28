@@ -1,4 +1,4 @@
-using Sirenix.OdinInspector;
+/*using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -64,7 +64,7 @@ public class ClickHandlerTuto : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private void LoadSpriteBtn(bool press)
     {
         animator.SetBool("enable", !press);
-       /* string imgName;
+       *//* string imgName;
         if (press)
         {
             imgName = "draw_press";
@@ -73,7 +73,7 @@ public class ClickHandlerTuto : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             imgName = "draw1";
         }
-        spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + imgName, typeof(Sprite)) as Sprite;*/
+        spriteRenderer.sprite = Resources.Load("Sprites/GameScene/Buttons/" + imgName, typeof(Sprite)) as Sprite;*//*
     }
 
     public void OND()
@@ -93,3 +93,4 @@ public class ClickHandlerTuto : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
 
 }
+*/

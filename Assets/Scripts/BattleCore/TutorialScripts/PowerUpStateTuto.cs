@@ -1,4 +1,4 @@
-using Com.InfallibleCode.TurnBasedGame.Combat;
+/*using Com.InfallibleCode.TurnBasedGame.Combat;
 using Serializables;
 using System;
 using System.Collections;
@@ -31,7 +31,7 @@ public class PowerUpStateTuto : StateTuto
         this.puElement = powerUpName.Substring(0, 1);
     }
 
-    public override IEnumerator Start()
+   *//* public override IEnumerator Start()
     {
         bool waitForAction = false;
         if (powerUpName.Equals(PowerUpNamesEnum.fm1.ToString())) // DRAW_2_CARDS
@@ -279,9 +279,9 @@ public class PowerUpStateTuto : StateTuto
         }
         foreach (CardUi card in cardsList)
         {
-            /* if (card.freeze && powerUpName.Equals("s1") || card.underSmoke && puElement.Equals("w") || card.underSmoke && puElement.Equals("f") || !card.underSmoke)
+            *//* if (card.freeze && powerUpName.Equals("s1") || card.underSmoke && puElement.Equals("w") || card.underSmoke && puElement.Equals("f") || !card.underSmoke)
              {
-             }*/
+             }*//*
             card.SetSelection(enable, puElement, powerUpName);
         }
     }
@@ -317,5 +317,6 @@ public class PowerUpStateTuto : StateTuto
             battleSystem.sameCardsSelection = true;
         }
         battleSystem.Interface.FadeCancelSelectModeScreen(true);
-    }
+    }*//*
 }
+*/

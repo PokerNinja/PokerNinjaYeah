@@ -51,14 +51,9 @@ public class BtnEmojiSelect : MonoBehaviour, IPointerDownHandler, IPointerUpHand
         transform.position = startingPosition.position;
         boxCollider.size = largeBox;
         boxCollider.offset = largeOffset;
-        if (!TutorialMode)
-        {
-            BattleSystem.Instance.EmojiSelected(currentEmojiId);
-        }
-        else
-        {
-            BattleSystemTuto.Instance.EmojiSelected(currentEmojiId);
-        }
+
+        BattleSystem.Instance.EmojiSelected(currentEmojiId);
+
 
         CancelInvoke("OnLongPress");
         //if (!held)
